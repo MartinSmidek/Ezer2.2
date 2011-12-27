@@ -1,1 +1,4 @@
 * text=auto !eol
+/$.ezer -text
+/comp.css -text
+/comp.php -text

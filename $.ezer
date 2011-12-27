@@ -1,0 +1,7 @@
+menu ezer2 { type:'main'
+  tabs syst {title:"Systém",  include:'onclick,ezer2.syst'
+    panel pers {type:'right', title:'Osobní nastavení', _sys:'*', include:'onclick,ezer2.pers'}
+  }
+  tabs help {title:"Dokumentace",  include:'onclick' }
+}
+
