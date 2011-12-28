@@ -13,17 +13,13 @@
                   border-right:1mm solid #333; border-bottom:1mm solid #333; }
   .page_sh      { display:block; left:5mm; margin:1mm 0mm; width:210mm; height:292mm;
                   border-right:2mm solid #333; border-bottom:2mm solid #333; }
-  .report       { display:block; width:200mm; height:287mm;
-                  background-color:white; margin:5mm; border:1px dotted silver;}
+  .report       { display:block; left:0mm; width:190mm; top:-5mm; height:277mm;
+                  background-color:white; margin:10mm; border:1px dotted silver;}
   .box_outline1 { outline:1px dotted red; }
   .box_outline2 { outline:1px dotted silver; }
 }
 
 /* styly pro vlastní tisk resp. preview v prohlížeči */
-
-@page {
-size: landscape;
-}
 
 @media print {
 /**               { display:none; }*/
@@ -33,7 +29,12 @@ size: landscape;
   .ae_pane,.ae_frm,.ae_box,.ae_txt,.report
                 { display:block !important; padding:0 !important;
                   left:0 !important; top:0 !important; margin:0 !important; }
-  .report       { height:287mm !important; overflow:hidden;  }
+  /*.report       { height:297mm !important; overflow:hidden;  width:210mm !important; }*/
+}
+
+@page {
+/*size: landscape;*/
+/*  size: A4 landscape;*/
 }
 
 /* obecné styly boxů */
