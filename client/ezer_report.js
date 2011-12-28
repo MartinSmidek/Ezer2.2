@@ -35,7 +35,14 @@ Ezer.Report= new Class({
       break;
     case 'add':                   // zařazení reportu do dávky
       if ( this.status=='check' || this.status=='pages' ) {
+
+        var style= this.batch ? " style='page-break-before:always;'" : '';
+        this.batch+= "\n  <div class='page'"+style+">&nbsp;";  // &nbsp; = aspoň jeden neabsolutní prvek
         this.batch+= '\n'+this.print_page();
+        this.batch+= "\n  </div>";
+
+//         this.batch+= '\n'+this.print_page();  = původní řešení místo 4 řádků výše
+
         this.report_init();
       }
       else Ezer.error(this.id+".report_batch('add'): report nebyl připraven funkcí report_check",0);
@@ -233,7 +240,7 @@ Ezer.Report= new Class({
         html+= "<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>\n";
         html+= " <head><title>Náhled tisku</title>\n";
         html+= "  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n";
-        html+= "  <link type='text/css' rel='stylesheet' href='"+Ezer.version+"/client/report.css.css' />\n";
+        html+= "  <link type='text/css' rel='stylesheet' href='ezer2/client/report.css.css' />\n";
         html+= "  <script>function keyPressHandler(e) {var kC= (window.event) ? event.keyCode : e.keyCode;var Esc= (window.event) ? 27 : e.DOM_VK_ESCAPE;if ( kC==Esc ) {window.close();}}\n";
         html+= " </script></head><body onkeypress='keyPressHandler(event)'>";
         html+= "\n";
