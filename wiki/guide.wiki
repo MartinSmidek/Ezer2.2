@@ -2,11 +2,21 @@
 
 == Verze 2.2 ==
 
-'''Přidáno'''
+=== Přidáno ===
 * uzpůsobeno pro nové verze balíků: Mootools 1.4.1, Clientcide 3.0.8, CKeditor 3.6.2
 
-'''Zrušeno'''
+=== Zrušeno ===
 * upload souborů pomocí button { type:'upload' ... }
+
+=== Návod pro převod z verze 2 do 2.2 ===
+# provést SVN update ezer2
+# v root.php a root.inc nahradit v cestách ezer2 za {$EZER->version}
+# na začátek root.inc přidat   $EZER= (object)array(); $EZER->version= 'ezer2';
+# v root.php upravit podmíněným výrazem vynechání asset.js a slider.js
+# vyzkoušet - musí fungovat, jinak byla v předchozích krocích chyba
+# založit ezer2.2 a do něj SVN checkout, ručně vkopírovat ckeditor (nemá cenu dávat do SVN)
+# v root.inc změnit $EZER->version= 'ezer2.2';
+# vyzkoušet např. posun kolečkem myši v browse
 
 == Přihlašování (i skupinové) ==
 
