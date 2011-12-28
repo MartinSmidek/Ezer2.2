@@ -83,10 +83,10 @@
   // seznam složky aplikace
   $ezer_root= $root;
   $state= '';
-  $ezer_path_root= str_replace("/ezer2/comp.php","",$_SERVER['SCRIPT_FILENAME']);
+  $ezer_path_root= str_replace("/ezer2.2/comp.php","",$_SERVER['SCRIPT_FILENAME']);
   $ezer_path_appl= "$ezer_path_root/$root";
   $ezer_path_code= "$ezer_path_root/$root/code";
-  $ezer_path_serv= "$ezer_path_root/ezer2/server";
+  $ezer_path_serv= "$ezer_path_root/ezer2.2/server";
   require_once("server/comp2.php");
   require_once("server/comp2def.php");
   $files= array();

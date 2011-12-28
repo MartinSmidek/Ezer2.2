@@ -1,0 +1,29 @@
+body {
+  overflow:hidden; background-color:#e2e2e2; font-family:Arial,Helvetica,sans-serif; font-size:11px;}
+#app {
+  background-color:#e2e2e2;  }
+
+#source {
+  font-family:Consolas; font-size:8pt; overflow-x:hidden; }
+#source div:hover {
+  background-color:#ffad39; }
+#source span.SourceNum {
+  background-color:#eee; padding:0 8px 0 8px; }
+#source .SourceStop {
+  background-color:#f00 !important; }
+#sourceCurr {
+  color:#00f !important; ; font-weight:bold !important; }
+
+.jxSplitArea, .jxSplitContainer, .jxPanelContentContainer, .jxPanelContent {
+  /*width:100% !important;   */                 /*+++*/
+}
+.jxPanelContent, .jxTreeRoot {
+  background-color:#f9f9f9; }
+
+.jxSplitArea {
+  overflow:auto; }
+  
+.jxSplitBarVertical {
+  background-color:#e2e2e2; }
+.jxSplitArea {
+  border: none; }

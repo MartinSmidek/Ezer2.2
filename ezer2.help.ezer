@@ -1,0 +1,102 @@
+#pragma library
+panel apl [,,770,] {type:'right', title:'Dokumentace', _sys:'dok'
+  menu m {type:'left', active:*
+    proc onclick(x) {
+      u.hresult.set(ask('i_doc_show','application',x.owner._id,x._id))
+#      echo(u,apl.u)
+    }
+  }
+  use u: form f [0,0,,]
+  proc onstart() {
+    var g: object
+    m.attach_code(ask('i_doc_menu','application','',''));
+    g.set(m.part('menu.group',1));
+    g.get; g.part('item',1); g.part('item',1).click
+  | u.hresult.set("Dokumentace není vygenerována")
+  }
+}
+panel ref [,,770,] {type:'right', title:'Reference', _sys:'ref', skill:'m'
+  menu m {type:'left', active:*
+    proc onclick(x) {
+      u.hresult.set(ask('i_doc_show','reference',x.owner._id,x._id))
+    }
+  }
+  use u: form f [0,0,,]
+  proc onstart() { m.attach_code(ask('i_doc_menu','reference','','')) }
+}
+panel str [,,770,] {type:'right', title:'Struktura', _sys:'str', skill:'m'
+  menu m {type:'left', active:*
+    menu stav {title:'stav',type:'group'
+      item {title:'Ezer moduly' proc onclick () { u.hresult.set(ask('doc_ezer')) } }
+      item {title:'PHP moduly' proc onclick () { u.hresult.set(ask('doc_php')) } }
+      item {title:'Seznam PHP funkcí' proc onclick () { u.hresult.set(ask('doc_called')) } }
+    }
+  }
+  use u: form f [0,0,,]
+}
+panel gen [,,770,] {type:'right', title:'Generování', _sys:'gen', skill:'m'
+  menu m {type:'left', active:*
+    menu stav {title:'stav',type:'group'
+      item {title:'přehled' proc onclick () { u.hresult.set(ask('i_doc','survay')) } }
+#       item {title:'tabulka funkcí' proc onclick () { u.hresult.set(ask('i_doc','funcs')) } }
+#       item {title:'tabulka atributů' proc onclick () { u.hresult.set(ask('i_doc','attrs')) } }
+    }
+    menu {title:'PSPad',type:'group'
+      item a {title:'generuj Ezer.ini'
+        proc onclick () { u.hresult.set(ask('pspad_gen')) }
+      }
+    }
+    menu refr {title:'obnovit',type:'group'
+      item a {title:'dokumentace z komentářů'
+        proc onclick () { u.hresult.set(ask('i_doc','javascript','app,ezer,ezer_report,ezer_fdom1,ezer_fdom2'));
+#         proc onclick ()  u.hresult.set(ask('i_doc','javascript','ezer'));
+#         proc onclick ()  u.hresult.set(ask('i_doc','javascript','app'));
+          ref.m.attach_code(ask('i_doc_menu','reference','',''))
+        }
+      }
+      item b {title:'reference jazyka'
+        proc onclick () { u.hresult.set(ask('i_doc','ezerscript'));
+          ref.m.attach_code(ask('i_doc_menu','reference','',''))
+        }
+      }
+      item c {title:'dokumentace Ezer'
+        proc onclick () { u.hresult.set(ask('i_doc','reference','ezer2/wiki/*.wiki'));
+          ref.m.attach_code(ask('i_doc_menu','reference','',''))
+        }
+      }
+      item d {title:'dokumentace aplikace'
+        proc onclick () { u.hresult.set(ask('i_doc','application','wiki/*.wiki'));
+          apl.m.attach_code(ask('i_doc_menu','application','',''))
+        }
+      }
+    }
+    menu dele {title:'údržba',type:'group'
+      item a {title:'smazat vše'
+        proc onclick () { u.hresult.set(ask('i_doc_reset'));
+          ref.m.attach_code(ask('i_doc_menu','reference','',''))
+        }}
+    }
+    proc onclick(x) { echo('menu',x._id) }
+  }
+  use u: form f [0,0,,]
+}
+panel nov [,,770,] {type:'right', title:'Novinky', _sys:'new'
+  menu m {type:'left', active:m.app.nove
+    menu app {title:'Novinky aplikace',type:'group'
+      item nove {title:'Nové' }
+      item stare {title:'Přehled starších' }
+      item todo {title:'Požadavky na doplnění' }
+      proc onclick(i) { u.hresult.set(ask('doc_todo',i._id,'app')) }
+    }
+    menu eze {title:'Novinky jádra systému Ezer2',type:'group', skill:'m'
+      item nove {title:'Nové' }
+      item stare {title:'Přehled starších' }
+      item todo {title:'Požadavky na doplnění' }
+      proc onclick(i) { u.hresult.set(ask('doc_todo',i._id,'sys')) }
+    }
+  }
+  use u: form f [0,0,,]
+}
+form f {
+  label hresult [0,0,*,] { title:'--' }
+}

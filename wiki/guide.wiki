@@ -1,0 +1,85 @@
+= Ezer2 =
+
+== Verze 2.2 ==
+
+'''Přidáno'''
+* uzpůsobeno pro nové verze balíků: Mootools 1.4.1, Clientcide 3.0.8, CKeditor 3.6.2
+
+'''Zrušeno'''
+* upload souborů pomocí button { type:'upload' ... }
+
+== Přihlašování (i skupinové) ==
+
+Způsob přihlašování do aplikace je kontrolován objektem ''Ezer.options'' vloženým do aplikace
+hlavním php-modulem.
+
+  must_log_in: true,                -- je vyžadováno přihlášení
+ refresh:                          -- viz dále
+ skill:'f',                        -- základní oprávnění požadované pro přihlášení do aplikace
+
+Položka ''refresh'' řídí reakci aplikace na ctrl-r. Pokud je uvedena, měla by být v php-modulu
+inicializována jako
+
+ refresh:$_SESSION[$ezer_root]['sess_state']= ='on' ? 'true' : 'false';
+ 
+Položky ''skill' a ''refresh'' mohou být vynechány.
+
+Pokud je potřebné, aby uživatel po přihlášení do jedné aplikace mohl pracovat v dalších aplikacích
+bez nutnosti se přihlašovat, je potřeba do objektu ''Ezer.options'' vložit část
+
+ group_login:'app1,app2'            -- seznam sdružených aplikací
+ 
+'''POZOR:''' Při tomto přihlášení se nekontroluje, zda má uživatel potřebná oprávnění
+''Ezer.options.skill'' ve sdružených aplikacích.
+
+== Automatické odhlašování ==
+
+* po uplynutí 2 hodin nečinnosti (nebo podle $options->login_interval v minutách) je uživatel po upozornění odhlášen
+* životnost SESSION je nastavena na 12 hodin (lze změnit  $pars->gc_maxlifetime v sec)
+* ve stavovém řádku je zobrazován počet minut do automatického odhlášení
+
+== Skiny ==
+
+Aplikaci je možno doplnit o výběr skinu. Skinem se rozumí kombinace definicí CSS a obrázků.
+Standardní skin se jmenuje 'default' a není třeba jej uvádět, vzhledem odpovídá základnímu vzhledu Ezer1.
+Definice standardního skinu je ve složce ''ezer2/client/skins/default'' (viz heslo '''Základní složky aplikace''')
+
+Změna skinu na uživatelský (nazvaný např. 'x') se provede nastavením
+   $_SESSION[$ezer_root]['skin']='x'
+  Ezer.options.skin='x'
+v hlavním programu aplikace 'a' a definicí složky ''skins/x''
+
+== Základní složky aplikace ==
+
+Písmeno ''a'' zastupuje ve schématu název systému
+
+     (root)                      : základní soubory aplikace a.php, a.ini
+ A  +-- a                       : zdrojové soubory aplikace (*.ezer, *.js, *.php)
+    |   +--- code               : přeložené soubory ezer (*.json)
+    |   +--- @                  : uschované verze souborů ezer během práce s debugerem
+ A  +-- skins                   : colors.php
+ A  |   +--- x                  : obrázky použité ve stylech a v jádru
+ A  |        +-- clientcide     : případné modifikace obrázků z ezer2/client/skins/default/clientcide
+ A  +-- wiki                    : dokumentace aplikace (*.wiki)
+ A  |   +--- img                : obrázky použité v dokumentaci
+ K  +-- ezer2.2                 : jádro ezer 2.2, zdrojové texty knihovních modulů
+ K      +-- client
+ K      |   +-- licensed
+ K      |   +-- skins
+ K      |       +-- default
+ K      |           +-- clientcide
+ K      +-- code
+ K      +-- server
+ K      |   +-- licensed
+ K      +-- wiki
+
+Složky Subversion pro aplikaci jsou označeny jako '''A''', pro jádro jako '''K''',
+neoznačené složky jsou z hlediska Subversion externí.
+
+== vývojové prostředí ==
+
+Pro editování EzerScriptu je používán freewarový editor '''PSPad'''
+do kterého je doplněn soubor Ezer.ini obsahující definici syntaktických kategorií jazyka.
+
+Projekt PSPadu je vhodné umístit do kořene aplikace.
+
