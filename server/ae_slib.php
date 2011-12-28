@@ -485,8 +485,8 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
 # zjistí svn-verzi běžící aplikace a jádra a porovná se zapamatovanou
 #   $roots      -- seznam podsložek, default=ezer2,app
 function root_svn($roots='') {
-  global $ezer_root, $ezer_path_root;
-  $roots= $roots ? $roots : "ezer2,$ezer_root";
+  global $EZER, $ezer_root, $ezer_path_root;
+  $roots= $roots ? $roots : "{$EZER->version},$ezer_root";
   $verze= 0;
   foreach (explode(',',$roots) as $root) {
     $entry= "$ezer_path_root/$root/.svn/entries";

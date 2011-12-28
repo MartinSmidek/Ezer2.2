@@ -752,7 +752,7 @@ Ezer.Block= new Class({
       }.bind(this),
       onProgress: function(event,xhr) {                   // ve verzi 1.4
           var loaded= event.loaded, total= event.total;
-          console.log(parseInt(loaded / total * 100, 10));
+          console.log(parseInt(total ? loaded / total * 100 : 0, 10));
       }
     });
     ajax.send();

@@ -10,7 +10,7 @@ function i_doc($typ,$fnames='') {
   global $i_doc_info, $i_doc_class, $i_doc_id, $i_doc_t, $i_doc_ref, $i_doc_err, $i_doc_n, $i_doc_file;
   $i_doc_info= array(); $i_doc_class= $i_doc_id= $i_doc_ref= $i_doc_err= ''; $i_doc_n= 0;
 //                                                 display("i_doc($typ,$fnames)");
-  global $mysql_db;
+  global $EZER, $mysql_db;
   $db= $mysql_db;
   $text= '';
   switch ( $typ ) {
@@ -34,7 +34,7 @@ function i_doc($typ,$fnames='') {
     // vytvoření seznamu jmen i s cestami
     $fdescs= array();
     foreach ( explode(',',$ezer_comp_ezer) as $fname )
-      $fdescs[]= (object)array('path'=>"$ezer_path_root/ezer2/client/$fname.js",'name'=>$fname);
+      $fdescs[]= (object)array('path'=>"$ezer_path_root/{$EZER->version}/client/$fname.js",'name'=>$fname);
     if ( $ezer_comp_root )
       foreach ( explode(',',$ezer_comp_root) as $dirfname ) {
         list($dir,$fname)= explode('/',$dirfname);

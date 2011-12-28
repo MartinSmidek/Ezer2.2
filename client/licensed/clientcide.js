@@ -1,6 +1,6 @@
 
-//This library: http://dev.clientcide.com/depender/build?download=true&version=Clientcide+3.0.8&require=Core%2FCore&require=Core%2FFx.Morph&require=Core%2FFx.Tween&require=Core%2FRequest&require=Core%2FCookie&require=Core%2FDOMReady&require=Core%2FJSON&require=Clientcide%2FStickyWin&require=More%2FSlider&require=More%2FFx.Slide&require=More%2FMask&require=More%2FLocale.cs-CZ.Date&require=More%2FAssets
-//Contents: Core:Source/Core/Core.js, Core:Source/Types/Array.js, Core:Source/Types/String.js, Core:Source/Types/Number.js, Core:Source/Types/Function.js, Core:Source/Utilities/JSON.js, Core:Source/Types/Object.js, Core:Source/Browser/Browser.js, Core:Source/Slick/Slick.Parser.js, Core:Source/Slick/Slick.Finder.js, Core:Source/Element/Element.js, Core:Source/Class/Class.js, Core:Source/Class/Class.Extras.js, Core:Source/Request/Request.js, Core:Source/Fx/Fx.js, Core:Source/Element/Element.Style.js, Core:Source/Fx/Fx.CSS.js, Core:Source/Fx/Fx.Morph.js, Core:Source/Fx/Fx.Tween.js, Core:Source/Types/DOMEvent.js, Core:Source/Element/Element.Event.js, More:Source/More/More.js, More:Source/Utilities/Assets.js, More:Source/Fx/Fx.Slide.js, Core:Source/Utilities/DOMReady.js, More:Source/Class/Class.Binds.js, Core:Source/Element/Element.Dimensions.js, More:Source/Element/Element.Measure.js, More:Source/Element/Element.Position.js, More:Source/Class/Class.Occlude.js, More:Source/Utilities/IframeShim.js, More:Source/Interface/Mask.js, More:Source/Types/Object.Extras.js, More:Source/Locale/Locale.js, More:Source/Locale/Locale.cs-CZ.Date.js, More:Source/Drag/Drag.js, More:Source/Drag/Slider.js, More:Source/Element/Element.Shortcuts.js, More:Source/Element/Element.Pin.js, Clientcide:Source/Core/Clientcide.js, Clientcide:Source/Core/dbug.js, Clientcide:Source/UI/StyleWriter.js, Clientcide:Source/UI/StickyWin.js, Core:Source/Utilities/Cookie.js
+//This library: http://dev.clientcide.com/depender/build?download=true&version=Clientcide+3.0.8&require=Core%2FCore&require=Core%2FFx.Morph&require=Core%2FFx.Tween&require=Core%2FRequest&require=Core%2FCookie&require=Core%2FDOMReady&require=Core%2FJSON&require=Clientcide%2FStickyWin.UI&require=Clientcide%2FStickyWin&require=More%2FSlider&require=More%2FFx.Slide&require=More%2FMask&require=More%2FLocale.cs-CZ.Date&require=More%2FDate.Extras&require=More%2FAssets
+//Contents: Core:Source/Core/Core.js, Core:Source/Types/Array.js, Core:Source/Types/String.js, Core:Source/Types/Number.js, More:Source/More/More.js, Core:Source/Types/Function.js, Core:Source/Class/Class.js, Core:Source/Class/Class.Extras.js, Core:Source/Types/Object.js, More:Source/Types/Object.Extras.js, More:Source/Locale/Locale.js, More:Source/Locale/Locale.en-US.Date.js, More:Source/Types/Date.js, More:Source/Types/Date.Extras.js, Core:Source/Utilities/JSON.js, Core:Source/Browser/Browser.js, Core:Source/Slick/Slick.Parser.js, Core:Source/Slick/Slick.Finder.js, Core:Source/Element/Element.js, Core:Source/Request/Request.js, Core:Source/Fx/Fx.js, Core:Source/Element/Element.Style.js, Core:Source/Fx/Fx.CSS.js, Core:Source/Fx/Fx.Morph.js, Core:Source/Fx/Fx.Tween.js, Core:Source/Types/DOMEvent.js, Core:Source/Element/Element.Event.js, More:Source/Utilities/Assets.js, More:Source/Fx/Fx.Slide.js, Core:Source/Utilities/DOMReady.js, More:Source/Class/Class.Binds.js, Core:Source/Element/Element.Dimensions.js, More:Source/Element/Element.Measure.js, More:Source/Element/Element.Position.js, More:Source/Class/Class.Occlude.js, More:Source/Utilities/IframeShim.js, More:Source/Interface/Mask.js, More:Source/Types/String.Extras.js, Clientcide:Source/Core/dbug.js, Clientcide:Source/UI/StyleWriter.js, More:Source/Element/Element.Shortcuts.js, More:Source/Element/Element.Pin.js, Clientcide:Source/Core/Clientcide.js, Clientcide:Source/UI/StickyWin.js, Clientcide:Source/UI/StickyWin.UI.js, More:Source/Locale/Locale.cs-CZ.Date.js, More:Source/Drag/Drag.js, More:Source/Drag/Slider.js, Core:Source/Utilities/Cookie.js
 
 // Begin: Source/Core/Core.js
 /*
@@ -837,6 +837,42 @@ Number.alias('each', 'times');
 })(['abs', 'acos', 'asin', 'atan', 'atan2', 'ceil', 'cos', 'exp', 'floor', 'log', 'max', 'min', 'pow', 'sin', 'sqrt', 'tan']);
 
 
+// Begin: Source/More/More.js
+/*
+---
+
+script: More.js
+
+name: More
+
+description: MooTools More
+
+license: MIT-style license
+
+authors:
+  - Guillermo Rauch
+  - Thomas Aylott
+  - Scott Kyle
+  - Arian Stolwijk
+  - Tim Wienk
+  - Christoph Pojer
+  - Aaron Newton
+  - Jacob Thornton
+
+requires:
+  - Core/MooTools
+
+provides: [MooTools.More]
+
+...
+*/
+
+MooTools.More = {
+	'version': '1.4.0.1',
+	'build': 'a4244edf2aa97ac8a196fc96082dd35af1abab87'
+};
+
+
 // Begin: Source/Types/Function.js
 /*
 ---
@@ -968,86 +1004,244 @@ var $try = Function.attempt;
 //</1.2compat>
 
 
-// Begin: Source/Utilities/JSON.js
+// Begin: Source/Class/Class.js
 /*
 ---
 
-name: JSON
+name: Class
 
-description: JSON encoder and decoder.
+description: Contains the Class Function for easily creating, extending, and implementing reusable Classes.
 
 license: MIT-style license.
 
-SeeAlso: <http://www.json.org/>
+requires: [Array, String, Function, Number]
 
-requires: [Array, String, Number, Function]
-
-provides: JSON
+provides: Class
 
 ...
 */
 
-if (typeof JSON == 'undefined') this.JSON = {};
+(function(){
 
-//<1.2compat>
+var Class = this.Class = new Type('Class', function(params){
+	if (instanceOf(params, Function)) params = {initialize: params};
 
-JSON = new Hash({
-	stringify: JSON.stringify,
-	parse: JSON.parse
+	var newClass = function(){
+		reset(this);
+		if (newClass.$prototyping) return this;
+		this.$caller = null;
+		var value = (this.initialize) ? this.initialize.apply(this, arguments) : this;
+		this.$caller = this.caller = null;
+		return value;
+	}.extend(this).implement(params);
+
+	newClass.$constructor = Class;
+	newClass.prototype.$constructor = newClass;
+	newClass.prototype.parent = parent;
+
+	return newClass;
 });
 
-//</1.2compat>
+var parent = function(){
+	if (!this.$caller) throw new Error('The method "parent" cannot be called.');
+	var name = this.$caller.$name,
+		parent = this.$caller.$owner.parent,
+		previous = (parent) ? parent.prototype[name] : null;
+	if (!previous) throw new Error('The method "' + name + '" has no parent.');
+	return previous.apply(this, arguments);
+};
+
+var reset = function(object){
+	for (var key in object){
+		var value = object[key];
+		switch (typeOf(value)){
+			case 'object':
+				var F = function(){};
+				F.prototype = value;
+				object[key] = reset(new F);
+			break;
+			case 'array': object[key] = value.clone(); break;
+		}
+	}
+	return object;
+};
+
+var wrap = function(self, key, method){
+	if (method.$origin) method = method.$origin;
+	var wrapper = function(){
+		if (method.$protected && this.$caller == null) throw new Error('The method "' + key + '" cannot be called.');
+		var caller = this.caller, current = this.$caller;
+		this.caller = current; this.$caller = wrapper;
+		var result = method.apply(this, arguments);
+		this.$caller = current; this.caller = caller;
+		return result;
+	}.extend({$owner: self, $origin: method, $name: key});
+	return wrapper;
+};
+
+var implement = function(key, value, retain){
+	if (Class.Mutators.hasOwnProperty(key)){
+		value = Class.Mutators[key].call(this, value);
+		if (value == null) return this;
+	}
+
+	if (typeOf(value) == 'function'){
+		if (value.$hidden) return this;
+		this.prototype[key] = (retain) ? value : wrap(this, key, value);
+	} else {
+		Object.merge(this.prototype, key, value);
+	}
+
+	return this;
+};
+
+var getInstance = function(klass){
+	klass.$prototyping = true;
+	var proto = new klass;
+	delete klass.$prototyping;
+	return proto;
+};
+
+Class.implement('implement', implement.overloadSetter());
+
+Class.Mutators = {
+
+	Extends: function(parent){
+		this.parent = parent;
+		this.prototype = getInstance(parent);
+	},
+
+	Implements: function(items){
+		Array.from(items).each(function(item){
+			var instance = new item;
+			for (var key in instance) implement.call(this, key, instance[key], true);
+		}, this);
+	}
+};
+
+})();
+
+
+// Begin: Source/Class/Class.Extras.js
+/*
+---
+
+name: Class.Extras
+
+description: Contains Utility Classes that can be implemented into your own Classes to ease the execution of many common tasks.
+
+license: MIT-style license.
+
+requires: Class
+
+provides: [Class.Extras, Chain, Events, Options]
+
+...
+*/
 
 (function(){
 
-var special = {'\b': '\\b', '\t': '\\t', '\n': '\\n', '\f': '\\f', '\r': '\\r', '"' : '\\"', '\\': '\\\\'};
+this.Chain = new Class({
 
-var escape = function(chr){
-	return special[chr] || '\\u' + ('0000' + chr.charCodeAt(0).toString(16)).slice(-4);
-};
+	$chain: [],
 
-JSON.validate = function(string){
-	string = string.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
-					replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
-					replace(/(?:^|:|,)(?:\s*\[)+/g, '');
+	chain: function(){
+		this.$chain.append(Array.flatten(arguments));
+		return this;
+	},
 
-	return (/^[\],:{}\s]*$/).test(string);
-};
+	callChain: function(){
+		return (this.$chain.length) ? this.$chain.shift().apply(this, arguments) : false;
+	},
 
-JSON.encode = JSON.stringify ? function(obj){
-	return JSON.stringify(obj);
-} : function(obj){
-	if (obj && obj.toJSON) obj = obj.toJSON();
-
-	switch (typeOf(obj)){
-		case 'string':
-			return '"' + obj.replace(/[\x00-\x1f\\"]/g, escape) + '"';
-		case 'array':
-			return '[' + obj.map(JSON.encode).clean() + ']';
-		case 'object': case 'hash':
-			var string = [];
-			Object.each(obj, function(value, key){
-				var json = JSON.encode(value);
-				if (json) string.push(JSON.encode(key) + ':' + json);
-			});
-			return '{' + string + '}';
-		case 'number': case 'boolean': return '' + obj;
-		case 'null': return 'null';
+	clearChain: function(){
+		this.$chain.empty();
+		return this;
 	}
 
-	return null;
+});
+
+var removeOn = function(string){
+	return string.replace(/^on([A-Z])/, function(full, first){
+		return first.toLowerCase();
+	});
 };
 
-JSON.decode = function(string, secure){
-	if (!string || typeOf(string) != 'string') return null;
+this.Events = new Class({
 
-	if (secure || JSON.secure){
-		if (JSON.parse) return JSON.parse(string);
-		if (!JSON.validate(string)) throw new Error('JSON could not decode the input; security is enabled and the value is not secure.');
+	$events: {},
+
+	addEvent: function(type, fn, internal){
+		type = removeOn(type);
+
+		/*<1.2compat>*/
+		if (fn == $empty) return this;
+		/*</1.2compat>*/
+
+		this.$events[type] = (this.$events[type] || []).include(fn);
+		if (internal) fn.internal = true;
+		return this;
+	},
+
+	addEvents: function(events){
+		for (var type in events) this.addEvent(type, events[type]);
+		return this;
+	},
+
+	fireEvent: function(type, args, delay){
+		type = removeOn(type);
+		var events = this.$events[type];
+		if (!events) return this;
+		args = Array.from(args);
+		events.each(function(fn){
+			if (delay) fn.delay(delay, this, args);
+			else fn.apply(this, args);
+		}, this);
+		return this;
+	},
+
+	removeEvent: function(type, fn){
+		type = removeOn(type);
+		var events = this.$events[type];
+		if (events && !fn.internal){
+			var index =  events.indexOf(fn);
+			if (index != -1) delete events[index];
+		}
+		return this;
+	},
+
+	removeEvents: function(events){
+		var type;
+		if (typeOf(events) == 'object'){
+			for (type in events) this.removeEvent(type, events[type]);
+			return this;
+		}
+		if (events) events = removeOn(events);
+		for (type in this.$events){
+			if (events && events != type) continue;
+			var fns = this.$events[type];
+			for (var i = fns.length; i--;) if (i in fns){
+				this.removeEvent(type, fns[i]);
+			}
+		}
+		return this;
 	}
 
-	return eval('(' + string + ')');
-};
+});
+
+this.Options = new Class({
+
+	setOptions: function(){
+		var options = this.options = Object.merge.apply(null, [{}, this.options].append(arguments));
+		if (this.addEvent) for (var option in options){
+			if (typeOf(options[option]) != 'function' || !(/^on[A-Z]/).test(option)) continue;
+			this.addEvent(option, options[option]);
+			delete options[option];
+		}
+		return this;
+	}
+
+});
 
 })();
 
@@ -1262,6 +1456,1106 @@ Hash.extend = Object.append;
 Hash.alias({indexOf: 'keyOf', contains: 'hasValue'});
 
 //</1.2compat>
+
+
+// Begin: Source/Types/Object.Extras.js
+/*
+---
+
+script: Object.Extras.js
+
+name: Object.Extras
+
+description: Extra Object generics, like getFromPath which allows a path notation to child elements.
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+
+requires:
+  - Core/Object
+  - /MooTools.More
+
+provides: [Object.Extras]
+
+...
+*/
+
+(function(){
+
+var defined = function(value){
+	return value != null;
+};
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+Object.extend({
+
+	getFromPath: function(source, parts){
+		if (typeof parts == 'string') parts = parts.split('.');
+		for (var i = 0, l = parts.length; i < l; i++){
+			if (hasOwnProperty.call(source, parts[i])) source = source[parts[i]];
+			else return null;
+		}
+		return source;
+	},
+
+	cleanValues: function(object, method){
+		method = method || defined;
+		for (var key in object) if (!method(object[key])){
+			delete object[key];
+		}
+		return object;
+	},
+
+	erase: function(object, key){
+		if (hasOwnProperty.call(object, key)) delete object[key];
+		return object;
+	},
+
+	run: function(object){
+		var args = Array.slice(arguments, 1);
+		for (var key in object) if (object[key].apply){
+			object[key].apply(object, args);
+		}
+		return object;
+	}
+
+});
+
+})();
+
+
+// Begin: Source/Locale/Locale.js
+/*
+---
+
+script: Locale.js
+
+name: Locale
+
+description: Provides methods for localization.
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+  - Arian Stolwijk
+
+requires:
+  - Core/Events
+  - /Object.Extras
+  - /MooTools.More
+
+provides: [Locale, Lang]
+
+...
+*/
+
+(function(){
+
+var current = null,
+	locales = {},
+	inherits = {};
+
+var getSet = function(set){
+	if (instanceOf(set, Locale.Set)) return set;
+	else return locales[set];
+};
+
+var Locale = this.Locale = {
+
+	define: function(locale, set, key, value){
+		var name;
+		if (instanceOf(locale, Locale.Set)){
+			name = locale.name;
+			if (name) locales[name] = locale;
+		} else {
+			name = locale;
+			if (!locales[name]) locales[name] = new Locale.Set(name);
+			locale = locales[name];
+		}
+
+		if (set) locale.define(set, key, value);
+
+		/*<1.2compat>*/
+		if (set == 'cascade') return Locale.inherit(name, key);
+		/*</1.2compat>*/
+
+		if (!current) current = locale;
+
+		return locale;
+	},
+
+	use: function(locale){
+		locale = getSet(locale);
+
+		if (locale){
+			current = locale;
+
+			this.fireEvent('change', locale);
+
+			/*<1.2compat>*/
+			this.fireEvent('langChange', locale.name);
+			/*</1.2compat>*/
+		}
+
+		return this;
+	},
+
+	getCurrent: function(){
+		return current;
+	},
+
+	get: function(key, args){
+		return (current) ? current.get(key, args) : '';
+	},
+
+	inherit: function(locale, inherits, set){
+		locale = getSet(locale);
+
+		if (locale) locale.inherit(inherits, set);
+		return this;
+	},
+
+	list: function(){
+		return Object.keys(locales);
+	}
+
+};
+
+Object.append(Locale, new Events);
+
+Locale.Set = new Class({
+
+	sets: {},
+
+	inherits: {
+		locales: [],
+		sets: {}
+	},
+
+	initialize: function(name){
+		this.name = name || '';
+	},
+
+	define: function(set, key, value){
+		var defineData = this.sets[set];
+		if (!defineData) defineData = {};
+
+		if (key){
+			if (typeOf(key) == 'object') defineData = Object.merge(defineData, key);
+			else defineData[key] = value;
+		}
+		this.sets[set] = defineData;
+
+		return this;
+	},
+
+	get: function(key, args, _base){
+		var value = Object.getFromPath(this.sets, key);
+		if (value != null){
+			var type = typeOf(value);
+			if (type == 'function') value = value.apply(null, Array.from(args));
+			else if (type == 'object') value = Object.clone(value);
+			return value;
+		}
+
+		// get value of inherited locales
+		var index = key.indexOf('.'),
+			set = index < 0 ? key : key.substr(0, index),
+			names = (this.inherits.sets[set] || []).combine(this.inherits.locales).include('en-US');
+		if (!_base) _base = [];
+
+		for (var i = 0, l = names.length; i < l; i++){
+			if (_base.contains(names[i])) continue;
+			_base.include(names[i]);
+
+			var locale = locales[names[i]];
+			if (!locale) continue;
+
+			value = locale.get(key, args, _base);
+			if (value != null) return value;
+		}
+
+		return '';
+	},
+
+	inherit: function(names, set){
+		names = Array.from(names);
+
+		if (set && !this.inherits.sets[set]) this.inherits.sets[set] = [];
+
+		var l = names.length;
+		while (l--) (set ? this.inherits.sets[set] : this.inherits.locales).unshift(names[l]);
+
+		return this;
+	}
+
+});
+
+/*<1.2compat>*/
+var lang = MooTools.lang = {};
+
+Object.append(lang, Locale, {
+	setLanguage: Locale.use,
+	getCurrentLanguage: function(){
+		var current = Locale.getCurrent();
+		return (current) ? current.name : null;
+	},
+	set: function(){
+		Locale.define.apply(this, arguments);
+		return this;
+	},
+	get: function(set, key, args){
+		if (key) set += '.' + key;
+		return Locale.get(set, args);
+	}
+});
+/*</1.2compat>*/
+
+})();
+
+
+// Begin: Source/Locale/Locale.en-US.Date.js
+/*
+---
+
+name: Locale.en-US.Date
+
+description: Date messages for US English.
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+
+requires:
+  - /Locale
+
+provides: [Locale.en-US.Date]
+
+...
+*/
+
+Locale.define('en-US', 'Date', {
+
+	months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+	months_abbr: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+	days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+	days_abbr: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+
+	// Culture's date order: MM/DD/YYYY
+	dateOrder: ['month', 'date', 'year'],
+	shortDate: '%m/%d/%Y',
+	shortTime: '%I:%M%p',
+	AM: 'AM',
+	PM: 'PM',
+	firstDayOfWeek: 0,
+
+	// Date.Extras
+	ordinal: function(dayOfMonth){
+		// 1st, 2nd, 3rd, etc.
+		return (dayOfMonth > 3 && dayOfMonth < 21) ? 'th' : ['th', 'st', 'nd', 'rd', 'th'][Math.min(dayOfMonth % 10, 4)];
+	},
+
+	lessThanMinuteAgo: 'less than a minute ago',
+	minuteAgo: 'about a minute ago',
+	minutesAgo: '{delta} minutes ago',
+	hourAgo: 'about an hour ago',
+	hoursAgo: 'about {delta} hours ago',
+	dayAgo: '1 day ago',
+	daysAgo: '{delta} days ago',
+	weekAgo: '1 week ago',
+	weeksAgo: '{delta} weeks ago',
+	monthAgo: '1 month ago',
+	monthsAgo: '{delta} months ago',
+	yearAgo: '1 year ago',
+	yearsAgo: '{delta} years ago',
+
+	lessThanMinuteUntil: 'less than a minute from now',
+	minuteUntil: 'about a minute from now',
+	minutesUntil: '{delta} minutes from now',
+	hourUntil: 'about an hour from now',
+	hoursUntil: 'about {delta} hours from now',
+	dayUntil: '1 day from now',
+	daysUntil: '{delta} days from now',
+	weekUntil: '1 week from now',
+	weeksUntil: '{delta} weeks from now',
+	monthUntil: '1 month from now',
+	monthsUntil: '{delta} months from now',
+	yearUntil: '1 year from now',
+	yearsUntil: '{delta} years from now'
+
+});
+
+
+// Begin: Source/Types/Date.js
+/*
+---
+
+script: Date.js
+
+name: Date
+
+description: Extends the Date native object to include methods useful in managing dates.
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+  - Nicholas Barthelemy - https://svn.nbarthelemy.com/date-js/
+  - Harald Kirshner - mail [at] digitarald.de; http://digitarald.de
+  - Scott Kyle - scott [at] appden.com; http://appden.com
+
+requires:
+  - Core/Array
+  - Core/String
+  - Core/Number
+  - MooTools.More
+  - Locale
+  - Locale.en-US.Date
+
+provides: [Date]
+
+...
+*/
+
+(function(){
+
+var Date = this.Date;
+
+var DateMethods = Date.Methods = {
+	ms: 'Milliseconds',
+	year: 'FullYear',
+	min: 'Minutes',
+	mo: 'Month',
+	sec: 'Seconds',
+	hr: 'Hours'
+};
+
+['Date', 'Day', 'FullYear', 'Hours', 'Milliseconds', 'Minutes', 'Month', 'Seconds', 'Time', 'TimezoneOffset',
+	'Week', 'Timezone', 'GMTOffset', 'DayOfYear', 'LastMonth', 'LastDayOfMonth', 'UTCDate', 'UTCDay', 'UTCFullYear',
+	'AMPM', 'Ordinal', 'UTCHours', 'UTCMilliseconds', 'UTCMinutes', 'UTCMonth', 'UTCSeconds', 'UTCMilliseconds'].each(function(method){
+	Date.Methods[method.toLowerCase()] = method;
+});
+
+var pad = function(n, digits, string){
+	if (digits == 1) return n;
+	return n < Math.pow(10, digits - 1) ? (string || '0') + pad(n, digits - 1, string) : n;
+};
+
+Date.implement({
+
+	set: function(prop, value){
+		prop = prop.toLowerCase();
+		var method = DateMethods[prop] && 'set' + DateMethods[prop];
+		if (method && this[method]) this[method](value);
+		return this;
+	}.overloadSetter(),
+
+	get: function(prop){
+		prop = prop.toLowerCase();
+		var method = DateMethods[prop] && 'get' + DateMethods[prop];
+		if (method && this[method]) return this[method]();
+		return null;
+	}.overloadGetter(),
+
+	clone: function(){
+		return new Date(this.get('time'));
+	},
+
+	increment: function(interval, times){
+		interval = interval || 'day';
+		times = times != null ? times : 1;
+
+		switch (interval){
+			case 'year':
+				return this.increment('month', times * 12);
+			case 'month':
+				var d = this.get('date');
+				this.set('date', 1).set('mo', this.get('mo') + times);
+				return this.set('date', d.min(this.get('lastdayofmonth')));
+			case 'week':
+				return this.increment('day', times * 7);
+			case 'day':
+				return this.set('date', this.get('date') + times);
+		}
+
+		if (!Date.units[interval]) throw new Error(interval + ' is not a supported interval');
+
+		return this.set('time', this.get('time') + times * Date.units[interval]());
+	},
+
+	decrement: function(interval, times){
+		return this.increment(interval, -1 * (times != null ? times : 1));
+	},
+
+	isLeapYear: function(){
+		return Date.isLeapYear(this.get('year'));
+	},
+
+	clearTime: function(){
+		return this.set({hr: 0, min: 0, sec: 0, ms: 0});
+	},
+
+	diff: function(date, resolution){
+		if (typeOf(date) == 'string') date = Date.parse(date);
+
+		return ((date - this) / Date.units[resolution || 'day'](3, 3)).round(); // non-leap year, 30-day month
+	},
+
+	getLastDayOfMonth: function(){
+		return Date.daysInMonth(this.get('mo'), this.get('year'));
+	},
+
+	getDayOfYear: function(){
+		return (Date.UTC(this.get('year'), this.get('mo'), this.get('date') + 1)
+			- Date.UTC(this.get('year'), 0, 1)) / Date.units.day();
+	},
+
+	setDay: function(day, firstDayOfWeek){
+		if (firstDayOfWeek == null){
+			firstDayOfWeek = Date.getMsg('firstDayOfWeek');
+			if (firstDayOfWeek === '') firstDayOfWeek = 1;
+		}
+
+		day = (7 + Date.parseDay(day, true) - firstDayOfWeek) % 7;
+		var currentDay = (7 + this.get('day') - firstDayOfWeek) % 7;
+
+		return this.increment('day', day - currentDay);
+	},
+
+	getWeek: function(firstDayOfWeek){
+		if (firstDayOfWeek == null){
+			firstDayOfWeek = Date.getMsg('firstDayOfWeek');
+			if (firstDayOfWeek === '') firstDayOfWeek = 1;
+		}
+
+		var date = this,
+			dayOfWeek = (7 + date.get('day') - firstDayOfWeek) % 7,
+			dividend = 0,
+			firstDayOfYear;
+
+		if (firstDayOfWeek == 1){
+			// ISO-8601, week belongs to year that has the most days of the week (i.e. has the thursday of the week)
+			var month = date.get('month'),
+				startOfWeek = date.get('date') - dayOfWeek;
+
+			if (month == 11 && startOfWeek > 28) return 1; // Week 1 of next year
+
+			if (month == 0 && startOfWeek < -2){
+				// Use a date from last year to determine the week
+				date = new Date(date).decrement('day', dayOfWeek);
+				dayOfWeek = 0;
+			}
+
+			firstDayOfYear = new Date(date.get('year'), 0, 1).get('day') || 7;
+			if (firstDayOfYear > 4) dividend = -7; // First week of the year is not week 1
+		} else {
+			// In other cultures the first week of the year is always week 1 and the last week always 53 or 54.
+			// Days in the same week can have a different weeknumber if the week spreads across two years.
+			firstDayOfYear = new Date(date.get('year'), 0, 1).get('day');
+		}
+
+		dividend += date.get('dayofyear');
+		dividend += 6 - dayOfWeek; // Add days so we calculate the current date's week as a full week
+		dividend += (7 + firstDayOfYear - firstDayOfWeek) % 7; // Make up for first week of the year not being a full week
+
+		return (dividend / 7);
+	},
+
+	getOrdinal: function(day){
+		return Date.getMsg('ordinal', day || this.get('date'));
+	},
+
+	getTimezone: function(){
+		return this.toString()
+			.replace(/^.*? ([A-Z]{3}).[0-9]{4}.*$/, '$1')
+			.replace(/^.*?\(([A-Z])[a-z]+ ([A-Z])[a-z]+ ([A-Z])[a-z]+\)$/, '$1$2$3');
+	},
+
+	getGMTOffset: function(){
+		var off = this.get('timezoneOffset');
+		return ((off > 0) ? '-' : '+') + pad((off.abs() / 60).floor(), 2) + pad(off % 60, 2);
+	},
+
+	setAMPM: function(ampm){
+		ampm = ampm.toUpperCase();
+		var hr = this.get('hr');
+		if (hr > 11 && ampm == 'AM') return this.decrement('hour', 12);
+		else if (hr < 12 && ampm == 'PM') return this.increment('hour', 12);
+		return this;
+	},
+
+	getAMPM: function(){
+		return (this.get('hr') < 12) ? 'AM' : 'PM';
+	},
+
+	parse: function(str){
+		this.set('time', Date.parse(str));
+		return this;
+	},
+
+	isValid: function(date){
+		if (!date) date = this;
+		return typeOf(date) == 'date' && !isNaN(date.valueOf());
+	},
+
+	format: function(format){
+		if (!this.isValid()) return 'invalid date';
+
+		if (!format) format = '%x %X';
+		if (typeof format == 'string') format = formats[format.toLowerCase()] || format;
+		if (typeof format == 'function') return format(this);
+
+		var d = this;
+		return format.replace(/%([a-z%])/gi,
+			function($0, $1){
+				switch ($1){
+					case 'a': return Date.getMsg('days_abbr')[d.get('day')];
+					case 'A': return Date.getMsg('days')[d.get('day')];
+					case 'b': return Date.getMsg('months_abbr')[d.get('month')];
+					case 'B': return Date.getMsg('months')[d.get('month')];
+					case 'c': return d.format('%a %b %d %H:%M:%S %Y');
+					case 'd': return pad(d.get('date'), 2);
+					case 'e': return pad(d.get('date'), 2, ' ');
+					case 'H': return pad(d.get('hr'), 2);
+					case 'I': return pad((d.get('hr') % 12) || 12, 2);
+					case 'j': return pad(d.get('dayofyear'), 3);
+					case 'k': return pad(d.get('hr'), 2, ' ');
+					case 'l': return pad((d.get('hr') % 12) || 12, 2, ' ');
+					case 'L': return pad(d.get('ms'), 3);
+					case 'm': return pad((d.get('mo') + 1), 2);
+					case 'M': return pad(d.get('min'), 2);
+					case 'o': return d.get('ordinal');
+					case 'p': return Date.getMsg(d.get('ampm'));
+					case 's': return Math.round(d / 1000);
+					case 'S': return pad(d.get('seconds'), 2);
+					case 'T': return d.format('%H:%M:%S');
+					case 'U': return pad(d.get('week'), 2);
+					case 'w': return d.get('day');
+					case 'x': return d.format(Date.getMsg('shortDate'));
+					case 'X': return d.format(Date.getMsg('shortTime'));
+					case 'y': return d.get('year').toString().substr(2);
+					case 'Y': return d.get('year');
+					case 'z': return d.get('GMTOffset');
+					case 'Z': return d.get('Timezone');
+				}
+				return $1;
+			}
+		);
+	},
+
+	toISOString: function(){
+		return this.format('iso8601');
+	}
+
+}).alias({
+	toJSON: 'toISOString',
+	compare: 'diff',
+	strftime: 'format'
+});
+
+// The day and month abbreviations are standardized, so we cannot use simply %a and %b because they will get localized
+var rfcDayAbbr = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+	rfcMonthAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+var formats = {
+	db: '%Y-%m-%d %H:%M:%S',
+	compact: '%Y%m%dT%H%M%S',
+	'short': '%d %b %H:%M',
+	'long': '%B %d, %Y %H:%M',
+	rfc822: function(date){
+		return rfcDayAbbr[date.get('day')] + date.format(', %d ') + rfcMonthAbbr[date.get('month')] + date.format(' %Y %H:%M:%S %Z');
+	},
+	rfc2822: function(date){
+		return rfcDayAbbr[date.get('day')] + date.format(', %d ') + rfcMonthAbbr[date.get('month')] + date.format(' %Y %H:%M:%S %z');
+	},
+	iso8601: function(date){
+		return (
+			date.getUTCFullYear() + '-' +
+			pad(date.getUTCMonth() + 1, 2) + '-' +
+			pad(date.getUTCDate(), 2) + 'T' +
+			pad(date.getUTCHours(), 2) + ':' +
+			pad(date.getUTCMinutes(), 2) + ':' +
+			pad(date.getUTCSeconds(), 2) + '.' +
+			pad(date.getUTCMilliseconds(), 3) + 'Z'
+		);
+	}
+};
+
+var parsePatterns = [],
+	nativeParse = Date.parse;
+
+var parseWord = function(type, word, num){
+	var ret = -1,
+		translated = Date.getMsg(type + 's');
+	switch (typeOf(word)){
+		case 'object':
+			ret = translated[word.get(type)];
+			break;
+		case 'number':
+			ret = translated[word];
+			if (!ret) throw new Error('Invalid ' + type + ' index: ' + word);
+			break;
+		case 'string':
+			var match = translated.filter(function(name){
+				return this.test(name);
+			}, new RegExp('^' + word, 'i'));
+			if (!match.length) throw new Error('Invalid ' + type + ' string');
+			if (match.length > 1) throw new Error('Ambiguous ' + type);
+			ret = match[0];
+	}
+
+	return (num) ? translated.indexOf(ret) : ret;
+};
+
+var startCentury = 1900,
+	startYear = 70;
+
+Date.extend({
+
+	getMsg: function(key, args){
+		return Locale.get('Date.' + key, args);
+	},
+
+	units: {
+		ms: Function.from(1),
+		second: Function.from(1000),
+		minute: Function.from(60000),
+		hour: Function.from(3600000),
+		day: Function.from(86400000),
+		week: Function.from(608400000),
+		month: function(month, year){
+			var d = new Date;
+			return Date.daysInMonth(month != null ? month : d.get('mo'), year != null ? year : d.get('year')) * 86400000;
+		},
+		year: function(year){
+			year = year || new Date().get('year');
+			return Date.isLeapYear(year) ? 31622400000 : 31536000000;
+		}
+	},
+
+	daysInMonth: function(month, year){
+		return [31, Date.isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+	},
+
+	isLeapYear: function(year){
+		return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
+	},
+
+	parse: function(from){
+		var t = typeOf(from);
+		if (t == 'number') return new Date(from);
+		if (t != 'string') return from;
+		from = from.clean();
+		if (!from.length) return null;
+
+		var parsed;
+		parsePatterns.some(function(pattern){
+			var bits = pattern.re.exec(from);
+			return (bits) ? (parsed = pattern.handler(bits)) : false;
+		});
+
+		if (!(parsed && parsed.isValid())){
+			parsed = new Date(nativeParse(from));
+			if (!(parsed && parsed.isValid())) parsed = new Date(from.toInt());
+		}
+		return parsed;
+	},
+
+	parseDay: function(day, num){
+		return parseWord('day', day, num);
+	},
+
+	parseMonth: function(month, num){
+		return parseWord('month', month, num);
+	},
+
+	parseUTC: function(value){
+		var localDate = new Date(value);
+		var utcSeconds = Date.UTC(
+			localDate.get('year'),
+			localDate.get('mo'),
+			localDate.get('date'),
+			localDate.get('hr'),
+			localDate.get('min'),
+			localDate.get('sec'),
+			localDate.get('ms')
+		);
+		return new Date(utcSeconds);
+	},
+
+	orderIndex: function(unit){
+		return Date.getMsg('dateOrder').indexOf(unit) + 1;
+	},
+
+	defineFormat: function(name, format){
+		formats[name] = format;
+		return this;
+	},
+
+	//<1.2compat>
+	parsePatterns: parsePatterns,
+	//</1.2compat>
+
+	defineParser: function(pattern){
+		parsePatterns.push((pattern.re && pattern.handler) ? pattern : build(pattern));
+		return this;
+	},
+
+	defineParsers: function(){
+		Array.flatten(arguments).each(Date.defineParser);
+		return this;
+	},
+
+	define2DigitYearStart: function(year){
+		startYear = year % 100;
+		startCentury = year - startYear;
+		return this;
+	}
+
+}).extend({
+	defineFormats: Date.defineFormat.overloadSetter()
+});
+
+var regexOf = function(type){
+	return new RegExp('(?:' + Date.getMsg(type).map(function(name){
+		return name.substr(0, 3);
+	}).join('|') + ')[a-z]*');
+};
+
+var replacers = function(key){
+	switch (key){
+		case 'T':
+			return '%H:%M:%S';
+		case 'x': // iso8601 covers yyyy-mm-dd, so just check if month is first
+			return ((Date.orderIndex('month') == 1) ? '%m[-./]%d' : '%d[-./]%m') + '([-./]%y)?';
+		case 'X':
+			return '%H([.:]%M)?([.:]%S([.:]%s)?)? ?%p? ?%z?';
+	}
+	return null;
+};
+
+var keys = {
+	d: /[0-2]?[0-9]|3[01]/,
+	H: /[01]?[0-9]|2[0-3]/,
+	I: /0?[1-9]|1[0-2]/,
+	M: /[0-5]?\d/,
+	s: /\d+/,
+	o: /[a-z]*/,
+	p: /[ap]\.?m\.?/,
+	y: /\d{2}|\d{4}/,
+	Y: /\d{4}/,
+	z: /Z|[+-]\d{2}(?::?\d{2})?/
+};
+
+keys.m = keys.I;
+keys.S = keys.M;
+
+var currentLanguage;
+
+var recompile = function(language){
+	currentLanguage = language;
+
+	keys.a = keys.A = regexOf('days');
+	keys.b = keys.B = regexOf('months');
+
+	parsePatterns.each(function(pattern, i){
+		if (pattern.format) parsePatterns[i] = build(pattern.format);
+	});
+};
+
+var build = function(format){
+	if (!currentLanguage) return {format: format};
+
+	var parsed = [];
+	var re = (format.source || format) // allow format to be regex
+	 .replace(/%([a-z])/gi,
+		function($0, $1){
+			return replacers($1) || $0;
+		}
+	).replace(/\((?!\?)/g, '(?:') // make all groups non-capturing
+	 .replace(/ (?!\?|\*)/g, ',? ') // be forgiving with spaces and commas
+	 .replace(/%([a-z%])/gi,
+		function($0, $1){
+			var p = keys[$1];
+			if (!p) return $1;
+			parsed.push($1);
+			return '(' + p.source + ')';
+		}
+	).replace(/\[a-z\]/gi, '[a-z\\u00c0-\\uffff;\&]'); // handle unicode words
+
+	return {
+		format: format,
+		re: new RegExp('^' + re + '$', 'i'),
+		handler: function(bits){
+			bits = bits.slice(1).associate(parsed);
+			var date = new Date().clearTime(),
+				year = bits.y || bits.Y;
+
+			if (year != null) handle.call(date, 'y', year); // need to start in the right year
+			if ('d' in bits) handle.call(date, 'd', 1);
+			if ('m' in bits || bits.b || bits.B) handle.call(date, 'm', 1);
+
+			for (var key in bits) handle.call(date, key, bits[key]);
+			return date;
+		}
+	};
+};
+
+var handle = function(key, value){
+	if (!value) return this;
+
+	switch (key){
+		case 'a': case 'A': return this.set('day', Date.parseDay(value, true));
+		case 'b': case 'B': return this.set('mo', Date.parseMonth(value, true));
+		case 'd': return this.set('date', value);
+		case 'H': case 'I': return this.set('hr', value);
+		case 'm': return this.set('mo', value - 1);
+		case 'M': return this.set('min', value);
+		case 'p': return this.set('ampm', value.replace(/\./g, ''));
+		case 'S': return this.set('sec', value);
+		case 's': return this.set('ms', ('0.' + value) * 1000);
+		case 'w': return this.set('day', value);
+		case 'Y': return this.set('year', value);
+		case 'y':
+			value = +value;
+			if (value < 100) value += startCentury + (value < startYear ? 100 : 0);
+			return this.set('year', value);
+		case 'z':
+			if (value == 'Z') value = '+00';
+			var offset = value.match(/([+-])(\d{2}):?(\d{2})?/);
+			offset = (offset[1] + '1') * (offset[2] * 60 + (+offset[3] || 0)) + this.getTimezoneOffset();
+			return this.set('time', this - offset * 60000);
+	}
+
+	return this;
+};
+
+Date.defineParsers(
+	'%Y([-./]%m([-./]%d((T| )%X)?)?)?', // "1999-12-31", "1999-12-31 11:59pm", "1999-12-31 23:59:59", ISO8601
+	'%Y%m%d(T%H(%M%S?)?)?', // "19991231", "19991231T1159", compact
+	'%x( %X)?', // "12/31", "12.31.99", "12-31-1999", "12/31/2008 11:59 PM"
+	'%d%o( %b( %Y)?)?( %X)?', // "31st", "31st December", "31 Dec 1999", "31 Dec 1999 11:59pm"
+	'%b( %d%o)?( %Y)?( %X)?', // Same as above with month and day switched
+	'%Y %b( %d%o( %X)?)?', // Same as above with year coming first
+	'%o %b %d %X %z %Y', // "Thu Oct 22 08:11:23 +0000 2009"
+	'%T', // %H:%M:%S
+	'%H:%M( ?%p)?' // "11:05pm", "11:05 am" and "11:05"
+);
+
+Locale.addEvent('change', function(language){
+	if (Locale.get('Date')) recompile(language);
+}).fireEvent('change', Locale.getCurrent());
+
+})();
+
+
+// Begin: Source/Types/Date.Extras.js
+/*
+---
+
+script: Date.Extras.js
+
+name: Date.Extras
+
+description: Extends the Date native object to include extra methods (on top of those in Date.js).
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+  - Scott Kyle
+
+requires:
+  - /Date
+
+provides: [Date.Extras]
+
+...
+*/
+
+Date.implement({
+
+	timeDiffInWords: function(to){
+		return Date.distanceOfTimeInWords(this, to || new Date);
+	},
+
+	timeDiff: function(to, separator){
+		if (to == null) to = new Date;
+		var delta = ((to - this) / 1000).floor().abs();
+
+		var vals = [],
+			durations = [60, 60, 24, 365, 0],
+			names = ['s', 'm', 'h', 'd', 'y'],
+			value, duration;
+
+		for (var item = 0; item < durations.length; item++){
+			if (item && !delta) break;
+			value = delta;
+			if ((duration = durations[item])){
+				value = (delta % duration);
+				delta = (delta / duration).floor();
+			}
+			vals.unshift(value + (names[item] || ''));
+		}
+
+		return vals.join(separator || ':');
+	}
+
+}).extend({
+
+	distanceOfTimeInWords: function(from, to){
+		return Date.getTimePhrase(((to - from) / 1000).toInt());
+	},
+
+	getTimePhrase: function(delta){
+		var suffix = (delta < 0) ? 'Until' : 'Ago';
+		if (delta < 0) delta *= -1;
+
+		var units = {
+			minute: 60,
+			hour: 60,
+			day: 24,
+			week: 7,
+			month: 52 / 12,
+			year: 12,
+			eon: Infinity
+		};
+
+		var msg = 'lessThanMinute';
+
+		for (var unit in units){
+			var interval = units[unit];
+			if (delta < 1.5 * interval){
+				if (delta > 0.75 * interval) msg = unit;
+				break;
+			}
+			delta /= interval;
+			msg = unit + 's';
+		}
+
+		delta = delta.round();
+		return Date.getMsg(msg + suffix, delta).substitute({delta: delta});
+	}
+
+}).defineParsers(
+
+	{
+		// "today", "tomorrow", "yesterday"
+		re: /^(?:tod|tom|yes)/i,
+		handler: function(bits){
+			var d = new Date().clearTime();
+			switch (bits[0]){
+				case 'tom': return d.increment();
+				case 'yes': return d.decrement();
+				default: return d;
+			}
+		}
+	},
+
+	{
+		// "next Wednesday", "last Thursday"
+		re: /^(next|last) ([a-z]+)$/i,
+		handler: function(bits){
+			var d = new Date().clearTime();
+			var day = d.getDay();
+			var newDay = Date.parseDay(bits[2], true);
+			var addDays = newDay - day;
+			if (newDay <= day) addDays += 7;
+			if (bits[1] == 'last') addDays -= 7;
+			return d.set('date', d.getDate() + addDays);
+		}
+	}
+
+).alias('timeAgoInWords', 'timeDiffInWords');
+
+
+// Begin: Source/Utilities/JSON.js
+/*
+---
+
+name: JSON
+
+description: JSON encoder and decoder.
+
+license: MIT-style license.
+
+SeeAlso: <http://www.json.org/>
+
+requires: [Array, String, Number, Function]
+
+provides: JSON
+
+...
+*/
+
+if (typeof JSON == 'undefined') this.JSON = {};
+
+//<1.2compat>
+
+JSON = new Hash({
+	stringify: JSON.stringify,
+	parse: JSON.parse
+});
+
+//</1.2compat>
+
+(function(){
+
+var special = {'\b': '\\b', '\t': '\\t', '\n': '\\n', '\f': '\\f', '\r': '\\r', '"' : '\\"', '\\': '\\\\'};
+
+var escape = function(chr){
+	return special[chr] || '\\u' + ('0000' + chr.charCodeAt(0).toString(16)).slice(-4);
+};
+
+JSON.validate = function(string){
+	string = string.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
+					replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+					replace(/(?:^|:|,)(?:\s*\[)+/g, '');
+
+	return (/^[\],:{}\s]*$/).test(string);
+};
+
+JSON.encode = JSON.stringify ? function(obj){
+	return JSON.stringify(obj);
+} : function(obj){
+	if (obj && obj.toJSON) obj = obj.toJSON();
+
+	switch (typeOf(obj)){
+		case 'string':
+			return '"' + obj.replace(/[\x00-\x1f\\"]/g, escape) + '"';
+		case 'array':
+			return '[' + obj.map(JSON.encode).clean() + ']';
+		case 'object': case 'hash':
+			var string = [];
+			Object.each(obj, function(value, key){
+				var json = JSON.encode(value);
+				if (json) string.push(JSON.encode(key) + ':' + json);
+			});
+			return '{' + string + '}';
+		case 'number': case 'boolean': return '' + obj;
+		case 'null': return 'null';
+	}
+
+	return null;
+};
+
+JSON.decode = function(string, secure){
+	if (!string || typeOf(string) != 'string') return null;
+
+	if (secure || JSON.secure){
+		if (JSON.parse) return JSON.parse(string);
+		if (!JSON.validate(string)) throw new Error('JSON could not decode the input; security is enabled and the value is not secure.');
+	}
+
+	return eval('(' + string + ')');
+};
+
+})();
 
 
 // Begin: Source/Browser/Browser.js
@@ -3704,248 +4998,6 @@ if (testForm.firstChild.value != 's') Element.Properties.value = {
 })();
 
 
-// Begin: Source/Class/Class.js
-/*
----
-
-name: Class
-
-description: Contains the Class Function for easily creating, extending, and implementing reusable Classes.
-
-license: MIT-style license.
-
-requires: [Array, String, Function, Number]
-
-provides: Class
-
-...
-*/
-
-(function(){
-
-var Class = this.Class = new Type('Class', function(params){
-	if (instanceOf(params, Function)) params = {initialize: params};
-
-	var newClass = function(){
-		reset(this);
-		if (newClass.$prototyping) return this;
-		this.$caller = null;
-		var value = (this.initialize) ? this.initialize.apply(this, arguments) : this;
-		this.$caller = this.caller = null;
-		return value;
-	}.extend(this).implement(params);
-
-	newClass.$constructor = Class;
-	newClass.prototype.$constructor = newClass;
-	newClass.prototype.parent = parent;
-
-	return newClass;
-});
-
-var parent = function(){
-	if (!this.$caller) throw new Error('The method "parent" cannot be called.');
-	var name = this.$caller.$name,
-		parent = this.$caller.$owner.parent,
-		previous = (parent) ? parent.prototype[name] : null;
-	if (!previous) throw new Error('The method "' + name + '" has no parent.');
-	return previous.apply(this, arguments);
-};
-
-var reset = function(object){
-	for (var key in object){
-		var value = object[key];
-		switch (typeOf(value)){
-			case 'object':
-				var F = function(){};
-				F.prototype = value;
-				object[key] = reset(new F);
-			break;
-			case 'array': object[key] = value.clone(); break;
-		}
-	}
-	return object;
-};
-
-var wrap = function(self, key, method){
-	if (method.$origin) method = method.$origin;
-	var wrapper = function(){
-		if (method.$protected && this.$caller == null) throw new Error('The method "' + key + '" cannot be called.');
-		var caller = this.caller, current = this.$caller;
-		this.caller = current; this.$caller = wrapper;
-		var result = method.apply(this, arguments);
-		this.$caller = current; this.caller = caller;
-		return result;
-	}.extend({$owner: self, $origin: method, $name: key});
-	return wrapper;
-};
-
-var implement = function(key, value, retain){
-	if (Class.Mutators.hasOwnProperty(key)){
-		value = Class.Mutators[key].call(this, value);
-		if (value == null) return this;
-	}
-
-	if (typeOf(value) == 'function'){
-		if (value.$hidden) return this;
-		this.prototype[key] = (retain) ? value : wrap(this, key, value);
-	} else {
-		Object.merge(this.prototype, key, value);
-	}
-
-	return this;
-};
-
-var getInstance = function(klass){
-	klass.$prototyping = true;
-	var proto = new klass;
-	delete klass.$prototyping;
-	return proto;
-};
-
-Class.implement('implement', implement.overloadSetter());
-
-Class.Mutators = {
-
-	Extends: function(parent){
-		this.parent = parent;
-		this.prototype = getInstance(parent);
-	},
-
-	Implements: function(items){
-		Array.from(items).each(function(item){
-			var instance = new item;
-			for (var key in instance) implement.call(this, key, instance[key], true);
-		}, this);
-	}
-};
-
-})();
-
-
-// Begin: Source/Class/Class.Extras.js
-/*
----
-
-name: Class.Extras
-
-description: Contains Utility Classes that can be implemented into your own Classes to ease the execution of many common tasks.
-
-license: MIT-style license.
-
-requires: Class
-
-provides: [Class.Extras, Chain, Events, Options]
-
-...
-*/
-
-(function(){
-
-this.Chain = new Class({
-
-	$chain: [],
-
-	chain: function(){
-		this.$chain.append(Array.flatten(arguments));
-		return this;
-	},
-
-	callChain: function(){
-		return (this.$chain.length) ? this.$chain.shift().apply(this, arguments) : false;
-	},
-
-	clearChain: function(){
-		this.$chain.empty();
-		return this;
-	}
-
-});
-
-var removeOn = function(string){
-	return string.replace(/^on([A-Z])/, function(full, first){
-		return first.toLowerCase();
-	});
-};
-
-this.Events = new Class({
-
-	$events: {},
-
-	addEvent: function(type, fn, internal){
-		type = removeOn(type);
-
-		/*<1.2compat>*/
-		if (fn == $empty) return this;
-		/*</1.2compat>*/
-
-		this.$events[type] = (this.$events[type] || []).include(fn);
-		if (internal) fn.internal = true;
-		return this;
-	},
-
-	addEvents: function(events){
-		for (var type in events) this.addEvent(type, events[type]);
-		return this;
-	},
-
-	fireEvent: function(type, args, delay){
-		type = removeOn(type);
-		var events = this.$events[type];
-		if (!events) return this;
-		args = Array.from(args);
-		events.each(function(fn){
-			if (delay) fn.delay(delay, this, args);
-			else fn.apply(this, args);
-		}, this);
-		return this;
-	},
-
-	removeEvent: function(type, fn){
-		type = removeOn(type);
-		var events = this.$events[type];
-		if (events && !fn.internal){
-			var index =  events.indexOf(fn);
-			if (index != -1) delete events[index];
-		}
-		return this;
-	},
-
-	removeEvents: function(events){
-		var type;
-		if (typeOf(events) == 'object'){
-			for (type in events) this.removeEvent(type, events[type]);
-			return this;
-		}
-		if (events) events = removeOn(events);
-		for (type in this.$events){
-			if (events && events != type) continue;
-			var fns = this.$events[type];
-			for (var i = fns.length; i--;) if (i in fns){
-				this.removeEvent(type, fns[i]);
-			}
-		}
-		return this;
-	}
-
-});
-
-this.Options = new Class({
-
-	setOptions: function(){
-		var options = this.options = Object.merge.apply(null, [{}, this.options].append(arguments));
-		if (this.addEvent) for (var option in options){
-			if (typeOf(options[option]) != 'function' || !(/^on[A-Z]/).test(option)) continue;
-			this.addEvent(option, options[option]);
-			delete options[option];
-		}
-		return this;
-	}
-
-});
-
-})();
-
-
 // Begin: Source/Request/Request.js
 /*
 ---
@@ -5273,42 +6325,6 @@ Element.Events = new Hash(Element.Events);
 //</1.2compat>
 
 })();
-
-
-// Begin: Source/More/More.js
-/*
----
-
-script: More.js
-
-name: More
-
-description: MooTools More
-
-license: MIT-style license
-
-authors:
-  - Guillermo Rauch
-  - Thomas Aylott
-  - Scott Kyle
-  - Arian Stolwijk
-  - Tim Wienk
-  - Christoph Pojer
-  - Aaron Newton
-  - Jacob Thornton
-
-requires:
-  - Core/MooTools
-
-provides: [MooTools.More]
-
-...
-*/
-
-MooTools.More = {
-	'version': '1.4.0.1',
-	'build': 'a4244edf2aa97ac8a196fc96082dd35af1abab87'
-};
 
 
 // Begin: Source/Utilities/Assets.js
@@ -6850,68 +7866,150 @@ Element.implement({
 });
 
 
-// Begin: Source/Types/Object.Extras.js
+// Begin: Source/Types/String.Extras.js
 /*
 ---
 
-script: Object.Extras.js
+script: String.Extras.js
 
-name: Object.Extras
+name: String.Extras
 
-description: Extra Object generics, like getFromPath which allows a path notation to child elements.
+description: Extends the String native object to include methods useful in managing various kinds of strings (query strings, urls, html, etc).
 
 license: MIT-style license
 
 authors:
   - Aaron Newton
+  - Guillermo Rauch
+  - Christopher Pitt
 
 requires:
-  - Core/Object
-  - /MooTools.More
+  - Core/String
+  - Core/Array
+  - MooTools.More
 
-provides: [Object.Extras]
+provides: [String.Extras]
 
 ...
 */
 
 (function(){
 
-var defined = function(value){
-	return value != null;
+var special = {
+	'a': /[àáâãäåăą]/g,
+	'A': /[ÀÁÂÃÄÅĂĄ]/g,
+	'c': /[ćčç]/g,
+	'C': /[ĆČÇ]/g,
+	'd': /[ďđ]/g,
+	'D': /[ĎÐ]/g,
+	'e': /[èéêëěę]/g,
+	'E': /[ÈÉÊËĚĘ]/g,
+	'g': /[ğ]/g,
+	'G': /[Ğ]/g,
+	'i': /[ìíîï]/g,
+	'I': /[ÌÍÎÏ]/g,
+	'l': /[ĺľł]/g,
+	'L': /[ĹĽŁ]/g,
+	'n': /[ñňń]/g,
+	'N': /[ÑŇŃ]/g,
+	'o': /[òóôõöøő]/g,
+	'O': /[ÒÓÔÕÖØ]/g,
+	'r': /[řŕ]/g,
+	'R': /[ŘŔ]/g,
+	's': /[ššş]/g,
+	'S': /[ŠŞŚ]/g,
+	't': /[ťţ]/g,
+	'T': /[ŤŢ]/g,
+	'ue': /[ü]/g,
+	'UE': /[Ü]/g,
+	'u': /[ùúûůµ]/g,
+	'U': /[ÙÚÛŮ]/g,
+	'y': /[ÿý]/g,
+	'Y': /[ŸÝ]/g,
+	'z': /[žźż]/g,
+	'Z': /[ŽŹŻ]/g,
+	'th': /[þ]/g,
+	'TH': /[Þ]/g,
+	'dh': /[ð]/g,
+	'DH': /[Ð]/g,
+	'ss': /[ß]/g,
+	'oe': /[œ]/g,
+	'OE': /[Œ]/g,
+	'ae': /[æ]/g,
+	'AE': /[Æ]/g
+},
+
+tidy = {
+	' ': /[\xa0\u2002\u2003\u2009]/g,
+	'*': /[\xb7]/g,
+	'\'': /[\u2018\u2019]/g,
+	'"': /[\u201c\u201d]/g,
+	'...': /[\u2026]/g,
+	'-': /[\u2013]/g,
+//	'--': /[\u2014]/g,
+	'&raquo;': /[\uFFFD]/g
 };
 
-var hasOwnProperty = Object.prototype.hasOwnProperty;
+var walk = function(string, replacements){
+	var result = string, key;
+	for (key in replacements) result = result.replace(replacements[key], key);
+	return result;
+};
 
-Object.extend({
+var getRegexForTag = function(tag, contents){
+	tag = tag || '';
+	var regstr = contents ? "<" + tag + "(?!\\w)[^>]*>([\\s\\S]*?)<\/" + tag + "(?!\\w)>" : "<\/?" + tag + "([^>]+)?>",
+		reg = new RegExp(regstr, "gi");
+	return reg;
+};
 
-	getFromPath: function(source, parts){
-		if (typeof parts == 'string') parts = parts.split('.');
-		for (var i = 0, l = parts.length; i < l; i++){
-			if (hasOwnProperty.call(source, parts[i])) source = source[parts[i]];
-			else return null;
-		}
-		return source;
+String.implement({
+
+	standardize: function(){
+		return walk(this, special);
 	},
 
-	cleanValues: function(object, method){
-		method = method || defined;
-		for (var key in object) if (!method(object[key])){
-			delete object[key];
-		}
-		return object;
+	repeat: function(times){
+		return new Array(times + 1).join(this);
 	},
 
-	erase: function(object, key){
-		if (hasOwnProperty.call(object, key)) delete object[key];
-		return object;
+	pad: function(length, str, direction){
+		if (this.length >= length) return this;
+
+		var pad = (str == null ? ' ' : '' + str)
+			.repeat(length - this.length)
+			.substr(0, length - this.length);
+
+		if (!direction || direction == 'right') return this + pad;
+		if (direction == 'left') return pad + this;
+
+		return pad.substr(0, (pad.length / 2).floor()) + this + pad.substr(0, (pad.length / 2).ceil());
 	},
 
-	run: function(object){
-		var args = Array.slice(arguments, 1);
-		for (var key in object) if (object[key].apply){
-			object[key].apply(object, args);
+	getTags: function(tag, contents){
+		return this.match(getRegexForTag(tag, contents)) || [];
+	},
+
+	stripTags: function(tag, contents){
+		return this.replace(getRegexForTag(tag, contents), '');
+	},
+
+	tidy: function(){
+		return walk(this, tidy);
+	},
+
+	truncate: function(max, trail, atChar){
+		var string = this;
+		if (trail == null && arguments.length == 1) trail = '…';
+		if (string.length > max){
+			string = string.substring(0, max);
+			if (atChar){
+				var index = string.lastIndexOf(atChar);
+				if (index != -1) string = string.substr(0, index);
+			}
+			if (trail) string += trail;
 		}
-		return object;
+		return string;
 	}
 
 });
@@ -6919,195 +8017,853 @@ Object.extend({
 })();
 
 
-// Begin: Source/Locale/Locale.js
+// Begin: Source/Core/dbug.js
 /*
 ---
 
-script: Locale.js
+name: dbug
 
-name: Locale
+description: A wrapper for Firebug console.* statements.
 
-description: Provides methods for localization.
-
-license: MIT-style license
+license: MIT-style license.
 
 authors:
-  - Aaron Newton
-  - Arian Stolwijk
+- Aaron Newton
 
-requires:
-  - Core/Events
-  - /Object.Extras
-  - /MooTools.More
-
-provides: [Locale, Lang]
+provides: dbug
 
 ...
 */
+var dbug = {
+	logged: [],
+	timers: {},
+	firebug: false, 
+	enabled: false, 
+	log: function() {
+		dbug.logged.push(arguments);
+	},
+	nolog: function(msg) {
+		dbug.logged.push(arguments);
+	},
+	time: function(name){
+		dbug.timers[name] = new Date().getTime();
+	},
+	timeEnd: function(name){
+		if (dbug.timers[name]) {
+			var end = new Date().getTime() - dbug.timers[name];
+			dbug.timers[name] = false;
+			dbug.log('%s: %s', name, end);
+		} else dbug.log('no such timer: %s', name);
+	},
+	enable: function(silent) { 
+		var con = window.firebug ? firebug.d.console.cmd : window.console;
 
-(function(){
-
-var current = null,
-	locales = {},
-	inherits = {};
-
-var getSet = function(set){
-	if (instanceOf(set, Locale.Set)) return set;
-	else return locales[set];
-};
-
-var Locale = this.Locale = {
-
-	define: function(locale, set, key, value){
-		var name;
-		if (instanceOf(locale, Locale.Set)){
-			name = locale.name;
-			if (name) locales[name] = locale;
+		if((!!window.console && !!window.console.warn) || window.firebug) {
+			try {
+				dbug.enabled = true;
+				dbug.log = function(){
+						try {
+							(con.debug || con.log).apply(con, arguments);
+						} catch(e) {
+							console.log(Array.slice(arguments));
+						}
+				};
+				dbug.time = function(){
+					con.time.apply(con, arguments);
+				};
+				dbug.timeEnd = function(){
+					con.timeEnd.apply(con, arguments);
+				};
+				if(!silent) dbug.log('enabling dbug');
+				for(var i=0;i<dbug.logged.length;i++){ dbug.log.apply(con, dbug.logged[i]); }
+				dbug.logged=[];
+			} catch(e) {
+				dbug.enable.delay(400);
+			}
+		}
+	},
+	disable: function(){ 
+		if(dbug.firebug) dbug.enabled = false;
+		dbug.log = dbug.nolog;
+		dbug.time = function(){};
+		dbug.timeEnd = function(){};
+	},
+	cookie: function(set){
+		var value = document.cookie.match('(?:^|;)\\s*jsdebug=([^;]*)');
+		var debugCookie = value ? unescape(value[1]) : false;
+		if((set == null && debugCookie != 'true') || (set != null && set)) {
+			dbug.enable();
+			dbug.log('setting debugging cookie');
+			var date = new Date();
+			date.setTime(date.getTime()+(24*60*60*1000));
+			document.cookie = 'jsdebug=true;expires='+date.toGMTString()+';path=/;';
+		} else dbug.disableCookie();
+	},
+	disableCookie: function(){
+		dbug.log('disabling debugging cookie');
+		document.cookie = 'jsdebug=false;path=/;';
+	},
+	conditional: function(fn, fnIfError) {
+		if (dbug.enabled) {
+			return fn();
 		} else {
-			name = locale;
-			if (!locales[name]) locales[name] = new Locale.Set(name);
-			locale = locales[name];
+			try {
+				return fn();
+			} catch(e) {
+				if (fnIfError) fnIfError(e);
+			}
 		}
-
-		if (set) locale.define(set, key, value);
-
-		/*<1.2compat>*/
-		if (set == 'cascade') return Locale.inherit(name, key);
-		/*</1.2compat>*/
-
-		if (!current) current = locale;
-
-		return locale;
-	},
-
-	use: function(locale){
-		locale = getSet(locale);
-
-		if (locale){
-			current = locale;
-
-			this.fireEvent('change', locale);
-
-			/*<1.2compat>*/
-			this.fireEvent('langChange', locale.name);
-			/*</1.2compat>*/
-		}
-
-		return this;
-	},
-
-	getCurrent: function(){
-		return current;
-	},
-
-	get: function(key, args){
-		return (current) ? current.get(key, args) : '';
-	},
-
-	inherit: function(locale, inherits, set){
-		locale = getSet(locale);
-
-		if (locale) locale.inherit(inherits, set);
-		return this;
-	},
-
-	list: function(){
-		return Object.keys(locales);
 	}
-
 };
 
-Object.append(Locale, new Events);
-
-Locale.Set = new Class({
-
-	sets: {},
-
-	inherits: {
-		locales: [],
-		sets: {}
-	},
-
-	initialize: function(name){
-		this.name = name || '';
-	},
-
-	define: function(set, key, value){
-		var defineData = this.sets[set];
-		if (!defineData) defineData = {};
-
-		if (key){
-			if (typeOf(key) == 'object') defineData = Object.merge(defineData, key);
-			else defineData[key] = value;
+(function(){
+	var fb = !!window.console || !!window.firebug;
+	var con = window.firebug ? window.firebug.d.console.cmd : window.console;
+	var debugMethods = ['debug','info','warn','error','assert','dir','dirxml'];
+	var otherMethods = ['trace','group','groupEnd','profile','profileEnd','count'];
+	function set(methodList, defaultFunction) {
+		
+		var getLogger = function(method) {
+			return function(){
+				con[method].apply(con, arguments);
+			};
+		};
+		
+		for(var i = 0; i < methodList.length; i++){
+			var method = methodList[i];
+			if (fb && con[method]) {
+				dbug[method] = getLogger(method);
+			} else {
+				dbug[method] = defaultFunction;
+			}
 		}
-		this.sets[set] = defineData;
+	};
+	set(debugMethods, dbug.log);
+	set(otherMethods, function(){});
+})();
+if ((!!window.console && !!window.console.warn) || window.firebug){
+	dbug.firebug = true;
+	var value = document.cookie.match('(?:^|;)\\s*jsdebug=([^;]*)');
+	var debugCookie = value ? unescape(value[1]) : false;
+	if(window.location.href.indexOf("jsdebug=true")>0 || debugCookie=='true') dbug.enable();
+	if(debugCookie=='true')dbug.log('debugging cookie enabled');
+	if(window.location.href.indexOf("jsdebugCookie=true")>0){
+		dbug.cookie();
+		if(!dbug.enabled)dbug.enable();
+	}
+	if(window.location.href.indexOf("jsdebugCookie=false")>0)dbug.disableCookie();
+}
 
-		return this;
+
+// Begin: Source/UI/StyleWriter.js
+/*
+---
+name: StyleWriter
+
+description: Provides a simple method for injecting a css style element into the DOM if it's not already present.
+
+license: MIT-Style License
+
+requires: [Core/Class, Core/DomReady, Core/Element, dbug]
+
+provides: StyleWriter
+
+...
+*/
+
+var StyleWriter = new Class({
+	createStyle: function(css, id) {
+		window.addEvent('domready', function(){
+			try {
+				if (document.id(id) && id) return;
+				var style = new Element('style', {id: id||''}).inject($$('head')[0]);
+				if (Browser.ie) style.styleSheet.cssText = css;
+				else style.set('text', css);
+			}catch(e){dbug.log('error: %s',e);}
+		}.bind(this));
+	}
+});
+
+// Begin: Source/Element/Element.Shortcuts.js
+/*
+---
+
+script: Element.Shortcuts.js
+
+name: Element.Shortcuts
+
+description: Extends the Element native object to include some shortcut methods.
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+
+requires:
+  - Core/Element.Style
+  - /MooTools.More
+
+provides: [Element.Shortcuts]
+
+...
+*/
+
+Element.implement({
+
+	isDisplayed: function(){
+		return this.getStyle('display') != 'none';
 	},
 
-	get: function(key, args, _base){
-		var value = Object.getFromPath(this.sets, key);
-		if (value != null){
-			var type = typeOf(value);
-			if (type == 'function') value = value.apply(null, Array.from(args));
-			else if (type == 'object') value = Object.clone(value);
-			return value;
-		}
-
-		// get value of inherited locales
-		var index = key.indexOf('.'),
-			set = index < 0 ? key : key.substr(0, index),
-			names = (this.inherits.sets[set] || []).combine(this.inherits.locales).include('en-US');
-		if (!_base) _base = [];
-
-		for (var i = 0, l = names.length; i < l; i++){
-			if (_base.contains(names[i])) continue;
-			_base.include(names[i]);
-
-			var locale = locales[names[i]];
-			if (!locale) continue;
-
-			value = locale.get(key, args, _base);
-			if (value != null) return value;
-		}
-
-		return '';
+	isVisible: function(){
+		var w = this.offsetWidth,
+			h = this.offsetHeight;
+		return (w == 0 && h == 0) ? false : (w > 0 && h > 0) ? true : this.style.display != 'none';
 	},
 
-	inherit: function(names, set){
-		names = Array.from(names);
+	toggle: function(){
+		return this[this.isDisplayed() ? 'hide' : 'show']();
+	},
 
-		if (set && !this.inherits.sets[set]) this.inherits.sets[set] = [];
+	hide: function(){
+		var d;
+		try {
+			//IE fails here if the element is not in the dom
+			d = this.getStyle('display');
+		} catch(e){}
+		if (d == 'none') return this;
+		return this.store('element:_originalDisplay', d || '').setStyle('display', 'none');
+	},
 
-		var l = names.length;
-		while (l--) (set ? this.inherits.sets[set] : this.inherits.locales).unshift(names[l]);
+	show: function(display){
+		if (!display && this.isDisplayed()) return this;
+		display = display || this.retrieve('element:_originalDisplay') || 'block';
+		return this.setStyle('display', (display == 'none') ? 'block' : display);
+	},
 
-		return this;
+	swapClass: function(remove, add){
+		return this.removeClass(remove).addClass(add);
 	}
 
 });
 
-/*<1.2compat>*/
-var lang = MooTools.lang = {};
+Document.implement({
 
-Object.append(lang, Locale, {
-	setLanguage: Locale.use,
-	getCurrentLanguage: function(){
-		var current = Locale.getCurrent();
-		return (current) ? current.name : null;
-	},
-	set: function(){
-		Locale.define.apply(this, arguments);
-		return this;
-	},
-	get: function(set, key, args){
-		if (key) set += '.' + key;
-		return Locale.get(set, args);
+	clearSelection: function(){
+		if (window.getSelection){
+			var selection = window.getSelection();
+			if (selection && selection.removeAllRanges) selection.removeAllRanges();
+		} else if (document.selection && document.selection.empty){
+			try {
+				//IE fails here if selected element is not in dom
+				document.selection.empty();
+			} catch(e){}
+		}
 	}
+
 });
-/*</1.2compat>*/
+
+
+// Begin: Source/Element/Element.Pin.js
+/*
+---
+
+script: Element.Pin.js
+
+name: Element.Pin
+
+description: Extends the Element native object to include the pin method useful for fixed positioning for elements.
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+
+requires:
+  - Core/Element.Event
+  - Core/Element.Dimensions
+  - Core/Element.Style
+  - /MooTools.More
+
+provides: [Element.Pin]
+
+...
+*/
+
+(function(){
+	var supportsPositionFixed = false,
+		supportTested = false;
+
+	var testPositionFixed = function(){
+		var test = new Element('div').setStyles({
+			position: 'fixed',
+			top: 0,
+			right: 0
+		}).inject(document.body);
+		supportsPositionFixed = (test.offsetTop === 0);
+		test.dispose();
+		supportTested = true;
+	};
+
+	Element.implement({
+
+		pin: function(enable, forceScroll){
+			if (!supportTested) testPositionFixed();
+			if (this.getStyle('display') == 'none') return this;
+
+			var pinnedPosition,
+				scroll = window.getScroll(),
+				parent,
+				scrollFixer;
+
+			if (enable !== false){
+				pinnedPosition = this.getPosition(supportsPositionFixed ? document.body : this.getOffsetParent());
+				if (!this.retrieve('pin:_pinned')){
+					var currentPosition = {
+						top: pinnedPosition.y - scroll.y,
+						left: pinnedPosition.x - scroll.x
+					};
+
+					if (supportsPositionFixed && !forceScroll){
+						this.setStyle('position', 'fixed').setStyles(currentPosition);
+					} else {
+
+						parent = this.getOffsetParent();
+						var position = this.getPosition(parent),
+							styles = this.getStyles('left', 'top');
+
+						if (parent && styles.left == 'auto' || styles.top == 'auto') this.setPosition(position);
+						if (this.getStyle('position') == 'static') this.setStyle('position', 'absolute');
+
+						position = {
+							x: styles.left.toInt() - scroll.x,
+							y: styles.top.toInt() - scroll.y
+						};
+
+						scrollFixer = function(){
+							if (!this.retrieve('pin:_pinned')) return;
+							var scroll = window.getScroll();
+							this.setStyles({
+								left: position.x + scroll.x,
+								top: position.y + scroll.y
+							});
+						}.bind(this);
+
+						this.store('pin:_scrollFixer', scrollFixer);
+						window.addEvent('scroll', scrollFixer);
+					}
+					this.store('pin:_pinned', true);
+				}
+
+			} else {
+				if (!this.retrieve('pin:_pinned')) return this;
+
+				parent = this.getParent();
+				var offsetParent = (parent.getComputedStyle('position') != 'static' ? parent : parent.getOffsetParent());
+
+				pinnedPosition = this.getPosition(offsetParent);
+
+				this.store('pin:_pinned', false);
+				scrollFixer = this.retrieve('pin:_scrollFixer');
+				if (!scrollFixer){
+					this.setStyles({
+						position: 'absolute',
+						top: pinnedPosition.y + scroll.y,
+						left: pinnedPosition.x + scroll.x
+					});
+				} else {
+					this.store('pin:_scrollFixer', null);
+					window.removeEvent('scroll', scrollFixer);
+				}
+				this.removeClass('isPinned');
+			}
+			return this;
+		},
+
+		unpin: function(){
+			return this.pin(false);
+		},
+
+		togglePin: function(){
+			return this.pin(!this.retrieve('pin:_pinned'));
+		}
+
+	});
+
+//<1.2compat>
+Element.alias('togglepin', 'togglePin');
+//</1.2compat>
 
 })();
+
+
+// Begin: Source/Core/Clientcide.js
+/*
+---
+
+name: Clientcide
+
+description: The Clientcide namespace.
+
+license: MIT-style license.
+
+provides: Clientcide
+
+...
+*/
+var Clientcide = {
+	version: '3.0.8',
+	assetLocation: "http://github.com/anutron/clientcide/raw/master/Assets",
+	setAssetLocation: function(baseHref) {
+		Clientcide.assetLocation = baseHref;
+		if (Clientcide.preloaded) Clientcide.preLoadCss();
+	},
+	preLoadCss: function(){
+		if (window.StickyWin && StickyWin.ui) StickyWin.ui();
+		if (window.StickyWin && StickyWin.pointy) StickyWin.pointy();
+		Clientcide.preloaded = true;
+		return true;
+	},
+	preloaded: false
+};
+(function(){
+	if (!window.addEvent) return;
+	var preload = function(){
+		if (window.dbug) dbug.log('preloading clientcide css');
+		if (!Clientcide.preloaded) Clientcide.preLoadCss();
+	};
+	window.addEvent('domready', preload);
+	window.addEvent('load', preload);
+})();
+setCNETAssetBaseHref = Clientcide.setAssetLocation;
+
+
+// Begin: Source/UI/StickyWin.js
+/*
+---
+
+name: StickyWin
+
+description: Creates a div within the page with the specified contents at the location relative to the element you specify; basically an in-page popup maker.
+
+license: MIT-Style License
+
+requires: [
+  Core/DomReady,
+  Core/Slick.Finder,
+  More/Element.Position,
+  More/Class.Binds,
+  More/Element.Shortcuts,
+  More/Element.Pin,
+  More/IframeShim,
+  More/Object.Extras,
+  Clientcide,
+  StyleWriter
+]
+
+provides: [StickyWin, StickyWin.Stacker]
+...
+*/
+
+
+var StickyWin = new Class({
+	Binds: ['destroy', 'hide', 'togglepin', 'esc'],
+	Implements: [Options, Events, StyleWriter],
+	options: {
+//		onDisplay: function(){},
+//		onClose: function(){},
+//		onDestroy: function(){},
+		closeClassName: 'closeSticky',
+		pinClassName: 'pinSticky',
+		content: '',
+		zIndex: 10000,
+		className: '',
+//		id: ... set above in initialize function
+/*  	these are the defaults for Element.position anyway
+		************************************************
+		edge: false, //see Element.position
+		position: 'center', //center, corner == upperLeft, upperRight, bottomLeft, bottomRight
+		offset: {x:0,y:0},
+		relativeTo: document.body, */
+		width: false,
+		height: false,
+		timeout: -1,
+		allowMultipleByClass: true,
+		allowMultiple: true,
+		showNow: true,
+		useIframeShim: true,
+		iframeShimSelector: '',
+		destroyOnClose: false,
+		closeOnClickOut: false,
+		closeOnEsc: false,
+		getWindowManager: function(){ return StickyWin.WM; }
+	},
+
+	css: '.SWclearfix:after {content: "."; display: block; height: 0; clear: both; visibility: hidden;}'+
+		 '.SWclearfix {display: inline-table;} * html .SWclearfix {height: 1%;} .SWclearfix {display: block;}',
+
+	initialize: function(options){
+		this.options.inject = this.options.inject || {
+			target: document.body,
+			where: 'bottom'
+		};
+		this.setOptions(options);
+		this.windowManager = this.options.getWindowManager();
+		this.id = this.options.id || 'StickyWin_'+new Date().getTime();
+		this.makeWindow();
+		if (this.windowManager) this.windowManager.add(this);
+
+		if (this.options.content) this.setContent(this.options.content);
+		if (this.options.timeout > 0) {
+			this.addEvent('onDisplay', function(){
+				this.hide.delay(this.options.timeout, this);
+			}.bind(this));
+		}
+		//add css for clearfix
+		this.createStyle(this.css, 'StickyWinClearFix');
+		if (this.options.closeOnClickOut || this.options.closeOnEsc) this.attach();
+		if (this.options.destroyOnClose) this.addEvent('close', this.destroy);
+		if (this.options.showNow) this.show();
+	},
+	toElement: function(){
+		return this.element;
+	},
+	attach: function(dettach){
+		var method = dettach ? 'removeEvents' : 'addEvents';
+		var events = {};
+		if (this.options.closeOnClickOut) events.click = this.esc;
+		if (this.options.closeOnEsc) events.keyup = this.esc;
+		document[method](events);
+	},
+	esc: function(e) {
+		if (e.key == "esc") this.hide();
+		if (e.type == "click" && this.element != e.target && !this.element.contains(e.target)) this.hide();
+	},
+	makeWindow: function(){
+		this.destroyOthers();
+		if (!document.id(this.id)) {
+			this.win = new Element('div', {
+				id: this.id
+			}).addClass(this.options.className).addClass('StickyWinInstance').addClass('SWclearfix').setStyles({
+			 	display: 'none',
+				position: 'absolute',
+				zIndex: this.options.zIndex
+			}).inject(this.options.inject.target, this.options.inject.where).store('StickyWin', this);
+		} else this.win = document.id(this.id);
+		this.element = this.win;
+		if (this.options.width && typeOf(this.options.width.toInt())=="number") this.win.setStyle('width', this.options.width.toInt());
+		if (this.options.height && typeOf(this.options.height.toInt())=="number") this.win.setStyle('height', this.options.height.toInt());
+		return this;
+	},
+	show: function(suppressEvent){
+		this.showWin();
+		if (!suppressEvent) this.fireEvent('display');
+		if (this.options.useIframeShim) this.showIframeShim();
+		this.visible = true;
+		return this;
+	},
+	showWin: function(){
+		if (this.windowManager) this.windowManager.focus(this);
+		if (!this.positioned) this.position();
+		this.win.show();
+	},
+	hide: function(suppressEvent){
+		if (typeOf(suppressEvent) == "event" || !suppressEvent) this.fireEvent('close');
+		this.hideWin();
+		if (this.options.useIframeShim) this.hideIframeShim();
+		this.visible = false;
+		return this;
+	},
+	hideWin: function(){
+		this.win.setStyle('display','none');
+	},
+	destroyOthers: function() {
+		if (!this.options.allowMultipleByClass || !this.options.allowMultiple) {
+			$$('div.StickyWinInstance').each(function(sw) {
+				if (!this.options.allowMultiple || (!this.options.allowMultipleByClass && sw.hasClass(this.options.className)))
+					sw.retrieve('StickyWin').destroy();
+			}, this);
+		}
+	},
+	setContent: function(html) {
+		if (this.win.getChildren().length>0) this.win.empty();
+		if (typeOf(html) == "string") this.win.set('html', html);
+		else if (document.id(html)) this.win.adopt(html);
+		this.win.getElements('.'+this.options.closeClassName).each(function(el){
+			el.addEvent('click', this.hide);
+		}, this);
+		this.win.getElements('.'+this.options.pinClassName).each(function(el){
+			el.addEvent('click', this.togglepin);
+		}, this);
+		return this;
+	},
+	position: function(options){
+		this.positioned = true;
+		this.setOptions(options);
+		this.win.position(
+			Object.cleanValues({
+				allowNegative: [this.options.allowNegative, this.options.relativeTo != document.body].pick(),
+				relativeTo: this.options.relativeTo,
+				position: this.options.position,
+				offset: this.options.offset,
+				edge: this.options.edge
+			})
+		);
+		if (this.shim) this.shim.position();
+		return this;
+	},
+	pin: function(pin) {
+		if (!this.win.pin) {
+			dbug.log('you must include element.pin.js!');
+			return this;
+		}
+		this.pinned = pin != null && pin;
+		this.win.pin(pin);
+		return this;
+	},
+	unpin: function(){
+		return this.pin(false);
+	},
+	togglepin: function(){
+		return this.pin(!this.pinned);
+	},
+	makeIframeShim: function(){
+		if (!this.shim){
+			var el = (this.options.iframeShimSelector)?this.win.getElement(this.options.iframeShimSelector):this.win;
+			this.shim = new IframeShim(el, {
+				display: false,
+				name: 'StickyWinShim'
+			});
+		}
+	},
+	showIframeShim: function(){
+		if (this.options.useIframeShim) {
+			this.makeIframeShim();
+			this.shim.show();
+		}
+	},
+	hideIframeShim: function(){
+		if (this.shim) this.shim.hide();
+	},
+	destroy: function(){
+		this.destroyed = true;
+		this.attach(true);
+		if (this.windowManager) this.windowManager.remove(this);
+		if (this.win) this.win.destroy();
+		if (this.options.useIframeShim && this.shim) this.shim.destroy();
+		if (document.id('modalOverlay')) document.id('modalOverlay').destroy();
+		this.fireEvent('destroy');
+	}
+});
+
+StickyWin.Stacker = new Class({
+	Implements: [Options, Events],
+	Binds: ['click'],
+	instances: [],
+	options: {
+		zIndexBase: 9000
+	},
+	initialize: function(options) {
+		this.setOptions(options);
+	},
+	add: function(sw) {
+		this.instances.include(sw);
+		$(sw).addEvent('mousedown', this.click);
+	},
+	click: function(e) {
+		this.instances.each(function(sw){
+			var el = $(sw);
+			if (el == e.target || el.contains($(e.target))) this.focus(sw);
+		}, this);
+	},
+	focus: function(instance){
+		if (this.focused == instance) return;
+		this.focused = instance;
+		if (instance) this.instances.erase(instance).push(instance);
+		this.instances.each(function(current, i){
+			$(current).setStyle('z-index', this.options.zIndexBase + i);
+		}, this);
+		this.focused = instance;
+	},
+	remove: function(sw) {
+		this.instances.erase(sw);
+		$(sw).removeEvent('click', this.click);
+	}
+});
+StickyWin.WM = new StickyWin.Stacker();
+
+// Begin: Source/UI/StickyWin.UI.js
+ /*
+---
+name: StickyWin.UI
+
+description: Creates an html holder for in-page popups using a default style.
+
+license: MIT-Style License
+
+requires: [Core/Element.Style, More/String.Extras, StyleWriter, StickyWin]
+
+provides: StickyWin.UI
+...
+*/
+StickyWin.UI = new Class({
+	Implements: [Options, StyleWriter],
+	options: {
+		width: 300,
+		css: "div.DefaultStickyWin {font-family:verdana; font-size:11px; line-height: 13px;position: relative;}"+
+			"div.DefaultStickyWin div.top{-moz-user-select: none;-khtml-user-select: none;}"+
+			"div.DefaultStickyWin div.top_ul{background:url({%baseHref%}full.png) top left no-repeat; height:30px; width:15px; float:left}"+
+			"div.DefaultStickyWin div.top_ur{position:relative; left:0px !important; left:-4px; background:url({%baseHref%}full.png) top right !important; height:30px; margin:0px 0px 0px 15px !important; margin-right:-4px; padding:0px}"+
+			"div.DefaultStickyWin h1.caption{clear: none !important; margin:0px !important; overflow: hidden; padding:0 !important; font-weight:bold; color:#555; font-size:14px !important; position:relative; top:8px !important; left:5px !important; float: left; height: 22px !important;}"+
+			"div.DefaultStickyWin div.middle, div.DefaultStickyWin div.closeBody {background:url({%baseHref%}body.png) top left repeat-y; margin:0px 20px 0px 0px !important;	margin-bottom: -3px; position: relative;	top: 0px !important; top: -3px;}"+
+			"div.DefaultStickyWin div.body{background:url({%baseHref%}body.png) top right repeat-y; padding:8px 23px 8px 0px !important; margin-left:5px !important; position:relative; right:-20px !important; z-index: 1;}"+
+			"div.DefaultStickyWin div.bottom{clear:both;}"+
+			"div.DefaultStickyWin div.bottom_ll{background:url({%baseHref%}full.png) bottom left no-repeat; width:15px; height:15px; float:left}"+
+			"div.DefaultStickyWin div.bottom_lr{background:url({%baseHref%}full.png) bottom right; position:relative; left:0px !important; left:-4px; margin:0px 0px 0px 15px !important; margin-right:-4px; height:15px}"+
+			"div.DefaultStickyWin div.closeButtons{text-align: center; background:url({%baseHref%}body.png) top right repeat-y; padding: 4px 30px 8px 0px; margin-left:5px; position:relative; right:-20px}"+
+			"div.DefaultStickyWin a.button:hover{background:url({%baseHref%}big_button_over.gif) repeat-x}"+
+			"div.DefaultStickyWin a.button {background:url({%baseHref%}big_button.gif) repeat-x; margin: 2px 8px 2px 8px; padding: 2px 12px; cursor:pointer; border: 1px solid #999 !important; text-decoration:none; color: #000 !important;}"+
+			"div.DefaultStickyWin div.closeButton{width:13px; height:13px; background:url({%baseHref%}closebtn.gif) no-repeat; position: absolute; right: 0px; margin:10px 15px 0px 0px !important; cursor:pointer;top:0px}"+
+			"div.DefaultStickyWin div.dragHandle {	width: 11px;	height: 25px;	position: relative;	top: 5px;	left: -3px;	cursor: move;	background: url({%baseHref%}drag_corner.gif); float: left;}",
+		cornerHandle: false,
+		cssClass: '',
+		buttons: [],
+		cssId: 'defaultStickyWinStyle',
+		cssClassName: 'DefaultStickyWin',
+		closeButton: true
+/*	These options are deprecated:
+		closeTxt: false,
+		onClose: function(){},
+		confirmTxt: false,
+		onConfirm: function(){}	*/
+	},
+	initialize: function() {
+		var args = this.getArgs(arguments);
+		this.setOptions(args.options);
+		this.legacy();
+		var css = this.options.css.substitute({baseHref: this.options.baseHref || Clientcide.assetLocation + '/stickyWinHTML/'}, /\\?\{%([^}]+)%\}/g);
+		if (Browser.ie) css = css.replace(/png/g, 'gif');
+		this.createStyle(css, this.options.cssId);
+		this.build();
+		if (args.caption || args.body) this.setContent(args.caption, args.body);
+	},
+	toElement: function(){
+		return this.element;
+	},
+	getArgs: function(){
+		return StickyWin.UI.getArgs.apply(this, arguments);
+	},
+	legacy: function(){
+		var opt = this.options; //saving bytes
+		//legacy support
+		if (opt.confirmTxt) opt.buttons.push({text: opt.confirmTxt, onClick: opt.onConfirm || function(){}});
+		if (opt.closeTxt) opt.buttons.push({text: opt.closeTxt, onClick: opt.onClose || function(){}});
+	},
+	build: function(){
+		var opt = this.options;
+
+		var container = new Element('div', {
+			'class': opt.cssClassName
+		});
+		if (opt.width) container.setStyle('width', opt.width);
+		this.element = container;
+		this.element.store('StickyWinUI', this);
+		if (opt.cssClass) container.addClass(opt.cssClass);
+		
+
+		var bodyDiv = new Element('div').addClass('body');
+		this.body = bodyDiv;
+		
+		var top_ur = new Element('div').addClass('top_ur');
+		this.top_ur = top_ur;
+		this.top = new Element('div').addClass('top').adopt(
+				new Element('div').addClass('top_ul')
+			).adopt(top_ur);
+		container.adopt(this.top);
+		
+		if (opt.cornerHandle) new Element('div').addClass('dragHandle').inject(top_ur, 'top');
+		
+		//body
+		container.adopt(new Element('div').addClass('middle').adopt(bodyDiv));
+		//close buttons
+		if (opt.buttons.length > 0){
+			var closeButtons = new Element('div').addClass('closeButtons');
+			opt.buttons.each(function(button){
+				if (button.properties && button.properties.className){
+					button.properties['class'] = button.properties.className;
+					delete button.properties.className;
+				}
+				var properties = Object.merge({'class': 'closeSticky'}, button.properties);
+				new Element('a').addEvent('click', button.onClick || function(){})
+					.appendText(button.text).inject(closeButtons).set(properties).addClass('button');
+			});
+			container.adopt(new Element('div').addClass('closeBody').adopt(closeButtons));
+		}
+		//footer
+		container.adopt(
+			new Element('div').addClass('bottom').adopt(
+					new Element('div').addClass('bottom_ll')
+				).adopt(
+					new Element('div').addClass('bottom_lr')
+			)
+		);
+		if (this.options.closeButton) container.adopt(new Element('div').addClass('closeButton').addClass('closeSticky'));
+		return this;
+	},
+	setCaption: function(caption) {
+		this.caption = caption;
+		if (!this.h1) {
+			this.makeCaption(caption);
+		} else {
+			if (document.id(caption)) this.h1.adopt(caption);
+			else this.h1.set('html', caption);
+		}
+		return this;
+	},
+	makeCaption: function(caption) {
+		if (!caption) return this.destroyCaption();
+		var opt = this.options;
+		this.h1 = new Element('h1').addClass('caption');
+		if (opt.width) this.h1.setStyle('width', (opt.width-(opt.cornerHandle?55:40)-(opt.closeButton?10:0)));
+		this.setCaption(caption);
+		this.top_ur.adopt(this.h1);
+		if (!this.options.cornerHandle) this.h1.addClass('dragHandle');
+		return this;
+	},
+	destroyCaption: function(){
+		if (this.h1) {
+			this.h1.destroy();
+			this.h1 = null;
+		}
+		return this;
+	},
+	setContent: function(){
+		var args = this.getArgs.apply(this, arguments);
+		var caption = args.caption;
+		var body = args.body;
+		this.setCaption(caption);
+		if (document.id(body)) this.body.empty().adopt(body);
+		else this.body.set('html', body);
+		return this;
+	}
+});
+StickyWin.UI.getArgs = function(){
+	var input = typeOf(arguments[0]) == "arguments"?arguments[0]:arguments;
+	if (Browser.opera && 1 === input.length) input = input[0];
+
+	var cap = input[0], bod = input[1];
+	var args = Array.link(input, {options: Type.isObject});
+	if (input.length == 3 || (!args.options && input.length == 2)) {
+		args.caption = cap;
+		args.body = bod;
+	} else if ((typeOf(bod) == 'object' || !bod) && cap && typeOf(cap) != 'object'){
+		args.body = cap;
+	}
+	return args;
+};
+
+StickyWin.ui = function(caption, body, options){
+	return document.id(new StickyWin.UI(caption, body, options));
+};
 
 
 // Begin: Source/Locale/Locale.cs-CZ.Date.js
@@ -7657,680 +9413,6 @@ var Slider = new Class({
 
 });
 
-
-// Begin: Source/Element/Element.Shortcuts.js
-/*
----
-
-script: Element.Shortcuts.js
-
-name: Element.Shortcuts
-
-description: Extends the Element native object to include some shortcut methods.
-
-license: MIT-style license
-
-authors:
-  - Aaron Newton
-
-requires:
-  - Core/Element.Style
-  - /MooTools.More
-
-provides: [Element.Shortcuts]
-
-...
-*/
-
-Element.implement({
-
-	isDisplayed: function(){
-		return this.getStyle('display') != 'none';
-	},
-
-	isVisible: function(){
-		var w = this.offsetWidth,
-			h = this.offsetHeight;
-		return (w == 0 && h == 0) ? false : (w > 0 && h > 0) ? true : this.style.display != 'none';
-	},
-
-	toggle: function(){
-		return this[this.isDisplayed() ? 'hide' : 'show']();
-	},
-
-	hide: function(){
-		var d;
-		try {
-			//IE fails here if the element is not in the dom
-			d = this.getStyle('display');
-		} catch(e){}
-		if (d == 'none') return this;
-		return this.store('element:_originalDisplay', d || '').setStyle('display', 'none');
-	},
-
-	show: function(display){
-		if (!display && this.isDisplayed()) return this;
-		display = display || this.retrieve('element:_originalDisplay') || 'block';
-		return this.setStyle('display', (display == 'none') ? 'block' : display);
-	},
-
-	swapClass: function(remove, add){
-		return this.removeClass(remove).addClass(add);
-	}
-
-});
-
-Document.implement({
-
-	clearSelection: function(){
-		if (window.getSelection){
-			var selection = window.getSelection();
-			if (selection && selection.removeAllRanges) selection.removeAllRanges();
-		} else if (document.selection && document.selection.empty){
-			try {
-				//IE fails here if selected element is not in dom
-				document.selection.empty();
-			} catch(e){}
-		}
-	}
-
-});
-
-
-// Begin: Source/Element/Element.Pin.js
-/*
----
-
-script: Element.Pin.js
-
-name: Element.Pin
-
-description: Extends the Element native object to include the pin method useful for fixed positioning for elements.
-
-license: MIT-style license
-
-authors:
-  - Aaron Newton
-
-requires:
-  - Core/Element.Event
-  - Core/Element.Dimensions
-  - Core/Element.Style
-  - /MooTools.More
-
-provides: [Element.Pin]
-
-...
-*/
-
-(function(){
-	var supportsPositionFixed = false,
-		supportTested = false;
-
-	var testPositionFixed = function(){
-		var test = new Element('div').setStyles({
-			position: 'fixed',
-			top: 0,
-			right: 0
-		}).inject(document.body);
-		supportsPositionFixed = (test.offsetTop === 0);
-		test.dispose();
-		supportTested = true;
-	};
-
-	Element.implement({
-
-		pin: function(enable, forceScroll){
-			if (!supportTested) testPositionFixed();
-			if (this.getStyle('display') == 'none') return this;
-
-			var pinnedPosition,
-				scroll = window.getScroll(),
-				parent,
-				scrollFixer;
-
-			if (enable !== false){
-				pinnedPosition = this.getPosition(supportsPositionFixed ? document.body : this.getOffsetParent());
-				if (!this.retrieve('pin:_pinned')){
-					var currentPosition = {
-						top: pinnedPosition.y - scroll.y,
-						left: pinnedPosition.x - scroll.x
-					};
-
-					if (supportsPositionFixed && !forceScroll){
-						this.setStyle('position', 'fixed').setStyles(currentPosition);
-					} else {
-
-						parent = this.getOffsetParent();
-						var position = this.getPosition(parent),
-							styles = this.getStyles('left', 'top');
-
-						if (parent && styles.left == 'auto' || styles.top == 'auto') this.setPosition(position);
-						if (this.getStyle('position') == 'static') this.setStyle('position', 'absolute');
-
-						position = {
-							x: styles.left.toInt() - scroll.x,
-							y: styles.top.toInt() - scroll.y
-						};
-
-						scrollFixer = function(){
-							if (!this.retrieve('pin:_pinned')) return;
-							var scroll = window.getScroll();
-							this.setStyles({
-								left: position.x + scroll.x,
-								top: position.y + scroll.y
-							});
-						}.bind(this);
-
-						this.store('pin:_scrollFixer', scrollFixer);
-						window.addEvent('scroll', scrollFixer);
-					}
-					this.store('pin:_pinned', true);
-				}
-
-			} else {
-				if (!this.retrieve('pin:_pinned')) return this;
-
-				parent = this.getParent();
-				var offsetParent = (parent.getComputedStyle('position') != 'static' ? parent : parent.getOffsetParent());
-
-				pinnedPosition = this.getPosition(offsetParent);
-
-				this.store('pin:_pinned', false);
-				scrollFixer = this.retrieve('pin:_scrollFixer');
-				if (!scrollFixer){
-					this.setStyles({
-						position: 'absolute',
-						top: pinnedPosition.y + scroll.y,
-						left: pinnedPosition.x + scroll.x
-					});
-				} else {
-					this.store('pin:_scrollFixer', null);
-					window.removeEvent('scroll', scrollFixer);
-				}
-				this.removeClass('isPinned');
-			}
-			return this;
-		},
-
-		unpin: function(){
-			return this.pin(false);
-		},
-
-		togglePin: function(){
-			return this.pin(!this.retrieve('pin:_pinned'));
-		}
-
-	});
-
-//<1.2compat>
-Element.alias('togglepin', 'togglePin');
-//</1.2compat>
-
-})();
-
-
-// Begin: Source/Core/Clientcide.js
-/*
----
-
-name: Clientcide
-
-description: The Clientcide namespace.
-
-license: MIT-style license.
-
-provides: Clientcide
-
-...
-*/
-var Clientcide = {
-	version: '3.0.8',
-	assetLocation: "http://github.com/anutron/clientcide/raw/master/Assets",
-	setAssetLocation: function(baseHref) {
-		Clientcide.assetLocation = baseHref;
-		if (Clientcide.preloaded) Clientcide.preLoadCss();
-	},
-	preLoadCss: function(){
-		if (window.StickyWin && StickyWin.ui) StickyWin.ui();
-		if (window.StickyWin && StickyWin.pointy) StickyWin.pointy();
-		Clientcide.preloaded = true;
-		return true;
-	},
-	preloaded: false
-};
-(function(){
-	if (!window.addEvent) return;
-	var preload = function(){
-		if (window.dbug) dbug.log('preloading clientcide css');
-		if (!Clientcide.preloaded) Clientcide.preLoadCss();
-	};
-	window.addEvent('domready', preload);
-	window.addEvent('load', preload);
-})();
-setCNETAssetBaseHref = Clientcide.setAssetLocation;
-
-
-// Begin: Source/Core/dbug.js
-/*
----
-
-name: dbug
-
-description: A wrapper for Firebug console.* statements.
-
-license: MIT-style license.
-
-authors:
-- Aaron Newton
-
-provides: dbug
-
-...
-*/
-var dbug = {
-	logged: [],
-	timers: {},
-	firebug: false, 
-	enabled: false, 
-	log: function() {
-		dbug.logged.push(arguments);
-	},
-	nolog: function(msg) {
-		dbug.logged.push(arguments);
-	},
-	time: function(name){
-		dbug.timers[name] = new Date().getTime();
-	},
-	timeEnd: function(name){
-		if (dbug.timers[name]) {
-			var end = new Date().getTime() - dbug.timers[name];
-			dbug.timers[name] = false;
-			dbug.log('%s: %s', name, end);
-		} else dbug.log('no such timer: %s', name);
-	},
-	enable: function(silent) { 
-		var con = window.firebug ? firebug.d.console.cmd : window.console;
-
-		if((!!window.console && !!window.console.warn) || window.firebug) {
-			try {
-				dbug.enabled = true;
-				dbug.log = function(){
-						try {
-							(con.debug || con.log).apply(con, arguments);
-						} catch(e) {
-							console.log(Array.slice(arguments));
-						}
-				};
-				dbug.time = function(){
-					con.time.apply(con, arguments);
-				};
-				dbug.timeEnd = function(){
-					con.timeEnd.apply(con, arguments);
-				};
-				if(!silent) dbug.log('enabling dbug');
-				for(var i=0;i<dbug.logged.length;i++){ dbug.log.apply(con, dbug.logged[i]); }
-				dbug.logged=[];
-			} catch(e) {
-				dbug.enable.delay(400);
-			}
-		}
-	},
-	disable: function(){ 
-		if(dbug.firebug) dbug.enabled = false;
-		dbug.log = dbug.nolog;
-		dbug.time = function(){};
-		dbug.timeEnd = function(){};
-	},
-	cookie: function(set){
-		var value = document.cookie.match('(?:^|;)\\s*jsdebug=([^;]*)');
-		var debugCookie = value ? unescape(value[1]) : false;
-		if((set == null && debugCookie != 'true') || (set != null && set)) {
-			dbug.enable();
-			dbug.log('setting debugging cookie');
-			var date = new Date();
-			date.setTime(date.getTime()+(24*60*60*1000));
-			document.cookie = 'jsdebug=true;expires='+date.toGMTString()+';path=/;';
-		} else dbug.disableCookie();
-	},
-	disableCookie: function(){
-		dbug.log('disabling debugging cookie');
-		document.cookie = 'jsdebug=false;path=/;';
-	},
-	conditional: function(fn, fnIfError) {
-		if (dbug.enabled) {
-			return fn();
-		} else {
-			try {
-				return fn();
-			} catch(e) {
-				if (fnIfError) fnIfError(e);
-			}
-		}
-	}
-};
-
-(function(){
-	var fb = !!window.console || !!window.firebug;
-	var con = window.firebug ? window.firebug.d.console.cmd : window.console;
-	var debugMethods = ['debug','info','warn','error','assert','dir','dirxml'];
-	var otherMethods = ['trace','group','groupEnd','profile','profileEnd','count'];
-	function set(methodList, defaultFunction) {
-		
-		var getLogger = function(method) {
-			return function(){
-				con[method].apply(con, arguments);
-			};
-		};
-		
-		for(var i = 0; i < methodList.length; i++){
-			var method = methodList[i];
-			if (fb && con[method]) {
-				dbug[method] = getLogger(method);
-			} else {
-				dbug[method] = defaultFunction;
-			}
-		}
-	};
-	set(debugMethods, dbug.log);
-	set(otherMethods, function(){});
-})();
-if ((!!window.console && !!window.console.warn) || window.firebug){
-	dbug.firebug = true;
-	var value = document.cookie.match('(?:^|;)\\s*jsdebug=([^;]*)');
-	var debugCookie = value ? unescape(value[1]) : false;
-	if(window.location.href.indexOf("jsdebug=true")>0 || debugCookie=='true') dbug.enable();
-	if(debugCookie=='true')dbug.log('debugging cookie enabled');
-	if(window.location.href.indexOf("jsdebugCookie=true")>0){
-		dbug.cookie();
-		if(!dbug.enabled)dbug.enable();
-	}
-	if(window.location.href.indexOf("jsdebugCookie=false")>0)dbug.disableCookie();
-}
-
-
-// Begin: Source/UI/StyleWriter.js
-/*
----
-name: StyleWriter
-
-description: Provides a simple method for injecting a css style element into the DOM if it's not already present.
-
-license: MIT-Style License
-
-requires: [Core/Class, Core/DomReady, Core/Element, dbug]
-
-provides: StyleWriter
-
-...
-*/
-
-var StyleWriter = new Class({
-	createStyle: function(css, id) {
-		window.addEvent('domready', function(){
-			try {
-				if (document.id(id) && id) return;
-				var style = new Element('style', {id: id||''}).inject($$('head')[0]);
-				if (Browser.ie) style.styleSheet.cssText = css;
-				else style.set('text', css);
-			}catch(e){dbug.log('error: %s',e);}
-		}.bind(this));
-	}
-});
-
-// Begin: Source/UI/StickyWin.js
-/*
----
-
-name: StickyWin
-
-description: Creates a div within the page with the specified contents at the location relative to the element you specify; basically an in-page popup maker.
-
-license: MIT-Style License
-
-requires: [
-  Core/DomReady,
-  Core/Slick.Finder,
-  More/Element.Position,
-  More/Class.Binds,
-  More/Element.Shortcuts,
-  More/Element.Pin,
-  More/IframeShim,
-  More/Object.Extras,
-  Clientcide,
-  StyleWriter
-]
-
-provides: [StickyWin, StickyWin.Stacker]
-...
-*/
-
-
-var StickyWin = new Class({
-	Binds: ['destroy', 'hide', 'togglepin', 'esc'],
-	Implements: [Options, Events, StyleWriter],
-	options: {
-//		onDisplay: function(){},
-//		onClose: function(){},
-//		onDestroy: function(){},
-		closeClassName: 'closeSticky',
-		pinClassName: 'pinSticky',
-		content: '',
-		zIndex: 10000,
-		className: '',
-//		id: ... set above in initialize function
-/*  	these are the defaults for Element.position anyway
-		************************************************
-		edge: false, //see Element.position
-		position: 'center', //center, corner == upperLeft, upperRight, bottomLeft, bottomRight
-		offset: {x:0,y:0},
-		relativeTo: document.body, */
-		width: false,
-		height: false,
-		timeout: -1,
-		allowMultipleByClass: true,
-		allowMultiple: true,
-		showNow: true,
-		useIframeShim: true,
-		iframeShimSelector: '',
-		destroyOnClose: false,
-		closeOnClickOut: false,
-		closeOnEsc: false,
-		getWindowManager: function(){ return StickyWin.WM; }
-	},
-
-	css: '.SWclearfix:after {content: "."; display: block; height: 0; clear: both; visibility: hidden;}'+
-		 '.SWclearfix {display: inline-table;} * html .SWclearfix {height: 1%;} .SWclearfix {display: block;}',
-
-	initialize: function(options){
-		this.options.inject = this.options.inject || {
-			target: document.body,
-			where: 'bottom'
-		};
-		this.setOptions(options);
-		this.windowManager = this.options.getWindowManager();
-		this.id = this.options.id || 'StickyWin_'+new Date().getTime();
-		this.makeWindow();
-		if (this.windowManager) this.windowManager.add(this);
-
-		if (this.options.content) this.setContent(this.options.content);
-		if (this.options.timeout > 0) {
-			this.addEvent('onDisplay', function(){
-				this.hide.delay(this.options.timeout, this);
-			}.bind(this));
-		}
-		//add css for clearfix
-		this.createStyle(this.css, 'StickyWinClearFix');
-		if (this.options.closeOnClickOut || this.options.closeOnEsc) this.attach();
-		if (this.options.destroyOnClose) this.addEvent('close', this.destroy);
-		if (this.options.showNow) this.show();
-	},
-	toElement: function(){
-		return this.element;
-	},
-	attach: function(dettach){
-		var method = dettach ? 'removeEvents' : 'addEvents';
-		var events = {};
-		if (this.options.closeOnClickOut) events.click = this.esc;
-		if (this.options.closeOnEsc) events.keyup = this.esc;
-		document[method](events);
-	},
-	esc: function(e) {
-		if (e.key == "esc") this.hide();
-		if (e.type == "click" && this.element != e.target && !this.element.contains(e.target)) this.hide();
-	},
-	makeWindow: function(){
-		this.destroyOthers();
-		if (!document.id(this.id)) {
-			this.win = new Element('div', {
-				id: this.id
-			}).addClass(this.options.className).addClass('StickyWinInstance').addClass('SWclearfix').setStyles({
-			 	display: 'none',
-				position: 'absolute',
-				zIndex: this.options.zIndex
-			}).inject(this.options.inject.target, this.options.inject.where).store('StickyWin', this);
-		} else this.win = document.id(this.id);
-		this.element = this.win;
-		if (this.options.width && typeOf(this.options.width.toInt())=="number") this.win.setStyle('width', this.options.width.toInt());
-		if (this.options.height && typeOf(this.options.height.toInt())=="number") this.win.setStyle('height', this.options.height.toInt());
-		return this;
-	},
-	show: function(suppressEvent){
-		this.showWin();
-		if (!suppressEvent) this.fireEvent('display');
-		if (this.options.useIframeShim) this.showIframeShim();
-		this.visible = true;
-		return this;
-	},
-	showWin: function(){
-		if (this.windowManager) this.windowManager.focus(this);
-		if (!this.positioned) this.position();
-		this.win.show();
-	},
-	hide: function(suppressEvent){
-		if (typeOf(suppressEvent) == "event" || !suppressEvent) this.fireEvent('close');
-		this.hideWin();
-		if (this.options.useIframeShim) this.hideIframeShim();
-		this.visible = false;
-		return this;
-	},
-	hideWin: function(){
-		this.win.setStyle('display','none');
-	},
-	destroyOthers: function() {
-		if (!this.options.allowMultipleByClass || !this.options.allowMultiple) {
-			$$('div.StickyWinInstance').each(function(sw) {
-				if (!this.options.allowMultiple || (!this.options.allowMultipleByClass && sw.hasClass(this.options.className)))
-					sw.retrieve('StickyWin').destroy();
-			}, this);
-		}
-	},
-	setContent: function(html) {
-		if (this.win.getChildren().length>0) this.win.empty();
-		if (typeOf(html) == "string") this.win.set('html', html);
-		else if (document.id(html)) this.win.adopt(html);
-		this.win.getElements('.'+this.options.closeClassName).each(function(el){
-			el.addEvent('click', this.hide);
-		}, this);
-		this.win.getElements('.'+this.options.pinClassName).each(function(el){
-			el.addEvent('click', this.togglepin);
-		}, this);
-		return this;
-	},
-	position: function(options){
-		this.positioned = true;
-		this.setOptions(options);
-		this.win.position(
-			Object.cleanValues({
-				allowNegative: [this.options.allowNegative, this.options.relativeTo != document.body].pick(),
-				relativeTo: this.options.relativeTo,
-				position: this.options.position,
-				offset: this.options.offset,
-				edge: this.options.edge
-			})
-		);
-		if (this.shim) this.shim.position();
-		return this;
-	},
-	pin: function(pin) {
-		if (!this.win.pin) {
-			dbug.log('you must include element.pin.js!');
-			return this;
-		}
-		this.pinned = pin != null && pin;
-		this.win.pin(pin);
-		return this;
-	},
-	unpin: function(){
-		return this.pin(false);
-	},
-	togglepin: function(){
-		return this.pin(!this.pinned);
-	},
-	makeIframeShim: function(){
-		if (!this.shim){
-			var el = (this.options.iframeShimSelector)?this.win.getElement(this.options.iframeShimSelector):this.win;
-			this.shim = new IframeShim(el, {
-				display: false,
-				name: 'StickyWinShim'
-			});
-		}
-	},
-	showIframeShim: function(){
-		if (this.options.useIframeShim) {
-			this.makeIframeShim();
-			this.shim.show();
-		}
-	},
-	hideIframeShim: function(){
-		if (this.shim) this.shim.hide();
-	},
-	destroy: function(){
-		this.destroyed = true;
-		this.attach(true);
-		if (this.windowManager) this.windowManager.remove(this);
-		if (this.win) this.win.destroy();
-		if (this.options.useIframeShim && this.shim) this.shim.destroy();
-		if (document.id('modalOverlay')) document.id('modalOverlay').destroy();
-		this.fireEvent('destroy');
-	}
-});
-
-StickyWin.Stacker = new Class({
-	Implements: [Options, Events],
-	Binds: ['click'],
-	instances: [],
-	options: {
-		zIndexBase: 9000
-	},
-	initialize: function(options) {
-		this.setOptions(options);
-	},
-	add: function(sw) {
-		this.instances.include(sw);
-		$(sw).addEvent('mousedown', this.click);
-	},
-	click: function(e) {
-		this.instances.each(function(sw){
-			var el = $(sw);
-			if (el == e.target || el.contains($(e.target))) this.focus(sw);
-		}, this);
-	},
-	focus: function(instance){
-		if (this.focused == instance) return;
-		this.focused = instance;
-		if (instance) this.instances.erase(instance).push(instance);
-		this.instances.each(function(current, i){
-			$(current).setStyle('z-index', this.options.zIndexBase + i);
-		}, this);
-		this.focused = instance;
-	},
-	remove: function(sw) {
-		this.instances.erase(sw);
-		$(sw).removeEvent('click', this.click);
-	}
-});
-StickyWin.WM = new StickyWin.Stacker();
 
 // Begin: Source/Utilities/Cookie.js
 /*
