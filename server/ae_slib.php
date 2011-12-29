@@ -104,6 +104,7 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   );
   $js_options->watch_ip= $EZER->options->watch_ip= $pars->watch_ip ? '1' : '0';
   $js_options->watch_key= $EZER->options->watch_key= $pars->watch_key ? '1' : '0';
+  $js_options->CKEditor= $pars->CKEditor ? $pars->CKEditor : '{}';
   if ( $menu )      $js_options->start= "'$menu'";
   if ( $xtrace ) {
     $js_options->to_trace= 1;

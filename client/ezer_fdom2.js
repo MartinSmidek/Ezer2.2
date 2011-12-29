@@ -1117,76 +1117,22 @@ Ezer.EditHtml.implement({
       this.DOM_Block= new Element('div',{'class':'EditHtml',styles:this.coord()}).adopt(
           this.DOM_Input= new Element('textarea')
         ).inject(this.owner.DOM_Block);
-      var options= this.options.par||{};
-      options.entities_latin= false;
-      options.width= this._w;
-      options.height= this._h-60;
-      options.skin= 'office2003';
-      // vlastní toolbars
-      if ( options.toolbar=='Ezer' )
-        options.toolbar= [
-          [ 'Find','Replace',
+      // základní nastavení editoru
+      var options= {
+        width:this._w, height:this._h-60, resize_enabled:false,
+        entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
+        skin:'office2003'
+      };
+      // úprava options z nastavení aplikace podle options.toolbar z Ezerscriptu
+      Object.append(options,this.options.par||{});
+      Object.append(options,options.toolbar && Ezer.options.CKEditor[options.toolbar]
+        ? Ezer.options.CKEditor[options.toolbar]
+        : {toolbar:[[ 'Find','Replace',    // nebo jednoduchý default
             '-','Bold','Italic','Subscript','Superscript',
             '-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock',
             '-','Link','Unlink',
             '-','OrderedList','UnorderedList',
-            '-','Source','ShowBlocks','RemoveFormat']
-        ];
-      else if ( options.toolbar=='Minimal' )
-        options.toolbar= [['Bold','Italic','Source']];
-      else if ( options.toolbar=='EzerLetter' )
-        options.toolbar= [
-          [ 'PasteFromWord',
-            '-','Bold','Italic','FontSize','Subscript','Superscript',
-            '-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock',
-            '-','NumberedList','BulletedList',
-            '-','Outdent','Indent','SpecialChar',
-            '-','Source','ShowBlocks','RemoveFormat']
-        ];
-      else if ( options.toolbar=='EzerMail' )
-        options.toolbar= [
-          [ 'PasteFromWord',
-            '-','Bold','Italic','TextColor','BGColor',//'Subscript','Superscript',
-            '-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock',
-            '-','Link','Unlink','HorizontalRule','Image','Smiley',
-            '-','NumberedList','BulletedList',
-            '-','Outdent','Indent',
-            '-','Source','ShowBlocks','RemoveFormat']
-        ];
-      else if ( options.toolbar=='EzerTable' )
-        options.toolbar= [
-          ['Bold','Italic'],
-          ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-          ['OrderedList','UnorderedList','-','Link','Unlink','Image','Table'],
-          ['Source','ShowBlocks','RemoveFormat']
-        ] ;
-      else if ( options.toolbar=='IntranetPersonalie' ) {
-        options.toolbar= [
-          ['Bold','Italic','-','Subscript','Superscript'],
-          ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-          ['NumberedList','BulletedList','-','Table','HorizontalRule','SpecialChar'],
-          ['Source','ShowBlocks','Maximize','RemoveFormat']
-        ] ;
-        options.entities= false;
-        options.language= 'cs';
-        options.contentsLanguage= 'cs';
-        options.removePlugins= 'wsc,elementspath,scayt';
-        options.browserContextMenuOnCtrl= true;
-        options.toolbarStartupExpanded= false;
-        options.resize_enabled= false;
-      }
-      else if ( options.toolbar=='IntranetSlim' ) {
-        options.toolbar= [
-          ['Bold','Italic','-','Subscript','Superscript','-','SpecialChar','Link','Unlink','-','Source']
-        ] ;
-        options.entities= false;
-        options.language= 'cs';
-        options.contentsLanguage= 'cs';
-        options.removePlugins= 'wsc,elementspath,scayt';
-        options.browserContextMenuOnCtrl= true;
-        options.toolbarStartupExpanded= false;
-        options.resize_enabled= false;
-      }
+            '-','Source','ShowBlocks','RemoveFormat' ]]});
       this.ckeditor= CKEDITOR.replace(this.DOM_Input,options);
       this.ckeditor.on('focus', function(ev) {
         this._value= this.ckeditor.getData();
@@ -1195,7 +1141,7 @@ Ezer.EditHtml.implement({
         this.fire('onfocus');
       }.bind(this));
       this.ckeditor.on('blur', function(ev) {
-                                                        Ezer.trace('*','ckeditor:blur');
+//                                                         Ezer.trace('*','ckeditor:blur');
         if ( Ezer.browser!='CH' )
           this.DOM_Block.removeClass('focus');
         if ( this.ckeditor.checkDirty() && this._value!=this.ckeditor.getData() ) {
