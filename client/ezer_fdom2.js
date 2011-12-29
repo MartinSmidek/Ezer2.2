@@ -762,7 +762,7 @@ Ezer.Label.implement({
   DOM_add: function() {
     // zobrazení label
     var align= this._fc('c') ? 'center' : this._fc('r') ? 'right' : 'left';
-    this.DOM_Block= new Element('div',{'class':'Label',html:this.options.title,
+    this.DOM_Block= new Element('div',{'class':'Label',html:this.options.title||'',
       styles:this.coord({textAlign:align}),events:{
         click: function(el) {
           if ( !Ezer.design ) {

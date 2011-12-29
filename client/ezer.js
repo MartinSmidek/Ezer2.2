@@ -7088,6 +7088,8 @@ Ezer.fce.touch= function (type,block,args) {
  server_write:
   if ( Ezer.sys.user.id_user ) {
     Ezer.App.hits++;
+    Ezer.App.clock_tics= 0;
+    Ezer.App.bar_clock_show(true);
     var to_send= to_logout= false;
     var x= {cmd:'touch',user_id:Ezer.sys.user.id_user,user_abbr:Ezer.sys.user.abbr};
     x.root= Ezer.root;                  // název/složka aplikace

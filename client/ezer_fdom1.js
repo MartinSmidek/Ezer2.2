@@ -177,7 +177,7 @@ Ezer.Application= new Class({
   // patička
   putFootDom: function(x) {
 //     this.domFoot.appendText(x);
-    this.domFoot.set('text',x);
+    this.domFoot.set('text',x?x:'');
   },
   // ----------------------------------------------------------------------------- _state
   // vrátí řetězec charakterizující stav výpočtu
@@ -325,14 +325,25 @@ Ezer.Application= new Class({
       else {
         // uživatel neaktivní ale nepřekročen limit NEBO čekáme
       }
+      this.bar_clock_show(true);
     }
+    else
+      this.bar_clock_show(false);
+    if ( !quiet )
+      setTimeout("Ezer.App.bar_clock()",60*1000); // minutové kyvadlo
+  },
+  // ----------------------------------------------------------------------------- bar_clock_show
+  // zobrazování času a stavu v ae_bar.time
+  bar_clock_show: function (zbyva) {
     var abbr= Ezer.sys.user
       ? "<span title='id="+Ezer.sys.user.id_user+' / '+Ezer.sys.user.skills+"'>"
         +(Ezer.sys.user.abbr||'---')+(Ezer.sys.user.note||'')+'</span>'
       : '';
-    this.domUser.innerHTML= ae_time()+' '+abbr+'&nbsp;';
-    if ( !quiet )
-      setTimeout("Ezer.App.bar_clock()",60*1000); // minutové kyvadlo
+    this.domUser.innerHTML= ae_time()+' '+abbr;
+    if ( zbyva ) {
+      this.domUser.innerHTML+= " ... <span title='minut do odhlášení'>"
+        +(Ezer.App.options.login_interval-this.clock_tics)+' min</span> ... &nbsp;';
+    }
   },
   // ----------------------------------------------------------------------------- bar_clock_continue
   // je voláno pokud uživatel v okně zobrazeném z bar_clock potvrdil, že chce pokračovat
@@ -341,7 +352,7 @@ Ezer.Application= new Class({
     Ezer.App.hits++;
     Ezer.App.waiting= false;
 //                                                   Ezer.trace('*','bar_clock: prodlouženo');
-    Ezer.App.bar_clock();
+    Ezer.App.bar_clock(true);
   },
   // ----------------------------------------------------------------------------- bar_chat
   // udržuje se serverem konverzaci
