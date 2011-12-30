@@ -55,12 +55,13 @@ $blocs2 = array (                                    // překládají se na AE_<
 #  form
   'form'        =>  explode(",",'view,var,proc,browse,browse.smart,radio,label,edit,edit.html,'
                                .'button,button.submit,button.reset,button.upload,select,select.auto,'
-                               .'select.map,select.map0,field,field.date,menu,chat,check,list'
+                               .'select.map,select.map0,field,field.date,field.list,menu,chat,check,list'
                                .($pragma_attrs?',select':'')),
   'view'        =>  explode(",",''),
   'var'         =>  explode(",",'button,select,select.map'), //??????????
   'field'       =>  explode(",",'proc,menu'),
   'field.date'  =>  explode(",",'proc,menu'),
+  'field.list'  =>  explode(",",'proc,menu'),
   'label'       =>  explode(",",'proc'),
   'button'      =>  explode(",",'proc,label'),
   'edit'        =>  explode(",",'proc'),
@@ -77,7 +78,7 @@ $blocs2 = array (                                    // překládají se na AE_<
   'case'        =>  explode(",",''),
 #  list
   'list'   =>  explode(",",'proc,label,button,select,select.auto,select.map,select.map0,field,'
-                          .'field.date,menu,check,radio'),
+                          .'field.date,field.list,menu,check,radio'),
 #  proc
   'proc'        =>  explode(",",''),
 );
@@ -208,7 +209,7 @@ $attribs = array (
   'form'   =>  explode(",",'style:s,css:s,tabindex:n,title:s,key:s'),
   'view'   =>  explode(",",'join:s,join_type:s'),
   'label'  =>  explode(",",'data:i,expr:s,title:s,style:s,css:s,help:s,format:s,attribute:s,skill:s'),
-  'field'  =>  explode(",",'data:i,expr:s,map_pipe:m,sql_pipe:s,style:s,format:s,help:s,css:s,'
+  'field'  =>  explode(",",'data:i,par:o,expr:s,map_pipe:m,sql_pipe:s,style:s,format:s,help:s,css:s,'
                           .'type:s,attribute:s,value:s,skill:s'),  // help_bg:s
   'button' =>  explode(",",'type:s,title:s,help:s,style:s,css:s,format:s,skill:s,par:o'),
   'edit'   =>  explode(",",'type:s,data:i,expr:s,help:s,style:s,css:s,format:s,skill:s,par:o'),

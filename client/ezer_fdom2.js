@@ -683,7 +683,7 @@ Ezer.PanelPopup.implement({
   DOM_add1: function() {
     var close= this.options.par && this.options.par.close=='no' ? false : true;
     this.DOM= $(new StickyWin({draggable:true,
-      content:StickyWin.ui(this.options.title,null,{
+      content:StickyWin.ui(this.options.title||'',null,{
         cornerHandle:true, width:this._w+55,
         cssClassName:'PanelPopup',closeButton:close
       })
@@ -822,7 +822,7 @@ Ezer.Button.implement({
               }
             }.bind(this)
       },
-      value:this.options.title                          // u Opery záleží na pořadí
+      value:this.options.title||''                      // u Opery záleží na pořadí
     }).inject(owners_block);
     this.DOM_optStyle(this.DOM_Block);
     if ( this._fc('d') )
@@ -961,7 +961,7 @@ Ezer.Elem.implement({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_ElemEvents
 // doplní společné události pro DOM_Input
 // při zvednutí klávesy Enter resp. Esc zavolá button.submit resp. button.reset formuláře
-  DOM_ElemEvents: function () {
+  DOM_ElemEvents: function (no_focus_blur) {
     this.DOM_Input.addEvents({
       click: function(el) {
         if ( el && el.control ) {
@@ -989,19 +989,19 @@ Ezer.Elem.implement({
             // pokud byl Enter a pole bylo změněno, vznikne událost onchanged
             this.fire('onchanged');
           }
-                                                        Ezer.trace('*','DOM_ElemEvents:enter');
+//                                                         Ezer.trace('*','DOM_ElemEvents:enter');
           $each(this.owner.part,function(field,id) {
             if ( field instanceof Ezer.Button && field.type=='button.submit' ) {
-                                                        Ezer.trace('*','DOM_ElemEvents:enter=>submit');
+//                                                         Ezer.trace('*','DOM_ElemEvents:enter=>submit');
               field.fire('onclick');
             }
           },this);
         }
         else if ( event.key=='esc' ) {
-                                                        Ezer.trace('*','DOM_ElemEvents:esc');
+//                                                         Ezer.trace('*','DOM_ElemEvents:esc');
           $each(this.owner.part,function(field,id) {
             if ( field instanceof Ezer.Button && field.type=='button.reset' ) {
-                                                        Ezer.trace('*','DOM_ElemEvents:esc=>reset');
+//                                                         Ezer.trace('*','DOM_ElemEvents:esc=>reset');
               field.fire('onclick');
             }
           },this);
@@ -1009,16 +1009,20 @@ Ezer.Elem.implement({
         else  {
           this.fire('onchange',[]);
         }
-      }.bind(this),
-      focus: function() {
-        this.DOM_focus();
-        this.fire('onfocus');
-      }.bind(this),
-      blur: function() {
-        this.DOM_blur();
-        this.fire('onblur');
       }.bind(this)
     });
+    if ( !no_focus_blur ) {
+      this.DOM_Input.addEvents({
+        focus: function() {
+          this.DOM_focus();
+          this.fire('onfocus');
+        }.bind(this),
+        blur: function() {
+          this.DOM_blur();
+          this.fire('onblur');
+        }.bind(this)
+      });
+    }
     if ( this.title ) this.DOM_Input.set('title',this.title);
     // společné formáty
     if ( this._fc('o') && this.DOM_Block ) {
@@ -1061,7 +1065,7 @@ Ezer.FieldDate.implement({
   DOM_add: function() {
     this.DOM_Block= new Element('div',{'class':'FieldDate',styles:this.coord()}).adopt(
         this.DOM_icon= new Element('img',{align:'right',src:Ezer.paths.images_cc+'calendar.gif'}),
-        this.DOM_Input= new Element('input',{type:'text',value:this.options.title,styles:{
+        this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
           width:(this._w||87)-18,height:this._h||16}})
     ).inject(this.owner.DOM_Block);
     this.DOM_ElemEvents();
@@ -1078,6 +1082,144 @@ Ezer.FieldDate.implement({
         this.fire('onchange',[]);
       }.bind(this)});
     }
+  }
+});
+// ================================================================================================= FieldList-DOM
+//c: FieldList-DOM ()
+//      prvek nesoucí datovou hodnotu s volitelným rozbalením obsahu podle oddělovače
+//t: Block-DOM,Elem-DOM
+//s: Block-DOM
+Ezer.FieldList.implement({
+  _values: [],                          // rozložené hodnoty
+  _focus: 0,                            // 0 když rozbalené prvky nemají focus
+// ------------------------------------------------------------------------------------ DOM_add
+//f: FieldList-DOM.DOM_add ()
+//      zobrazí prvek field
+  DOM_add: function() {
+    var img= true;
+    this._h= this._h||16;         // defaultní výška prvku
+    this.DOM_Block= new Element('div',{'class':'Select FieldList',styles:this.coord()
+    }).inject(this.owner.DOM_Block);
+    this.DOM_Closure= new Element('div',{'class':'SelectClosure'}).inject(this.DOM_Block);
+    new Element('img',{align:'right',src:Ezer.version+'/client/img/field_list.gif',events:{
+      click: function() {
+//                                                         Ezer.trace('*','onfocus B '+this._focus);
+        if ( this.DOM_Input.hasClass('empty') ) {
+          this.DOM_Input.value= this.value;
+          this.DOM_Input.removeClass('empty').addClass('empty_focus');
+        }
+        this._focus++;
+        this.fire('onfocus');
+        this.DOM_show();
+      }.bind(this)
+    }}).inject(this.DOM_Closure);
+    this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
+        width:this._w-(img ? 20 : 0),height:this._h-4}
+    }).inject(this.DOM_Closure);
+    this.DOM_ElemEvents(true);
+    this.DOM_optStyle(this.DOM_Block);
+    // obal pro jednotlivé řádky
+    var dl_w= this.options.par && this.options.par.width
+      ? this.options.par.width : this._w-1;
+    this.DOM_DropList= new Element('div',{'class':'SelectDrop',styles:{
+        width:dl_w,display:'none'}}).inject(this.DOM_Block);
+    if ( this._fc('u') )           // pokud je format:'u' budou řádky nad field
+      this.DOM_DropList.setStyle('bottom',this._h);
+    else                           // jinak pod field
+      this.DOM_DropList.setStyle('top',this._h+3);
+    // definice obsluhy událostí
+    this.DOM_Input.addEvents({
+      focus: function(event) {
+//                                                         Ezer.trace('*','onfocus A '+this._focus);
+        if ( !this._focus ) {
+          this._focus++;
+          this.DOM_focus();
+          this.fire('onfocus');
+        }
+        this.DOM_hide();
+      }.bind(this),
+      blur: function (event) {
+//                                                         Ezer.trace('*','onblur A '+this._focus);
+        this._focus--;
+        this.DOM_hide();
+        this.DOM_blur();
+        this.fire('onblur');
+      }.bind(this),
+      change: function() {
+        this.DOM_changed(1,this._fc('t')?1:0); // když není format:'t' se zvýrazněním změny
+      }.bind(this),
+      keydown: function (event) {
+        event.stopPropagation();
+        if (event.key=='enter') event.stop();
+      }.bind(this),
+      keyup: function (event) {
+        if ( event.key=='esc' )
+          this.DOM_Input.fireEvent('blur');
+      }.bind(this)
+    });
+  },
+// ------------------------------------------------------------------------------------ DOM_show
+//f: FieldList-DOM.DOM_show
+//      zobrazí hodnoty
+  DOM_show: function() {
+    // odstraň předchozí hodnoty
+    this.DOM_DropList.getChildren().destroy();
+    // rozbal hodnotu s oddělovačem a vytvoř seznam
+    var values= this.DOM_Input.value.split(this.options.par ? this.options.par.delim||',' : ',');
+    var theFocus= null;
+    this._values= [];
+    values.each(function(value) {
+      var li= new Element('input',{'class':'FieldList',value:value,events:{
+        focus: function(event) {
+          this._focus++;
+        }.bind(this),
+        blur: function (event) {
+          this._focus--;
+          // počkáme chvilku a pak otestujeme _fokus (mohl být zvýšen klikem na jinou podhodnotu)
+          setTimeout(function() {
+//                                                         Ezer.trace('*','onblur B '+this._focus);
+            if ( this._focus==1 ) {
+              this.DOM_hide();
+              this.DOM_blur();
+              this.fire('onblur');
+            }
+          }.bind(this), 50);
+        }.bind(this),
+        change: function() {
+          this.DOM_changed(1,this._fc('t')?1:0);
+          this.DOM_refresh();
+        }.bind(this),
+        keyup: function(event) {
+          this.DOM_refresh();
+        }.bind(this)
+      }}).inject(this.DOM_DropList);
+      if ( !theFocus )
+        theFocus= li;
+      this._values.push(li);
+    },this);
+    // zobraz seznam
+    this.DOM_DropList.setStyle('display','block');
+    this.DOM_Block.setStyle('zIndex',999);
+    if ( theFocus )
+      theFocus.focus();
+  },
+// ------------------------------------------------------------------------------------ DOM_hide
+//f: FieldList-DOM.DOM_hide
+//      skryje hodnoty
+  DOM_hide: function() {
+    this.DOM_DropList.setStyle('display','none');
+    this._focus= 0;
+  },
+// ------------------------------------------------------------------------------------ DOM_refresh
+//f: FieldList-DOM.DOM_refresh
+//      obnoví hodnotu ze složek
+  DOM_refresh: function() {
+    this.DOM_Input.value= '';
+    var del= '';
+    this._values.each(function(li) {
+      this.DOM_Input.value+= del+li.value;
+      del= this.options.par ? this.options.par.delim||',' : ',';
+    },this);
   }
 });
 // ================================================================================================= Edit-DOM
@@ -1456,13 +1598,13 @@ Ezer.Select.implement({
 //o: Select-DOM.DOM_Closure - obal pro input a ikonu
     this.DOM_Closure= new Element('div',{'class':'SelectClosure'}).inject(this.DOM_Block);
     if ( img ) {
-      // varianta bez obrázku šipky
+      // varianta s obrázkem šipky
       var src= this.type=='select.auto' ? 'select_auto.gif' : 'select.gif';
         new Element('img',{align:'right',src:Ezer.version+'/client/img/'+src,events:{
           click: function() {this.DOM_Input.focus();}.bind(this)
         }}).inject(this.DOM_Closure);
     }
-    this.DOM_Input= new Element('input',{type:'text',value:this.options.title,styles:{
+    this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
         width:this._w-(img ? 20 : 0),height:this._h-4}
     }).inject(this.DOM_Closure);
     this.DOM_optStyle(this.DOM_Input);

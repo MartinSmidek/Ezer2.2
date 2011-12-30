@@ -390,6 +390,11 @@ border:2px dotted #ff0 !important; left:-1px; top:-1px;]
   margin-top:1px; }
 .FieldDate input {
   border:1px solid #aaa; }
+.FieldList input.FieldList {
+  border:0; border-bottom:1px solid #aaa; }
+.FieldList div.SelectDrop {
+  border:1px solid #aaa; position:absolute; z-index:1; -moz-box-shadow:5px 5px 10px #567;
+  overflow-y:auto; overflow-x:hidden; max-height:192px; }
 .Edit {
   position:absolute; font-family:Arial,Helvetica,sans-serif; font-size:9pt; z-index:1;
   border:1px solid #aaa; overflow-y:scroll; _overflow:scroll; }

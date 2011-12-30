@@ -570,6 +570,7 @@ Ezer.Block= new Class({
               case 'edit.html':     part= new Ezer.EditHtml(this,desc,DOM,id,skill); break;
               case 'field':         part= new Ezer.Field(this,desc,DOM,id,skill); break;
               case 'field.date':    part= new Ezer.FieldDate(this,desc,DOM,id,skill); break;
+              case 'field.list':    part= new Ezer.FieldList(this,desc,DOM,id,skill); break;
               case 'item':          part= new Ezer.Item(this,desc,DOM,id,skill); break;
               case 'item.clipboard':part= new Ezer.Item(this,desc,DOM,id,skill); break;
               case 'list':          part= new Ezer.List(this,desc,DOM,id,skill); break;
@@ -2704,10 +2705,17 @@ Ezer.Field= new Class({
 //      vstupní část formuláře
 //t: Block,Elem,Field
 //s: Block
-//os: FieldDate.format - zarovnání dialogu
-//  ; 'U' : 'upper' s horním okrajem data
-//  ; 'R' : 'right' s pravým okrajem data
 Ezer.FieldDate= new Class({
+  Extends: Ezer.Field,
+  options: {}
+});
+// ================================================================================================= FieldDate
+//c: FieldList ()
+//      vstupní část formuláře - rozbalení obsahu podle oddělovače
+//t: Block,Elem,Field
+//s: Block
+//os: FieldList.par - delim: oddělovač
+Ezer.FieldList= new Class({
   Extends: Ezer.Field,
   options: {}
 });
@@ -6813,8 +6821,7 @@ Ezer.fce.href= function (path) {
     window.location.hash= hs[1];
     window.location.hash= '';
   }
-  // fce musí vracet false kvůli použití v <a href='#' ...>
-  return false;
+  return 1;
 }
 // ------------------------------------------------------------------------------------ download
 //ff: fce.download (file)
