@@ -2632,6 +2632,7 @@ Ezer.Show.implement({
         // potlačení zobrazení HTML a PHP tagů
         val= Ezer.fce.strip_tags(val);
       }
+      val= val==null ? '' : val;
       this.DOM_cell[ti].setProperty('text',val);
       if ( this._fc('t') ) {
         // zobrazení hodnoty i jako title pro format:'t'
@@ -2666,6 +2667,7 @@ Ezer.Show.implement({
         // potlačení zobrazení HTML a PHP tagů
         val= Ezer.fce.strip_tags(val);
       }
+      val= val==null ? '' : val;
       this.DOM_cell[r-browse.t+1].setProperty('text',val);
       if ( this._fc('t') ) {
         // zobrazení hodnoty i jako title pro format:'t'

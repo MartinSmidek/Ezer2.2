@@ -4063,68 +4063,6 @@ Ezer.Browse= new Class({
     }
     return _key;
   },
-// ------------------------------------------------------------------------------------ browse_page
-//-fx: Browse.browse_page ()
-//      zajistí viditelnost záznamů, které v současném řazení následují těsně za záznamem
-//      zobrazeným na posledním řádku browse; pokud je tento záznam poslední, vrátí 0.
-//      Metoda nevyvolá onrowclick;
-//   browse_page: function() {
-//     x= {};
-//     var b= this.b, blen= this.blen, t= this.t, tlen= this.tlen, slen= this.slen;
-//     if ( t+tlen<slen ) {
-//       // existuje alespoň jeden další záznam - zjistíme kolik jich je ještě v buf
-//       var r= Math.min(slen-1,t+tlen+this.tmax);
-//                                                         Ezer.trace('*','t='+t+',r='+r);
-//       // chybí-li cmd, nebude volána funkce na serveru
-//           var len= Math.min(r-b-blen,blen);
-//           var from= b+blen;
-//           b= r-blen+1;
-//           t= r-tlen+1;
-//           var x= this._params({cmd:'browse_scroll'},null,null,null,from,1);
-//           x.count= slen;                 // celkový počet záznamů select již známe
-//           x.rows= len;
-//           x.r= t;
-//           x.b= b; x.blen= blen; x.t= t; x.tlen= tlen; x.mode= 4; x.cmd='browse_scroll';
-//     }
-//     else {
-//       // pokud ne, vrať neobjekt 0 - to bude i návratová hodnota metody
-//       x= 0;
-//     }
-//                                                         Ezer.debug(x,'browse_page');
-//     return x;
-//   },
-//   browse_page_: function(y) {
-//     var rows= Number(y.rows),
-//       r= Number(y.r), b= Number(y.b), blen= Number(y.blen), t= Number(y.t), tlen= Number(y.tlen);
-//     // načtení bloku do nových polí
-//     var buf= [], keys= [], key= null;           // pro nová data
-//     if ( rows>0 ) {
-//       // naplň buf a keys daty
-//       for (var bi= 0; bi<rows; bi++) {          // bi ukazuje do buf a keys
-//         buf[bi]= {};
-//         for (var vi in y.values[bi+1]) {        // vi je identifikátor show
-//           // hodnota bude do buf transformována show._load
-//           buf[bi][vi]= this.part[vi]._load(y.values[bi+1][vi]);
-//           if ( keys[bi]==undefined && this.part[vi].data && this.part[vi].data.id==y.key_id ) {
-//             // klíč je zapsán jen podle první položky, která jej má v data.id
-//             key= keys[bi]= buf[bi][vi];
-//           }
-//         }
-//       }
-//     }
-//     // data je třeba vložit za konec buferu - prvních rows zapomeneme
-//     this.buf.splice(0,rows);
-//     this.buf= this.buf.concat(buf);
-//     this.keys.splice(0,rows);
-//     this.keys= this.keys.concat(keys);
-//     this.owner._key= key;
-//     // obnovení stavových hodnot
-//     this.r= r; this.b= b; this.blen= blen; this.t= t; this.tlen= tlen;
-//     // zobrazení tabulky
-//     this.DOM_show(true);                        // zobrazení bez scroll
-//     this.DOM_hi_row(this.r,false,false);         // focus bez onrowclick
-//     return 1;
-//   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _row_seek
 // funkce projde načtené řádky a pokud dojde ke shodě prvního písmena v r-tém sloupci
 // se vzorem nastaví řádek jako aktivní - procházení je kruhové
