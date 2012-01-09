@@ -532,9 +532,10 @@ function fce_warning ($msg,$send_mail='') { trace();
 # -------------------------------------------------------------------------------------------------- send_mail
 # pošle systémový mail, pokud není určen adresát či odesílatel jde o mail správci aplikace
 # $to může být seznam adres oddělený čárkou
-function send_mail($subject,$html,$from='',$to='') { trace();
+function send_mail($subject,$html,$from='',$to='',$fromname='') { trace();
   global $ezer_path_serv, $ezer_root, $EZER;
   $from= $from ? $from : ($EZER->smtp->from ? $EZER->smtp->from : $EZER->options->mail);
+  $fromname= $fromname ? $fromname : $ezer_root;
   $to= $to ? $to : $EZER->options->mail;
   // poslání mailu
   $phpmailer_path= "$ezer_path_serv/licensed/phpmailer";
@@ -547,7 +548,7 @@ function send_mail($subject,$html,$from='',$to='') { trace();
   $mail->Port= $EZER->smtp->port ? $EZER->smtp->port : 25;
   $mail->CharSet = "utf-8";
   $mail->From= $from;
-  $mail->FromName= "$ezer_root";
+  $mail->FromName= $fromname;
   foreach (explode(',',$to) as $to1) {
     $mail->AddAddress($to1);
   }
