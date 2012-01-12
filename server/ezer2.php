@@ -803,7 +803,7 @@
       $res2= mysql_qry($qry2);
       $from= mysql_num_rows($res2);
       $from= max(0,$from-1);
-      $from= intval($from/$rows)*$rows;
+#      $from= intval($from/$rows)*$rows;  ### TZ, 12.1.2012, aby browse_seek odroloval tak že na prvním řádku bude požadovaný záznam
       if ( isset($x->group) || isset($x->having) && $x->having ) {
 
         // pokud je GROUP musíme použít SQL_CALC_FOUND_ROWS
