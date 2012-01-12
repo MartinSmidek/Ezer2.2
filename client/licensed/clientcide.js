@@ -1,6 +1,6 @@
 
-//This library: http://dev.clientcide.com/depender/build?download=true&version=Clientcide+3.0.8&require=Core%2FCore&require=Core%2FFx.Morph&require=Core%2FFx.Tween&require=Core%2FRequest&require=Core%2FCookie&require=Core%2FDOMReady&require=Core%2FJSON&require=Clientcide%2FStickyWin.Alert&require=Clientcide%2FStickyWin.UI&require=Clientcide%2FStickyWin&require=More%2FSlider&require=More%2FFx.Slide&require=More%2FMask&require=More%2FLocale.cs-CZ.Date&require=More%2FDate.Extras&require=More%2FAssets
-//Contents: Core:Source/Core/Core.js, Core:Source/Types/Object.js, Core:Source/Types/Array.js, Core:Source/Types/Function.js, Core:Source/Types/Number.js, Core:Source/Types/String.js, Core:Source/Browser/Browser.js, Core:Source/Slick/Slick.Parser.js, Core:Source/Slick/Slick.Finder.js, Core:Source/Element/Element.js, Core:Source/Class/Class.js, Core:Source/Class/Class.Extras.js, Core:Source/Request/Request.js, Core:Source/Fx/Fx.js, Core:Source/Element/Element.Style.js, Core:Source/Fx/Fx.CSS.js, Core:Source/Fx/Fx.Morph.js, Core:Source/Types/DOMEvent.js, Core:Source/Element/Element.Event.js, More:Source/More/More.js, More:Source/Class/Class.Binds.js, Core:Source/Element/Element.Dimensions.js, More:Source/Element/Element.Measure.js, More:Source/Element/Element.Position.js, More:Source/Class/Class.Occlude.js, More:Source/Utilities/IframeShim.js, More:Source/Interface/Mask.js, Core:Source/Utilities/DOMReady.js, More:Source/Element/Element.Shortcuts.js, More:Source/Element/Element.Pin.js, More:Source/Types/Object.Extras.js, Clientcide:Source/Core/Clientcide.js, Clientcide:Source/Core/dbug.js, Clientcide:Source/UI/StyleWriter.js, Clientcide:Source/UI/StickyWin.js, Clientcide:Source/UI/StickyWin.Modal.js, More:Source/Types/String.Extras.js, Clientcide:Source/UI/StickyWin.UI.js, Clientcide:Source/UI/StickyWin.Alert.js, More:Source/Drag/Drag.js, More:Source/Drag/Slider.js, Core:Source/Utilities/Cookie.js, More:Source/Locale/Locale.js, More:Source/Locale/Locale.en-US.Date.js, More:Source/Types/Date.js, More:Source/Types/Date.Extras.js, Core:Source/Utilities/JSON.js, Core:Source/Fx/Fx.Tween.js, More:Source/Utilities/Assets.js, More:Source/Fx/Fx.Slide.js, More:Source/Locale/Locale.cs-CZ.Date.js
+//This library: http://dev.clientcide.com/depender/build?download=true&version=Clientcide+3.0.10&require=Core%2FCore&require=Core%2FFx.Morph&require=Core%2FFx.Tween&require=Core%2FRequest&require=Core%2FCookie&require=Core%2FDOMReady&require=Core%2FJSON&require=Clientcide%2FStickyWin.Alert&require=Clientcide%2FStickyWin.Drag&require=Clientcide%2FStickyWin.UI&require=Clientcide%2FStickyWin&require=More%2FSlider&require=More%2FFx.Slide&require=More%2FMask&require=More%2FLocale.cs-CZ.Date&require=More%2FDate.Extras&require=More%2FAssets
+//Contents: Core:Source/Core/Core.js, Core:Source/Types/Object.js, Core:Source/Types/Array.js, Core:Source/Types/Function.js, Core:Source/Types/Number.js, Core:Source/Types/String.js, Core:Source/Browser/Browser.js, Core:Source/Slick/Slick.Parser.js, Core:Source/Slick/Slick.Finder.js, Core:Source/Element/Element.js, Core:Source/Class/Class.js, Core:Source/Class/Class.Extras.js, Core:Source/Request/Request.js, Core:Source/Fx/Fx.js, Core:Source/Element/Element.Style.js, Core:Source/Fx/Fx.CSS.js, Core:Source/Fx/Fx.Morph.js, More:Source/More/More.js, More:Source/Class/Class.Refactor.js, Core:Source/Element/Element.Dimensions.js, Core:Source/Types/DOMEvent.js, Core:Source/Element/Element.Event.js, More:Source/Drag/Drag.js, More:Source/Drag/Drag.Move.js, Core:Source/Utilities/DOMReady.js, More:Source/Element/Element.Measure.js, More:Source/Element/Element.Position.js, More:Source/Class/Class.Binds.js, More:Source/Element/Element.Shortcuts.js, More:Source/Element/Element.Pin.js, More:Source/Class/Class.Occlude.js, More:Source/Utilities/IframeShim.js, More:Source/Types/Object.Extras.js, Clientcide:Source/Core/Clientcide.js, Clientcide:Source/Core/dbug.js, Clientcide:Source/UI/StyleWriter.js, Clientcide:Source/UI/StickyWin.js, Clientcide:Source/UI/StickyWin.Drag.js, More:Source/Interface/Mask.js, Clientcide:Source/UI/StickyWin.Modal.js, More:Source/Types/String.Extras.js, Clientcide:Source/UI/StickyWin.UI.js, Clientcide:Source/UI/StickyWin.Alert.js, More:Source/Drag/Slider.js, Core:Source/Utilities/Cookie.js, More:Source/Locale/Locale.js, More:Source/Locale/Locale.en-US.Date.js, More:Source/Types/Date.js, More:Source/Types/Date.Extras.js, Core:Source/Utilities/JSON.js, Core:Source/Fx/Fx.Tween.js, More:Source/Utilities/Assets.js, More:Source/Fx/Fx.Slide.js, More:Source/Locale/Locale.cs-CZ.Date.js
 
 // Begin: Source/Core/Core.js
 /*
@@ -4758,6 +4758,371 @@ Element.implement({
 });
 
 
+// Begin: Source/More/More.js
+/*
+---
+
+script: More.js
+
+name: More
+
+description: MooTools More
+
+license: MIT-style license
+
+authors:
+  - Guillermo Rauch
+  - Thomas Aylott
+  - Scott Kyle
+  - Arian Stolwijk
+  - Tim Wienk
+  - Christoph Pojer
+  - Aaron Newton
+  - Jacob Thornton
+
+requires:
+  - Core/MooTools
+
+provides: [MooTools.More]
+
+...
+*/
+
+MooTools.More = {
+	'version': '1.4.0.1',
+	'build': 'a4244edf2aa97ac8a196fc96082dd35af1abab87'
+};
+
+
+// Begin: Source/Class/Class.Refactor.js
+/*
+---
+
+script: Class.Refactor.js
+
+name: Class.Refactor
+
+description: Extends a class onto itself with new property, preserving any items attached to the class's namespace.
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+
+requires:
+  - Core/Class
+  - /MooTools.More
+
+# Some modules declare themselves dependent on Class.Refactor
+provides: [Class.refactor, Class.Refactor]
+
+...
+*/
+
+Class.refactor = function(original, refactors){
+
+	Object.each(refactors, function(item, name){
+		var origin = original.prototype[name];
+		origin = (origin && origin.$origin) || origin || function(){};
+		original.implement(name, (typeof item == 'function') ? function(){
+			var old = this.previous;
+			this.previous = origin;
+			var value = item.apply(this, arguments);
+			this.previous = old;
+			return value;
+		} : item);
+	});
+
+	return original;
+
+};
+
+
+// Begin: Source/Element/Element.Dimensions.js
+/*
+---
+
+name: Element.Dimensions
+
+description: Contains methods to work with size, scroll, or positioning of Elements and the window object.
+
+license: MIT-style license.
+
+credits:
+  - Element positioning based on the [qooxdoo](http://qooxdoo.org/) code and smart browser fixes, [LGPL License](http://www.gnu.org/licenses/lgpl.html).
+  - Viewport dimensions based on [YUI](http://developer.yahoo.com/yui/) code, [BSD License](http://developer.yahoo.com/yui/license.html).
+
+requires: [Element, Element.Style]
+
+provides: [Element.Dimensions]
+
+...
+*/
+
+(function(){
+
+var element = document.createElement('div'),
+	child = document.createElement('div');
+element.style.height = '0';
+element.appendChild(child);
+var brokenOffsetParent = (child.offsetParent === element);
+element = child = null;
+
+var isOffset = function(el){
+	return styleString(el, 'position') != 'static' || isBody(el);
+};
+
+var isOffsetStatic = function(el){
+	return isOffset(el) || (/^(?:table|td|th)$/i).test(el.tagName);
+};
+
+Element.implement({
+
+	scrollTo: function(x, y){
+		if (isBody(this)){
+			this.getWindow().scrollTo(x, y);
+		} else {
+			this.scrollLeft = x;
+			this.scrollTop = y;
+		}
+		return this;
+	},
+
+	getSize: function(){
+		if (isBody(this)) return this.getWindow().getSize();
+		return {x: this.offsetWidth, y: this.offsetHeight};
+	},
+
+	getScrollSize: function(){
+		if (isBody(this)) return this.getWindow().getScrollSize();
+		return {x: this.scrollWidth, y: this.scrollHeight};
+	},
+
+	getScroll: function(){
+		if (isBody(this)) return this.getWindow().getScroll();
+		return {x: this.scrollLeft, y: this.scrollTop};
+	},
+
+	getScrolls: function(){
+		var element = this.parentNode, position = {x: 0, y: 0};
+		while (element && !isBody(element)){
+			position.x += element.scrollLeft;
+			position.y += element.scrollTop;
+			element = element.parentNode;
+		}
+		return position;
+	},
+
+	getOffsetParent: brokenOffsetParent ? function(){
+		var element = this;
+		if (isBody(element) || styleString(element, 'position') == 'fixed') return null;
+
+		var isOffsetCheck = (styleString(element, 'position') == 'static') ? isOffsetStatic : isOffset;
+		while ((element = element.parentNode)){
+			if (isOffsetCheck(element)) return element;
+		}
+		return null;
+	} : function(){
+		var element = this;
+		if (isBody(element) || styleString(element, 'position') == 'fixed') return null;
+
+		try {
+			return element.offsetParent;
+		} catch(e) {}
+		return null;
+	},
+
+	getOffsets: function(){
+		if (this.getBoundingClientRect && !Browser.Platform.ios){
+			var bound = this.getBoundingClientRect(),
+				html = document.id(this.getDocument().documentElement),
+				htmlScroll = html.getScroll(),
+				elemScrolls = this.getScrolls(),
+				isFixed = (styleString(this, 'position') == 'fixed');
+
+			return {
+				x: bound.left.toInt() + elemScrolls.x + ((isFixed) ? 0 : htmlScroll.x) - html.clientLeft,
+				y: bound.top.toInt()  + elemScrolls.y + ((isFixed) ? 0 : htmlScroll.y) - html.clientTop
+			};
+		}
+
+		var element = this, position = {x: 0, y: 0};
+		if (isBody(this)) return position;
+
+		while (element && !isBody(element)){
+			position.x += element.offsetLeft;
+			position.y += element.offsetTop;
+
+			if (Browser.firefox){
+				if (!borderBox(element)){
+					position.x += leftBorder(element);
+					position.y += topBorder(element);
+				}
+				var parent = element.parentNode;
+				if (parent && styleString(parent, 'overflow') != 'visible'){
+					position.x += leftBorder(parent);
+					position.y += topBorder(parent);
+				}
+			} else if (element != this && Browser.safari){
+				position.x += leftBorder(element);
+				position.y += topBorder(element);
+			}
+
+			element = element.offsetParent;
+		}
+		if (Browser.firefox && !borderBox(this)){
+			position.x -= leftBorder(this);
+			position.y -= topBorder(this);
+		}
+		return position;
+	},
+
+	getPosition: function(relative){
+		var offset = this.getOffsets(),
+			scroll = this.getScrolls();
+		var position = {
+			x: offset.x - scroll.x,
+			y: offset.y - scroll.y
+		};
+
+		if (relative && (relative = document.id(relative))){
+			var relativePosition = relative.getPosition();
+			return {x: position.x - relativePosition.x - leftBorder(relative), y: position.y - relativePosition.y - topBorder(relative)};
+		}
+		return position;
+	},
+
+	getCoordinates: function(element){
+		if (isBody(this)) return this.getWindow().getCoordinates();
+		var position = this.getPosition(element),
+			size = this.getSize();
+		var obj = {
+			left: position.x,
+			top: position.y,
+			width: size.x,
+			height: size.y
+		};
+		obj.right = obj.left + obj.width;
+		obj.bottom = obj.top + obj.height;
+		return obj;
+	},
+
+	computePosition: function(obj){
+		return {
+			left: obj.x - styleNumber(this, 'margin-left'),
+			top: obj.y - styleNumber(this, 'margin-top')
+		};
+	},
+
+	setPosition: function(obj){
+		return this.setStyles(this.computePosition(obj));
+	}
+
+});
+
+
+[Document, Window].invoke('implement', {
+
+	getSize: function(){
+		var doc = getCompatElement(this);
+		return {x: doc.clientWidth, y: doc.clientHeight};
+	},
+
+	getScroll: function(){
+		var win = this.getWindow(), doc = getCompatElement(this);
+		return {x: win.pageXOffset || doc.scrollLeft, y: win.pageYOffset || doc.scrollTop};
+	},
+
+	getScrollSize: function(){
+		var doc = getCompatElement(this),
+			min = this.getSize(),
+			body = this.getDocument().body;
+
+		return {x: Math.max(doc.scrollWidth, body.scrollWidth, min.x), y: Math.max(doc.scrollHeight, body.scrollHeight, min.y)};
+	},
+
+	getPosition: function(){
+		return {x: 0, y: 0};
+	},
+
+	getCoordinates: function(){
+		var size = this.getSize();
+		return {top: 0, left: 0, bottom: size.y, right: size.x, height: size.y, width: size.x};
+	}
+
+});
+
+// private methods
+
+var styleString = Element.getComputedStyle;
+
+function styleNumber(element, style){
+	return styleString(element, style).toInt() || 0;
+}
+
+function borderBox(element){
+	return styleString(element, '-moz-box-sizing') == 'border-box';
+}
+
+function topBorder(element){
+	return styleNumber(element, 'border-top-width');
+}
+
+function leftBorder(element){
+	return styleNumber(element, 'border-left-width');
+}
+
+function isBody(element){
+	return (/^(?:body|html)$/i).test(element.tagName);
+}
+
+function getCompatElement(element){
+	var doc = element.getDocument();
+	return (!doc.compatMode || doc.compatMode == 'CSS1Compat') ? doc.html : doc.body;
+}
+
+})();
+
+//aliases
+Element.alias({position: 'setPosition'}); //compatability
+
+[Window, Document, Element].invoke('implement', {
+
+	getHeight: function(){
+		return this.getSize().y;
+	},
+
+	getWidth: function(){
+		return this.getSize().x;
+	},
+
+	getScrollTop: function(){
+		return this.getScroll().y;
+	},
+
+	getScrollLeft: function(){
+		return this.getScroll().x;
+	},
+
+	getScrollHeight: function(){
+		return this.getScrollSize().y;
+	},
+
+	getScrollWidth: function(){
+		return this.getScrollSize().x;
+	},
+
+	getTop: function(){
+		return this.getPosition().y;
+	},
+
+	getLeft: function(){
+		return this.getPosition().x;
+	}
+
+});
+
+
 // Begin: Source/Types/DOMEvent.js
 /*
 ---
@@ -5079,365 +5444,549 @@ Element.Events = new Hash(Element.Events);
 })();
 
 
-// Begin: Source/More/More.js
+// Begin: Source/Drag/Drag.js
 /*
 ---
 
-script: More.js
+script: Drag.js
 
-name: More
+name: Drag
 
-description: MooTools More
+description: The base Drag Class. Can be used to drag and resize Elements using mouse events.
 
 license: MIT-style license
 
 authors:
-  - Guillermo Rauch
-  - Thomas Aylott
-  - Scott Kyle
-  - Arian Stolwijk
-  - Tim Wienk
-  - Christoph Pojer
-  - Aaron Newton
-  - Jacob Thornton
+  - Valerio Proietti
+  - Tom Occhinno
+  - Jan Kassens
 
 requires:
-  - Core/MooTools
-
-provides: [MooTools.More]
-
-...
-*/
-
-MooTools.More = {
-	'version': '1.4.0.1',
-	'build': 'a4244edf2aa97ac8a196fc96082dd35af1abab87'
-};
-
-
-// Begin: Source/Class/Class.Binds.js
-/*
----
-
-script: Class.Binds.js
-
-name: Class.Binds
-
-description: Automagically binds specified methods in a class to the instance of the class.
-
-license: MIT-style license
-
-authors:
-  - Aaron Newton
-
-requires:
-  - Core/Class
+  - Core/Events
+  - Core/Options
+  - Core/Element.Event
+  - Core/Element.Style
+  - Core/Element.Dimensions
   - /MooTools.More
 
-provides: [Class.Binds]
-
+provides: [Drag]
 ...
+
 */
 
-Class.Mutators.Binds = function(binds){
-	if (!this.prototype.initialize) this.implement('initialize', function(){});
-	return Array.from(binds).concat(this.prototype.Binds || []);
-};
+var Drag = new Class({
 
-Class.Mutators.initialize = function(initialize){
-	return function(){
-		Array.from(this.Binds).each(function(name){
-			var original = this[name];
-			if (original) this[name] = original.bind(this);
-		}, this);
-		return initialize.apply(this, arguments);
-	};
-};
+	Implements: [Events, Options],
+
+	options: {/*
+		onBeforeStart: function(thisElement){},
+		onStart: function(thisElement, event){},
+		onSnap: function(thisElement){},
+		onDrag: function(thisElement, event){},
+		onCancel: function(thisElement){},
+		onComplete: function(thisElement, event){},*/
+		snap: 6,
+		unit: 'px',
+		grid: false,
+		style: true,
+		limit: false,
+		handle: false,
+		invert: false,
+		preventDefault: false,
+		stopPropagation: false,
+		modifiers: {x: 'left', y: 'top'}
+	},
+
+	initialize: function(){
+		var params = Array.link(arguments, {
+			'options': Type.isObject,
+			'element': function(obj){
+				return obj != null;
+			}
+		});
+
+		this.element = document.id(params.element);
+		this.document = this.element.getDocument();
+		this.setOptions(params.options || {});
+		var htype = typeOf(this.options.handle);
+		this.handles = ((htype == 'array' || htype == 'collection') ? $$(this.options.handle) : document.id(this.options.handle)) || this.element;
+		this.mouse = {'now': {}, 'pos': {}};
+		this.value = {'start': {}, 'now': {}};
+
+		this.selection = (Browser.ie) ? 'selectstart' : 'mousedown';
 
 
-// Begin: Source/Element/Element.Dimensions.js
-/*
----
-
-name: Element.Dimensions
-
-description: Contains methods to work with size, scroll, or positioning of Elements and the window object.
-
-license: MIT-style license.
-
-credits:
-  - Element positioning based on the [qooxdoo](http://qooxdoo.org/) code and smart browser fixes, [LGPL License](http://www.gnu.org/licenses/lgpl.html).
-  - Viewport dimensions based on [YUI](http://developer.yahoo.com/yui/) code, [BSD License](http://developer.yahoo.com/yui/license.html).
-
-requires: [Element, Element.Style]
-
-provides: [Element.Dimensions]
-
-...
-*/
-
-(function(){
-
-var element = document.createElement('div'),
-	child = document.createElement('div');
-element.style.height = '0';
-element.appendChild(child);
-var brokenOffsetParent = (child.offsetParent === element);
-element = child = null;
-
-var isOffset = function(el){
-	return styleString(el, 'position') != 'static' || isBody(el);
-};
-
-var isOffsetStatic = function(el){
-	return isOffset(el) || (/^(?:table|td|th)$/i).test(el.tagName);
-};
-
-Element.implement({
-
-	scrollTo: function(x, y){
-		if (isBody(this)){
-			this.getWindow().scrollTo(x, y);
-		} else {
-			this.scrollLeft = x;
-			this.scrollTop = y;
+		if (Browser.ie && !Drag.ondragstartFixed){
+			document.ondragstart = Function.from(false);
+			Drag.ondragstartFixed = true;
 		}
+
+		this.bound = {
+			start: this.start.bind(this),
+			check: this.check.bind(this),
+			drag: this.drag.bind(this),
+			stop: this.stop.bind(this),
+			cancel: this.cancel.bind(this),
+			eventStop: Function.from(false)
+		};
+		this.attach();
+	},
+
+	attach: function(){
+		this.handles.addEvent('mousedown', this.bound.start);
 		return this;
 	},
 
-	getSize: function(){
-		if (isBody(this)) return this.getWindow().getSize();
-		return {x: this.offsetWidth, y: this.offsetHeight};
+	detach: function(){
+		this.handles.removeEvent('mousedown', this.bound.start);
+		return this;
 	},
 
-	getScrollSize: function(){
-		if (isBody(this)) return this.getWindow().getScrollSize();
-		return {x: this.scrollWidth, y: this.scrollHeight};
-	},
+	start: function(event){
+		var options = this.options;
 
-	getScroll: function(){
-		if (isBody(this)) return this.getWindow().getScroll();
-		return {x: this.scrollLeft, y: this.scrollTop};
-	},
+		if (event.rightClick) return;
 
-	getScrolls: function(){
-		var element = this.parentNode, position = {x: 0, y: 0};
-		while (element && !isBody(element)){
-			position.x += element.scrollLeft;
-			position.y += element.scrollTop;
-			element = element.parentNode;
-		}
-		return position;
-	},
+		if (options.preventDefault) event.preventDefault();
+		if (options.stopPropagation) event.stopPropagation();
+		this.mouse.start = event.page;
 
-	getOffsetParent: brokenOffsetParent ? function(){
-		var element = this;
-		if (isBody(element) || styleString(element, 'position') == 'fixed') return null;
+		this.fireEvent('beforeStart', this.element);
 
-		var isOffsetCheck = (styleString(element, 'position') == 'static') ? isOffsetStatic : isOffset;
-		while ((element = element.parentNode)){
-			if (isOffsetCheck(element)) return element;
-		}
-		return null;
-	} : function(){
-		var element = this;
-		if (isBody(element) || styleString(element, 'position') == 'fixed') return null;
+		var limit = options.limit;
+		this.limit = {x: [], y: []};
 
-		try {
-			return element.offsetParent;
-		} catch(e) {}
-		return null;
-	},
+		var z, coordinates;
+		for (z in options.modifiers){
+			if (!options.modifiers[z]) continue;
 
-	getOffsets: function(){
-		if (this.getBoundingClientRect && !Browser.Platform.ios){
-			var bound = this.getBoundingClientRect(),
-				html = document.id(this.getDocument().documentElement),
-				htmlScroll = html.getScroll(),
-				elemScrolls = this.getScrolls(),
-				isFixed = (styleString(this, 'position') == 'fixed');
+			var style = this.element.getStyle(options.modifiers[z]);
 
-			return {
-				x: bound.left.toInt() + elemScrolls.x + ((isFixed) ? 0 : htmlScroll.x) - html.clientLeft,
-				y: bound.top.toInt()  + elemScrolls.y + ((isFixed) ? 0 : htmlScroll.y) - html.clientTop
-			};
-		}
-
-		var element = this, position = {x: 0, y: 0};
-		if (isBody(this)) return position;
-
-		while (element && !isBody(element)){
-			position.x += element.offsetLeft;
-			position.y += element.offsetTop;
-
-			if (Browser.firefox){
-				if (!borderBox(element)){
-					position.x += leftBorder(element);
-					position.y += topBorder(element);
-				}
-				var parent = element.parentNode;
-				if (parent && styleString(parent, 'overflow') != 'visible'){
-					position.x += leftBorder(parent);
-					position.y += topBorder(parent);
-				}
-			} else if (element != this && Browser.safari){
-				position.x += leftBorder(element);
-				position.y += topBorder(element);
+			// Some browsers (IE and Opera) don't always return pixels.
+			if (style && !style.match(/px$/)){
+				if (!coordinates) coordinates = this.element.getCoordinates(this.element.getOffsetParent());
+				style = coordinates[options.modifiers[z]];
 			}
 
-			element = element.offsetParent;
-		}
-		if (Browser.firefox && !borderBox(this)){
-			position.x -= leftBorder(this);
-			position.y -= topBorder(this);
-		}
-		return position;
-	},
+			if (options.style) this.value.now[z] = (style || 0).toInt();
+			else this.value.now[z] = this.element[options.modifiers[z]];
 
-	getPosition: function(relative){
-		var offset = this.getOffsets(),
-			scroll = this.getScrolls();
-		var position = {
-			x: offset.x - scroll.x,
-			y: offset.y - scroll.y
+			if (options.invert) this.value.now[z] *= -1;
+
+			this.mouse.pos[z] = event.page[z] - this.value.now[z];
+
+			if (limit && limit[z]){
+				var i = 2;
+				while (i--){
+					var limitZI = limit[z][i];
+					if (limitZI || limitZI === 0) this.limit[z][i] = (typeof limitZI == 'function') ? limitZI() : limitZI;
+				}
+			}
+		}
+
+		if (typeOf(this.options.grid) == 'number') this.options.grid = {
+			x: this.options.grid,
+			y: this.options.grid
 		};
 
-		if (relative && (relative = document.id(relative))){
-			var relativePosition = relative.getPosition();
-			return {x: position.x - relativePosition.x - leftBorder(relative), y: position.y - relativePosition.y - topBorder(relative)};
-		}
-		return position;
-	},
-
-	getCoordinates: function(element){
-		if (isBody(this)) return this.getWindow().getCoordinates();
-		var position = this.getPosition(element),
-			size = this.getSize();
-		var obj = {
-			left: position.x,
-			top: position.y,
-			width: size.x,
-			height: size.y
+		var events = {
+			mousemove: this.bound.check,
+			mouseup: this.bound.cancel
 		};
-		obj.right = obj.left + obj.width;
-		obj.bottom = obj.top + obj.height;
-		return obj;
+		events[this.selection] = this.bound.eventStop;
+		this.document.addEvents(events);
 	},
 
-	computePosition: function(obj){
+	check: function(event){
+		if (this.options.preventDefault) event.preventDefault();
+		var distance = Math.round(Math.sqrt(Math.pow(event.page.x - this.mouse.start.x, 2) + Math.pow(event.page.y - this.mouse.start.y, 2)));
+		if (distance > this.options.snap){
+			this.cancel();
+			this.document.addEvents({
+				mousemove: this.bound.drag,
+				mouseup: this.bound.stop
+			});
+			this.fireEvent('start', [this.element, event]).fireEvent('snap', this.element);
+		}
+	},
+
+	drag: function(event){
+		var options = this.options;
+
+		if (options.preventDefault) event.preventDefault();
+		this.mouse.now = event.page;
+
+		for (var z in options.modifiers){
+			if (!options.modifiers[z]) continue;
+			this.value.now[z] = this.mouse.now[z] - this.mouse.pos[z];
+
+			if (options.invert) this.value.now[z] *= -1;
+
+			if (options.limit && this.limit[z]){
+				if ((this.limit[z][1] || this.limit[z][1] === 0) && (this.value.now[z] > this.limit[z][1])){
+					this.value.now[z] = this.limit[z][1];
+				} else if ((this.limit[z][0] || this.limit[z][0] === 0) && (this.value.now[z] < this.limit[z][0])){
+					this.value.now[z] = this.limit[z][0];
+				}
+			}
+
+			if (options.grid[z]) this.value.now[z] -= ((this.value.now[z] - (this.limit[z][0]||0)) % options.grid[z]);
+
+			if (options.style) this.element.setStyle(options.modifiers[z], this.value.now[z] + options.unit);
+			else this.element[options.modifiers[z]] = this.value.now[z];
+		}
+
+		this.fireEvent('drag', [this.element, event]);
+	},
+
+	cancel: function(event){
+		this.document.removeEvents({
+			mousemove: this.bound.check,
+			mouseup: this.bound.cancel
+		});
+		if (event){
+			this.document.removeEvent(this.selection, this.bound.eventStop);
+			this.fireEvent('cancel', this.element);
+		}
+	},
+
+	stop: function(event){
+		var events = {
+			mousemove: this.bound.drag,
+			mouseup: this.bound.stop
+		};
+		events[this.selection] = this.bound.eventStop;
+		this.document.removeEvents(events);
+		if (event) this.fireEvent('complete', [this.element, event]);
+	}
+
+});
+
+Element.implement({
+
+	makeResizable: function(options){
+		var drag = new Drag(this, Object.merge({
+			modifiers: {
+				x: 'width',
+				y: 'height'
+			}
+		}, options));
+
+		this.store('resizer', drag);
+		return drag.addEvent('drag', function(){
+			this.fireEvent('resize', drag);
+		}.bind(this));
+	}
+
+});
+
+
+// Begin: Source/Drag/Drag.Move.js
+/*
+---
+
+script: Drag.Move.js
+
+name: Drag.Move
+
+description: A Drag extension that provides support for the constraining of draggables to containers and droppables.
+
+license: MIT-style license
+
+authors:
+  - Valerio Proietti
+  - Tom Occhinno
+  - Jan Kassens
+  - Aaron Newton
+  - Scott Kyle
+
+requires:
+  - Core/Element.Dimensions
+  - /Drag
+
+provides: [Drag.Move]
+
+...
+*/
+
+Drag.Move = new Class({
+
+	Extends: Drag,
+
+	options: {/*
+		onEnter: function(thisElement, overed){},
+		onLeave: function(thisElement, overed){},
+		onDrop: function(thisElement, overed, event){},*/
+		droppables: [],
+		container: false,
+		precalculate: false,
+		includeMargins: true,
+		checkDroppables: true
+	},
+
+	initialize: function(element, options){
+		this.parent(element, options);
+		element = this.element;
+
+		this.droppables = $$(this.options.droppables);
+		this.container = document.id(this.options.container);
+
+		if (this.container && typeOf(this.container) != 'element')
+			this.container = document.id(this.container.getDocument().body);
+
+		if (this.options.style){
+			if (this.options.modifiers.x == 'left' && this.options.modifiers.y == 'top'){
+				var parent = element.getOffsetParent(),
+					styles = element.getStyles('left', 'top');
+				if (parent && (styles.left == 'auto' || styles.top == 'auto')){
+					element.setPosition(element.getPosition(parent));
+				}
+			}
+
+			if (element.getStyle('position') == 'static') element.setStyle('position', 'absolute');
+		}
+
+		this.addEvent('start', this.checkDroppables, true);
+		this.overed = null;
+	},
+
+	start: function(event){
+		if (this.container) this.options.limit = this.calculateLimit();
+
+		if (this.options.precalculate){
+			this.positions = this.droppables.map(function(el){
+				return el.getCoordinates();
+			});
+		}
+
+		this.parent(event);
+	},
+
+	calculateLimit: function(){
+		var element = this.element,
+			container = this.container,
+
+			offsetParent = document.id(element.getOffsetParent()) || document.body,
+			containerCoordinates = container.getCoordinates(offsetParent),
+			elementMargin = {},
+			elementBorder = {},
+			containerMargin = {},
+			containerBorder = {},
+			offsetParentPadding = {};
+
+		['top', 'right', 'bottom', 'left'].each(function(pad){
+			elementMargin[pad] = element.getStyle('margin-' + pad).toInt();
+			elementBorder[pad] = element.getStyle('border-' + pad).toInt();
+			containerMargin[pad] = container.getStyle('margin-' + pad).toInt();
+			containerBorder[pad] = container.getStyle('border-' + pad).toInt();
+			offsetParentPadding[pad] = offsetParent.getStyle('padding-' + pad).toInt();
+		}, this);
+
+		var width = element.offsetWidth + elementMargin.left + elementMargin.right,
+			height = element.offsetHeight + elementMargin.top + elementMargin.bottom,
+			left = 0,
+			top = 0,
+			right = containerCoordinates.right - containerBorder.right - width,
+			bottom = containerCoordinates.bottom - containerBorder.bottom - height;
+
+		if (this.options.includeMargins){
+			left += elementMargin.left;
+			top += elementMargin.top;
+		} else {
+			right += elementMargin.right;
+			bottom += elementMargin.bottom;
+		}
+
+		if (element.getStyle('position') == 'relative'){
+			var coords = element.getCoordinates(offsetParent);
+			coords.left -= element.getStyle('left').toInt();
+			coords.top -= element.getStyle('top').toInt();
+
+			left -= coords.left;
+			top -= coords.top;
+			if (container.getStyle('position') != 'relative'){
+				left += containerBorder.left;
+				top += containerBorder.top;
+			}
+			right += elementMargin.left - coords.left;
+			bottom += elementMargin.top - coords.top;
+
+			if (container != offsetParent){
+				left += containerMargin.left + offsetParentPadding.left;
+				top += ((Browser.ie6 || Browser.ie7) ? 0 : containerMargin.top) + offsetParentPadding.top;
+			}
+		} else {
+			left -= elementMargin.left;
+			top -= elementMargin.top;
+			if (container != offsetParent){
+				left += containerCoordinates.left + containerBorder.left;
+				top += containerCoordinates.top + containerBorder.top;
+			}
+		}
+
 		return {
-			left: obj.x - styleNumber(this, 'margin-left'),
-			top: obj.y - styleNumber(this, 'margin-top')
+			x: [left, right],
+			y: [top, bottom]
 		};
 	},
 
-	setPosition: function(obj){
-		return this.setStyles(this.computePosition(obj));
+	getDroppableCoordinates: function(element){
+		var position = element.getCoordinates();
+		if (element.getStyle('position') == 'fixed'){
+			var scroll = window.getScroll();
+			position.left += scroll.x;
+			position.right += scroll.x;
+			position.top += scroll.y;
+			position.bottom += scroll.y;
+		}
+		return position;
+	},
+
+	checkDroppables: function(){
+		var overed = this.droppables.filter(function(el, i){
+			el = this.positions ? this.positions[i] : this.getDroppableCoordinates(el);
+			var now = this.mouse.now;
+			return (now.x > el.left && now.x < el.right && now.y < el.bottom && now.y > el.top);
+		}, this).getLast();
+
+		if (this.overed != overed){
+			if (this.overed) this.fireEvent('leave', [this.element, this.overed]);
+			if (overed) this.fireEvent('enter', [this.element, overed]);
+			this.overed = overed;
+		}
+	},
+
+	drag: function(event){
+		this.parent(event);
+		if (this.options.checkDroppables && this.droppables.length) this.checkDroppables();
+	},
+
+	stop: function(event){
+		this.checkDroppables();
+		this.fireEvent('drop', [this.element, this.overed, event]);
+		this.overed = null;
+		return this.parent(event);
+	}
+
+});
+
+Element.implement({
+
+	makeDraggable: function(options){
+		var drag = new Drag.Move(this, options);
+		this.store('dragger', drag);
+		return drag;
 	}
 
 });
 
 
-[Document, Window].invoke('implement', {
+// Begin: Source/Utilities/DOMReady.js
+/*
+---
 
-	getSize: function(){
-		var doc = getCompatElement(this);
-		return {x: doc.clientWidth, y: doc.clientHeight};
-	},
+name: DOMReady
 
-	getScroll: function(){
-		var win = this.getWindow(), doc = getCompatElement(this);
-		return {x: win.pageXOffset || doc.scrollLeft, y: win.pageYOffset || doc.scrollTop};
-	},
+description: Contains the custom event domready.
 
-	getScrollSize: function(){
-		var doc = getCompatElement(this),
-			min = this.getSize(),
-			body = this.getDocument().body;
+license: MIT-style license.
 
-		return {x: Math.max(doc.scrollWidth, body.scrollWidth, min.x), y: Math.max(doc.scrollHeight, body.scrollHeight, min.y)};
-	},
+requires: [Browser, Element, Element.Event]
 
-	getPosition: function(){
-		return {x: 0, y: 0};
-	},
+provides: [DOMReady, DomReady]
 
-	getCoordinates: function(){
-		var size = this.getSize();
-		return {top: 0, left: 0, bottom: size.y, right: size.x, height: size.y, width: size.x};
+...
+*/
+
+(function(window, document){
+
+var ready,
+	loaded,
+	checks = [],
+	shouldPoll,
+	timer,
+	testElement = document.createElement('div');
+
+var domready = function(){
+	clearTimeout(timer);
+	if (ready) return;
+	Browser.loaded = ready = true;
+	document.removeListener('DOMContentLoaded', domready).removeListener('readystatechange', check);
+
+	document.fireEvent('domready');
+	window.fireEvent('domready');
+};
+
+var check = function(){
+	for (var i = checks.length; i--;) if (checks[i]()){
+		domready();
+		return true;
 	}
+	return false;
+};
 
+var poll = function(){
+	clearTimeout(timer);
+	if (!check()) timer = setTimeout(poll, 10);
+};
+
+document.addListener('DOMContentLoaded', domready);
+
+/*<ltIE8>*/
+// doScroll technique by Diego Perini http://javascript.nwbox.com/IEContentLoaded/
+// testElement.doScroll() throws when the DOM is not ready, only in the top window
+var doScrollWorks = function(){
+	try {
+		testElement.doScroll();
+		return true;
+	} catch (e){}
+	return false;
+};
+// If doScroll works already, it can't be used to determine domready
+//   e.g. in an iframe
+if (testElement.doScroll && !doScrollWorks()){
+	checks.push(doScrollWorks);
+	shouldPoll = true;
+}
+/*</ltIE8>*/
+
+if (document.readyState) checks.push(function(){
+	var state = document.readyState;
+	return (state == 'loaded' || state == 'complete');
 });
 
-// private methods
+if ('onreadystatechange' in document) document.addListener('readystatechange', check);
+else shouldPoll = true;
 
-var styleString = Element.getComputedStyle;
+if (shouldPoll) poll();
 
-function styleNumber(element, style){
-	return styleString(element, style).toInt() || 0;
-}
-
-function borderBox(element){
-	return styleString(element, '-moz-box-sizing') == 'border-box';
-}
-
-function topBorder(element){
-	return styleNumber(element, 'border-top-width');
-}
-
-function leftBorder(element){
-	return styleNumber(element, 'border-left-width');
-}
-
-function isBody(element){
-	return (/^(?:body|html)$/i).test(element.tagName);
-}
-
-function getCompatElement(element){
-	var doc = element.getDocument();
-	return (!doc.compatMode || doc.compatMode == 'CSS1Compat') ? doc.html : doc.body;
-}
-
-})();
-
-//aliases
-Element.alias({position: 'setPosition'}); //compatability
-
-[Window, Document, Element].invoke('implement', {
-
-	getHeight: function(){
-		return this.getSize().y;
-	},
-
-	getWidth: function(){
-		return this.getSize().x;
-	},
-
-	getScrollTop: function(){
-		return this.getScroll().y;
-	},
-
-	getScrollLeft: function(){
-		return this.getScroll().x;
-	},
-
-	getScrollHeight: function(){
-		return this.getScrollSize().y;
-	},
-
-	getScrollWidth: function(){
-		return this.getScrollSize().x;
-	},
-
-	getTop: function(){
-		return this.getPosition().y;
-	},
-
-	getLeft: function(){
-		return this.getPosition().x;
+Element.Events.domready = {
+	onAdd: function(fn){
+		if (ready) fn.call(this);
 	}
+};
 
+// Make sure that domready fires before load
+Element.Events.load = {
+	base: 'load',
+	onAdd: function(fn){
+		if (loaded && this == window) fn.call(this);
+	},
+	condition: function(){
+		if (this == window){
+			domready();
+			delete Element.Events.load;
+		}
+		return true;
+	}
+};
+
+// This is based on the custom load event
+window.addEvent('load', function(){
+	loaded = true;
 });
+
+})(window, document);
 
 
 // Begin: Source/Element/Element.Measure.js
@@ -5851,500 +6400,44 @@ Element.implement({
 })(Element.prototype.position);
 
 
-// Begin: Source/Class/Class.Occlude.js
+// Begin: Source/Class/Class.Binds.js
 /*
 ---
 
-script: Class.Occlude.js
+script: Class.Binds.js
 
-name: Class.Occlude
+name: Class.Binds
 
-description: Prevents a class from being applied to a DOM element twice.
+description: Automagically binds specified methods in a class to the instance of the class.
 
-license: MIT-style license.
+license: MIT-style license
 
 authors:
   - Aaron Newton
 
 requires:
   - Core/Class
-  - Core/Element
   - /MooTools.More
 
-provides: [Class.Occlude]
+provides: [Class.Binds]
 
 ...
 */
 
-Class.Occlude = new Class({
-
-	occlude: function(property, element){
-		element = document.id(element || this.element);
-		var instance = element.retrieve(property || this.property);
-		if (instance && !this.occluded)
-			return (this.occluded = instance);
-
-		this.occluded = false;
-		element.store(property || this.property, this);
-		return this.occluded;
-	}
-
-});
-
-
-// Begin: Source/Utilities/IframeShim.js
-/*
----
-
-script: IframeShim.js
-
-name: IframeShim
-
-description: Defines IframeShim, a class for obscuring select lists and flash objects in IE.
-
-license: MIT-style license
-
-authors:
-  - Aaron Newton
-
-requires:
-  - Core/Element.Event
-  - Core/Element.Style
-  - Core/Options
-  - Core/Events
-  - /Element.Position
-  - /Class.Occlude
-
-provides: [IframeShim]
-
-...
-*/
-
-var IframeShim = new Class({
-
-	Implements: [Options, Events, Class.Occlude],
-
-	options: {
-		className: 'iframeShim',
-		src: 'javascript:false;document.write("");',
-		display: false,
-		zIndex: null,
-		margin: 0,
-		offset: {x: 0, y: 0},
-		browsers: (Browser.ie6 || (Browser.firefox && Browser.version < 3 && Browser.Platform.mac))
-	},
-
-	property: 'IframeShim',
-
-	initialize: function(element, options){
-		this.element = document.id(element);
-		if (this.occlude()) return this.occluded;
-		this.setOptions(options);
-		this.makeShim();
-		return this;
-	},
-
-	makeShim: function(){
-		if (this.options.browsers){
-			var zIndex = this.element.getStyle('zIndex').toInt();
-
-			if (!zIndex){
-				zIndex = 1;
-				var pos = this.element.getStyle('position');
-				if (pos == 'static' || !pos) this.element.setStyle('position', 'relative');
-				this.element.setStyle('zIndex', zIndex);
-			}
-			zIndex = ((this.options.zIndex != null || this.options.zIndex === 0) && zIndex > this.options.zIndex) ? this.options.zIndex : zIndex - 1;
-			if (zIndex < 0) zIndex = 1;
-			this.shim = new Element('iframe', {
-				src: this.options.src,
-				scrolling: 'no',
-				frameborder: 0,
-				styles: {
-					zIndex: zIndex,
-					position: 'absolute',
-					border: 'none',
-					filter: 'progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)'
-				},
-				'class': this.options.className
-			}).store('IframeShim', this);
-			var inject = (function(){
-				this.shim.inject(this.element, 'after');
-				this[this.options.display ? 'show' : 'hide']();
-				this.fireEvent('inject');
-			}).bind(this);
-			if (!IframeShim.ready) window.addEvent('load', inject);
-			else inject();
-		} else {
-			this.position = this.hide = this.show = this.dispose = Function.from(this);
-		}
-	},
-
-	position: function(){
-		if (!IframeShim.ready || !this.shim) return this;
-		var size = this.element.measure(function(){
-			return this.getSize();
-		});
-		if (this.options.margin != undefined){
-			size.x = size.x - (this.options.margin * 2);
-			size.y = size.y - (this.options.margin * 2);
-			this.options.offset.x += this.options.margin;
-			this.options.offset.y += this.options.margin;
-		}
-		this.shim.set({width: size.x, height: size.y}).position({
-			relativeTo: this.element,
-			offset: this.options.offset
-		});
-		return this;
-	},
-
-	hide: function(){
-		if (this.shim) this.shim.setStyle('display', 'none');
-		return this;
-	},
-
-	show: function(){
-		if (this.shim) this.shim.setStyle('display', 'block');
-		return this.position();
-	},
-
-	dispose: function(){
-		if (this.shim) this.shim.dispose();
-		return this;
-	},
-
-	destroy: function(){
-		if (this.shim) this.shim.destroy();
-		return this;
-	}
-
-});
-
-window.addEvent('load', function(){
-	IframeShim.ready = true;
-});
-
-
-// Begin: Source/Interface/Mask.js
-/*
----
-
-script: Mask.js
-
-name: Mask
-
-description: Creates a mask element to cover another.
-
-license: MIT-style license
-
-authors:
-  - Aaron Newton
-
-requires:
-  - Core/Options
-  - Core/Events
-  - Core/Element.Event
-  - /Class.Binds
-  - /Element.Position
-  - /IframeShim
-
-provides: [Mask]
-
-...
-*/
-
-var Mask = new Class({
-
-	Implements: [Options, Events],
-
-	Binds: ['position'],
-
-	options: {/*
-		onShow: function(){},
-		onHide: function(){},
-		onDestroy: function(){},
-		onClick: function(event){},
-		inject: {
-			where: 'after',
-			target: null,
-		},
-		hideOnClick: false,
-		id: null,
-		destroyOnHide: false,*/
-		style: {},
-		'class': 'mask',
-		maskMargins: false,
-		useIframeShim: true,
-		iframeShimOptions: {}
-	},
-
-	initialize: function(target, options){
-		this.target = document.id(target) || document.id(document.body);
-		this.target.store('mask', this);
-		this.setOptions(options);
-		this.render();
-		this.inject();
-	},
-
-	render: function(){
-		this.element = new Element('div', {
-			'class': this.options['class'],
-			id: this.options.id || 'mask-' + String.uniqueID(),
-			styles: Object.merge({}, this.options.style, {
-				display: 'none'
-			}),
-			events: {
-				click: function(event){
-					this.fireEvent('click', event);
-					if (this.options.hideOnClick) this.hide();
-				}.bind(this)
-			}
-		});
-
-		this.hidden = true;
-	},
-
-	toElement: function(){
-		return this.element;
-	},
-
-	inject: function(target, where){
-		where = where || (this.options.inject ? this.options.inject.where : '') || this.target == document.body ? 'inside' : 'after';
-		target = target || (this.options.inject && this.options.inject.target) || this.target;
-
-		this.element.inject(target, where);
-
-		if (this.options.useIframeShim){
-			this.shim = new IframeShim(this.element, this.options.iframeShimOptions);
-
-			this.addEvents({
-				show: this.shim.show.bind(this.shim),
-				hide: this.shim.hide.bind(this.shim),
-				destroy: this.shim.destroy.bind(this.shim)
-			});
-		}
-	},
-
-	position: function(){
-		this.resize(this.options.width, this.options.height);
-
-		this.element.position({
-			relativeTo: this.target,
-			position: 'topLeft',
-			ignoreMargins: !this.options.maskMargins,
-			ignoreScroll: this.target == document.body
-		});
-
-		return this;
-	},
-
-	resize: function(x, y){
-		var opt = {
-			styles: ['padding', 'border']
-		};
-		if (this.options.maskMargins) opt.styles.push('margin');
-
-		var dim = this.target.getComputedSize(opt);
-		if (this.target == document.body){
-			this.element.setStyles({width: 0, height: 0});
-			var win = window.getScrollSize();
-			if (dim.totalHeight < win.y) dim.totalHeight = win.y;
-			if (dim.totalWidth < win.x) dim.totalWidth = win.x;
-		}
-		this.element.setStyles({
-			width: Array.pick([x, dim.totalWidth, dim.x]),
-			height: Array.pick([y, dim.totalHeight, dim.y])
-		});
-
-		return this;
-	},
-
-	show: function(){
-		if (!this.hidden) return this;
-
-		window.addEvent('resize', this.position);
-		this.position();
-		this.showMask.apply(this, arguments);
-
-		return this;
-	},
-
-	showMask: function(){
-		this.element.setStyle('display', 'block');
-		this.hidden = false;
-		this.fireEvent('show');
-	},
-
-	hide: function(){
-		if (this.hidden) return this;
-
-		window.removeEvent('resize', this.position);
-		this.hideMask.apply(this, arguments);
-		if (this.options.destroyOnHide) return this.destroy();
-
-		return this;
-	},
-
-	hideMask: function(){
-		this.element.setStyle('display', 'none');
-		this.hidden = true;
-		this.fireEvent('hide');
-	},
-
-	toggle: function(){
-		this[this.hidden ? 'show' : 'hide']();
-	},
-
-	destroy: function(){
-		this.hide();
-		this.element.destroy();
-		this.fireEvent('destroy');
-		this.target.eliminate('mask');
-	}
-
-});
-
-Element.Properties.mask = {
-
-	set: function(options){
-		var mask = this.retrieve('mask');
-		if (mask) mask.destroy();
-		return this.eliminate('mask').store('mask:options', options);
-	},
-
-	get: function(){
-		var mask = this.retrieve('mask');
-		if (!mask){
-			mask = new Mask(this, this.retrieve('mask:options'));
-			this.store('mask', mask);
-		}
-		return mask;
-	}
-
+Class.Mutators.Binds = function(binds){
+	if (!this.prototype.initialize) this.implement('initialize', function(){});
+	return Array.from(binds).concat(this.prototype.Binds || []);
 };
 
-Element.implement({
-
-	mask: function(options){
-		if (options) this.set('mask', options);
-		this.get('mask').show();
-		return this;
-	},
-
-	unmask: function(){
-		this.get('mask').hide();
-		return this;
-	}
-
-});
-
-
-// Begin: Source/Utilities/DOMReady.js
-/*
----
-
-name: DOMReady
-
-description: Contains the custom event domready.
-
-license: MIT-style license.
-
-requires: [Browser, Element, Element.Event]
-
-provides: [DOMReady, DomReady]
-
-...
-*/
-
-(function(window, document){
-
-var ready,
-	loaded,
-	checks = [],
-	shouldPoll,
-	timer,
-	testElement = document.createElement('div');
-
-var domready = function(){
-	clearTimeout(timer);
-	if (ready) return;
-	Browser.loaded = ready = true;
-	document.removeListener('DOMContentLoaded', domready).removeListener('readystatechange', check);
-
-	document.fireEvent('domready');
-	window.fireEvent('domready');
+Class.Mutators.initialize = function(initialize){
+	return function(){
+		Array.from(this.Binds).each(function(name){
+			var original = this[name];
+			if (original) this[name] = original.bind(this);
+		}, this);
+		return initialize.apply(this, arguments);
+	};
 };
-
-var check = function(){
-	for (var i = checks.length; i--;) if (checks[i]()){
-		domready();
-		return true;
-	}
-	return false;
-};
-
-var poll = function(){
-	clearTimeout(timer);
-	if (!check()) timer = setTimeout(poll, 10);
-};
-
-document.addListener('DOMContentLoaded', domready);
-
-/*<ltIE8>*/
-// doScroll technique by Diego Perini http://javascript.nwbox.com/IEContentLoaded/
-// testElement.doScroll() throws when the DOM is not ready, only in the top window
-var doScrollWorks = function(){
-	try {
-		testElement.doScroll();
-		return true;
-	} catch (e){}
-	return false;
-};
-// If doScroll works already, it can't be used to determine domready
-//   e.g. in an iframe
-if (testElement.doScroll && !doScrollWorks()){
-	checks.push(doScrollWorks);
-	shouldPoll = true;
-}
-/*</ltIE8>*/
-
-if (document.readyState) checks.push(function(){
-	var state = document.readyState;
-	return (state == 'loaded' || state == 'complete');
-});
-
-if ('onreadystatechange' in document) document.addListener('readystatechange', check);
-else shouldPoll = true;
-
-if (shouldPoll) poll();
-
-Element.Events.domready = {
-	onAdd: function(fn){
-		if (ready) fn.call(this);
-	}
-};
-
-// Make sure that domready fires before load
-Element.Events.load = {
-	base: 'load',
-	onAdd: function(fn){
-		if (loaded && this == window) fn.call(this);
-	},
-	condition: function(){
-		if (this == window){
-			domready();
-			delete Element.Events.load;
-		}
-		return true;
-	}
-};
-
-// This is based on the custom load event
-window.addEvent('load', function(){
-	loaded = true;
-});
-
-})(window, document);
 
 
 // Begin: Source/Element/Element.Shortcuts.js
@@ -6559,6 +6652,180 @@ Element.alias('togglepin', 'togglePin');
 })();
 
 
+// Begin: Source/Class/Class.Occlude.js
+/*
+---
+
+script: Class.Occlude.js
+
+name: Class.Occlude
+
+description: Prevents a class from being applied to a DOM element twice.
+
+license: MIT-style license.
+
+authors:
+  - Aaron Newton
+
+requires:
+  - Core/Class
+  - Core/Element
+  - /MooTools.More
+
+provides: [Class.Occlude]
+
+...
+*/
+
+Class.Occlude = new Class({
+
+	occlude: function(property, element){
+		element = document.id(element || this.element);
+		var instance = element.retrieve(property || this.property);
+		if (instance && !this.occluded)
+			return (this.occluded = instance);
+
+		this.occluded = false;
+		element.store(property || this.property, this);
+		return this.occluded;
+	}
+
+});
+
+
+// Begin: Source/Utilities/IframeShim.js
+/*
+---
+
+script: IframeShim.js
+
+name: IframeShim
+
+description: Defines IframeShim, a class for obscuring select lists and flash objects in IE.
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+
+requires:
+  - Core/Element.Event
+  - Core/Element.Style
+  - Core/Options
+  - Core/Events
+  - /Element.Position
+  - /Class.Occlude
+
+provides: [IframeShim]
+
+...
+*/
+
+var IframeShim = new Class({
+
+	Implements: [Options, Events, Class.Occlude],
+
+	options: {
+		className: 'iframeShim',
+		src: 'javascript:false;document.write("");',
+		display: false,
+		zIndex: null,
+		margin: 0,
+		offset: {x: 0, y: 0},
+		browsers: (Browser.ie6 || (Browser.firefox && Browser.version < 3 && Browser.Platform.mac))
+	},
+
+	property: 'IframeShim',
+
+	initialize: function(element, options){
+		this.element = document.id(element);
+		if (this.occlude()) return this.occluded;
+		this.setOptions(options);
+		this.makeShim();
+		return this;
+	},
+
+	makeShim: function(){
+		if (this.options.browsers){
+			var zIndex = this.element.getStyle('zIndex').toInt();
+
+			if (!zIndex){
+				zIndex = 1;
+				var pos = this.element.getStyle('position');
+				if (pos == 'static' || !pos) this.element.setStyle('position', 'relative');
+				this.element.setStyle('zIndex', zIndex);
+			}
+			zIndex = ((this.options.zIndex != null || this.options.zIndex === 0) && zIndex > this.options.zIndex) ? this.options.zIndex : zIndex - 1;
+			if (zIndex < 0) zIndex = 1;
+			this.shim = new Element('iframe', {
+				src: this.options.src,
+				scrolling: 'no',
+				frameborder: 0,
+				styles: {
+					zIndex: zIndex,
+					position: 'absolute',
+					border: 'none',
+					filter: 'progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)'
+				},
+				'class': this.options.className
+			}).store('IframeShim', this);
+			var inject = (function(){
+				this.shim.inject(this.element, 'after');
+				this[this.options.display ? 'show' : 'hide']();
+				this.fireEvent('inject');
+			}).bind(this);
+			if (!IframeShim.ready) window.addEvent('load', inject);
+			else inject();
+		} else {
+			this.position = this.hide = this.show = this.dispose = Function.from(this);
+		}
+	},
+
+	position: function(){
+		if (!IframeShim.ready || !this.shim) return this;
+		var size = this.element.measure(function(){
+			return this.getSize();
+		});
+		if (this.options.margin != undefined){
+			size.x = size.x - (this.options.margin * 2);
+			size.y = size.y - (this.options.margin * 2);
+			this.options.offset.x += this.options.margin;
+			this.options.offset.y += this.options.margin;
+		}
+		this.shim.set({width: size.x, height: size.y}).position({
+			relativeTo: this.element,
+			offset: this.options.offset
+		});
+		return this;
+	},
+
+	hide: function(){
+		if (this.shim) this.shim.setStyle('display', 'none');
+		return this;
+	},
+
+	show: function(){
+		if (this.shim) this.shim.setStyle('display', 'block');
+		return this.position();
+	},
+
+	dispose: function(){
+		if (this.shim) this.shim.dispose();
+		return this;
+	},
+
+	destroy: function(){
+		if (this.shim) this.shim.destroy();
+		return this;
+	}
+
+});
+
+window.addEvent('load', function(){
+	IframeShim.ready = true;
+});
+
+
 // Begin: Source/Types/Object.Extras.js
 /*
 ---
@@ -6643,7 +6910,7 @@ provides: Clientcide
 ...
 */
 var Clientcide = {
-	version: '3.0.8',
+	version: '3.0.10',
 	assetLocation: "http://github.com/anutron/clientcide/raw/master/Assets",
 	setAssetLocation: function(baseHref) {
 		Clientcide.assetLocation = baseHref;
@@ -6689,8 +6956,8 @@ provides: dbug
 var dbug = {
 	logged: [],
 	timers: {},
-	firebug: false, 
-	enabled: false, 
+	firebug: false,
+	enabled: false,
 	log: function() {
 		dbug.logged.push(arguments);
 	},
@@ -6707,7 +6974,7 @@ var dbug = {
 			dbug.log('%s: %s', name, end);
 		} else dbug.log('no such timer: %s', name);
 	},
-	enable: function(silent) { 
+	enable: function(silent) {
 		var con = window.firebug ? firebug.d.console.cmd : window.console;
 
 		if((!!window.console && !!window.console.warn) || window.firebug) {
@@ -6734,7 +7001,7 @@ var dbug = {
 			}
 		}
 	},
-	disable: function(){ 
+	disable: function(){
 		if(dbug.firebug) dbug.enabled = false;
 		dbug.log = dbug.nolog;
 		dbug.time = function(){};
@@ -6774,13 +7041,13 @@ var dbug = {
 	var debugMethods = ['debug','info','warn','error','assert','dir','dirxml'];
 	var otherMethods = ['trace','group','groupEnd','profile','profileEnd','count'];
 	function set(methodList, defaultFunction) {
-		
+
 		var getLogger = function(method) {
 			return function(){
 				con[method].apply(con, arguments);
 			};
 		};
-		
+
 		for(var i = 0; i < methodList.length; i++){
 			var method = methodList[i];
 			if (fb && con[method]) {
@@ -7090,6 +7357,311 @@ StickyWin.Stacker = new Class({
 });
 StickyWin.WM = new StickyWin.Stacker();
 
+// Begin: Source/UI/StickyWin.Drag.js
+/*
+---
+
+name: StickyWin.Drag
+
+description: Implements drag and resize functionaity into StickyWin.Fx. See StickyWin.Fx for the options.
+
+license: MIT-Style License
+
+requires: [More/Class.Refactor, More/Drag.Move, StickyWin]
+
+provides: StickyWin.Drag
+
+...
+*/
+StickyWin = Class.refactor(StickyWin, {
+	options: {
+		draggable: false,
+		dragOptions: {
+			onComplete: function(){}
+		},
+		dragHandleSelector: '.dragHandle',
+		resizable: false,
+		resizeOptions: {
+			onComplete: function(){}
+		},
+		resizeHandleSelector: ''
+	},
+	setContent: function(){
+		this.previous.apply(this, arguments);
+		if (this.options.draggable) this.makeDraggable();
+		if (this.options.resizable) this.makeResizable();
+		return this;
+	},
+	makeDraggable: function(){
+		var toggled = this.toggleVisible(true);
+		if (this.options.useIframeShim) {
+			this.makeIframeShim();
+			var onComplete = (this.options.dragOptions.onComplete);
+			this.options.dragOptions.onComplete = function(){
+				onComplete();
+				this.shim.position();
+			}.bind(this);
+		}
+		if (this.options.dragHandleSelector) {
+			var handle = this.win.getElement(this.options.dragHandleSelector);
+			if (handle) {
+				handle.setStyle('cursor','move');
+				this.options.dragOptions.handle = handle;
+			}
+		}
+		this.win.makeDraggable(this.options.dragOptions);
+		if (toggled) this.toggleVisible(false);
+	},
+	makeResizable: function(){
+		var toggled = this.toggleVisible(true);
+		if (this.options.useIframeShim) {
+			this.makeIframeShim();
+			var onComplete = (this.options.resizeOptions.onComplete);
+			this.options.resizeOptions.onComplete = function(){
+				onComplete();
+				this.shim.position();
+			}.bind(this);
+		}
+		if (this.options.resizeHandleSelector) {
+			var handle = this.win.getElement(this.options.resizeHandleSelector);
+			if (handle) this.options.resizeOptions.handle = this.win.getElement(this.options.resizeHandleSelector);
+		}
+		this.win.makeResizable(this.options.resizeOptions);
+		if (toggled) this.toggleVisible(false);
+	},
+	toggleVisible: function(show){
+		if (!this.visible && show == null || show) {
+			this.win.setStyles({
+				display: 'block',
+				opacity: 0
+			});
+			return true;
+		} else if (show != null && !show){
+			this.win.setStyles({
+				display: 'none',
+				opacity: 1
+			});
+			return false;
+		}
+		return false;
+	}
+});
+StickyWin.Fx = StickyWin;
+
+// Begin: Source/Interface/Mask.js
+/*
+---
+
+script: Mask.js
+
+name: Mask
+
+description: Creates a mask element to cover another.
+
+license: MIT-style license
+
+authors:
+  - Aaron Newton
+
+requires:
+  - Core/Options
+  - Core/Events
+  - Core/Element.Event
+  - /Class.Binds
+  - /Element.Position
+  - /IframeShim
+
+provides: [Mask]
+
+...
+*/
+
+var Mask = new Class({
+
+	Implements: [Options, Events],
+
+	Binds: ['position'],
+
+	options: {/*
+		onShow: function(){},
+		onHide: function(){},
+		onDestroy: function(){},
+		onClick: function(event){},
+		inject: {
+			where: 'after',
+			target: null,
+		},
+		hideOnClick: false,
+		id: null,
+		destroyOnHide: false,*/
+		style: {},
+		'class': 'mask',
+		maskMargins: false,
+		useIframeShim: true,
+		iframeShimOptions: {}
+	},
+
+	initialize: function(target, options){
+		this.target = document.id(target) || document.id(document.body);
+		this.target.store('mask', this);
+		this.setOptions(options);
+		this.render();
+		this.inject();
+	},
+
+	render: function(){
+		this.element = new Element('div', {
+			'class': this.options['class'],
+			id: this.options.id || 'mask-' + String.uniqueID(),
+			styles: Object.merge({}, this.options.style, {
+				display: 'none'
+			}),
+			events: {
+				click: function(event){
+					this.fireEvent('click', event);
+					if (this.options.hideOnClick) this.hide();
+				}.bind(this)
+			}
+		});
+
+		this.hidden = true;
+	},
+
+	toElement: function(){
+		return this.element;
+	},
+
+	inject: function(target, where){
+		where = where || (this.options.inject ? this.options.inject.where : '') || this.target == document.body ? 'inside' : 'after';
+		target = target || (this.options.inject && this.options.inject.target) || this.target;
+
+		this.element.inject(target, where);
+
+		if (this.options.useIframeShim){
+			this.shim = new IframeShim(this.element, this.options.iframeShimOptions);
+
+			this.addEvents({
+				show: this.shim.show.bind(this.shim),
+				hide: this.shim.hide.bind(this.shim),
+				destroy: this.shim.destroy.bind(this.shim)
+			});
+		}
+	},
+
+	position: function(){
+		this.resize(this.options.width, this.options.height);
+
+		this.element.position({
+			relativeTo: this.target,
+			position: 'topLeft',
+			ignoreMargins: !this.options.maskMargins,
+			ignoreScroll: this.target == document.body
+		});
+
+		return this;
+	},
+
+	resize: function(x, y){
+		var opt = {
+			styles: ['padding', 'border']
+		};
+		if (this.options.maskMargins) opt.styles.push('margin');
+
+		var dim = this.target.getComputedSize(opt);
+		if (this.target == document.body){
+			this.element.setStyles({width: 0, height: 0});
+			var win = window.getScrollSize();
+			if (dim.totalHeight < win.y) dim.totalHeight = win.y;
+			if (dim.totalWidth < win.x) dim.totalWidth = win.x;
+		}
+		this.element.setStyles({
+			width: Array.pick([x, dim.totalWidth, dim.x]),
+			height: Array.pick([y, dim.totalHeight, dim.y])
+		});
+
+		return this;
+	},
+
+	show: function(){
+		if (!this.hidden) return this;
+
+		window.addEvent('resize', this.position);
+		this.position();
+		this.showMask.apply(this, arguments);
+
+		return this;
+	},
+
+	showMask: function(){
+		this.element.setStyle('display', 'block');
+		this.hidden = false;
+		this.fireEvent('show');
+	},
+
+	hide: function(){
+		if (this.hidden) return this;
+
+		window.removeEvent('resize', this.position);
+		this.hideMask.apply(this, arguments);
+		if (this.options.destroyOnHide) return this.destroy();
+
+		return this;
+	},
+
+	hideMask: function(){
+		this.element.setStyle('display', 'none');
+		this.hidden = true;
+		this.fireEvent('hide');
+	},
+
+	toggle: function(){
+		this[this.hidden ? 'show' : 'hide']();
+	},
+
+	destroy: function(){
+		this.hide();
+		this.element.destroy();
+		this.fireEvent('destroy');
+		this.target.eliminate('mask');
+	}
+
+});
+
+Element.Properties.mask = {
+
+	set: function(options){
+		var mask = this.retrieve('mask');
+		if (mask) mask.destroy();
+		return this.eliminate('mask').store('mask:options', options);
+	},
+
+	get: function(){
+		var mask = this.retrieve('mask');
+		if (!mask){
+			mask = new Mask(this, this.retrieve('mask:options'));
+			this.store('mask', mask);
+		}
+		return mask;
+	}
+
+};
+
+Element.implement({
+
+	mask: function(options){
+		if (options) this.set('mask', options);
+		this.get('mask').show();
+		return this;
+	},
+
+	unmask: function(){
+		this.get('mask').hide();
+		return this;
+	}
+
+});
+
+
 // Begin: Source/UI/StickyWin.Modal.js
 /*
 ---
@@ -7380,20 +7952,20 @@ StickyWin.UI = new Class({
 		this.element = container;
 		this.element.store('StickyWinUI', this);
 		if (opt.cssClass) container.addClass(opt.cssClass);
-		
+
 
 		var bodyDiv = new Element('div').addClass('body');
 		this.body = bodyDiv;
-		
+
 		var top_ur = new Element('div').addClass('top_ur');
 		this.top_ur = top_ur;
 		this.top = new Element('div').addClass('top').adopt(
 				new Element('div').addClass('top_ul')
 			).adopt(top_ur);
 		container.adopt(this.top);
-		
+
 		if (opt.cornerHandle) new Element('div').addClass('dragHandle').inject(top_ur, 'top');
-		
+
 		//body
 		container.adopt(new Element('div').addClass('middle').adopt(bodyDiv));
 		//close buttons
@@ -7538,7 +8110,7 @@ StickyWin.Alert = new Class({
 });
 
 StickyWin.Error = new Class({
-	Extends: StickyWin.Alert, 
+	Extends: StickyWin.Alert,
 	makeMessage: function(){
 		var message = this.parent();
 		new Element('img', {
@@ -7563,243 +8135,6 @@ StickyWin.alert = function(caption, message, options) {
 StickyWin.error = function(caption, message, options) {
 	return new StickyWin.Error(caption, message, options);
 };
-
-// Begin: Source/Drag/Drag.js
-/*
----
-
-script: Drag.js
-
-name: Drag
-
-description: The base Drag Class. Can be used to drag and resize Elements using mouse events.
-
-license: MIT-style license
-
-authors:
-  - Valerio Proietti
-  - Tom Occhinno
-  - Jan Kassens
-
-requires:
-  - Core/Events
-  - Core/Options
-  - Core/Element.Event
-  - Core/Element.Style
-  - Core/Element.Dimensions
-  - /MooTools.More
-
-provides: [Drag]
-...
-
-*/
-
-var Drag = new Class({
-
-	Implements: [Events, Options],
-
-	options: {/*
-		onBeforeStart: function(thisElement){},
-		onStart: function(thisElement, event){},
-		onSnap: function(thisElement){},
-		onDrag: function(thisElement, event){},
-		onCancel: function(thisElement){},
-		onComplete: function(thisElement, event){},*/
-		snap: 6,
-		unit: 'px',
-		grid: false,
-		style: true,
-		limit: false,
-		handle: false,
-		invert: false,
-		preventDefault: false,
-		stopPropagation: false,
-		modifiers: {x: 'left', y: 'top'}
-	},
-
-	initialize: function(){
-		var params = Array.link(arguments, {
-			'options': Type.isObject,
-			'element': function(obj){
-				return obj != null;
-			}
-		});
-
-		this.element = document.id(params.element);
-		this.document = this.element.getDocument();
-		this.setOptions(params.options || {});
-		var htype = typeOf(this.options.handle);
-		this.handles = ((htype == 'array' || htype == 'collection') ? $$(this.options.handle) : document.id(this.options.handle)) || this.element;
-		this.mouse = {'now': {}, 'pos': {}};
-		this.value = {'start': {}, 'now': {}};
-
-		this.selection = (Browser.ie) ? 'selectstart' : 'mousedown';
-
-
-		if (Browser.ie && !Drag.ondragstartFixed){
-			document.ondragstart = Function.from(false);
-			Drag.ondragstartFixed = true;
-		}
-
-		this.bound = {
-			start: this.start.bind(this),
-			check: this.check.bind(this),
-			drag: this.drag.bind(this),
-			stop: this.stop.bind(this),
-			cancel: this.cancel.bind(this),
-			eventStop: Function.from(false)
-		};
-		this.attach();
-	},
-
-	attach: function(){
-		this.handles.addEvent('mousedown', this.bound.start);
-		return this;
-	},
-
-	detach: function(){
-		this.handles.removeEvent('mousedown', this.bound.start);
-		return this;
-	},
-
-	start: function(event){
-		var options = this.options;
-
-		if (event.rightClick) return;
-
-		if (options.preventDefault) event.preventDefault();
-		if (options.stopPropagation) event.stopPropagation();
-		this.mouse.start = event.page;
-
-		this.fireEvent('beforeStart', this.element);
-
-		var limit = options.limit;
-		this.limit = {x: [], y: []};
-
-		var z, coordinates;
-		for (z in options.modifiers){
-			if (!options.modifiers[z]) continue;
-
-			var style = this.element.getStyle(options.modifiers[z]);
-
-			// Some browsers (IE and Opera) don't always return pixels.
-			if (style && !style.match(/px$/)){
-				if (!coordinates) coordinates = this.element.getCoordinates(this.element.getOffsetParent());
-				style = coordinates[options.modifiers[z]];
-			}
-
-			if (options.style) this.value.now[z] = (style || 0).toInt();
-			else this.value.now[z] = this.element[options.modifiers[z]];
-
-			if (options.invert) this.value.now[z] *= -1;
-
-			this.mouse.pos[z] = event.page[z] - this.value.now[z];
-
-			if (limit && limit[z]){
-				var i = 2;
-				while (i--){
-					var limitZI = limit[z][i];
-					if (limitZI || limitZI === 0) this.limit[z][i] = (typeof limitZI == 'function') ? limitZI() : limitZI;
-				}
-			}
-		}
-
-		if (typeOf(this.options.grid) == 'number') this.options.grid = {
-			x: this.options.grid,
-			y: this.options.grid
-		};
-
-		var events = {
-			mousemove: this.bound.check,
-			mouseup: this.bound.cancel
-		};
-		events[this.selection] = this.bound.eventStop;
-		this.document.addEvents(events);
-	},
-
-	check: function(event){
-		if (this.options.preventDefault) event.preventDefault();
-		var distance = Math.round(Math.sqrt(Math.pow(event.page.x - this.mouse.start.x, 2) + Math.pow(event.page.y - this.mouse.start.y, 2)));
-		if (distance > this.options.snap){
-			this.cancel();
-			this.document.addEvents({
-				mousemove: this.bound.drag,
-				mouseup: this.bound.stop
-			});
-			this.fireEvent('start', [this.element, event]).fireEvent('snap', this.element);
-		}
-	},
-
-	drag: function(event){
-		var options = this.options;
-
-		if (options.preventDefault) event.preventDefault();
-		this.mouse.now = event.page;
-
-		for (var z in options.modifiers){
-			if (!options.modifiers[z]) continue;
-			this.value.now[z] = this.mouse.now[z] - this.mouse.pos[z];
-
-			if (options.invert) this.value.now[z] *= -1;
-
-			if (options.limit && this.limit[z]){
-				if ((this.limit[z][1] || this.limit[z][1] === 0) && (this.value.now[z] > this.limit[z][1])){
-					this.value.now[z] = this.limit[z][1];
-				} else if ((this.limit[z][0] || this.limit[z][0] === 0) && (this.value.now[z] < this.limit[z][0])){
-					this.value.now[z] = this.limit[z][0];
-				}
-			}
-
-			if (options.grid[z]) this.value.now[z] -= ((this.value.now[z] - (this.limit[z][0]||0)) % options.grid[z]);
-
-			if (options.style) this.element.setStyle(options.modifiers[z], this.value.now[z] + options.unit);
-			else this.element[options.modifiers[z]] = this.value.now[z];
-		}
-
-		this.fireEvent('drag', [this.element, event]);
-	},
-
-	cancel: function(event){
-		this.document.removeEvents({
-			mousemove: this.bound.check,
-			mouseup: this.bound.cancel
-		});
-		if (event){
-			this.document.removeEvent(this.selection, this.bound.eventStop);
-			this.fireEvent('cancel', this.element);
-		}
-	},
-
-	stop: function(event){
-		var events = {
-			mousemove: this.bound.drag,
-			mouseup: this.bound.stop
-		};
-		events[this.selection] = this.bound.eventStop;
-		this.document.removeEvents(events);
-		if (event) this.fireEvent('complete', [this.element, event]);
-	}
-
-});
-
-Element.implement({
-
-	makeResizable: function(options){
-		var drag = new Drag(this, Object.merge({
-			modifiers: {
-				x: 'width',
-				y: 'height'
-			}
-		}, options));
-
-		this.store('resizer', drag);
-		return drag.addEvent('drag', function(){
-			this.fireEvent('resize', drag);
-		}.bind(this));
-	}
-
-});
-
 
 // Begin: Source/Drag/Slider.js
 /*

@@ -348,7 +348,7 @@ $html_header
   </div>
 <!-- pracovní plocha -->
   <div id="stred">
-    <div id="shield"></div>
+    <!-- div id="shield"></div -->
     <div id="work"></div>
   </div>
   <div id="uzivatel"></div>
@@ -390,7 +390,7 @@ $html_header
   <!--div id='ajax_bar'></div-->
 <!-- pracovní plocha -->
   <div id="stred" style="top:35px">
-    <div id="shield"></div>
+    <!-- div id="shield"></div -->
     <div id="work"></div>
   </div>
 <!-- paticka -->

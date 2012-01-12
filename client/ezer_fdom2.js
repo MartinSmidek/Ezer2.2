@@ -163,7 +163,7 @@ Ezer.MenuMain.implement({
     $('work').getChildren().destroy();
     $('body').getElements('div[id^=StickyWin]').destroy();
     $('body').getElements('ul.ContextMenu[id^=DbgMenu]');
-    $('shield').setStyles({visibility:'hidden'});
+//     $('shield').setStyles({visibility:'hidden'});
     Ezer.app.clearDom();
   },
 // ------------------------------------------------------------------------------------ DOM_setSelectedTabs
@@ -682,7 +682,7 @@ Ezer.PanelPopup.implement({
   // ---------------------------------------------------------------------------------- DOM_add1
   DOM_add1: function() {
     var close= this.options.par && this.options.par.close=='no' ? false : true;
-    this.DOM= $(new StickyWin({draggable:true,
+    this.DOM= $(this.StickyWin= new StickyWin({draggable:true,
       content:StickyWin.ui(this.options.title||'',null,{
         cornerHandle:true, width:this._w+55,
         cssClassName:'PanelPopup',closeButton:close
@@ -710,6 +710,7 @@ Ezer.PanelPopup.implement({
       this.DOM.setStyles({left:l,top:t+Ezer.Shield.top});
     }
     this.DOM_shown= true;
+    this.StickyWin.showWin();
     if ( title )
       this.DOM.getElement('.caption').set('text',title);
     if ( !noevent ) {
