@@ -371,6 +371,7 @@ Ezer.Block= new Class({
 //   tags - regulární výraz popisující vyhovující tagy (např. 'f.|g')
   enable: function(enabled,tags) {
     var ok= 1;
+    enabled= enabled=="0" ? 0 : enabled;
     if ( enabled==undefined ) {
       ok= this.options.enabled;
 //       var block= this instanceof Ezer.Var && this.value ? this.value : this;
@@ -405,6 +406,7 @@ Ezer.Block= new Class({
 //   tags - regulární výraz popisující vyhovující tagy (např. 'f.|g')
   display: function (on,tags) {
     var ok= 1;
+    on= on=="0" ? 0 : on;
     if ( on==undefined ) {
       var block= this instanceof Ezer.Var && this.value ? this.value.DOM_Block : this.DOM_Block;
       ok= block && block.getStyle('display')=='block' ? 1 : 0;
