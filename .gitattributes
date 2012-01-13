@@ -162,4 +162,5 @@ server/licensed/xls/Worksheet.php -text
 server/reference.php -text
 server/session.php -text
 server/sys_doc.php -text
+wiki/Poznamky.txt -text
 wiki/guide.wiki -text
