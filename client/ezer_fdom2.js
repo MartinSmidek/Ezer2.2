@@ -1063,6 +1063,7 @@ Ezer.FieldDate.implement({
 // ------------------------------------------------------------------------------------ DOM_add
 //f: FieldDate-DOM.DOM_add ()
 //      zobrazí prvek field
+  DatePicker: null,
   DOM_add: function() {
     this.DOM_Block= new Element('div',{'class':'FieldDate',styles:this.coord()}).adopt(
         this.DOM_icon= new Element('img',{align:'right',src:Ezer.paths.images_cc+'calendar.gif'}),
@@ -1074,14 +1075,29 @@ Ezer.FieldDate.implement({
     if ( this.skill==2 && !this._fc('d') && !this._fc('o') ) {
       var ox= this._fc('R') ? -150 : 0;
       var oy= this._fc('U') ? -230 : 0;
-      var pos= "upperLeft";
-      var dp= new DatePicker(this.DOM_Input,
-        {updateOnBlur:false,showOnInputFocus:false,format:'%d.%m.%Y',weekStartOffset:1,
-          additionalShowLinks:[this.DOM_icon],stickyWinUiOptions:{cssClassName:'PanelPopup'},
-          stickyWinOptions:{offset:{x:ox,y:oy}}});
-      dp.addEvents({onPick:function(){
-        this.fire('onchange',[]);
-      }.bind(this)});
+      // viz http://www.monkeyphysics.com/mootools/script/2/datepicker
+      this.DatePicker= new DatePicker(this.DOM_Input, { //debug:true,
+        pickerClass: 'datepicker_vista', format:'j.n.Y', inputOutputFormat:'j.n.Y',
+        toggleElements:this.DOM_icon, positionOffset:{x:ox,y:oy}, allowEmpty:true,
+        days:Locale.getCurrent().sets.Date.days, months:Locale.getCurrent().sets.Date.months,
+        onSelect:function(){
+//                                                         Ezer.trace('*','onSelect');
+          this.DOM_Input.removeClass('empty');
+          this.fire('onchange',[]);
+        }.bind(this),
+        onStart:function(){
+//                                                         Ezer.trace('*','onStart');
+          if ( this.DOM_Input.hasClass('empty') ) {
+            this.DOM_Input.value= this.value;
+          }
+        }.bind(this),
+        onClose:function(){
+//                                                         Ezer.trace('*','onClose');
+          if ( this.DOM_Input.hasClass('empty') ) {
+            this.DOM_Input.value= this.help;
+          }
+        }.bind(this)
+      });
     }
   }
 });

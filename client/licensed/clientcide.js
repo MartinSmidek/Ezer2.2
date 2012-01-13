@@ -1,6 +1,6 @@
 
-//This library: http://dev.clientcide.com/depender/build?download=true&version=Clientcide+3.0.10&require=Core%2FCore&require=Core%2FFx.Morph&require=Core%2FFx.Tween&require=Core%2FRequest&require=Core%2FCookie&require=Core%2FDOMReady&require=Core%2FJSON&require=Clientcide%2FStickyWin.Alert&require=Clientcide%2FStickyWin.Drag&require=Clientcide%2FStickyWin.UI&require=Clientcide%2FStickyWin&require=More%2FSlider&require=More%2FFx.Slide&require=More%2FMask&require=More%2FLocale.cs-CZ.Date&require=More%2FDate.Extras&require=More%2FAssets
-//Contents: Core:Source/Core/Core.js, Core:Source/Types/Object.js, Core:Source/Types/Array.js, Core:Source/Types/Function.js, Core:Source/Types/Number.js, Core:Source/Types/String.js, Core:Source/Browser/Browser.js, Core:Source/Slick/Slick.Parser.js, Core:Source/Slick/Slick.Finder.js, Core:Source/Element/Element.js, Core:Source/Class/Class.js, Core:Source/Class/Class.Extras.js, Core:Source/Request/Request.js, Core:Source/Fx/Fx.js, Core:Source/Element/Element.Style.js, Core:Source/Fx/Fx.CSS.js, Core:Source/Fx/Fx.Morph.js, More:Source/More/More.js, More:Source/Class/Class.Refactor.js, Core:Source/Element/Element.Dimensions.js, Core:Source/Types/DOMEvent.js, Core:Source/Element/Element.Event.js, More:Source/Drag/Drag.js, More:Source/Drag/Drag.Move.js, Core:Source/Utilities/DOMReady.js, More:Source/Element/Element.Measure.js, More:Source/Element/Element.Position.js, More:Source/Class/Class.Binds.js, More:Source/Element/Element.Shortcuts.js, More:Source/Element/Element.Pin.js, More:Source/Class/Class.Occlude.js, More:Source/Utilities/IframeShim.js, More:Source/Types/Object.Extras.js, Clientcide:Source/Core/Clientcide.js, Clientcide:Source/Core/dbug.js, Clientcide:Source/UI/StyleWriter.js, Clientcide:Source/UI/StickyWin.js, Clientcide:Source/UI/StickyWin.Drag.js, More:Source/Interface/Mask.js, Clientcide:Source/UI/StickyWin.Modal.js, More:Source/Types/String.Extras.js, Clientcide:Source/UI/StickyWin.UI.js, Clientcide:Source/UI/StickyWin.Alert.js, More:Source/Drag/Slider.js, Core:Source/Utilities/Cookie.js, More:Source/Locale/Locale.js, More:Source/Locale/Locale.en-US.Date.js, More:Source/Types/Date.js, More:Source/Types/Date.Extras.js, Core:Source/Utilities/JSON.js, Core:Source/Fx/Fx.Tween.js, More:Source/Utilities/Assets.js, More:Source/Fx/Fx.Slide.js, More:Source/Locale/Locale.cs-CZ.Date.js
+//This library: http://dev.clientcide.com/depender/build?download=true&version=Clientcide+3.0.10&require=Core%2FCore&require=Core%2FFx.Morph&require=Core%2FFx.Transitions&require=Core%2FFx.Tween&require=Core%2FRequest&require=Core%2FCookie&require=Core%2FDOMReady&require=Core%2FJSON&require=Clientcide%2FStickyWin.Alert&require=Clientcide%2FStickyWin.Drag&require=Clientcide%2FStickyWin.UI&require=Clientcide%2FStickyWin&require=More%2FSlider&require=More%2FFx.Slide&require=More%2FMask&require=More%2FLocale.cs-CZ.Date&require=More%2FDate.Extras&require=More%2FAssets
+//Contents: Core:Source/Core/Core.js, Core:Source/Types/Object.js, Core:Source/Types/Array.js, Core:Source/Types/Function.js, Core:Source/Types/Number.js, Core:Source/Types/String.js, Core:Source/Browser/Browser.js, Core:Source/Slick/Slick.Parser.js, Core:Source/Slick/Slick.Finder.js, Core:Source/Element/Element.js, Core:Source/Class/Class.js, Core:Source/Class/Class.Extras.js, Core:Source/Request/Request.js, Core:Source/Fx/Fx.js, Core:Source/Element/Element.Style.js, Core:Source/Fx/Fx.CSS.js, Core:Source/Fx/Fx.Morph.js, More:Source/More/More.js, More:Source/Class/Class.Refactor.js, Core:Source/Element/Element.Dimensions.js, Core:Source/Types/DOMEvent.js, Core:Source/Element/Element.Event.js, More:Source/Drag/Drag.js, More:Source/Drag/Drag.Move.js, Core:Source/Utilities/DOMReady.js, More:Source/Element/Element.Measure.js, More:Source/Element/Element.Position.js, More:Source/Class/Class.Binds.js, More:Source/Element/Element.Shortcuts.js, More:Source/Element/Element.Pin.js, More:Source/Class/Class.Occlude.js, More:Source/Utilities/IframeShim.js, More:Source/Types/Object.Extras.js, Clientcide:Source/Core/Clientcide.js, Clientcide:Source/Core/dbug.js, Clientcide:Source/UI/StyleWriter.js, Clientcide:Source/UI/StickyWin.js, Clientcide:Source/UI/StickyWin.Drag.js, Core:Source/Fx/Fx.Transitions.js, More:Source/Interface/Mask.js, Clientcide:Source/UI/StickyWin.Modal.js, More:Source/Types/String.Extras.js, Clientcide:Source/UI/StickyWin.UI.js, Clientcide:Source/UI/StickyWin.Alert.js, More:Source/Drag/Slider.js, Core:Source/Utilities/Cookie.js, More:Source/Locale/Locale.js, More:Source/Locale/Locale.en-US.Date.js, More:Source/Types/Date.js, More:Source/Types/Date.Extras.js, Core:Source/Utilities/JSON.js, Core:Source/Fx/Fx.Tween.js, More:Source/Utilities/Assets.js, More:Source/Fx/Fx.Slide.js, More:Source/Locale/Locale.cs-CZ.Date.js
 
 // Begin: Source/Core/Core.js
 /*
@@ -7447,6 +7447,122 @@ StickyWin = Class.refactor(StickyWin, {
 	}
 });
 StickyWin.Fx = StickyWin;
+
+// Begin: Source/Fx/Fx.Transitions.js
+/*
+---
+
+name: Fx.Transitions
+
+description: Contains a set of advanced transitions to be used with any of the Fx Classes.
+
+license: MIT-style license.
+
+credits:
+  - Easing Equations by Robert Penner, <http://www.robertpenner.com/easing/>, modified and optimized to be used with MooTools.
+
+requires: Fx
+
+provides: Fx.Transitions
+
+...
+*/
+
+Fx.implement({
+
+	getTransition: function(){
+		var trans = this.options.transition || Fx.Transitions.Sine.easeInOut;
+		if (typeof trans == 'string'){
+			var data = trans.split(':');
+			trans = Fx.Transitions;
+			trans = trans[data[0]] || trans[data[0].capitalize()];
+			if (data[1]) trans = trans['ease' + data[1].capitalize() + (data[2] ? data[2].capitalize() : '')];
+		}
+		return trans;
+	}
+
+});
+
+Fx.Transition = function(transition, params){
+	params = Array.from(params);
+	var easeIn = function(pos){
+		return transition(pos, params);
+	};
+	return Object.append(easeIn, {
+		easeIn: easeIn,
+		easeOut: function(pos){
+			return 1 - transition(1 - pos, params);
+		},
+		easeInOut: function(pos){
+			return (pos <= 0.5 ? transition(2 * pos, params) : (2 - transition(2 * (1 - pos), params))) / 2;
+		}
+	});
+};
+
+Fx.Transitions = {
+
+	linear: function(zero){
+		return zero;
+	}
+
+};
+
+//<1.2compat>
+
+Fx.Transitions = new Hash(Fx.Transitions);
+
+//</1.2compat>
+
+Fx.Transitions.extend = function(transitions){
+	for (var transition in transitions) Fx.Transitions[transition] = new Fx.Transition(transitions[transition]);
+};
+
+Fx.Transitions.extend({
+
+	Pow: function(p, x){
+		return Math.pow(p, x && x[0] || 6);
+	},
+
+	Expo: function(p){
+		return Math.pow(2, 8 * (p - 1));
+	},
+
+	Circ: function(p){
+		return 1 - Math.sin(Math.acos(p));
+	},
+
+	Sine: function(p){
+		return 1 - Math.cos(p * Math.PI / 2);
+	},
+
+	Back: function(p, x){
+		x = x && x[0] || 1.618;
+		return Math.pow(p, 2) * ((x + 1) * p - x);
+	},
+
+	Bounce: function(p){
+		var value;
+		for (var a = 0, b = 1; 1; a += b, b /= 2){
+			if (p >= (7 - 4 * a) / 11){
+				value = b * b - Math.pow((11 - 6 * a - 11 * p) / 4, 2);
+				break;
+			}
+		}
+		return value;
+	},
+
+	Elastic: function(p, x){
+		return Math.pow(2, 10 * --p) * Math.cos(20 * p * Math.PI * (x && x[0] || 1) / 3);
+	}
+
+});
+
+['Quad', 'Cubic', 'Quart', 'Quint'].each(function(transition, i){
+	Fx.Transitions[transition] = new Fx.Transition(function(p){
+		return Math.pow(p, i + 2);
+	});
+});
+
 
 // Begin: Source/Interface/Mask.js
 /*
