@@ -312,6 +312,7 @@ __EOD;
 </html>
 __EOD;
   // definice možných HTML template stránky
+  $version= "title='jádro {$EZER->version}'";
   switch ($ezer_template) {
   case 'menu':
 # ------------------------------------------------------------------------------- HTML menu
@@ -321,7 +322,7 @@ $html_header
 <body id="body" class='nogrid' onclick="$('DbgMenu').setStyle('display','none');/*Ezer.app.bodyClick();*/">
 <!-- menu a submenu -->
   <div id='horni' class="MainBar">
-    <div id="appl">$title_right</div>
+    <div id="appl" $version>$title_right</div>
     <div id='logo' oncontextmenu="$('DbgMenu').setStyle('display','block');return false;">
       <img class="StatusIcon" id="StatusIcon_idle" src="./$ezer_root/img/-logo.gif" />
       <img class="StatusIcon" id="StatusIcon_server" src="./$ezer_root/img/+logo.gif" />

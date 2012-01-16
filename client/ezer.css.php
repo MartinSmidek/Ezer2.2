@@ -609,7 +609,7 @@ hr.cleaner {
   padding:15px; cursor:default; display:none; }
 #kuk_err, #error {
   background-color:$s_kuk; height:75px; }
-#kuk table, .dbg table {
+#kuk table, .dbg  {
   border-collapse:collapse; margin:3px 0;}
 #kuk td, .dbg td {
   border:1px solid #aaa; font:x-small Arial;color:#777;padding:0 3px; line-height:11px; }
