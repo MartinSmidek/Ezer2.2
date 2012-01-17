@@ -599,9 +599,11 @@ var DatePicker = new Class({
 	},
 	
 	destroy: function() {
-		this.picker.destroy();
-		this.picker = null;
-		this.options.onClose();
+		if ( this.picker ) {  // MS2012
+                  this.picker.destroy();
+		  this.picker = null;
+		  this.options.onClose();
+                }
 	},
 	
 	select: function(values) {

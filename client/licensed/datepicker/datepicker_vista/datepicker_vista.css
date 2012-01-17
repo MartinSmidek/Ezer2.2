@@ -8,6 +8,7 @@
 	height: 135px;
 	padding: 14px;
 	background: url(frame.png) no-repeat;
+        z-index:1;
 }
 
 /* header
