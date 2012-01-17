@@ -811,11 +811,12 @@ Ezer.Button.implement({
       styles:this.coord({height:undefined,width:undefined}),
       type:this.type=='button.submit'?'submit':'submit',events:{
         mouseup:
-          this.type=='button.upload'
-          ? function(el) {
-              this._showUpload();
-            }.bind(this)
-          : function(el) {
+//           this.type=='button.upload'
+//           ? function(el) {
+//               this._showUpload();
+//             }.bind(this)
+//           :
+            function(el) {
                                                         Ezer.trace('*','button:mouseup');
               if ( !Ezer.design ) {
                 Ezer.fce.touch('block',this);           // informace do _touch na server
@@ -838,25 +839,25 @@ Ezer.Button.implement({
 // přenese hodnotu z DOM do this.value
   DOM_get: function () {
     this.value= this.DOM_Input.hasClass('empty') ? '' : this.DOM_Input.value;
-  },
+//   },
 // ------------------------------------------------------------------------------------ _showUpload
-  _showUpload: function() {
-    // vyprázdnění starého stavu
-    this.DOM_Upload.getElement('ul.upload-list').empty();
-    var prog= this.DOM_Upload.getElements('span.progress-text');
-    if ( prog ) prog.destroy();
-    // zobrazení
-    Ezer.assert(this.options.par && this.options.par.mask && this.options.par.path,
-      "Upload: chybí definice 'mask' nebo 'path' v atributu 'par'",this);
-    var par= JSON.encode(this.options.par);
-    this.url= Ezer.version+'/server/ezer2.php?upload=1&root='+Ezer.root+'&par='+par+
-      '&session='+Ezer.options.session+
-      '&path='+this.options.par.path+
-      '&user='+Ezer.sys.user.abbr+'&move='+(this.options.par.move||'');
-    this.DOM_Upload.setStyles({display:'block'});
-    var mask= this.options.par.mask.split('|'), filter= {};
-    filter[mask[0]]= mask[1];
-    Swiff.Ezer(this.DOM_Upload,{url:this.url,filter:filter});
+//   _showUpload: function() {
+//     // vyprázdnění starého stavu
+//     this.DOM_Upload.getElement('ul.upload-list').empty();
+//     var prog= this.DOM_Upload.getElements('span.progress-text');
+//     if ( prog ) prog.destroy();
+//     // zobrazení
+//     Ezer.assert(this.options.par && this.options.par.mask && this.options.par.path,
+//       "Upload: chybí definice 'mask' nebo 'path' v atributu 'par'",this);
+//     var par= JSON.encode(this.options.par);
+//     this.url= Ezer.version+'/server/ezer2.php?upload=1&root='+Ezer.root+'&par='+par+
+//       '&session='+Ezer.options.session+
+//       '&path='+this.options.par.path+
+//       '&user='+Ezer.sys.user.abbr+'&move='+(this.options.par.move||'');
+//     this.DOM_Upload.setStyles({display:'block'});
+//     var mask= this.options.par.mask.split('|'), filter= {};
+//     filter[mask[0]]= mask[1];
+//     Swiff.Ezer(this.DOM_Upload,{url:this.url,filter:filter});
   }
 });
 // ================================================================================================= Elem-DOM

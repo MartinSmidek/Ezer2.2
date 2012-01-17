@@ -5,7 +5,7 @@
   global $json, $USER, $EZER, $ezer_user_id;
   # ------------------------------------------------------------------------------------------------ requires
   # vložení a inicializace balíků
-  $ezer_root= $_POST['root'];                        // jméno adresáře a hlavního objektu aplikace
+  if ( !$ezer_root ) $ezer_root= $_POST['root'];     // jméno adresáře a hlavního objektu aplikace
   if ( !$ezer_root ) $ezer_root= $_GET['root'];
   $ezer_session= $_POST['session'];                  // způsob práce se $_SESSION php|ezer
   if ( !$ezer_session ) $ezer_session= $_GET['session'];
@@ -40,12 +40,12 @@
       return $json->decode($x);
     }
   }
-  # ------------------------------------------------------------------------------------------------ FancyUpload
-  # zpracování požadavku na Upload
-  if ( isset($_GET['upload']) ) {
-    echo json_encode(upload());
-    die;
-  }
+//   # ------------------------------------------------------------------------------------------------ FancyUpload
+//   # zpracování požadavku na Upload
+//   if ( isset($_GET['upload']) ) {
+//     echo json_encode(upload());
+//     die;
+//   }
   # ------------------------------------------------------------------------------------------------ params
   # cmd    - příkaz
   # x      - parametry
@@ -1558,88 +1558,88 @@ function array2object(array $array) {
   }
   return $object;
 }
-# ================================================================================================== upload
-# -------------------------------------------------------------------------------------------------- upload_ymd
-function upload_ymd($tmp_name,$name,$par) {
-  global $EZER;
-  $path= "{$EZER->options->docs_path}/{$_GET['path']}";
-//   $log= "path=".$_GET['path'];
-//   file_put_contents("$path/x.log",$log);
-  $prefix= preg_match("/^[0-9]{6}_/",$name) ? '' : date('ymd_');
-  move_uploaded_file($tmp_name, "$path/{$prefix}$name");
-}
-# -------------------------------------------------------------------------------------------------- upload
-function upload() {
-  global $ezer_path_root, $json;
-  chdir($ezer_path_root);
-  $data= '';
-  $error= '';
-  $tmp_name= $_FILES['Filedata']['tmp_name'];
-  if (!isset($_FILES['Filedata']) || !is_uploaded_file($tmp_name)) {
-    $error= 'Invalid Upload';
-  }
-  // Processing
-  $log= date('Y-m-d h:i ').str_pad($_GET['user'],3);
-  $name0= $_FILES['Filedata']['name'];
-  $name= cz2ascii($name0);
-  $size= $_FILES['Filedata']['size'];
-  $path= "{$_GET['path']}/$name";
-  $md5= md5_file($tmp_name);
-  // uložení souboru
-  if ( $fce= $_GET['move'] ) {
-    $log.= " - USER $fce";
-    call_user_func_array($fce,array($tmp_name,$name,$json->decode($_GET['par'])));
-  }
-  else {
-    $log.= " - STND ";
-    move_uploaded_file($tmp_name, $path);
-  }
-  $log.= str_pad($size,9,' ',STR_PAD_LEFT).' '.$path;
-  if ( $name!=$name0 )
-    $log.= " - $name0";
-  if ($error) {
-    $log.= " -- $error";
-  }
-  else {
-    // komunikace s klientem - FancyUpload
-    $return= array('status'=>'1','name'=>$name,'hash'=>$md5);
-    // ... pro obrázky
-    $info= @getimagesize($tmp_name);
-    if ($info) {
-      $return['width']= $info[0];
-      $return['height']= $info[1];
-      $return['mime']= $info['mime'];
-    }
-    if ( $name!=$name0 )
-      $return['rename']= $name;
-  }
-  // zápis do logu s omezením velikosti souboru
-  $logf= "logs/uploads.log";
-  if ( file_exists($logf) && filesize($logf) > 100000 ) {
-    rename($logf,"logs/".date('ymd')."_uploads.log");
-  }
-  $res= @fopen($logf,'a');
-  if ($res ) {
-    fputs($res,"$log\n");
-    fclose($res);
-  }
-  // Komunikace s FancyUpload
-  // The Content-type headers are uncommented, since Flash doesn't care for them
-  // anyway. This way also the IFrame-based uploader sees the content.
-  if (isset($_REQUEST['response']) && $_REQUEST['response'] == 'xml') {
-    // header('Content-type: text/xml');
-    $data= '<response>';
-    foreach ($return as $key => $value) {
-      $data.= "<$key><![CDATA[$value]]></$key>";
-    }
-    $data.= '</response>';
-  }
-  else {
-    // header('Content-type: application/json');
-    $data= $return;
-  }
-  return $data;
-}
+// # ================================================================================================== upload
+// # -------------------------------------------------------------------------------------------------- upload_ymd
+// function upload_ymd($tmp_name,$name,$par) {
+//   global $EZER;
+//   $path= "{$EZER->options->docs_path}/{$_GET['path']}";
+// //   $log= "path=".$_GET['path'];
+// //   file_put_contents("$path/x.log",$log);
+//   $prefix= preg_match("/^[0-9]{6}_/",$name) ? '' : date('ymd_');
+//   move_uploaded_file($tmp_name, "$path/{$prefix}$name");
+// }
+// # -------------------------------------------------------------------------------------------------- upload
+// function upload() {
+//   global $ezer_path_root, $json;
+//   chdir($ezer_path_root);
+//   $data= '';
+//   $error= '';
+//   $tmp_name= $_FILES['Filedata']['tmp_name'];
+//   if (!isset($_FILES['Filedata']) || !is_uploaded_file($tmp_name)) {
+//     $error= 'Invalid Upload';
+//   }
+//   // Processing
+//   $log= date('Y-m-d h:i ').str_pad($_GET['user'],3);
+//   $name0= $_FILES['Filedata']['name'];
+//   $name= cz2ascii($name0);
+//   $size= $_FILES['Filedata']['size'];
+//   $path= "{$_GET['path']}/$name";
+//   $md5= md5_file($tmp_name);
+//   // uložení souboru
+//   if ( $fce= $_GET['move'] ) {
+//     $log.= " - USER $fce";
+//     call_user_func_array($fce,array($tmp_name,$name,$json->decode($_GET['par'])));
+//   }
+//   else {
+//     $log.= " - STND ";
+//     move_uploaded_file($tmp_name, $path);
+//   }
+//   $log.= str_pad($size,9,' ',STR_PAD_LEFT).' '.$path;
+//   if ( $name!=$name0 )
+//     $log.= " - $name0";
+//   if ($error) {
+//     $log.= " -- $error";
+//   }
+//   else {
+//     // komunikace s klientem - FancyUpload
+//     $return= array('status'=>'1','name'=>$name,'hash'=>$md5);
+//     // ... pro obrázky
+//     $info= @getimagesize($tmp_name);
+//     if ($info) {
+//       $return['width']= $info[0];
+//       $return['height']= $info[1];
+//       $return['mime']= $info['mime'];
+//     }
+//     if ( $name!=$name0 )
+//       $return['rename']= $name;
+//   }
+//   // zápis do logu s omezením velikosti souboru
+//   $logf= "logs/uploads.log";
+//   if ( file_exists($logf) && filesize($logf) > 100000 ) {
+//     rename($logf,"logs/".date('ymd')."_uploads.log");
+//   }
+//   $res= @fopen($logf,'a');
+//   if ($res ) {
+//     fputs($res,"$log\n");
+//     fclose($res);
+//   }
+//   // Komunikace s FancyUpload
+//   // The Content-type headers are uncommented, since Flash doesn't care for them
+//   // anyway. This way also the IFrame-based uploader sees the content.
+//   if (isset($_REQUEST['response']) && $_REQUEST['response'] == 'xml') {
+//     // header('Content-type: text/xml');
+//     $data= '<response>';
+//     foreach ($return as $key => $value) {
+//       $data.= "<$key><![CDATA[$value]]></$key>";
+//     }
+//     $data.= '</response>';
+//   }
+//   else {
+//     // header('Content-type: application/json');
+//     $data= $return;
+//   }
+//   return $data;
+// }
 # -------------------------------------------------------------------------------------------------- load_files
 # načtení atributů souborů ze složky, používá se v browse_load a browse_scroll
 # x.cond = path AND elem AND elem ...

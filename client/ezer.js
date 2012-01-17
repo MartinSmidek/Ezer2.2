@@ -567,7 +567,7 @@ Ezer.Block= new Class({
               case 'button':        part= new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'button.submit': part= new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'button.reset':  part= new Ezer.Button(this,desc,DOM,id,skill); break;
-              case 'button.upload': part= new Ezer.Button(this,desc,DOM,id,skill); break;
+//               case 'button.upload': part= new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'case':          part= new Ezer.Case(this,desc,DOM,id,skill); break;
               case 'chat':          part= new Ezer.Chat(this,desc,DOM,id,skill); break;
               case 'check':         part= new Ezer.Check(this,desc,DOM,id,skill); break;
@@ -2435,9 +2435,9 @@ Ezer.Button= new Class({
   title: null,                                  // nápověda položky
 //os: Button.title - název
   options: {},
-//oo: Button.par - {path:podsložka na serveru,mask:'název masky|seznam masek'} pro type:'upload'
-//      path udává cílovou podsložku na serveru, v souboru logs/uploads.log je doplněn záznam
-//      každém uploadu. Maska je tvořena podle vzoru: 'Obrázky|*.jpg;*.gif'
+//-- oo: Button.par - {path:podsložka na serveru,mask:'název masky|seznam masek'} pro type:'upload'
+//--      path udává cílovou podsložku na serveru, v souboru logs/uploads.log je doplněn záznam
+//--      každém uploadu. Maska je tvořena podle vzoru: 'Obrázky|*.jpg;*.gif'
   initialize: function(owner,desc,DOM,id,skill) {
     this.parent(owner,desc,DOM,id,skill);
     this.title= this.options.help||null;

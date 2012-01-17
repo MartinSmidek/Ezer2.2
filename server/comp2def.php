@@ -54,7 +54,7 @@ $blocs2 = array (                                    // překládají se na AE_<
   'box'         =>  explode(",",'box'),
 #  form
   'form'        =>  explode(",",'view,var,proc,browse,browse.smart,radio,label,edit,edit.html,'
-                               .'button,button.submit,button.reset,button.upload,select,select.auto,'
+                               .'button,button.submit,button.reset,select,select.auto,' //,button.upload
                                .'select.map,select.map0,field,field.date,field.list,menu,chat,check,list'
                                .($pragma_attrs?',select':'')),
   'view'        =>  explode(",",''),
