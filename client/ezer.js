@@ -380,8 +380,9 @@ Ezer.Block= new Class({
     else if ( tags ) {
       var re= new RegExp(tags);
       // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
-      for(var i in this.part) {
-        var part= this.part[i];
+      var top_part= this instanceof Ezer.Var && this.value ? this.value.part : this.part;
+      for(var i in top_part) {
+        var part= top_part[i];
         if ( part.DOM_Block && part.options.tag && re.test(part.options.tag) ) {
           part.options.enabled= enabled;
           part.DOM_enabled(enabled);
@@ -414,8 +415,9 @@ Ezer.Block= new Class({
     else if ( tags ) {
       var re= new RegExp(tags);
       // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
-      for(var i in this.part) {
-        var part= this.part[i];
+      var top_part= this instanceof Ezer.Var && this.value ? this.value.part : this.part;
+      for(var i in top_part) {
+        var part= top_part[i];
         var block= part instanceof Ezer.Var && part.value ? part.value.DOM_Block : part.DOM_Block;
         if ( block && part.options.tag ) {
           if ( re.test(part.options.tag) ) {
@@ -449,8 +451,9 @@ Ezer.Block= new Class({
     if ( tags ) {
       var re= new RegExp(tags);
       // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
-      for(var i in this.part) {
-        var part= this.part[i];
+      var top_part= this instanceof Ezer.Var && this.value ? this.value.part : this.part;
+      for(var i in top_part) {
+        var part= top_part[i];
         if ( part.DOM_Block && part.options.tag && re.test(part.options.tag) ) {
           if ( id1 ) id1.split(' ').each(function(id){part.DOM_Block.addClass(id)});
           if ( id2 ) id2.split(' ').each(function(id){part.DOM_Block.removeClass(id)});
@@ -2716,7 +2719,7 @@ Ezer.FieldDate= new Class({
 //      vstupní část formuláře - rozbalení obsahu podle oddělovače
 //t: Block,Elem,Field
 //s: Block
-//os: FieldList.par - delim: oddělovač
+//os: FieldList.par - delim: oddělovač jako regulární výraz
 Ezer.FieldList= new Class({
   Extends: Ezer.Field,
   options: {}

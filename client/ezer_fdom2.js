@@ -1181,8 +1181,11 @@ Ezer.FieldList.implement({
   DOM_show: function() {
     // odstraň předchozí hodnoty
     this.DOM_DropList.getChildren().destroy();
+    // rozliš oddělovač na string nebo regulární výraz podle délky
+    var delim= this.options.par ? this.options.par.delim||',' : ',';
+    if ( delim.length>1 ) delim= new RegExp(delim);
     // rozbal hodnotu s oddělovačem a vytvoř seznam
-    var values= this.DOM_Input.value.split(this.options.par ? this.options.par.delim||',' : ',');
+    var values= this.DOM_Input.value.split(delim);
     var theFocus= null;
     this._values= [];
     values.each(function(value) {
