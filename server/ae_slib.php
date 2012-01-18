@@ -508,6 +508,14 @@ function root_svn($roots='') {
 }
 # ================================================================================================== SYSTEM
 # knihovna funkcí pro moduly server, compiler, reference
+# -------------------------------------------------------------------------------------------------- fce_log
+# append do souboru ezer.log v rootu aplikace
+function fce_log ($msg) {
+  $fp= fopen("ezer.log","a");
+  fwrite($fp,date("d.m H:i:s")." $msg\n");
+  fclose($fp);
+  return true;
+}
 # -------------------------------------------------------------------------------------------------- fce_error
 # $send_mail může obsahovat doplňkové informace zaslané správci aplikace mailem
 function fce_error ($msg,$send_mail='') { trace();
