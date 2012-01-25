@@ -8,9 +8,16 @@
 	height: 135px;
 	padding: 14px;
 	background: url(frame.png) no-repeat;
+}
+/* korekce MS
+********************************************************/
+.datepicker_vista {
         z-index:2;
 }
-
+.datepicker_vista .month {
+        z-index:3;
+        position: relative;
+}
 /* header
 ********************************************************/
 .datepicker_vista .header {
@@ -163,6 +170,9 @@
 
 /* months-grid
 ********************************************************/
+/*.datepicker_vista div.month {
+        z-index:2;  background-color:red !important;
+} */
 .datepicker_vista .months .month {
 	float: left;
 	cursor: pointer;
