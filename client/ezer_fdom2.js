@@ -1819,7 +1819,7 @@ Ezer.Select.implement({
         mouseout: function (event) {
           event.target.removeClass('selected');
         }.bind(this),
-        mousedown: function (event) {
+        click: function (event) {
           this.DOM_seekItem(event.target);
           this.fire('onchanged');
           return false;
