@@ -1822,6 +1822,7 @@ Ezer.Select.implement({
         mousedown: function (event) {
           this.DOM_seekItem(event.target);
           this.fire('onchanged');
+          return false;
         }.bind(this)
       }}).inject(this.DOM_DropList);
       if ( this.options.par && this.options.par.subtype=='keys' )
