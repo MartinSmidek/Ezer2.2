@@ -1,6 +1,6 @@
 
-//This library: http://dev.clientcide.com/depender/build?download=true&version=Clientcide+3.0.10&require=Core%2FCore&require=Core%2FFx.Morph&require=Core%2FFx.Transitions&require=Core%2FFx.Tween&require=Core%2FRequest&require=Core%2FCookie&require=Core%2FDOMReady&require=Core%2FJSON&require=Clientcide%2FStickyWin.Alert&require=Clientcide%2FStickyWin.Drag&require=Clientcide%2FStickyWin.UI&require=Clientcide%2FStickyWin&require=More%2FSlider&require=More%2FFx.Slide&require=More%2FMask&require=More%2FLocale.cs-CZ.Date&require=More%2FDate.Extras&require=More%2FAssets
-//Contents: Core:Source/Core/Core.js, Core:Source/Types/Object.js, Core:Source/Types/Array.js, Core:Source/Types/Function.js, Core:Source/Types/Number.js, Core:Source/Types/String.js, Core:Source/Browser/Browser.js, Core:Source/Slick/Slick.Parser.js, Core:Source/Slick/Slick.Finder.js, Core:Source/Element/Element.js, Core:Source/Class/Class.js, Core:Source/Class/Class.Extras.js, Core:Source/Request/Request.js, Core:Source/Fx/Fx.js, Core:Source/Element/Element.Style.js, Core:Source/Fx/Fx.CSS.js, Core:Source/Fx/Fx.Morph.js, More:Source/More/More.js, More:Source/Class/Class.Refactor.js, Core:Source/Element/Element.Dimensions.js, Core:Source/Types/DOMEvent.js, Core:Source/Element/Element.Event.js, More:Source/Drag/Drag.js, More:Source/Drag/Drag.Move.js, Core:Source/Utilities/DOMReady.js, More:Source/Element/Element.Measure.js, More:Source/Element/Element.Position.js, More:Source/Class/Class.Binds.js, More:Source/Element/Element.Shortcuts.js, More:Source/Element/Element.Pin.js, More:Source/Class/Class.Occlude.js, More:Source/Utilities/IframeShim.js, More:Source/Types/Object.Extras.js, Clientcide:Source/Core/Clientcide.js, Clientcide:Source/Core/dbug.js, Clientcide:Source/UI/StyleWriter.js, Clientcide:Source/UI/StickyWin.js, Clientcide:Source/UI/StickyWin.Drag.js, Core:Source/Fx/Fx.Transitions.js, More:Source/Interface/Mask.js, Clientcide:Source/UI/StickyWin.Modal.js, More:Source/Types/String.Extras.js, Clientcide:Source/UI/StickyWin.UI.js, Clientcide:Source/UI/StickyWin.Alert.js, More:Source/Drag/Slider.js, Core:Source/Utilities/Cookie.js, More:Source/Locale/Locale.js, More:Source/Locale/Locale.en-US.Date.js, More:Source/Types/Date.js, More:Source/Types/Date.Extras.js, Core:Source/Utilities/JSON.js, Core:Source/Fx/Fx.Tween.js, More:Source/Utilities/Assets.js, More:Source/Fx/Fx.Slide.js, More:Source/Locale/Locale.cs-CZ.Date.js
+//This library: http://dev.clientcide.com/depender/build?download=true&version=Clientcide+3.0.10&require=Core%2FCore&require=Core%2FFx.Morph&require=Core%2FFx.Transitions&require=Core%2FFx.Tween&require=Core%2FRequest&require=Core%2FCookie&require=Core%2FDOMReady&require=Core%2FJSON&require=Clientcide%2FStickyWin.Alert&require=Clientcide%2FStickyWin.Drag&require=Clientcide%2FStickyWin.UI&require=Clientcide%2FStickyWin&require=More%2FSlider&require=More%2FFx.Slide&require=More%2FMask&require=More%2FLocale.cs-CZ.Date&require=More%2FArray.Extras&require=More%2FDate.Extras&require=More%2FAssets
+//Contents: Core:Source/Core/Core.js, Core:Source/Types/Object.js, Core:Source/Types/Array.js, Core:Source/Types/Function.js, Core:Source/Types/Number.js, Core:Source/Types/String.js, Core:Source/Browser/Browser.js, Core:Source/Slick/Slick.Parser.js, Core:Source/Slick/Slick.Finder.js, Core:Source/Element/Element.js, Core:Source/Class/Class.js, Core:Source/Class/Class.Extras.js, Core:Source/Request/Request.js, Core:Source/Fx/Fx.js, Core:Source/Element/Element.Style.js, Core:Source/Fx/Fx.CSS.js, Core:Source/Fx/Fx.Morph.js, More:Source/More/More.js, More:Source/Class/Class.Refactor.js, Core:Source/Element/Element.Dimensions.js, Core:Source/Types/DOMEvent.js, Core:Source/Element/Element.Event.js, More:Source/Drag/Drag.js, More:Source/Drag/Drag.Move.js, Core:Source/Utilities/DOMReady.js, More:Source/Element/Element.Measure.js, More:Source/Element/Element.Position.js, More:Source/Class/Class.Binds.js, More:Source/Element/Element.Shortcuts.js, More:Source/Element/Element.Pin.js, More:Source/Class/Class.Occlude.js, More:Source/Utilities/IframeShim.js, More:Source/Types/Object.Extras.js, Clientcide:Source/Core/Clientcide.js, Clientcide:Source/Core/dbug.js, Clientcide:Source/UI/StyleWriter.js, Clientcide:Source/UI/StickyWin.js, Clientcide:Source/UI/StickyWin.Drag.js, Core:Source/Fx/Fx.Transitions.js, More:Source/Interface/Mask.js, Clientcide:Source/UI/StickyWin.Modal.js, More:Source/Types/String.Extras.js, Clientcide:Source/UI/StickyWin.UI.js, Clientcide:Source/UI/StickyWin.Alert.js, More:Source/Drag/Slider.js, More:Source/Types/Array.Extras.js, More:Source/Locale/Locale.js, More:Source/Locale/Locale.en-US.Date.js, More:Source/Types/Date.js, More:Source/Types/Date.Extras.js, Core:Source/Utilities/JSON.js, Core:Source/Fx/Fx.Tween.js, More:Source/Utilities/Assets.js, More:Source/Fx/Fx.Slide.js, Core:Source/Utilities/Cookie.js, More:Source/Locale/Locale.cs-CZ.Date.js
 
 // Begin: Source/Core/Core.js
 /*
@@ -8480,81 +8480,86 @@ var Slider = new Class({
 });
 
 
-// Begin: Source/Utilities/Cookie.js
+// Begin: Source/Types/Array.Extras.js
 /*
 ---
 
-name: Cookie
+script: Array.Extras.js
 
-description: Class for creating, reading, and deleting browser Cookies.
+name: Array.Extras
 
-license: MIT-style license.
+description: Extends the Array native object to include useful methods to work with arrays.
 
-credits:
-  - Based on the functions by Peter-Paul Koch (http://quirksmode.org).
+license: MIT-style license
 
-requires: [Options, Browser]
+authors:
+  - Christoph Pojer
+  - Sebastian Markbåge
 
-provides: Cookie
+requires:
+  - Core/Array
+  - MooTools.More
+
+provides: [Array.Extras]
 
 ...
 */
 
-var Cookie = new Class({
+(function(nil){
 
-	Implements: Options,
+Array.implement({
 
-	options: {
-		path: '/',
-		domain: false,
-		duration: false,
-		secure: false,
-		document: document,
-		encode: true
+	min: function(){
+		return Math.min.apply(null, this);
 	},
 
-	initialize: function(key, options){
-		this.key = key;
-		this.setOptions(options);
+	max: function(){
+		return Math.max.apply(null, this);
 	},
 
-	write: function(value){
-		if (this.options.encode) value = encodeURIComponent(value);
-		if (this.options.domain) value += '; domain=' + this.options.domain;
-		if (this.options.path) value += '; path=' + this.options.path;
-		if (this.options.duration){
-			var date = new Date();
-			date.setTime(date.getTime() + this.options.duration * 24 * 60 * 60 * 1000);
-			value += '; expires=' + date.toGMTString();
+	average: function(){
+		return this.length ? this.sum() / this.length : 0;
+	},
+
+	sum: function(){
+		var result = 0, l = this.length;
+		if (l){
+			while (l--) result += this[l];
 		}
-		if (this.options.secure) value += '; secure';
-		this.options.document.cookie = this.key + '=' + value;
+		return result;
+	},
+
+	unique: function(){
+		return [].combine(this);
+	},
+
+	shuffle: function(){
+		for (var i = this.length; i && --i;){
+			var temp = this[i], r = Math.floor(Math.random() * ( i + 1 ));
+			this[i] = this[r];
+			this[r] = temp;
+		}
 		return this;
 	},
 
-	read: function(){
-		var value = this.options.document.cookie.match('(?:^|;)\\s*' + this.key.escapeRegExp() + '=([^;]*)');
-		return (value) ? decodeURIComponent(value[1]) : null;
+	reduce: function(fn, value){
+		for (var i = 0, l = this.length; i < l; i++){
+			if (i in this) value = value === nil ? this[i] : fn.call(null, value, this[i], i, this);
+		}
+		return value;
 	},
 
-	dispose: function(){
-		new Cookie(this.key, Object.merge({}, this.options, {duration: -1})).write('');
-		return this;
+	reduceRight: function(fn, value){
+		var i = this.length;
+		while (i--){
+			if (i in this) value = value === nil ? this[i] : fn.call(null, value, this[i], i, this);
+		}
+		return value;
 	}
 
 });
 
-Cookie.write = function(key, value, options){
-	return new Cookie(key, options).write(value);
-};
-
-Cookie.read = function(key){
-	return new Cookie(key).read();
-};
-
-Cookie.dispose = function(key, options){
-	return new Cookie(key, options).dispose();
-};
+})();
 
 
 // Begin: Source/Locale/Locale.js
@@ -10005,6 +10010,83 @@ Element.implement({
 	}
 
 });
+
+
+// Begin: Source/Utilities/Cookie.js
+/*
+---
+
+name: Cookie
+
+description: Class for creating, reading, and deleting browser Cookies.
+
+license: MIT-style license.
+
+credits:
+  - Based on the functions by Peter-Paul Koch (http://quirksmode.org).
+
+requires: [Options, Browser]
+
+provides: Cookie
+
+...
+*/
+
+var Cookie = new Class({
+
+	Implements: Options,
+
+	options: {
+		path: '/',
+		domain: false,
+		duration: false,
+		secure: false,
+		document: document,
+		encode: true
+	},
+
+	initialize: function(key, options){
+		this.key = key;
+		this.setOptions(options);
+	},
+
+	write: function(value){
+		if (this.options.encode) value = encodeURIComponent(value);
+		if (this.options.domain) value += '; domain=' + this.options.domain;
+		if (this.options.path) value += '; path=' + this.options.path;
+		if (this.options.duration){
+			var date = new Date();
+			date.setTime(date.getTime() + this.options.duration * 24 * 60 * 60 * 1000);
+			value += '; expires=' + date.toGMTString();
+		}
+		if (this.options.secure) value += '; secure';
+		this.options.document.cookie = this.key + '=' + value;
+		return this;
+	},
+
+	read: function(){
+		var value = this.options.document.cookie.match('(?:^|;)\\s*' + this.key.escapeRegExp() + '=([^;]*)');
+		return (value) ? decodeURIComponent(value[1]) : null;
+	},
+
+	dispose: function(){
+		new Cookie(this.key, Object.merge({}, this.options, {duration: -1})).write('');
+		return this;
+	}
+
+});
+
+Cookie.write = function(key, value, options){
+	return new Cookie(key, options).write(value);
+};
+
+Cookie.read = function(key){
+	return new Cookie(key).read();
+};
+
+Cookie.dispose = function(key, options){
+	return new Cookie(key, options).dispose();
+};
 
 
 // Begin: Source/Locale/Locale.cs-CZ.Date.js

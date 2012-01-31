@@ -14,3 +14,6 @@ http://dev.clientcide.com/depender/#select=Core/Core;Core/Fx.Morph;Core/Fx.Tween
 
 http://dev.clientcide.com/depender/#select=Core/Core;Core/Fx.Morph;Core/Fx.Transitions;Core/Fx.Tween;Core/Request;Core/Cookie;Core/DOMReady;Core/JSON;Clientcide/StickyWin.Alert;Clientcide/StickyWin.Drag;Clientcide/StickyWin.UI;Clientcide/StickyWin;More/Slider;More/Fx.Slide;More/Mask;More/Locale.cs-CZ.Date;More/Date.Extras;More/Assets
 
+přidáno More Array.Extras kvůli array.max()
+http://dev.clientcide.com/depender/#select=Core/Core;Core/Fx.Morph;Core/Fx.Transitions;Core/Fx.Tween;Core/Request;Core/Cookie;Core/DOMReady;Core/JSON;Clientcide/StickyWin.Alert;Clientcide/StickyWin.Drag;Clientcide/StickyWin.UI;Clientcide/StickyWin;More/Slider;More/Fx.Slide;More/Mask;More/Locale.cs-CZ.Date;More/Array.Extras;More/Date.Extras;More/Assets
+
