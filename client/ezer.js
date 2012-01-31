@@ -2313,6 +2313,7 @@ Ezer.Form= new Class({
       if ( !x.table ) {                         // info o table, pokud již v x není
         x.table= field.table.id + (field.view ? ' AS '+field.view.id : '');
         x.key_id= field.table.options.key_id||'id_'+field.table.id;
+//         x.key_id= field.table.options.key_id||'id_'+field.table.id;
         x.db= field.table.options.db||'';
       }
       if ( field.view ) {                       // s odkazem přes view
@@ -3428,6 +3429,8 @@ Ezer.Browse= new Class({
 //-
 //i: Browse.onchoice - výběr řádku klávesou Ins
 //-
+//os: Browse.key_id   - jméno sloupce s klíčem pro browse_load ap. (pokud není udáno, odvozuje se z použité tabulky)
+//-
   selected_op: 'ignore',                // co budeme s klíči dělat ... viz fce selected
   cond: null,                           // aktuální pro WHERE ...    expr
   order: null,                          // aktuální pro ORDER BY ... id [ASC|DESC]
@@ -4345,7 +4348,8 @@ Ezer.Browse= new Class({
       field= this.part[ic];
       if ( field.skill ) this.owner._fillx(field,x,to_map);
     }
-    this.owner._fillx2(x.cond+x.order,x);
+//     this.owner._fillx2(x.cond+x.order,x);
+    this._fillx2(x.cond+x.order,x); // s možnou explicitní definicí x.key_id
     // změň podmínku na "jen vybrané", pokud je požadováno
     if ( this.selected_op=='use' ) {
       if ( this.keys_sel.length>0 ) {
@@ -4362,6 +4366,9 @@ Ezer.Browse= new Class({
       Ezer.error("RUN ERROR '"+x.cmd+"' chybi ridici tabulka pro browse "+this.id);
     if ( this.options.group_by )
       x.group= this.options.group_by;
+    // explicitní nastavení jména klíče  (120131_MS)
+    if ( this.options.key_id )
+      x.key_id= this.options.key_id;
     return x;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _fillx+
@@ -4373,7 +4380,8 @@ Ezer.Browse= new Class({
       desc= {id:field.id};
       if ( !x.table ) {                         // info o table, pokud již v x není
         x.table= field.table.id + (field.view ? ' AS '+field.view.id : '');
-        x.key_id= field.table.options.key_id||'id_'+field.table.id;
+        x.key_id= this.options.key_id ? this.options.key_id
+          : field.table.options.key_id||'id_'+field.table.id;
         x.db= field.table.options.db||'';
       }
       if ( field.view ) {                       // s odkazem přes view
