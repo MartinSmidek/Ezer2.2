@@ -128,7 +128,7 @@ Ezer.MenuMain.implement({
       $each(this.part,function(desc,id) {
         var href= 'ezer://'+id;
         if ( desc.type=='tabs' ) {
-          new Element('a',{href:href,text:desc.options.title||id}).inject(new Element('div').inject(
+          new Element('a',{href:href,html:desc.options.title||id}).inject(new Element('div').inject(
           desc.DOM_li= new Element('li',{
   //           'class': id==active ? 'Active' : '',
             events:{
@@ -142,7 +142,7 @@ Ezer.MenuMain.implement({
         }
         // odhlášení (i když není požadováno přihlášení)
         else if ( desc.type=='tabs.logoff' ) {
-          new Element('a',{text:desc.options.title||id}).inject(new Element('div').inject(
+          new Element('a',{html:desc.options.title||id}).inject(new Element('div').inject(
           desc.DOM_li= new Element('li',{
             events:{
               click: function(event) {
@@ -605,7 +605,7 @@ Ezer.PanelMain.implement({
 // ------------------------------------------------------------------------------------------------- fce pro panely v Tabs
 Ezer.PanelInTabs_add= function(panel) {
     var href= 'ezer://'+panel.owner.id+'.'+panel.id;
-    new Element('a',{href:href,text:panel.options.title||panel.id}).inject(new Element('div').inject(
+    new Element('a',{href:href,html:panel.options.title||panel.id}).inject(new Element('div').inject(
     panel._tabDom= new Element('li',{styles:{display:'none'},
     events:{
       click: function(event) {

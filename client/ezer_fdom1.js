@@ -795,6 +795,7 @@ Ezer.Help= new Class({
                 Ezer.help.title(this);
               }
             }
+            return false;
           }.bind(this),
           mouseout:  function() {
             this._helpIn= false;
@@ -804,6 +805,7 @@ Ezer.Help= new Class({
                 {outline:this._helpSave.outline,cursor:this._helpSave.cursor,
                  opacity:this._helpSave.opacity});
             }
+            return false;
           }.bind(this)
         });
       }
