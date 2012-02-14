@@ -4620,6 +4620,10 @@ Ezer.Show= new Class({
       this.DOM_th.setStyle('width',w);
       for (var i= 1; i<this.DOM_qry.length; i++) {
         this.DOM_qry[i].setStyle('width',w);
+        if ( this.DOM_qry_select[i] )
+          this.DOM_qry_select[i].DOM.setStyle('width',w);
+        else
+          this.DOM_qry[i].parentElement.setStyle('width',w);
       }
       for (var i= 1; i<this.DOM_cell.length; i++) {
         this.DOM_cell[i].setStyle('width',w);
