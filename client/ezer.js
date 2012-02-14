@@ -4616,39 +4616,38 @@ Ezer.Show= new Class({
 //fm: Show.width ([w])
 //      pokud je definováno w nastaví šířku sloupce, jinak ji vrátí
   width: function (w) {
+    function width_set(w) {
+      this.DOM_th.setStyle('width',w);
+      for (var i= 1; i<this.DOM_qry.length; i++) {
+        this.DOM_qry[i].setStyle('width',w);
+      }
+      for (var i= 1; i<this.DOM_cell.length; i++) {
+        this.DOM_cell[i].setStyle('width',w);
+      }
+      // úprava případného show-select
+      for (var i= 0; i<this.DOM_qry_select.length; i++) {
+        // vytvoř z mapy seznam možností pro případný výběrový select
+        var sel= this.DOM_qry_select[i];
+        if ( sel ) {
+          sel.DOM_Block.setStyle('width',w);
+          sel.DOM_Closure.setStyle('width',w);
+          sel.DOM_Input.setStyle('width',w);
+          sel.DOM_DropList.setStyle('width',w);
+        }
+      }
+    }
+    // provedení změny
     var val= 1;
     if ( this.DOM_th ) {
       if ( w==undefined )
         val= this.DOM_th.getStyle('width').toInt();
       else if ( Number(w)==0 ) {
-        this.DOM_th.setStyle('width',0);
+        width_set.call(this,0);
         this.DOM_th.addClass('BrowseNoClmn');
-        // úprava případného show-select
-        for (var i= 0; i<this.DOM_qry_select.length; i++) {
-          // vytvoř z mapy seznam možností pro případný výběrový select
-          var sel= this.DOM_qry_select[i];
-          if ( sel ) {
-            sel.DOM_Block.setStyle('width',0);
-            sel.DOM_Closure.setStyle('width',0);
-            sel.DOM_Input.setStyle('width',0);
-            sel.DOM_DropList.setStyle('width',0);
-          }
-        }
       }
       else {
-        this.DOM_th.setStyle('width',w);
+        width_set.call(this,w);
         this.DOM_th.removeClass('BrowseNoClmn');
-        // úprava případného show-select
-        for (var i= 0; i<this.DOM_qry_select.length; i++) {
-          // vytvoř z mapy seznam možností pro případný výběrový select
-          var sel= this.DOM_qry_select[i];
-          if ( sel ) {
-            sel.DOM_Block.setStyle('width',w);
-            sel.DOM_Closure.setStyle('width',w);
-            sel.DOM_Input.setStyle('width',w);
-            sel.DOM_DropList.setStyle('width',w);
-          }
-        }
       }
     }
     return val;

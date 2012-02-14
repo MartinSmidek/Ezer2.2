@@ -388,7 +388,9 @@ function base64_encode (data) {
     return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
 }
 // ================================================================================================= Resample
-var Resample = (function (canvas) {
+var Resample =
+Ezer.browser=='IE' ? null :
+(function (canvas) {
  // (C) WebReflection Mit Style License
  // Resample function, accepts an image as url, base64 string, or Image/HTMLImgElement
  // optional width or height, and a callback to invoke on operation complete

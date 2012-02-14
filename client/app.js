@@ -2,6 +2,7 @@
 
 //Ezer.root                     je definován v hlavním programu aplikace
 //Ezer.version                  dtto - default=ezer2
+//Ezer.browser                  CH|FF|OP|IE
 Ezer.options= Ezer.options || {};
 Ezer.parm= Ezer.parm || {};     // parametry z nadřazené aplikace
 Ezer.code= {};                  // kód modulů stažený ze serveru jako celkový strom
@@ -50,12 +51,16 @@ window.addEvent('load', function() {
   if ( Ezer.app.options.ondomready ) ondomready();
 });
 // ----------------------------------------------------------------------------- ON popstate
-window.addEventListener("popstate", function(e) {
-//                                                 Ezer.trace('*','the url has changed to '+location.href);
-  var re= /\?menu=([^&]*)&?/;
-  var obj= re.exec(location.href);
-  if ( obj && Ezer.run.$ ) Ezer.fce.href(obj[1]);
-});
+if ( Ezer.browser!='IE' )                               // IE nepodporuje HTML5
+  window.addEventListener("popstate", function(e) {
+  //                                                 Ezer.trace('*','the url has changed to '+location.href);
+    var re= /\?menu=([^&]*)&?/;
+    var obj= re.exec(location.href);
+    if ( obj && Ezer.run.$ ) Ezer.fce.href(obj[1]);
+  });
+Ezer.pushState = Ezer.browser=='IE'
+  ? function() {}
+  : function(href) { history.pushState(null,null,href); }
 // ================================================================================================= ClientCide - úpravy
 Locale.use('cs-CZ');
 Element.NativeEvents = $merge(Element.NativeEvents, {dragover:2, dragleave:2, drop:2});

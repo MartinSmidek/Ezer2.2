@@ -133,7 +133,7 @@ Ezer.MenuMain.implement({
   //           'class': id==active ? 'Active' : '',
             events:{
               click: function(event) {
-                history.pushState(null,null,href);
+                Ezer.pushState(href);
                 Ezer.fce.touch('block',this);     // informace do _touch na server
                 this._focus();
                 return false;
@@ -393,7 +393,7 @@ Ezer.Item.implement({
       this.domA.addEvents({
         click: function(el) {
           if ( !el.target.hasClass('disabled') ) {
-            history.pushState(null,null,href);
+            Ezer.pushState(href);
             this._click(el);
             Ezer.fce.touch('block',this);     // informace do _touch na server
           }
@@ -616,7 +616,7 @@ Ezer.PanelInTabs_add= function(panel) {
     panel._tabDom= new Element('li',{styles:{display:'none'},
     events:{
       click: function(event) {
-        history.pushState(null,null,href);
+        Ezer.pushState(href);
         this._focus();
         return false;
       }.bind(panel)
