@@ -1049,46 +1049,42 @@ Ezer.FieldDate.implement({
 // ------------------------------------------------------------------------------------ DOM_add
 //f: FieldDate-DOM.DOM_add ()
 //      zobrazí prvek field
-  DatePicker: null,
   DOM_add: function() {
     this.DOM_Block= new Element('div',{'class':'FieldDate',styles:this.coord()}).adopt(
         this.DOM_icon= new Element('img',{align:'right',src:Ezer.paths.images_cc+'calendar.gif'}),
         this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
           width:(this._w||87)-18,height:this._h||16}})
     ).inject(this.owner.DOM_Block);
+    this.DOM_ElemEvents();
+    this.DOM_optStyle(this.DOM_Block);
     if ( this.skill==2 && !this._fc('d') && !this._fc('o') ) {
-      var ox= this._fc('R') ? -150 : 0;
-      var oy= this._fc('U') ? -230 : 0;
+      var ox= this._fc('R') ? -106 :  -7;                          // 44
+      var oy= this._fc('U') ? -200 : -20;                          // 30
       // viz http://www.monkeyphysics.com/mootools/script/2/datepicker
-      this.DatePicker= new DatePicker(this.DOM_Input, { //debug:true,
+      new DatePicker(this.DOM_Input, { //debug:true,
         pickerClass: 'datepicker_vista', format:'j.n.Y', inputOutputFormat:'j.n.Y',
         toggleElements:this.DOM_icon, positionOffset:{x:ox,y:oy}, allowEmpty:true,
         days:Locale.getCurrent().sets.Date.days, months:Locale.getCurrent().sets.Date.months,
+        animationDuration:200, useFadeInOut:true,
         onSelect:function(){
-//                                                         Ezer.trace('*','onSelect');
           this.DOM_Input.removeClass('empty');
+          this.DOM_Input.value= this.DOM_Input2.value;
+          this.DOM_changed(1,this._fc('t'));     // když není format:'t' se zvýrazněním změny
           this.fire('onchange',[]);
         }.bind(this),
         onStart:function(){
-//                                                         Ezer.trace('*','onStart');
-          if ( this.DOM_Input.hasClass('empty') ) {
-            this.DOM_Input.value= this.value;
-          }
+          this.DOM_Input.value= this.value;
         }.bind(this),
         onClose:function(){
-//                                                         Ezer.trace('*','onClose');
           if ( this.DOM_Input.hasClass('empty') ) {
             this.DOM_Input.value= this.help;
           }
         }.bind(this)
       });
-      this.DOM_Input= this.DatePicker.attachToClone;
-      this.DOM_ElemEvents();
-      this.DOM_optStyle(this.DOM_Block);
-    }
-    else {
-      this.DOM_ElemEvents();
-      this.DOM_optStyle(this.DOM_Block);
+      this.DOM_Input2= this.DOM_Input.getNext();
+      this.DOM_Input.setStyles({display:'block'});
+      this.DOM_Input2.setStyles({visibility:'hidden'});
+//       this.DOM_Input2.setStyles({marginTop:20,backgroundColor:'#eeeeaa'});
     }
   }
 });
