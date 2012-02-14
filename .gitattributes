@@ -2,6 +2,7 @@
 /$.ezer -text
 client/app.js -text
 client/appf.css -text
+client/area.js -text
 client/dbg.css -text
 client/dbg.js -text
 client/dbgf.html -text
@@ -49,6 +50,7 @@ client/img/menu_on2.png -text
 client/img/menu_on3.png -text
 client/img/menu_on_hover.png -text
 client/img/method.png -text
+client/img/mootree.gif -text
 client/img/select.gif -text
 client/img/select_auto.gif -text
 client/img/sort_a.png -text
@@ -67,6 +69,7 @@ client/licensed/datepicker/datepicker_vista/frame.png -text
 client/licensed/datepicker/datepicker_vista/months.png -text
 client/licensed/datepicker/datepicker_vista/years.png -text
 client/licensed/glfx.js -text
+client/licensed/mootree.js -text
 client/licensed/zeroclipboard/ZeroClipboard.as -text
 client/licensed/zeroclipboard/ZeroClipboard.fla -text
 client/licensed/zeroclipboard/ZeroClipboard.js -text

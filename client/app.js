@@ -13,10 +13,10 @@ Ezer.dbg= {stop:false};         // ladící struktury
 Ezer.design= false;             // design-mode
 Ezer.continuation= null;        // pokračování po stop-adrese
 Ezer.DOM= null;                 // uživatelská plocha
-Ezer.paths= {
-  images_lib: './'+Ezer.version+'/client/images/',
-  images_cc:  './'+Ezer.version+'/client/img/clientcide/'      // viz případná změna v initialize
-};
+Ezer.paths= Ezer.paths || {};   // parametry z nadřazené aplikace
+Ezer.paths.images_lib= './'+Ezer.version+'/client/img/';
+Ezer.paths.images_cc=  './'+Ezer.version+'/client/img/clientcide/'; // viz případná změna v initialize
+;
 Ezer.used= [];                  // seznam vyžádaných zdrojů ???
 Ezer.evals= 0;                  // počet aktivních objektů Ezer.Eval (nuluje i DblClick na trace)
 Ezer.process= 0;                // jednoznačné číslo procesu
@@ -42,14 +42,20 @@ Ezer.const_value= function (id,val) {
   }
   return value;
 }
-
+// ----------------------------------------------------------------------------- ON load
 window.addEvent('load', function() {
   Ezer.app= new Ezer.Application(Ezer.options);
 //   if ( Ezer.app.options.debug ) window.top.dbg.init();
   Ezer.app._mini_debug(Ezer.app.options.mini_debug);
   if ( Ezer.app.options.ondomready ) ondomready();
 });
-
+// ----------------------------------------------------------------------------- ON popstate
+window.addEventListener("popstate", function(e) {
+//                                                 Ezer.trace('*','the url has changed to '+location.href);
+  var re= /\?menu=([^&]*)&?/;
+  var obj= re.exec(location.href);
+  if ( obj && Ezer.run.$ ) Ezer.fce.href(obj[1]);
+});
 // ================================================================================================= ClientCide - úpravy
 Locale.use('cs-CZ');
 Element.NativeEvents = $merge(Element.NativeEvents, {dragover:2, dragleave:2, drop:2});

@@ -1189,6 +1189,7 @@ function gen_name($name,$pars,$vars,$first,$c=null,$nargs=null) {  #trace();
       }
       $nvars= count((array)$obj->vars);
       if ( $nvars ) $code[0]->v= $nvars;
+      if ( $c && $c->lc ) $code[0]->s= $c->lc;
     }
     else {
       $code[0]= (object)array('o'=>'o','i'=>$full);
@@ -1267,6 +1268,7 @@ function gen_name($name,$pars,$vars,$first,$c=null,$nargs=null) {  #trace();
             $code[0]= (object)array('o'=>($is_desc?'C':'c'),'i'=>$full);
             $nvars= count((array)$obj->vars);
             if ( $nvars ) $code[0]->v= $nvars;
+            if ( $c && $c->lc ) $code[0]->s= $c->lc;
           }
           else {
             $code[$is_this?1:0]= (object)array('o'=>$is_this?'q':'o','i'=>$full);
@@ -1352,7 +1354,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       $code_top-= $npar;
     }
     elseif ( $c->op=='new_form' ) {
-      if ( count($c->par)==3 && $c->par[0]->expr=='name' ) {
+      if ( $npar==3 && $c->par[0]->expr=='name' ) {
         $form= find_part_abs($c->par[0]->name,$fullname,'form');
         if ( $form && $form->type=='form' ) {
           $code[]= (object)array('o'=>'y','c'=>array((object)array('o'=>'v','v'=>$fullname)));
@@ -1368,6 +1370,26 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       }
       else comp_error("CODE: new_form má chybné parametry");
     }
+    elseif ( $c->op=='new_area' ) {
+      if ( count($c->par)>=2 && $c->par[0]->expr=='name' ) {
+        $area= find_part_abs($c->par[0]->name,$fullname,'area');
+        if ( $area && $area->type=='area' ) {
+          $code[]= (object)array('o'=>'y','c'=>array((object)array('o'=>'v','v'=>$fullname)));
+          for ($i= 1; $i<$npar; $i++) {
+            $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[$i],0,$struct1),
+              'str_c'=>$c->par[$i],'str_s'=>$struct1);
+            $struct->arr[]= $struct1;
+          }
+          $code[]= (object)array('o'=>'s','i'=>'new_area','a'=>$npar);
+//           $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[1],0,$struct1),
+//             'str_c'=>$c->par[1],'str_s'=>$struct1);
+//           $struct->arr[]= $struct1;
+//           $code[]= (object)array('o'=>'s','i'=>'new_area','a'=>2);
+        }
+        else comp_error("CODE: výraz new_area nemá jako 1 parametr form");
+      }
+      else comp_error("CODE: new_area má chybné parametry");
+    }
     elseif ( $c->op=='each' ) {
       $np_each= count($c->par);
       if ( $c->par[1]->expr=='name' ) {
@@ -1377,7 +1399,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
           $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[0],0,$struct1),
             'str_c'=>$c->par[0],'str_s'=>$struct1);
           $struct->arr[]= $struct1;
-          $code[]= (object)array('o'=>'y','c'=>gen_name($c->par[1]->name,$pars,$vars,true));
+          $code[]= (object)array('o'=>'y','c'=>gen_name($c->par[1]->name,$pars,$vars,true,$c->par[1]));
           for ($i= 2; $i<count($c->par); $i++) {
             $code[]= gen($pars,$vars,$c->par[$i],0,$struct1);
             $struct->arr[]= $struct1;
@@ -1841,7 +1863,7 @@ function get_if_coord ($block) {
 function get_type (&$type) {
   global $head, $lex, $typ, $tree;
   $type= $lex[$head];
-  $ok= ($type=='number'||$type=='text'||$type=='object'||$type=='form');
+  $ok= ($type=='number'||$type=='text'||$type=='object'||$type=='form'||$type=='area');
   $head++;
   $tree.= " t";
   if ( !$ok ) comp_error("SYNTAX: bylo očekáváno jméno typu");

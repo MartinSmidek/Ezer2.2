@@ -126,13 +126,14 @@ Ezer.MenuMain.implement({
     // zjisti aktivní Tabs
     if ( this.part ) {
       $each(this.part,function(desc,id) {
-        var href= 'ezer://'+id;
+        var href= make_url_menu([id]); // 'ezer://'+id;
         if ( desc.type=='tabs' ) {
           new Element('a',{href:href,html:desc.options.title||id}).inject(new Element('div').inject(
           desc.DOM_li= new Element('li',{
   //           'class': id==active ? 'Active' : '',
             events:{
               click: function(event) {
+                history.pushState(null,null,href);
                 Ezer.fce.touch('block',this);     // informace do _touch na server
                 this._focus();
                 return false;
@@ -253,8 +254,8 @@ Ezer.MenuGroup.implement({
   DOM_add1: function() {
     Ezer.assert(this.owner.type=='menu.left','chybné menu - group mimo accordion');
     this.DOM= new Element('div',{'class':'MGroup MEntry'}).inject(this.owner.DOM_Block);
-    var href= 'ezer://'+this.owner.owner.owner.id+'.'+this.owner.owner.id
-          +'.'+this.owner.id+'.'+this.id;
+    var href= make_url_menu([this.owner.owner.owner.id,this.owner.owner.id,this.owner.id,this.id]);
+    // 'ezer://'+this.owner.owner.owner.id+'.'+this.owner.owner.id+'.'+this.owner.id+'.'+this.id;
     this.domA= new Element('a',{href:href,text:this.options.title||this.id}).inject(this.DOM);
     this.DOM_Block= new Element('div',{'class':'MGroupContent'}).inject(this.DOM);
     if ( !this.owner.sel_group ) {
@@ -278,7 +279,10 @@ Ezer.MenuGroup.implement({
 Ezer.MenuContext.implement({
   DOM_add1: function() {
     this.DOM= new Element('ul',{'class':'ContextMenu'}).inject($('body'));
-    new ContextMenu({target:this.owner.DOM_Block,menu:this.DOM});
+    this.ContextMenu= new ContextMenu({target:this.owner.DOM_Block,menu:this.DOM,ezer_owner:null});
+  },
+  DOM_add2: function() {
+    this.ContextMenu.ezer_owner= this;
   }
 });
 // ================================================================================================= Tabs
@@ -381,12 +385,15 @@ Ezer.Item.implement({
     switch (this.owner.type) {
     case 'menu.group':
       this.DOM_Block= new Element('div',{'class':'MFile MEntry'}).inject(this.owner.DOM_Block);
-      var href= 'ezer://'+this.owner.owner.owner.owner.id+'.'+this.owner.owner.owner.id+'.'
-            +this.owner.owner.id+'.'+this.owner.id+'.'+this.id;
+      var href= make_url_menu([this.owner.owner.owner.owner.id,this.owner.owner.owner.id,
+        this.owner.owner.id,this.owner.id,this.id]);
+      // 'ezer://'+this.owner.owner.owner.owner.id+'.'+this.owner.owner.owner.id+'.'
+      // +this.owner.owner.id+'.'+this.owner.id+'.'+this.id;
       this.domA= new Element('a',{href:href,text:this.options.title||this.id}).inject(this.DOM_Block);
       this.domA.addEvents({
         click: function(el) {
           if ( !el.target.hasClass('disabled') ) {
+            history.pushState(null,null,href);
             this._click(el);
             Ezer.fce.touch('block',this);     // informace do _touch na server
           }
@@ -604,11 +611,12 @@ Ezer.PanelMain.implement({
 // ================================================================================================= Panel pod Tabs
 // ------------------------------------------------------------------------------------------------- fce pro panely v Tabs
 Ezer.PanelInTabs_add= function(panel) {
-    var href= 'ezer://'+panel.owner.id+'.'+panel.id;
+    var href= make_url_menu([panel.owner.id,panel.id]); // 'ezer://'+panel.owner.id+'.'+panel.id;
     new Element('a',{href:href,html:panel.options.title||panel.id}).inject(new Element('div').inject(
     panel._tabDom= new Element('li',{styles:{display:'none'},
     events:{
       click: function(event) {
+        history.pushState(null,null,href);
         this._focus();
         return false;
       }.bind(panel)
@@ -762,6 +770,7 @@ Ezer.Label.implement({
   Implements: [Ezer.Drag,Ezer.Help],
   DOM_add: function() {
     // zobrazení label
+    var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
     var align= this._fc('c') ? 'center' : this._fc('r') ? 'right' : 'left';
     this.DOM_Block= new Element('div',{'class':'Label',html:this.options.title||'',
       styles:this.coord({textAlign:align}),events:{
@@ -772,7 +781,7 @@ Ezer.Label.implement({
           }
         }.bind(this)
       }
-    }).inject(this.owner.DOM_Block);
+    }).inject(owners_block);
     this.DOM_optStyle(this.DOM_Block);
     if ( this.options.help )
       this.DOM_Block.set('title',this.options.help);
@@ -810,19 +819,13 @@ Ezer.Button.implement({
       'class':this.type=='button.submit'?'ButtonSubmit':'Button',
       styles:this.coord({height:undefined,width:undefined}),
       type:this.type=='button.submit'?'submit':'submit',events:{
-        mouseup:
-//           this.type=='button.upload'
-//           ? function(el) {
-//               this._showUpload();
-//             }.bind(this)
-//           :
-            function(el) {
-                                                        Ezer.trace('*','button:mouseup');
-              if ( !Ezer.design ) {
-                Ezer.fce.touch('block',this);           // informace do _touch na server
-                this.fire('onclick',[],el);
-              }
-            }.bind(this)
+        mouseup: function(el) {
+                                                      Ezer.trace('*','button:mouseup');
+          if ( !Ezer.design ) {
+            Ezer.fce.touch('block',this);           // informace do _touch na server
+            this.fire('onclick',[],el);
+          }
+        }.bind(this)
       },
       value:this.options.title||''                      // u Opery záleží na pořadí
     }).inject(owners_block);
@@ -839,25 +842,6 @@ Ezer.Button.implement({
 // přenese hodnotu z DOM do this.value
   DOM_get: function () {
     this.value= this.DOM_Input.hasClass('empty') ? '' : this.DOM_Input.value;
-//   },
-// ------------------------------------------------------------------------------------ _showUpload
-//   _showUpload: function() {
-//     // vyprázdnění starého stavu
-//     this.DOM_Upload.getElement('ul.upload-list').empty();
-//     var prog= this.DOM_Upload.getElements('span.progress-text');
-//     if ( prog ) prog.destroy();
-//     // zobrazení
-//     Ezer.assert(this.options.par && this.options.par.mask && this.options.par.path,
-//       "Upload: chybí definice 'mask' nebo 'path' v atributu 'par'",this);
-//     var par= JSON.encode(this.options.par);
-//     this.url= Ezer.version+'/server/ezer2.php?upload=1&root='+Ezer.root+'&par='+par+
-//       '&session='+Ezer.options.session+
-//       '&path='+this.options.par.path+
-//       '&user='+Ezer.sys.user.abbr+'&move='+(this.options.par.move||'');
-//     this.DOM_Upload.setStyles({display:'block'});
-//     var mask= this.options.par.mask.split('|'), filter= {};
-//     filter[mask[0]]= mask[1];
-//     Swiff.Ezer(this.DOM_Upload,{url:this.url,filter:filter});
   }
 });
 // ================================================================================================= Elem-DOM
@@ -1047,10 +1031,11 @@ Ezer.Field.implement({
 //f: Field-DOM.DOM_add ()
 //      zobrazí prvek field
   DOM_add: function() {
+    var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
     this.DOM_Block= this.DOM_Input= new Element('input',{'class':'Field',
       styles:this.coord({height:this._h||15}),
       type:this._f('p')==-1?'text':'password'
-    }).inject(this.owner.DOM_Block);
+    }).inject(owners_block);
     this.DOM_ElemEvents();
     this.DOM_optStyle(this.DOM_Block);
   }
@@ -1064,42 +1049,46 @@ Ezer.FieldDate.implement({
 // ------------------------------------------------------------------------------------ DOM_add
 //f: FieldDate-DOM.DOM_add ()
 //      zobrazí prvek field
+  DatePicker: null,
   DOM_add: function() {
     this.DOM_Block= new Element('div',{'class':'FieldDate',styles:this.coord()}).adopt(
         this.DOM_icon= new Element('img',{align:'right',src:Ezer.paths.images_cc+'calendar.gif'}),
         this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
           width:(this._w||87)-18,height:this._h||16}})
     ).inject(this.owner.DOM_Block);
-    this.DOM_ElemEvents();
-    this.DOM_optStyle(this.DOM_Block);
     if ( this.skill==2 && !this._fc('d') && !this._fc('o') ) {
-      var ox= this._fc('R') ? -106 :  -7;                          // 44
-      var oy= this._fc('U') ? -200 : -20;                          // 30
+      var ox= this._fc('R') ? -150 : 0;
+      var oy= this._fc('U') ? -230 : 0;
       // viz http://www.monkeyphysics.com/mootools/script/2/datepicker
-      new DatePicker(this.DOM_Input, { //debug:true,
+      this.DatePicker= new DatePicker(this.DOM_Input, { //debug:true,
         pickerClass: 'datepicker_vista', format:'j.n.Y', inputOutputFormat:'j.n.Y',
         toggleElements:this.DOM_icon, positionOffset:{x:ox,y:oy}, allowEmpty:true,
         days:Locale.getCurrent().sets.Date.days, months:Locale.getCurrent().sets.Date.months,
-        animationDuration:200, useFadeInOut:true,
         onSelect:function(){
+//                                                         Ezer.trace('*','onSelect');
           this.DOM_Input.removeClass('empty');
-          this.DOM_Input.value= this.DOM_Input2.value;
-          this.DOM_changed(1,this._fc('t'));     // když není format:'t' se zvýrazněním změny
           this.fire('onchange',[]);
         }.bind(this),
         onStart:function(){
-          this.DOM_Input.value= this.value;
+//                                                         Ezer.trace('*','onStart');
+          if ( this.DOM_Input.hasClass('empty') ) {
+            this.DOM_Input.value= this.value;
+          }
         }.bind(this),
         onClose:function(){
+//                                                         Ezer.trace('*','onClose');
           if ( this.DOM_Input.hasClass('empty') ) {
             this.DOM_Input.value= this.help;
           }
         }.bind(this)
       });
-      this.DOM_Input2= this.DOM_Input.getNext();
-      this.DOM_Input.setStyles({display:'block'});
-      this.DOM_Input2.setStyles({visibility:'hidden'});
-//       this.DOM_Input2.setStyles({marginTop:20,backgroundColor:'#eeeeaa'});
+      this.DOM_Input= this.DatePicker.attachToClone;
+      this.DOM_ElemEvents();
+      this.DOM_optStyle(this.DOM_Block);
+    }
+    else {
+      this.DOM_ElemEvents();
+      this.DOM_optStyle(this.DOM_Block);
     }
   }
 });
@@ -1183,11 +1172,8 @@ Ezer.FieldList.implement({
   DOM_show: function() {
     // odstraň předchozí hodnoty
     this.DOM_DropList.getChildren().destroy();
-    // rozliš oddělovač na string nebo regulární výraz podle délky
-    var delim= this.options.par ? this.options.par.delim||',' : ',';
-    if ( delim.length>1 ) delim= new RegExp(delim);
     // rozbal hodnotu s oddělovačem a vytvoř seznam
-    var values= this.DOM_Input.value.split(delim);
+    var values= this.DOM_Input.value.split(this.options.par ? this.options.par.delim||',' : ',');
     var theFocus= null;
     this._values= [];
     values.each(function(value) {
@@ -1257,10 +1243,11 @@ Ezer.FieldList.implement({
 // ------------------------------------------------------------------------------------ ...
 Ezer.Edit.implement({
   DOM_add: function() {
+    var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
     var corr= Ezer.browser=='CH' ? {height:this._h-4,width:this._w-2} : {height:this._h-2};
     this.DOM_Block= this.DOM_Input= new Element('textarea',{'class':'Edit',
       styles:this.coord(corr)
-    }).inject(this.owner.DOM_Block);
+    }).inject(owners_block);
     this.DOM_ElemEvents();
     this.DOM_optStyle(this.DOM_Block);
   }
@@ -1614,10 +1601,11 @@ Ezer.Select.implement({
 //      pokud atribut par.subtype='browse' pak se jedná o select vnořený do Show
   DOM_add: function() {
     // obecné zobrazení select
+    var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
     var img= this.options.par && this.options.par.noimg==1 ? false : true;
     this._h= this._h||16;         // defaultní výška prvku
     this.DOM_Block= new Element('div',{'class':'Select',styles:this.coord()
-    }).inject(this.owner.DOM_Block);
+    }).inject(owners_block);
 //o: Select-DOM.DOM_Closure - obal pro input a ikonu
     this.DOM_Closure= new Element('div',{'class':'SelectClosure'}).inject(this.DOM_Block);
     if ( img ) {

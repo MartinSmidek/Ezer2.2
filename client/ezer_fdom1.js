@@ -308,7 +308,7 @@ Ezer.Application= new Class({
       if ( this.waiting && this.clock_tics > Ezer.App.options.login_interval + wait ) {
         // je zobrazena výzva a čas vypršel, cookie zanikne zavřením browseru
         Cookie.write(Ezer.root+'_logoff',
-          'odhlaseno '+ae_time()+' po '+this.clock_tics+' min. necinosti',{duration:false});
+          'odhlaseno '+ae_datum(1)+' po '+this.clock_tics+' min. necinosti',{duration:false});
 //                                                   Ezer.trace('*','bar_clock: logout');
         Ezer.fce.touch('logout');       // jako po kliknutí na Tabs.logoff
         return;

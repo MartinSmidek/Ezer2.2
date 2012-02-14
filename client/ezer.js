@@ -256,7 +256,7 @@ Ezer.Block= new Class({
 //fm: Block.call (name,a1,...)
 //      zavolá proceduru daného složeného jména vnořenou do bloku a předá argumenty
 //r: objekt
-  call: function(name) {
+  _call: function(lc,name) {
     var o= 0, ok= 0;
     var b= this.type=='var' ? this.value : this;
     var ids= $type(name)=='string' ? name.split('.') : [name];
@@ -275,10 +275,10 @@ Ezer.Block= new Class({
     // pokud se jméno povedlo vyřešit
     if ( o && o.type=='proc' ) {
       var args= [];
-      for (var i= 1; i<arguments.length; i++) {
+      for (var i= 2; i<arguments.length; i++) {
         args.push(arguments[i]);
       }
-      new Ezer.Eval([{o:'c',i:o.id,a:args.length}],o.context||form,args,o.id);
+      new Ezer.Eval([{o:'c',i:o.id,a:args.length,s:lc}],o.context||form,args,o.id);
       ok= 1;
     }
     return ok;
@@ -380,9 +380,8 @@ Ezer.Block= new Class({
     else if ( tags ) {
       var re= new RegExp(tags);
       // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
-      var top_part= this instanceof Ezer.Var && this.value ? this.value.part : this.part;
-      for(var i in top_part) {
-        var part= top_part[i];
+      for(var i in this.part) {
+        var part= this.part[i];
         if ( part.DOM_Block && part.options.tag && re.test(part.options.tag) ) {
           part.options.enabled= enabled;
           part.DOM_enabled(enabled);
@@ -415,9 +414,8 @@ Ezer.Block= new Class({
     else if ( tags ) {
       var re= new RegExp(tags);
       // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
-      var top_part= this instanceof Ezer.Var && this.value ? this.value.part : this.part;
-      for(var i in top_part) {
-        var part= top_part[i];
+      for(var i in this.part) {
+        var part= this.part[i];
         var block= part instanceof Ezer.Var && part.value ? part.value.DOM_Block : part.DOM_Block;
         if ( block && part.options.tag ) {
           if ( re.test(part.options.tag) ) {
@@ -451,9 +449,8 @@ Ezer.Block= new Class({
     if ( tags ) {
       var re= new RegExp(tags);
       // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
-      var top_part= this instanceof Ezer.Var && this.value ? this.value.part : this.part;
-      for(var i in top_part) {
-        var part= top_part[i];
+      for(var i in this.part) {
+        var part= this.part[i];
         if ( part.DOM_Block && part.options.tag && re.test(part.options.tag) ) {
           if ( id1 ) id1.split(' ').each(function(id){part.DOM_Block.addClass(id)});
           if ( id2 ) id2.split(' ').each(function(id){part.DOM_Block.removeClass(id)});
@@ -567,7 +564,7 @@ Ezer.Block= new Class({
               case 'button':        part= new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'button.submit': part= new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'button.reset':  part= new Ezer.Button(this,desc,DOM,id,skill); break;
-//               case 'button.upload': part= new Ezer.Button(this,desc,DOM,id,skill); break;
+              case 'button.upload': part= new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'case':          part= new Ezer.Case(this,desc,DOM,id,skill); break;
               case 'chat':          part= new Ezer.Chat(this,desc,DOM,id,skill); break;
               case 'check':         part= new Ezer.Check(this,desc,DOM,id,skill); break;
@@ -610,6 +607,7 @@ Ezer.Block= new Class({
               case 'map':           part= new Ezer.Map(this,desc,null,id); break;
               case 'proc':          part= new Ezer.Proc(this,desc,this); break;
               // přeskakované (informace dostupné přes Ezer.code)
+              case 'area':          break;
               case 'form':          break;
               case 'number':        break;
               case 'text':          break;
@@ -2436,9 +2434,9 @@ Ezer.Button= new Class({
   title: null,                                  // nápověda položky
 //os: Button.title - název
   options: {},
-//-- oo: Button.par - {path:podsložka na serveru,mask:'název masky|seznam masek'} pro type:'upload'
-//--      path udává cílovou podsložku na serveru, v souboru logs/uploads.log je doplněn záznam
-//--      každém uploadu. Maska je tvořena podle vzoru: 'Obrázky|*.jpg;*.gif'
+//oo: Button.par - {path:podsložka na serveru,mask:'název masky|seznam masek'} pro type:'upload'
+//      path udává cílovou podsložku na serveru, v souboru logs/uploads.log je doplněn záznam
+//      každém uploadu. Maska je tvořena podle vzoru: 'Obrázky|*.jpg;*.gif'
   initialize: function(owner,desc,DOM,id,skill) {
     this.parent(owner,desc,DOM,id,skill);
     this.title= this.options.help||null;
@@ -2720,7 +2718,7 @@ Ezer.FieldDate= new Class({
 //      vstupní část formuláře - rozbalení obsahu podle oddělovače
 //t: Block,Elem,Field
 //s: Block
-//os: FieldList.par - delim: oddělovač jako regulární výraz
+//oo: FieldList.par - delim: oddělovač
 Ezer.FieldList= new Class({
   Extends: Ezer.Field,
   options: {}
@@ -4895,7 +4893,7 @@ Ezer.Eval= new Class({
     Ezer.fce.DOM.warning_();            // konec případného warningu
     this.context= context;
 //                                                 Ezer.trace('T','eval    '+context.type);
-    if ( context.oneval ) {
+    if ( context && context.oneval ) {
       // pokud se na skončení/zahájení bude v bloku context.oneval reagovat
       if ( context.oneval.evals==0 ) {
 //                                                 Ezer.trace('T','onbusy  '+context.oneval.type);
@@ -5003,7 +5001,7 @@ Ezer.Eval= new Class({
     return tr;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  trace_proc
-  trace_proc: function(str,proc,nargs,typ) {
+  trace_proc: function(lc,str,proc,nargs,typ) {
     typ= typ||'E';
     var tr= '', del= '';
     if ( str ) {
@@ -5017,12 +5015,17 @@ Ezer.Eval= new Class({
       del= ',';
     }
     tr+= ')';
+    // pozice ve zdrojovém řádku
+    if ( lc ) {
+      var lcs= lc.split(',');
+      tr= "<span class='trace_click'>"+padNum(lcs[0],3)+"</span>"+tr;
+    }
     // výstup
     Ezer.trace(typ,tr,proc);
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  trace_fce
 // ms jsou nepovinné milisekundy
-  trace_fce: function(str,context,args,typ,val,ms) {
+  trace_fce: function(lc,str,context,args,typ,val,ms) {
     var tr= '', del= '';
     if ( str ) {
       while (tr.length < this.calls.length) tr+= ' ';
@@ -5037,6 +5040,11 @@ Ezer.Eval= new Class({
         del= ',';
       }
       tr+= ')';
+    }
+    // pozice ve zdrojovém řádku
+    if ( lc ) {
+      var lcs= lc.split(',');
+      tr= "<span class='trace_click'>"+padNum(lcs[0],3)+"</span>"+tr;
     }
     // úprava podle typu a výstup
     if ( typ=='f'  || typ=='m'  ) tr+= '=>'+this.val(val);
@@ -5090,7 +5098,7 @@ Ezer.Eval= new Class({
       this.step= step||this.step;
       if ( !step && !back )
         if ( Ezer.is_trace.q )
-           this.trace((this.code?padNum(this.code.length,2):'  ')+'::'+this.context.id+'.'+this.id);
+           this.trace((this.code?padNum(this.code.length,2):'  ')+'::'+(this.context?this.context.id:'?')+'.'+this.id);
       last_lc= '';
       this.value= null;
       while (true) {
@@ -5250,12 +5258,12 @@ Ezer.Eval= new Class({
                 if ( Ezer.is_trace.q )
                   this.trace((this.code?padNum(this.code.length,2):'  ')+'::'+(this.context?this.context.id:'?')+'.'+cc.i);
                 if ( Ezer.is_trace.E )
-                  this.trace_proc(this.context.id+(cc.o=='C'?'.desc.':'.')+cc.i,this.proc,this.nargs);
+                  this.trace_proc(cc.s,this.context.id+(cc.o=='C'?'.desc.':'.')+cc.i,this.proc,this.nargs);
                 else if ( Ezer.is_trace.T && this.proc.trace )
-                  this.trace_proc(this.context.id+'.'+cc.i,this.proc,this.nargs,'T');
+                  this.trace_proc(cc.s,this.context.id+'.'+cc.i,this.proc,this.nargs,'T');
               }
               if ( this.step || this.proc.stop || this.proc.desc && this.proc.desc.stop ) {
-                this.trace_proc('>>>STOP '+this.context.id+'.'+cc.i,this.proc,this.nargs,'T');
+                this.trace_proc(cc.s,'>>>STOP '+this.context.id+'.'+cc.i,this.proc,this.nargs,'T');
                 Ezer.continuation= this;
                 Ezer.App.stopped(this.proc);
                 this.simple= false;
@@ -5279,7 +5287,7 @@ Ezer.Eval= new Class({
               Ezer.calee= this.proc;
               val= fce.apply(this.context,args);
               Ezer.calee= null;
-              if ( Ezer.to_trace && Ezer.is_trace.f ) this.trace_fce(cc.i,this.context,args,'f',val);
+              if ( Ezer.to_trace && Ezer.is_trace.f ) this.trace_fce(cc.s,cc.i,this.context,args,'f',val);
               if ( val!==false ) this.stack[++this.top]= val;
               break;
             // struktura: na zásobník dá kód pro výpočet
@@ -5311,8 +5319,8 @@ Ezer.Eval= new Class({
               for (i= nargs-1, args= []; i>=0; i--)
                 args.push(this.stack[this.top-i]);
               this.top-= nargs;
-              if ( Ezer.to_trace && Ezer.is_trace.a ) this.trace_fce(cc.i,obj,args,'a1');
-              this.ask(cc.i,args);
+              if ( Ezer.to_trace && Ezer.is_trace.a ) this.trace_fce(cc.s,cc.i,obj,args,'a1');
+              this.ask(cc.i,args,cc.s);
               this.c= c;
               this.simple= false;
               return;
@@ -5326,16 +5334,27 @@ Ezer.Eval= new Class({
               obj= this.stack[this.top--]; // odstraň objekt
               if ( $type(obj)!='object' )
                 Ezer.error('EVAL: '+cc.i+' nemá definovaný objekt','S',this.proc,last_lc);
-              // cc.i je buďto metoda proměnné nebo metoda objektu, který je hodnotou proměnné
-              if ( !(fce= obj[cc.i]) && obj.type=='var' && (obj= obj.value) )
-                fce= obj[cc.i]
-              if ( $type(fce)!='function' )
-                Ezer.error('EVAL: '+cc.i+' není metoda '+obj.type,'S',this.proc,last_lc);
-              Ezer.calee= this.proc;
-              val= fce.apply(obj,args);
+              // metodu call vyřešíme zvlášť
+              if ( cc.i=='call' ) {
+                if ( obj.type=='var' )
+                  obj= obj.value;
+                fce= obj._call;
+                Ezer.calee= this.proc;
+                args.unshift(cc.s);
+                val= fce.apply(obj,args);
+              }
+              else {
+                // cc.i je buďto metoda proměnné nebo metoda objektu, který je hodnotou proměnné
+                if ( !(fce= obj[cc.i]) && obj.type=='var' && (obj= obj.value) )
+                  fce= obj[cc.i]
+                if ( $type(fce)!='function' )
+                  Ezer.error('EVAL: '+cc.i+' není metoda '+obj.type,'S',this.proc,last_lc);
+                Ezer.calee= this.proc;
+                val= fce.apply(obj,args);
+              }
               Ezer.calee= null;
               val= ( val===false ) ? obj : val;  // pokud není hodnota, zůstane objekt na zásobníku
-              if ( Ezer.to_trace && Ezer.is_trace.m ) this.trace_fce(obj.id+'.'+cc.i,obj,args,'m',val);
+              if ( Ezer.to_trace && Ezer.is_trace.m ) this.trace_fce(cc.s,obj.id+'.'+cc.i,obj,args,'m',val);
               this.stack[++this.top]= val;
               break;
             // přerušení: stav se uloží do context.continuation
@@ -5396,7 +5415,7 @@ Ezer.Eval= new Class({
               if ( $type(fce)!='function' )
                 Ezer.error('EVAL: '+cc.i+' není metoda '+obj.type,'S',this.proc,last_lc);
               val= fce.apply(obj,args);
-              if ( Ezer.to_trace && Ezer.is_trace.x ) this.trace_fce(obj.id+'.'+cc.i,obj,args,'x1');
+              if ( Ezer.to_trace && Ezer.is_trace.x ) this.trace_fce(cc.s,obj.id+'.'+cc.i,obj,args,'x1');
                                                       if (Ezer.is_trace.x) Ezer.debug(val,'fx:'+cc.i+'>');
               if ( typeof(val)=='object' ) {
                 if ( val && val.cmd ) {
@@ -5575,12 +5594,14 @@ Ezer.Eval= new Class({
     Ezer.App._ajax(1);
   },
   // ask(args): dotaz na server s pokračováním ve výpočtu po dokončení
-  ask: function(fce,args) {
+  //            lc obsahuje informaci o řádku a sloupci ezerscriptu
+  ask: function(fce,args,lc) {
     this.requests++;                   // zvyš počet požadavků na server
     var app= this;
     var ms= new Date().valueOf();
 //                                                  Ezer.trace('*','ms:'+ms);
     var x= {cmd:'ask',fce:fce,args:args,nargs:args.length,parm:Ezer.parm};
+    if ( lc ) x.lc= lc;
     x.root= Ezer.root;          // název/složka aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     var ajax= new Request({url:Ezer.App.options.server_url, data:x, method:'post',
@@ -5620,7 +5641,7 @@ Ezer.Eval= new Class({
         Ezer.fce.warning(y.warning);
       }
       if ( Ezer.to_trace && Ezer.is_trace[t] )
-        this.trace_fce((obj?obj.id+'.':'')+fce,obj,null,t+'2',val,ms);
+        this.trace_fce(y.x.lc?y.x.lc:'?',(obj?obj.id+'.':'')+fce,obj,null,t+'2',val,ms);
       this.eval.apply(this,[this.step,true]);
     }
   }
@@ -5880,7 +5901,7 @@ Ezer.str['each']= function () {
       for(var i= 0; i<pars.length; i++) {
         code.push({o:'v',v:pars[i]});
       }
-      code.push({o:'c',i:fce_code[0].i,a:pars.length+2});
+      code.push({o:'c',i:fce_code[0].i,a:pars.length+2,s:fce_code[0].s});
       new Ezer.Eval(code,that.context,args,'each-part');
       n++;
     });
@@ -6732,6 +6753,7 @@ Ezer.fce.href= function (path) {
           case 'panel.plain':
           case 'panel.right':
             part._focus();
+            part.fire('onpopstate',[location.href]);
             break;
           case 'menu.left':
             break;
@@ -6760,7 +6782,7 @@ Ezer.fce.href= function (path) {
           }
         }
         else {
-          Ezer.fce.warning('odkaz '+path+' má nedostupnou ',i+1,'. část');
+          Ezer.fce.warning('odkaz '+path+' má nedostupnou ',i+1,'. část ',part==undefined?'':part);
           break walk;
         }
       }
@@ -6772,7 +6794,8 @@ Ezer.fce.href= function (path) {
     window.location.hash= hs[1];
     window.location.hash= '';
   }
-  return 1;
+  // fce musí vracet false kvůli použití v <a href='#' ...>
+  return false;
 }
 // ------------------------------------------------------------------------------------ download
 //ff: fce.download (file)

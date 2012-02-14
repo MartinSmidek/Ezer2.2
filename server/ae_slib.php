@@ -72,8 +72,14 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     $info= $_SESSION;
   }
   // přenesení GET parametrů do SESSION aby byly přístupné i v root.ini volané z ezer2.php
-  foreach($_GET as $key => $val)
+  // a do Ezer.get aby byly přístupné v klientu, klíč menu je vynechán
+  $gets= ''; $del= '';
+  foreach($_GET as $key => $val) {
     $_SESSION[$ezer_root]['GET'][$key]= $val;
+    if ( $key!='menu' ) {
+      $gets.= "$del$key:'$val'"; $del= ',';
+    }
+  }
   $_SESSION['trace_height']= $theight;
   $_SESSION[$ezer_root]['skin']= $skin;
   $_SESSION[$ezer_root]['app_name']= $app_name;
@@ -278,7 +284,7 @@ __EOD;
       $head.= "\n  <link rel='stylesheet' href='$x' type='text/css' media='screen' charset='utf-8' />";
     }
   }
-  // definice povinného zaačátku a konce HTML stránky
+  // definice povinného začátku a konce HTML stránky
   $html_header= "\xEF\xBB\xBF";    // DOM pro UTF-8
   $html_header.= <<<__EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -290,6 +296,7 @@ __EOD;
   <title>$app_name</title>
   <script type="text/javascript">
     var Ezer= {};
+    Ezer.get= { $gets };
     Ezer.parm= location.hash.split(',');
     Ezer.fce= {};
     Ezer.str= {};
@@ -508,14 +515,6 @@ function root_svn($roots='') {
 }
 # ================================================================================================== SYSTEM
 # knihovna funkcí pro moduly server, compiler, reference
-# -------------------------------------------------------------------------------------------------- fce_log
-# append do souboru ezer.log v rootu aplikace
-function fce_log ($msg) {
-  $fp= fopen("ezer.log","a");
-  fwrite($fp,date("d.m H:i:s")." $msg\n");
-  fclose($fp);
-  return true;
-}
 # -------------------------------------------------------------------------------------------------- fce_error
 # $send_mail může obsahovat doplňkové informace zaslané správci aplikace mailem
 function fce_error ($msg,$send_mail='') { trace();
@@ -619,10 +618,12 @@ function display_ ($msg) {
 # -------------------------------------------------------------------------------------------------- trace
 # $note je poznámka uvedená za trasovací informací
 function trace($note='',$coding='') {
-  global $trace;
+  global $trace, $trace_parm;
   $time= date("H:i:s");
   $act= debug_backtrace();
   $x= ($trace ? "<br/>" : '')."$time ".call_stack($act,1).($note?" /$note":'');
+  $x.= $trace_parm;
+  $trace_parm= '';
   if ( $coding=='win1250' ) $x= wu($x);
   $trace.= $x;
 }

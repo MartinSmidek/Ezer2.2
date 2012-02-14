@@ -379,7 +379,7 @@ border:2px dotted #ff0 !important; left:-1px; top:-1px;]
 .Label h1 {
   font-size:12pt; margin:0; padding:0 }
 .Label a {
-  color:$c_kuk !important; }
+  color:$c_kuk /*!important;*/ }
 .Label a:hover {
   background-color:$b_kuk !important; }
 .Field {
@@ -603,20 +603,24 @@ hr.cleaner {
   z-index:2; display:none; height:{$h_kuk}px; margin:0;
   background-color:#eee; overflow-y:scroll; font-size:8pt; line-height:13px; }
 .dbg {
-  margin:0; overflow-y:auto; font-size:8pt; line-height:13px; height:100%; }
+  margin:0; overflow-y:auto; font-size:8pt; line-height:13px; }
 #warning {
   background-color:$b_warn; color:$c_warn; opacity:.8; font-weight:bold;
   padding:15px; cursor:default; display:none; }
 #kuk_err, #error {
   background-color:$s_kuk; height:75px; }
-#kuk table, .dbg  {
-  border-collapse:collapse; margin:3px 0;}
+#kuk table, .dbg table {
+  border-collapse:collapse; margin:1px 0;}
 #kuk td, .dbg td {
-  border:1px solid #aaa; font:x-small Arial;color:#777;padding:0 3px; line-height:11px; }
+  border:1px solid #aaa; font:x-small Arial;color:#777;padding:1px 3px; line-height:11px; }
 #kuk td.title, .dbg td.title {
-  color:#33a;}
+  color:#000; background-color:#aaa; }
 #kuk td.label, .dbg td.label {
   color:#a33;}
+.dbg table.dbg_array {
+  background-color:#ddeeff; }
+.dbg table.dbg_object {
+  background-color:#ffffaa; }
 .ae_switch_on {
   background-color:$b_kuk; color:$c2_kuk;  }
 #kuk div.trace {
@@ -629,9 +633,18 @@ hr.cleaner {
 #kuk span.trace_click {
   background-color:#ddd; }
 
-/* dokumentace */
+/* tree */
 
-/* nadpisy */
+.mooTree_node {
+  font-family: Verdana, Arial, Helvetica; font-size: 10px; white-space: nowrap; }
+.mooTree_text {
+  padding-top: 3px; height: 15px; cursor: pointer; }
+.mooTree_img {
+  float: left; width: 18px; height: 18px; overflow: hidden; }
+.mooTree_selected {
+  background-color: #e0f0ff; font-weight: bold; margin-right: 10px; }
+
+/* dokumentace */
 
 #Content, #Index{ background: #fff; /*margin-left: 10px; margin-left: 210px;*/ padding:15px;
                 /*font-size: 13px;*/ min-height: 400px;}

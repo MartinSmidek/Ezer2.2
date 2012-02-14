@@ -17,6 +17,27 @@ function clip_complete(client, text) {
 //   Ezer.clip.setText( 'nazdar' );
 //   alert("Copied text to clipboard: " + text );
 }
+// ------------------------------------------------------------------------------------------------- make_url_menu
+// sestavení url aplikace se změněným odkazem na menu
+// menu = pole pro parametr menu
+function make_url_menu(menu) {
+  var url= location.protocol+'//'+location.hostname+(location.port?':'+location.port:'');
+  url+= location.pathname;
+  // přidání menu
+  var del= '';
+  url+= '?menu=';
+  menu.each(function(id){
+    url+= del+id;
+    del= '.';
+  });
+  // přidání původních $_GET parametrů
+  for (var tag in Ezer.get ) {
+    var val= Ezer.get[tag];
+    url+= '&'+tag+'='+val;
+  }
+//                                                 Ezer.trace('*',url);
+  return url;
+}
 // ------------------------------------------------------------------------------------------------- get_url_param
 // zjištění hodnoty parametru v url
 // see http://www.netlobo.com/url_query_string_javascript.html
@@ -156,7 +177,8 @@ function debug (gt,label,depth) {
     x= debugx(gt,label,depth);
   }
   else {
-    x= "<table border='1' bgcolor='#ddeeff'><tr><td valign='top' class='title'>"+label+"</td></tr><tr><td>"+x+"</td></tr></table>";
+    x= "<table class='dbg' style='background-color:#ddeeff'><tr><td valign='top' class='title'>"+
+      label+"</td></tr><tr><td>"+x+"</td></tr></table>";
   }
   return x;
 }
@@ -165,15 +187,11 @@ function debugx (gt,label,depth) {
   if ( depth < 0 ) return "<table class='dbg_over'><tr><td>...</td></tr></table>";
   if ( $type(gt)=='array' || $type(gt)=='object' ) {
     c= $type(gt)=='array' ? '#ddeeff' : '#eeeeaa';
-    x= "<table border='1' bgcolor='"+c+"'>";
+    x= "<table class='dbg' style='background-color:"+c+"'>";
     x+= label ? "<tr><td valign='top' colspan='2' class='title'>"+label+"</td></tr>" : '';
-    for (g in gt) {
-      if ( g=='$family' ) continue;     // vynechání příznaku typu v Mootools
-      if ( --maxlen < 0 ) return x+"<tr><td>...</td></tr></table>";
-      t= gt[g];
-      if ( typeof(t)!='function' )
-        x+= "<tr><td valign='top' color='label'>"+g+"</td><td>"+debugx(t,null,depth-1)+"</td></tr>";
-    }
+    Object.each(gt,function(t,g){
+      x+= "<tr><td valign='top' color='label'>"+g+"</td><td>"+debugx(t,null,depth-1)+"</td></tr>";
+    });
     x+= "</table>";
   }
   else if ( $type(gt)=='string' ) {
@@ -188,6 +206,7 @@ var ContextMenu = new Class({
   // implements
   Implements: [Options,Events],
   shown: false,
+  ezer_owner: null,                              //120130 ezer owner
   // options
   options: {
     actions: {},

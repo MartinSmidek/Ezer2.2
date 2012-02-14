@@ -17,10 +17,10 @@ else
 # parametrizace chování
 $wiki= 0;                                           // 0 => překlad, 1 => dokumentace
 $blocs3 = array (                                    // universálně zanořitelné bloky
-  'table','report','map','group', 'form', 'panel.popup', 'menu.context'
+  'table','report','map','group','form','area','panel.popup','menu.context'
 );
 $blocs2 = array (                                    // překládají se na AE_<part>
-  ''            =>  explode(",",'pragma,group,system,module,ezer,table,report,form,map,panel.main,'
+  ''            =>  explode(",",'pragma,group,system,module,ezer,table,report,form,area,map,panel.main,'
                                .'panel.plain,panel.right,panel.popup,menu.main,menu.left,tabs,var,use,proc'),
 # pragma a souvislosti
   'pragma'      =>  explode(",",''),
@@ -52,13 +52,15 @@ $blocs2 = array (                                    // překládají se na AE_<
   'report'      =>  explode(",",'box,const'),
   'const'       =>  explode(",",''),
   'box'         =>  explode(",",'box'),
+#  area
+  'area'        =>  explode(",",'var,proc,panel.popup'),
 #  form
   'form'        =>  explode(",",'view,var,proc,browse,browse.smart,radio,label,edit,edit.html,'
-                               .'button,button.submit,button.reset,select,select.auto,' //,button.upload
+                               .'button,button.submit,button.reset,button.upload,select,select.auto,'
                                .'select.map,select.map0,field,field.date,field.list,menu,chat,check,list'
                                .($pragma_attrs?',select':'')),
   'view'        =>  explode(",",''),
-  'var'         =>  explode(",",'button,select,select.map'), //??????????
+  'var'         =>  explode(",",'button,select,select.map,label,edit,field'), //??????????
   'field'       =>  explode(",",'proc,menu'),
   'field.date'  =>  explode(",",'proc,menu'),
   'field.list'  =>  explode(",",'proc,menu'),
@@ -84,7 +86,7 @@ $blocs2 = array (                                    // překládají se na AE_<
 );
 # definice povolených vnořených bloků
 $blocs = array (                                    // překládají se na AE_<part>
-  ''       =>  explode(",",'pragma,system,group,module,ezer,table,report,form,map,panel,menu,tabs,var,use,proc'),
+  ''       =>  explode(",",'pragma,system,group,module,ezer,table,report,form,area,map,panel,menu,tabs,var,use,proc'),
   'pragma' =>  explode(",",''),
   'system' =>  explode(",",'module'),
 #  ezer
@@ -106,6 +108,8 @@ $blocs = array (                                    // překládají se na AE_<p
   'report' =>  explode(",",'box,const'),
   'const'  =>  explode(",",''),
   'box'    =>  explode(",",'box'),
+#  area
+  'area'   =>  explode(",",'var,proc,area'),
 #  form
   'form'   =>  explode(",",'view,var,proc,browse,radio,label,edit.html,button,select,field,menu,chat,check,list'),
   'view'   =>  explode(",",''),
@@ -156,6 +160,8 @@ $specs = array (
   'report' =>  explode(",",'part,coor+,note'),
   'const'  =>  explode(",",'const,cmnt'),
   'box'    =>  explode(",",'part,coor+,cmnt'),
+#  area
+  'area'   =>  explode(",",'part,proc,note'),
 #  form
   'form'   =>  explode(",",'part,coor+,par,view,proc,note'),
   'view'   =>  explode(",",'part,use_table,cmnt'),
@@ -205,6 +211,8 @@ $attribs = array (
 #  report
   'report' =>  explode(",",'format:s'),
   'box'    =>  explode(",",'title:s,xactive:b,pagebreak:s,css:s,style:s'),
+#  area
+  'area'   =>  explode(",",'title:s'),
 #  form
   'form'   =>  explode(",",'style:s,css:s,tabindex:n,title:s,key:s'),
   'view'   =>  explode(",",'join:s,join_type:s'),
@@ -324,6 +332,8 @@ jméno souboru ''prog_modul.wiki'' s dokumentací (''prog'' je jméno programu).
 #  report
   'report' =>  "Popis reportu - tiskové sestavy.",
   'box'    =>  "Obdélníková část reportu, naplněná a zobrazená podle typu.",
+#  area
+  'area'   =>  "Popis oblasti.",
 #  form
   'form'   =>  "Popis formuláře.",
   'view'   =>  "Popis použití tabulky ve formuláři, včetně vztahu k jiným použitým tabulkám.",
