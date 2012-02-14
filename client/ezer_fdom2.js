@@ -1230,6 +1230,7 @@ Ezer.FieldList.implement({
 //      skryje hodnoty
   DOM_hide: function() {
     this.DOM_DropList.setStyle('display','none');
+    this.DOM_Block.setStyle('zIndex',1);
     this._focus= 0;
   },
 // ------------------------------------------------------------------------------------ DOM_refresh
