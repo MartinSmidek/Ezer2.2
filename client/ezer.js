@@ -255,6 +255,7 @@ Ezer.Block= new Class({
 // ------------------------------------------------------------------------------------ call
 //fm: Block.call (name,a1,...)
 //      zavolá proceduru daného složeného jména vnořenou do bloku a předá argumenty
+//      (interně má jméno _call)
 //r: objekt
   _call: function(lc,name) {
     var o= 0, ok= 0;
@@ -339,7 +340,7 @@ Ezer.Block= new Class({
                 Resample(x,options.max_width,options.max_height, function(data64){
                   this.file_drop_info.text= data64; // výstup je base 64 encoded
                   //$("StatusIcon_idle").src= data64;
-                  this.call(options.handler,this.file_drop_info)
+                  this._call(0,options.handler,this.file_drop_info)
                   //$("StatusIcon_idle").src= null;
                 }.bind(this));
               }
@@ -347,13 +348,16 @@ Ezer.Block= new Class({
                 if ( options.transfer=='base64' )
                   x= base64_encode(x);
                 this.file_drop_info.text= x;
-                this.call(options.handler,this.file_drop_info);  // uživatelská funkce ondrop
+                this._call(0,options.handler,this.file_drop_info);  // uživatelská funkce ondrop
               }
             }.bind(this);
             switch(options.transfer) {
-            case 'base64': r.readAsBinaryString(f); break;
-            case 'text':   r.readAsText(f); break;
-            case 'url':    r.readAsDataURL(f); break;
+            case 'base64':
+              r.readAsBinaryString(f); break;
+            case 'text':
+              r.readAsText(f); break;
+            case 'url':
+              r.readAsDataURL(f); break;
             }
           }
         }

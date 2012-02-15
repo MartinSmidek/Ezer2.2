@@ -79,7 +79,7 @@ echo <<<__EOD
   outline-color:#f00 !important; }
 
 .drop_envelope {
-  background-color:$b_work}
+  background-color:$b_work; border:2px dashed white; }
 .drop_area {
   outline:2px dashed #fff; outline-radius:5px;  }
 .drop_area_hover {
