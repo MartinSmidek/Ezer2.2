@@ -160,16 +160,18 @@ Ezer.Block= new Class({
     return '$.'+id;
   },
 // ------------------------------------------------------------------------------------ set_attrib
-//fm: Block.set_attrib (name,val)       nedokumentováno, může být změněno
+//fm: Block.set_attrib (name,val[,desc=])       nedokumentováno, může být změněno
 //      změní hodnotu atributu 'name' na 'val'
 //      name může být složeným jménem
 //      pokud je val objekt, bude jím nahrazena celá hodnota - narozdíl od set_attrib
+//      pokud je definováno desc bude změna provedena v popisu Block.desc, ne v instanci
 //a: name - jméno atributu
 //   val - nová hodnota atributu
-  set_attrib: function(name,val) {
+  set_attrib: function(name,val,desc) {
     Ezer.assert(typeof(name)=='string','první parametr není jménem atributu',this);
     var ids= name.split('.');
-    var o= this.options;
+    Ezer.assert(this.desc.part[desc],desc+" není popsáno v "+this.id,this);
+    var o= desc==undefined ? this.options : this.desc.part[desc].options;
     for (var i= 0; i<ids.length-1; i++) {
       Ezer.assert(o[ids[i]],name+" je chybné jméno v set_attrib",this);
       o= o[ids[i]];
@@ -6066,6 +6068,18 @@ Ezer.fce.object= function () {
   for (var i= 0; i<arguments.length; i+=2) {
     n= arguments[i]; v= arguments[i+1];
     o[n]= v;
+  }
+  return o;
+}
+// ------------------------------------------------------------------------------------ array
+//ff: fce.array (value1,value2,...)
+//      zkonstruuje pole [value1,value2,...]
+//s: funkce
+Ezer.fce.array= function () {
+  var o= [], n, v;
+  for (var i= 0; i<arguments.length; i++) {
+    v= arguments[i];
+    o[i]= v;
   }
   return o;
 }

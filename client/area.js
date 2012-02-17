@@ -86,6 +86,11 @@ Ezer.Area= new Class({
 //     if ( !this.DOM_Area )
 //       Ezer.error(name.value+' nemá správný formát html kódu');
   },
+// ------------------------------------------------------------------------------------------ delete
+//fm: Area.delete ([all=0])
+//      vymaže area, pokud je all=1 pak vymaže všechny instance (N.Y.I.)
+  delete: function (all) {
+  },
 // -------------------------------------------------------------------------------------------- init
 //fm: Area.init ([all=0])
 //      obnoví podle podle aktuálního obsahu proměnných
@@ -138,7 +143,7 @@ Ezer.Area= new Class({
         el.addEvent('click',function(ev){
           history.pushState(null,null,href);
           // případná obsluha události
-          this.fire('area_onclick',[href],ev);
+          this.fire('area_onclick',[href,ev.target.id],ev);
           return false;
         }.bind(this));
       }
