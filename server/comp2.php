@@ -478,6 +478,15 @@ function link_code(&$c,$name,$isroot,$block) { #trace("{$c->type}");
       comp_error("CODE: '{$c->_init}' není jménem {$c->_of}",0);
     }
   }
+  else if ( $c->type=='var' && $c->_of=='area' && $c->_init) {
+    $area= find_part_abs($c->_init,$fullname,$c->_of);
+    if ( $area && $area->type=='area' ) {
+      $c->_init= $fullname;
+    }
+    else {
+      comp_error("CODE: '{$c->_init}' není jménem {$c->_of}",0);
+    }
+  }
   else if ( $c->type=='proc' ) {
 //     $desc= (object)array('id'=>$name);
 //     $procs[]= $desc;
@@ -716,6 +725,9 @@ function export(&$c,$id) {
               $e->part->$cid->id= $cid;
             }
             else if ( $e->type=='form' ) {
+              $e->id= $id;
+            }
+            else if ( $e->type=='area' ) {
               $e->id= $id;
             }
 //             else if ( $e->type=='group' ) {
@@ -1093,6 +1105,21 @@ function gen_name($name,$pars,$vars,$first,$c=null,$nargs=null) {  #trace();
     $code[0]= (object)array('o'=>'t','i'=>'p');
     $is_this= true;
   }
+  else if ( $id=='area' ) {
+    $code[0]= (object)array('o'=>'t','i'=>'a');
+    for ($i= $end_cx; $i>=0; $i--) {
+      if ( $context[$i]->ctx->type=='area'
+        || $context[$i]->ctx->type=='var' && $context[$i]->ctx->_of=='area' ) {
+        $obj= $context[$i]->ctx;
+        if ( count($ids)>1 && $ids[1]=='desc' ) {
+          $is_desc= true;
+          $k1= 2;
+        }
+        break;
+      }
+    }
+    $is_this= true;
+  }
   else if ( $id=='form' ) {
     $code[0]= (object)array('o'=>'t','i'=>'f');
     for ($i= $end_cx; $i>=0; $i--) {
@@ -1227,10 +1254,7 @@ function gen_name($name,$pars,$vars,$first,$c=null,$nargs=null) {  #trace();
       }
       else {
         if ( $obj->type=='var' ) {
-          if ( $obj->_of=='table' && $obj->_init ) {
-            $obj= find_obj($obj->_init);
-          }
-          elseif ( $obj->_of=='form' && $obj->_init ) {
+          if ( $obj->_init && in_array($obj->_of,array('table','form','area') ) ) {
             $obj= find_obj($obj->_init);
           }
           else {
@@ -1248,7 +1272,7 @@ function gen_name($name,$pars,$vars,$first,$c=null,$nargs=null) {  #trace();
                 $full.= ".$id";
               }
             }
-            $code[0]= (object)array('o'=>'o','i'=>$full);                    //           $note.= 'c';
+            $code[0]= (object)array('o'=>$nargs!==null?'c':'o','i'=>$full);       //           $note.= 'c';
             if ( $op ) {
               $type= $names[$op]->op;
               $o= $type[0]=='o' ? 'a' : ($type=='fm' ? 'm' : ( $type=='fx' ? 'x' : ( $type=='fi' ? 'i' : null)));
@@ -1303,7 +1327,9 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
   global $call_php;
   switch ( $c->expr ) {
   case 'value':
-    $code= (object)array('o'=>'v','v'=>$c->value);
+    $code= $c->type=='this'
+      ? (object)array('o'=>'t','v'=>$c->value[0])
+      : (object)array('o'=>'v','v'=>$c->value);
     $code_top++;
     break;
   case 'par':
@@ -1371,25 +1397,45 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       else comp_error("CODE: new_form má chybné parametry");
     }
     elseif ( $c->op=='new_area' ) {
-      if ( count($c->par)>=2 && $c->par[0]->expr=='name' ) {
-        $area= find_part_abs($c->par[0]->name,$fullname,'area');
-        if ( $area && $area->type=='area' ) {
-          $code[]= (object)array('o'=>'y','c'=>array((object)array('o'=>'v','v'=>$fullname)));
-          for ($i= 1; $i<$npar; $i++) {
-            $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[$i],0,$struct1),
-              'str_c'=>$c->par[$i],'str_s'=>$struct1);
-            $struct->arr[]= $struct1;
+      if ( count($c->par)>=2  ) {
+        $area_ok= false;
+        if ( $c->par[0]->expr=='name' ) {
+          $area= find_part_abs($c->par[0]->name,$fullname,'area');
+          if ( $area && $area->type=='area' ) {
+            $code[]= (object)array('o'=>'y','c'=>array((object)array('o'=>'o','i'=>$fullname)));
+            $area_ok= true;
           }
-          $code[]= (object)array('o'=>'s','i'=>'new_area','a'=>$npar);
-//           $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[1],0,$struct1),
-//             'str_c'=>$c->par[1],'str_s'=>$struct1);
-//           $struct->arr[]= $struct1;
-//           $code[]= (object)array('o'=>'s','i'=>'new_area','a'=>2);
         }
-        else comp_error("CODE: výraz new_area nemá jako 1 parametr form");
+        if ( !$area_ok ) {
+          $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[$i],0,$struct1),
+            'str_c'=>$c->par[$i],'str_s'=>$struct1);
+          $struct->arr[]= $struct1;
+        }
+        for ($i= 1; $i<$npar; $i++) {
+          $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[$i],0,$struct1),
+            'str_c'=>$c->par[$i],'str_s'=>$struct1);
+          $struct->arr[]= $struct1;
+        }
+        $code[]= (object)array('o'=>'s','i'=>'new_area','a'=>$npar);
       }
       else comp_error("CODE: new_area má chybné parametry");
     }
+//     elseif ( $c->op=='new_area' ) {
+//       if ( count($c->par)>=2 && $c->par[0]->expr=='name' ) {
+//         $area= find_part_abs($c->par[0]->name,$fullname,'area');
+//         if ( $area && $area->type=='area' ) {
+//           $code[]= (object)array('o'=>'y','c'=>array((object)array('o'=>'v','v'=>$fullname)));
+//           for ($i= 1; $i<$npar; $i++) {
+//             $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[$i],0,$struct1),
+//               'str_c'=>$c->par[$i],'str_s'=>$struct1);
+//             $struct->arr[]= $struct1;
+//           }
+//           $code[]= (object)array('o'=>'s','i'=>'new_area','a'=>$npar);
+//         }
+//         else comp_error("CODE: výraz new_area nemá jako 1 parametr area");
+//       }
+//       else comp_error("CODE: new_area má chybné parametry");
+//     }
     elseif ( $c->op=='each' ) {
       $np_each= count($c->par);
       if ( $c->par[1]->expr=='name' ) {
@@ -1571,13 +1617,12 @@ function get_if_block ($root,&$block,&$id) {
           $block->_of= 'form';
           $block->_init= $copy;
         }
-//         elseif ( $fg=='group'   ) {
-//           $block->use= $copy;
-//           $ids= array($copy);
-//           get_if_comma_ids(&$ids);
-//           $block->group= $ids;
-//         }
-        else $ok= comp_error("SYNTAX: po 'use' smí následovat jen form"); // nebo group");
+        elseif ( $fg=='area' ) {
+          $block->type= 'var';
+          $block->_of= 'area';
+          $block->_init= $copy;
+        }
+        else $ok= comp_error("SYNTAX: po 'use' smí následovat jen form nebo area"); // nebo group");
       }
       if ( in_array('use_table' ,$specs[$key])
            && get_delimiter(':') && get_keyed_name('table',$copy,$lc,$nt) ) {
@@ -2052,13 +2097,18 @@ function get_value (&$val,&$type) {
     $head++;
     get_object($val,$type);
   }
+  else if ( $typ[$head]=='key' && ($val=='this' || $val=='panel' || $val=='area') ) {
+    $ok= true;
+    $head++;
+    $type= 'this';
+  }
   else if ( $typ[$head]=='id' && isset($const_list[$id= $val]) ) {     // jméno konstanty
     $ok= true;
     $head++;
     $val= $const_list[$id]['value'];
     $type= $const_list[$id]['type'];
   }
-  if ( !$ok ) comp_error("SYNTAX: byla očekávána hodnota");
+  if ( !$ok ) comp_error("SYNTAX: byla očekávána hodnota místo {$typ[$head]} $val");
   return true;
 }
 # --------------------------------------------------------------------------------------------------

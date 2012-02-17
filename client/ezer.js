@@ -253,7 +253,7 @@ Ezer.Block= new Class({
     return o;
   },
 // ------------------------------------------------------------------------------------ call
-//fm: Block.call (name,a1,...)
+//fm: Block.call/_call (name,a1,...)
 //      zavolá proceduru daného složeného jména vnořenou do bloku a předá argumenty
 //      (interně má jméno _call)
 //r: objekt
@@ -1165,10 +1165,12 @@ Ezer.Tabs= new Class({
       // pokud je definován atribut active a tab je aktivní
       if ( Ezer.options && Ezer.options.start && Ezer.excited<2 ) {
         var ids= Ezer.options.start.split('.');
-        id= ids[1];
-        panel= this._part(id);
-        Ezer.excited= 2;
-        Ezer.assert(panel instanceof Ezer.Panel,'"'+ids[0]+'.'+id+'" v parametru menu neoznačuje panel');
+        if ( ids.length>1 ) {
+          id= ids[1];
+          panel= this._part(id);
+          Ezer.excited= 2;
+          Ezer.assert(panel instanceof Ezer.Panel,'"'+ids[0]+'.'+id+'" v parametru menu neoznačuje panel');
+        }
       }
       else if ( this.options.active && this.active ) {
         var panel= null, path;
@@ -1393,6 +1395,27 @@ Ezer.Var= new Class({
         var form= new Ezer.Form(this,ctx[0],DOM,this.options,ctx[0].id);
         this.set(form);
         this.value.id= id;
+      }
+      else if ( Ezer.Area && desc._of=='area' ) {
+        var name= desc._init;
+        var ctx= Ezer.code_name(name,null,this);
+        Ezer.assert(ctx,name+' je neznámé jméno - očekává se jméno area');
+        Ezer.assert(ctx[0].type=='area',name+' není jméno area');
+        // nalezneme panel
+        var panel= null;
+        for (var o= this.owner; o; o= o.owner) {
+          if ( o.type.substr(0,5)=='panel' ) {
+            panel= o;
+            break;
+          }
+        }
+        if ( panel && panel.DOM_Block ) {
+          // vyvoření area bez události area_oncreate
+          var area= new Ezer.Area(panel,ctx[0],panel.DOM_Block,this.options,ctx[0].id,[],true);
+          this.set(area);
+          this.value.id= id;
+        }
+        else Ezer.error("area není vnořena do panelu");
       }
     }
     // vložení případných podčástí (např. přepisu těl procedur)
@@ -5069,7 +5092,7 @@ Ezer.Eval= new Class({
 //a: 0       - prázdná operace
 //   d i     - definuje context hodnotou i (nemění zásobník)
 //   t a     - this: dá context na zásobník po počtu aplikací owner podle parametru (lze jen a==1)
-//   t i     - this: dá zásobník kontext nejbližšího panel (i=='p') nebo form (i=='f')
+//   t i     - this: dá zásobník kontext nejbližšího panel (i=='p') nebo form (i=='f') nabo area (i=='a')
 //   v v     - hodnota v na zásobník
 //   y c     - kód c na zásobník
 //   u       - return
@@ -5176,7 +5199,7 @@ Ezer.Eval= new Class({
             // this na zásobník
             case 't':
               if ( cc.i ) {
-                // formát1: this('f'|'p')  -- form|panel
+                // formát1: this('f'|'p'|'a')  -- form|panel|area
                 obj= null;
                 if ( cc.i=='p' ) {
                   for (var o= this.context; o; o= o.owner) {
@@ -5189,6 +5212,14 @@ Ezer.Eval= new Class({
                 else if ( cc.i=='f' ) {
                   for (var o= this.context; o; o= o.owner) {
                     if ( o.type=='form' || o.type=='var' && o._of=='form' ) {
+                      obj= o;
+                      break;
+                    }
+                  }
+                }
+                else if ( cc.i=='a' ) {
+                  for (var o= this.context; o; o= o.owner) {
+                    if ( o.type=='area' || o.type=='var' && o._of=='area' ) {
                       obj= o;
                       break;
                     }
@@ -5345,6 +5376,8 @@ Ezer.Eval= new Class({
               if ( cc.i=='call' ) {
                 if ( obj.type=='var' )
                   obj= obj.value;
+                if ( !obj || !obj._call )
+                  Ezer.error('EVAL: call nemá definovaný objekt','S',this.proc,last_lc);
                 fce= obj._call;
                 Ezer.calee= this.proc;
                 args.unshift(cc.s);

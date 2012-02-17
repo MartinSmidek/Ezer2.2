@@ -15,11 +15,14 @@
 //c: Area ([options])
 //      základní třída
 //s: Block
+//e: area_onstart - (this) po vytvoření area, parametrem je vytvořený objekt
+//e: area_onclick - (p) pokud dojde ke kliknutí na element <a href=p ...> v area (viz metoda set)
 Ezer.Area= new Class({
   Extends:Ezer.Block,
   tree: null,                   // vnořený objekt MooTreeControl
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  initialize
-  initialize: function(owner,desc,DOM,options,id,par) {
+// quiet způsobí potlačení události area_onstart
+  initialize: function(owner,desc,DOM,options,id,par,quiet) {
     this.parent(owner,desc,DOM,id);
     this.setOptions(options);
     // substituce předaných parametrů do title
@@ -48,7 +51,8 @@ Ezer.Area= new Class({
         area_var.set(subst[name]);
       }
     }
-    this.fire('area_onstart',[]);
+    if ( !quiet )
+      this.fire('area_onstart',[this]);
   },
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_attach
   // DOM - DOM_Block - DOM_Area
@@ -78,9 +82,9 @@ Ezer.Area= new Class({
       }.bind(this))
     }
     this.DOM_Block.set('html',title);
-    this.DOM_Area= this.DOM_Block.firstChild;
-    if ( !this.DOM_Area )
-      Ezer.error(name.value+' nemá správný formát html kódu');
+    this.DOM_Area= this.DOM_Block.firstChild ? this.DOM_Block.firstChild : null;
+//     if ( !this.DOM_Area )
+//       Ezer.error(name.value+' nemá správný formát html kódu');
   },
 // -------------------------------------------------------------------------------------------- init
 //fm: Area.init ([all=0])
@@ -101,10 +105,14 @@ Ezer.Area= new Class({
         return value;
       }.bind(this));
       this.DOM_Block.set('html',title);
-      this.DOM_Area= this.DOM_Block.firstChild;
+
+      var path= location.protocol+'//'+location.hostname+(location.port?':'+location.port:'');
+      path+= location.pathname;
+      this._set_onclick(this.DOM_Block);
+      this.DOM_Area= this.DOM_Block.firstChild ? this.DOM_Block.firstChild : null;
     }
     return 1;
- },
+  },
 // --------------------------------------------------------------------------------------------- set
 //fm: Area.set (id,html)
 //      vymění html elementu area daného ID
@@ -115,24 +123,30 @@ Ezer.Area= new Class({
       // doplnění lokálních odkazů o onclick s argumentem href a u globálních doplnění target
       var path= location.protocol+'//'+location.hostname+(location.port?':'+location.port:'');
       path+= location.pathname;
-      elem.getElements('a').each(function(el){
-        var href= el.href, prefix= href.substr(0,path.length);
-//                                           Ezer.trace('*',"href="+href+", target="+el.target);
-        if ( prefix==path ) {
-          el.addEvent('click',function(ev){
-            history.pushState(null,null,href);
-            // případná obsluha události
-            this.fire('area_onclick',[href],ev);
-            return false;
-          }.bind(this));
-        }
-        else if ( !el.target ) {
-          el.target= 'panel';
-        }
-      }.bind(this));
+      this._set_onclick(elem);
     }
     return 1;
  },
+// ------------------------------------------------------------------- _set_onclick
+// odkazům dovnitř aplikace zamění defaultní událost za area_onclick
+  _set_onclick: function(elem) {
+    var path= location.protocol+'//'+location.hostname+(location.port?':'+location.port:'');
+    path+= location.pathname;
+    elem.getElements('a').each(function(el){
+      var href= el.href, prefix= href.substr(0,path.length);
+      if ( prefix==path ) {
+        el.addEvent('click',function(ev){
+          history.pushState(null,null,href);
+          // případná obsluha události
+          this.fire('area_onclick',[href],ev);
+          return false;
+        }.bind(this));
+      }
+      else if ( !el.target ) {
+        el.target= 'panel';
+      }
+    }.bind(this));
+  },
 // ------------------------------------------------------------------------------------------- focus
 //fm: Area.focus (id_oblast,id_element)
 //      označí element v dané jako aktivní tzn. definuje mu jako jedinému v oblasti class='active'
@@ -307,19 +321,20 @@ Ezer.Area= new Class({
     return 1;
   }
 });
-// ================================================================================================= STR
+// ================================================================================================= STRUKTURY
 // ---------------------------------------------------------------------------------------- new_area
 //fs: str.new_area (name,parent[,par])
-//      vytvoření instance area
+//      vytvoření instance area dané stringem jako úplné jméno area nebo přímo area
 //      A) vnořené do parent zadaného jako ID (string) nebo jak Ezer objekt
 //         nebo jako DOM element (například výsledek volání new_area)
-//      B) pokud není zadán parent, dojde k napojení nové area na element s ID=par1
+//  ?   B) pokud není zadán parent, dojde k napojení nové area na element s ID=par1
 //      - volá se výrazem new_area
 //s: funkce
 Ezer.str.new_area= function() {
   var that= arguments[0];       // volající objekt Ezer.Eval
   var args= arguments[1];       // hodnoty parametrů a proměnných volajícího objektu Ezer.Eval
   var name= new Ezer.Eval(arguments[2],that.context,args,'new_area-name');
+  var area_desc= name.value;
   var parent= new Ezer.Eval(arguments[3],that.context,args,'new_area-parent');
   var npar= arguments.length-4, par= [];
   for (var i=0; i<npar; i++) {
@@ -331,8 +346,13 @@ Ezer.str.new_area= function() {
   var owner= null;      // vlastník area
   var owner= that.context;
   var desc= null;       // popis area
-  var ctx= Ezer.code_name(name.value,null,that.context);
-  if ( ctx && ctx[0] && ctx[0].type=='area' ) {
+  var ctx= null;
+  if ( typeof(area_desc)=='string' ) {
+    // jméno musí být úplné
+    area_desc= Ezer.code_name(area_desc,null,that.context);
+    if ( area_desc ) area_desc= area_desc[0];
+  }
+  if ( area_desc && area_desc.type=='area' ) {
     // nalezení instance vlastnícícho panelu
     var panel= null;
     for (var o= that.context; o; o= o.owner) {
@@ -343,8 +363,6 @@ Ezer.str.new_area= function() {
     }
     if ( !panel )
       Ezer.error('výraz new_form není zanořen do panelu','S');
-    //
-    desc= ctx[0];
     if ( !parent.value ) {
     }
     else {
@@ -355,16 +373,15 @@ Ezer.str.new_area= function() {
       else if ( typeof(parent.value)=='object' ) {
         if ( parent.value instanceof Element )
           DOM= parent.value;
-        else if ( parent.value.DOM_Block ) {
-          owner= parent.value;
-          DOM= owner.DOM_Block;
+        else if ( parent.value.DOM_Block || parent.value.DOM ) {
+          DOM= parent.value.DOM_Block || parent.value.DOM;
         }
       }
       if ( !DOM )
         Ezer.error(name.value+' nelze napojit na 2.parametr');
     }
-    // vytvoření Ezer representace
-    ezer_area= new Ezer.Area(panel,desc,DOM,{},desc.id,par);
+    // vytvoření Ezer representace s událostí area_oncreate
+    ezer_area= new Ezer.Area(panel,area_desc,DOM,{},area_desc.id,par,false);
   }
   else
     Ezer.error(name.value+' je neznámé jméno - očekává se jméno area');
