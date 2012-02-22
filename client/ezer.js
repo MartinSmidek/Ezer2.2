@@ -4273,6 +4273,7 @@ Ezer.Browse= new Class({
         Ezer.error('browse '+browse.owner.id+'.'+browse.id+'.css nemá jako první člen jméno sloupce');
         return false;
       }
+      me.css_default= null;
       for (is= 1; is<as.length; is++) {
         aas= as[is].split(':');
         if ( aas.length>1 ) {
@@ -4323,7 +4324,11 @@ Ezer.Browse= new Class({
             if ( clmn.css_clmn ) {
               // pokud je požadavek na barvení, najdi sloupec, který ho určuje a doplň barvu
               icss= Number(this.buf[this.t+i-1-this.b][clmn.css_clmn.id]);
-              if ( clmn.css[icss] )
+              if ( clmn.css[icss]==undefined ) {            // indexující styly
+                // defaultní styl, pokud je definován
+                if ( clmn.css_default ) ccss+= ' '+clmn.css_default;
+              }
+              else if ( clmn.css[icss] )
                 ccss+= ' '+clmn.css[icss];
             }
             clmn.DOM_cell[i].className= ccss;
@@ -5647,7 +5652,9 @@ Ezer.Eval= new Class({
     x.root= Ezer.root;          // název/složka aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     var ajax= new Request({url:Ezer.App.options.server_url, data:x, method:'post',
-      onComplete: function(ay){ this.onComplete(ay,null,fce,'a',ms); }.bind(this)},this);
+      onComplete: function(ay){
+        this.onComplete(ay,null,fce,'a',ms);
+      }.bind(this)},this);
     ajax.send();
     Ezer.App._ajax(1);
   },

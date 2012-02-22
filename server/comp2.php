@@ -1272,7 +1272,7 @@ function gen_name($name,$pars,$vars,$first,$c=null,$nargs=null) {  #trace();
                 $full.= ".$id";
               }
             }
-            $code[0]= (object)array('o'=>$nargs!==null?'c':'o','i'=>$full);       //           $note.= 'c';
+            $code[0]= (object)array('o'=>$nargs!==null && $k==$end_id ?'c':'o','i'=>$full);
             if ( $op ) {
               $type= $names[$op]->op;
               $o= $type[0]=='o' ? 'a' : ($type=='fm' ? 'm' : ( $type=='fx' ? 'x' : ( $type=='fi' ? 'i' : null)));
