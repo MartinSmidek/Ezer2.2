@@ -5500,6 +5500,8 @@ Ezer.Eval= new Class({
             if ( this.top<0 )
               Ezer.error('EVAL: stack underflow');
             top= this.stack[this.top--];
+            if ( top=='0' )
+              top= 0;
             if ( cc.jmp ) {
               c+= cc.jmp;
               Ezer.eval_jump= ' ';                      // příznak neskoku
