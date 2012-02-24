@@ -326,8 +326,10 @@ Ezer.Tabs.implement({
     else {
       if ( this.part ) {
         $each(this.part,function(desc,id) {
-          if ( desc.type=='panel.plain' || desc.type=='panel.right' )
+          if ( desc.type=='panel.plain' || desc.type=='panel.right' ) {
             desc._tabDom.setStyles({display:'block'});
+            Ezer.panel= desc;                   // informace o aktivním panelu pro dump etc.
+          }
         },this);
       }
       this.active= true;

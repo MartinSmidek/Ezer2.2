@@ -633,7 +633,8 @@ function time_mark($msg) { trace();
 }
 # -------------------------------------------------------------------------------------------------- call_stack
 function call_stack($act,$n,$hloubka=2,$show_call=1) { #$this->debug($act,'call_stack');
-  $fce= isset($act[$n]['class']) ? "{$act[$n]['class']}.{$act[$n]['function']}" : $act[$n]['function'];
+  $fce= isset($act[$n]['class'])
+    ? "{$act[$n]['class']}{$act[$n]['type']}{$act[$n]['function']}" : $act[$n]['function'];
   $del= '';
   $max_string= 36;
   $args= '';

@@ -236,7 +236,13 @@
     global $trace_parm;
     try {
       $fce= $x->fce;
-      if ( function_exists($fce) ) {
+      $ok= function_exists($fce);
+      if ( !$ok ) {
+        list($class,$meth)= explode('::',$fce);
+        $ok= method_exists($class,$meth);
+        $fce= array($class,$meth);
+      }
+      if ( $ok ) {
 //                                                         display("ask $fce");
         // předání parametrů včetně chybějících hodnot
         $args= array();
@@ -248,7 +254,7 @@
         $val= call_user_func_array($fce,$args);
         $y->value= $val;// win2utf($val);
       }
-      else fce_error("ask: funkce '$fce' neexistuje");
+      else fce_error("ask: funkce '{$x->fce}' neexistuje");
       $y->args= $x->args;
     }
     catch (Exception $e) {

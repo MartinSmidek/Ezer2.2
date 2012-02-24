@@ -73,6 +73,7 @@ Ezer.Area= new Class({
   DOM_add: function(title) {
     // vytvoření instance area
     this.DOM_Block= new Element('div',{'class':'Area'}).inject(this.DOM);
+    this.DOM_optStyle(this.DOM_Block);
     // obsluha podporovaných událostí
     var fce= this.desc.part ? this.desc.part.onclick : null;
     if ( fce ) {
@@ -86,10 +87,17 @@ Ezer.Area= new Class({
 //     if ( !this.DOM_Area )
 //       Ezer.error(name.value+' nemá správný formát html kódu');
   },
-// ------------------------------------------------------------------------------------------ delete
-//fm: Area.delete ([all=0])
-//      vymaže area, pokud je all=1 pak vymaže všechny instance (N.Y.I.)
-  delete: function (all) {
+// ------------------------------------------------------------------------------------------- empty
+//fm: Area.empty ([all=0])
+//      vymaže obsah area, pokud je all=1 pak vymaže všechny instance (N.Y.I.)
+  empty: function (all) {
+    if ( this.DOM_Area instanceof Element ) {
+      this.DOM_Area.empty();
+    }
+    else if ( this.DOM_Area ) {
+      this.DOM_Block.set('html','');
+      this.DOM_Area= null;
+    }
   },
 // -------------------------------------------------------------------------------------------- init
 //fm: Area.init ([all=0])
@@ -142,7 +150,7 @@ Ezer.Area= new Class({
       if ( prefix==path ) {
         el.addEvent('click',function(ev){
           history.pushState(null,null,href);
-          // případná obsluha události
+          // ------------------------------------------------- událost area_onclick
           this.fire('area_onclick',[href,ev.target.id],ev);
           return false;
         }.bind(this));
@@ -153,10 +161,11 @@ Ezer.Area= new Class({
     }.bind(this));
   },
 // ------------------------------------------------------------------------------------------- focus
-//fm: Area.focus (id_oblast,id_element)
-//      označí element v dané jako aktivní tzn. definuje mu jako jedinému v oblasti class='active'
-  focus: function (id_oblast,id_elem) {
-    var oblast= this.DOM_Block.getElementById(id_oblast);
+//fm: Area.focus (id_element)
+//      označí element a jeho rodičovský element jako aktivní tzn. definuje
+//      jim jako jediným v Area class='active'
+  focus: function (id_elem) {
+    var oblast= this.DOM_Block; //.getElementById(id_oblast);
     if ( oblast ) {
       oblast.getElements('.active').each(function(ael){
         ael.removeClass('active');
@@ -164,6 +173,7 @@ Ezer.Area= new Class({
       var elem= oblast.getElementById(id_elem);
       if ( elem ) {
         elem.addClass('active');
+        elem.parentNode.addClass('active');
       };
     }
     return 1;
@@ -175,8 +185,8 @@ Ezer.Area= new Class({
   tree_insert: function (id) {
     var node= null, old= this.tree.get(id);
     if ( old ) {
-      var node_id= id+'_copy';
-      node= old.insert({id:node_id,text:node_id});
+      var node_id= id+',*';
+      node= old.insert({id:node_id,text:'*'});
     }
     return node;
   },
@@ -228,16 +238,19 @@ Ezer.Area= new Class({
     return 1;
   },
 // ------------------------------------------------------------------------------------- tree_update
-//fm: Area.tree_update (id,new_id,data)
-//      zamění obsah daného uzlu, new_id se zamění pouze je-li neprázdné
-  tree_update: function (id,new_id,data) {
+//fm: Area.tree_update (id,new_idn,data)
+//      zamění obsah uzlu daného id, poslední část se zamění za new_idn pouze, je-li neprázdné
+  tree_update: function (id,new_idn,data) {
     var node= this.tree.get(id);
     if ( node ) {
       node.data= data;
-      if ( new_id ) {
-        delete this.tree.index[node.id];
-        node.text= node.id= new_id;
-        this.tree.index[new_id]= node;
+      if ( new_idn ) {
+        delete this.tree.index[id];
+        var fid= id.split(',');
+        fid[fid.length-1]= new_idn;
+        node.text= new_idn;
+        node.id= fid.toString();
+        this.tree.index[node.id]= node;
         node.update();
       }
     }
@@ -249,7 +262,8 @@ Ezer.Area= new Class({
   tree_dump: function () {
     var js= '';
     function walk(root) {
-      js+= '{"prop":{"id":"'+root.id+'","data":'+JSON.stringify(root.data, undefined, 2)+'}';
+      var id= root.id.split(',');
+      js+= '{"prop":{"id":"'+id[id.length-1]+'","data":'+JSON.stringify(root.data, undefined, 2)+'}';
       if ( root.nodes.length ) {
         js+= ',\n "down":[';
         var n= 0;
@@ -273,11 +287,14 @@ Ezer.Area= new Class({
 //   node:  {prop:{text:<string>,down:nodes}}
 //e: tree_onclick - (id,node,node.data.json,merge.data.json)
   tree_show: function (desc,id) {
+    // načte další generaci pod root podle popisu v desc
     function load(root,desc) {
       if ( desc.down ) {
         for (var i= 0; i<desc.down.length; i++) {
           var down= desc.down[i];
-          down.prop.text= down.prop.id;
+          down.prop.text= down.prop.data.name||down.prop.id;
+          // úprava down.prop.id na složené jméno
+          down.prop.id= root.id+','+down.prop.id;
           var node= root.insert(down.prop);
           load(node,down);
         }
@@ -289,6 +306,7 @@ Ezer.Area= new Class({
       this.tree= new MooTreeControl({div:id ? id : this.DOM_Block,grid:true,
         mode:'files',                   // folders|files
         path:Ezer.paths.images_lib,     // cesta k mootree.gif
+        theme:'mootree_white.gif',
         // ----------------------------------------------------------------- onclick
         onClick: function(node) { // při kliknutí na libovolný uzel
           // spočítáme sumu data - shora dolů
@@ -302,7 +320,9 @@ Ezer.Area= new Class({
             })
             var ndata= JSON.stringify(node.data, undefined, 2);
             var adata= JSON.stringify(data, undefined, 2);
-            this.fire('tree_onclick',[node.id,node.data,ndata,adata]);
+            var fid= node.id.split(',');
+            var idn= fid[fid.length-1];
+            this.fire('tree_onclick',[node.id,idn,node.data,ndata,adata]);
           }
           return false;
         }.bind(this)
@@ -315,7 +335,7 @@ Ezer.Area= new Class({
     this.tree.disable(); // potlačí zobrazení
     if ( desc && desc.prop ) {
       Object.append(this.tree.root,desc.prop);
-      this.tree.root.text= this.tree.root.id;
+      this.tree.root.text= this.tree.root.data.name||this.tree.root.id;
       this.tree.index[this.tree.root.id]= this.tree.root;
       load(this.tree.root,desc);
       this.tree.expand();
@@ -358,7 +378,8 @@ Ezer.str.new_area= function() {
     if ( area_desc ) area_desc= area_desc[0];
   }
   if ( area_desc && area_desc.type=='area' ) {
-    // nalezení instance vlastnícícho panelu
+    area_desc= area_desc.desc ? area_desc.desc : area_desc;
+    // nalezení instance vlastnícího panelu
     var panel= null;
     for (var o= that.context; o; o= o.owner) {
       if ( o.type.substr(0,5)=='panel' ) {

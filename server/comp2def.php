@@ -212,7 +212,7 @@ $attribs = array (
   'report' =>  explode(",",'format:s'),
   'box'    =>  explode(",",'title:s,xactive:b,pagebreak:s,css:s,style:s'),
 #  area
-  'area'   =>  explode(",",'title:s'),
+  'area'   =>  explode(",",'title:s,style:s,css:s'),
 #  form
   'form'   =>  explode(",",'style:s,css:s,tabindex:n,title:s,key:s'),
   'view'   =>  explode(",",'join:s,join_type:s'),

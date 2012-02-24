@@ -367,6 +367,28 @@ Ezer.Block= new Class({
     }
     return ok;
   },
+//------------------------------------------------------------------------------------- dump
+//fm: Block.dump ([opt])
+//      vytvoří objekt obsahující názvy a hodnoty proměnných, výpis lze ovlivnit řetězem opt:
+//      o: hodnoty objektů
+  dump: function (opt) {
+    var v= {};
+    // projdi proměnné
+    for(var i in this.part) {
+      var part= this.part[i];
+      if ( part instanceof Ezer.Var ) {
+        v[part.id]=
+          part._of=='form' ? (part.value && opt && opt.indexOf('f')>=0 ?
+            part.value.dump() : '<i>form</i>') :
+          part._of=='area' ? (part.value && opt && opt.indexOf('a')>=0 ?
+            part.value.dump() : '<i>area</i>') :
+          typeof(part.value)=='object' ? (part.value==null ? '<i>null</i>' :
+            ( opt && opt.indexOf('o')>=0 ? part.value : '<i>object</i>' ) ) :
+          part.value;
+      }
+    }
+    return v;
+  },
 // ------------------------------------------------------------------------------------ enable
 //fm: Block.enable ([on[,tags]])
 //      Nastaví vlastnost enable podle on;

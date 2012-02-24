@@ -3,6 +3,7 @@
 // ΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞ app.js
 // layout aplikace a jeho ovládání - Ezer.Shield ukrývá obsah pod PanelPopup
 Ezer.is_trace= {};                              // zapínání typů trasování
+Ezer.is_dump= {};                               // zapínání typů výpisů
 Ezer.Application= new Class({
   // ----------------------------------------------------------------------------------------------- DOM...
   domApp: null,    // aplikace
@@ -200,7 +201,7 @@ Ezer.Application= new Class({
     if ( this.options.to_trace ) {
       this._barRightDom.getChildren().destroy();
       Ezer.to_trace= this.options.show_trace;
-      new Element('span', {text:'trace','class':Ezer.to_trace?'ae_switch_on':'',
+      new Element('span', {text:'trace:','class':Ezer.to_trace?'ae_switch_on':'',
         title:'zapíná/vypíná trasování',
         events:{
           click: function(event) {
@@ -234,6 +235,18 @@ Ezer.Application= new Class({
       this._barSwitch('q','kód interpreta');
       this._barSwitch('Q','kód interpreta (jen s ift,iff,is)');
       this._barSwitch('C','trasování kompilátoru');
+      // dump
+      new Element('span', {text:'dump:',title:'vypíše proměnné zobrazeného panelu', events:{
+        click: function(event) {
+          if ( Ezer.panel ) {
+            Ezer.trace(null,Ezer.fce.debug(Ezer.panel.dump(this.options.ae_dump),
+              "panel "+Ezer.panel.id));
+          }
+        }.bind(this)
+      }}).inject(this._barRightDom);
+      this._barDump('f','zobrazit Form');
+      this._barDump('a','zobrazit Area');
+      this._barDump('o','zobrazit objekty');
       // informace na konci
       new Element('span', {text:'| '+MooTools.lang.getCurrentLanguage()}).inject(this._barRightDom);
       // obsluha okna s chybami a trasováním
@@ -263,7 +276,7 @@ Ezer.Application= new Class({
   },
   // ----------------------------------------------------------------------------- _barSwitch
   // přidání ovladače trasování k status_bar
-  _barSwitch: function (id,title) {
+  _barSwitch: function (id,title,dump) {
     Ezer.is_trace[id]= this.options.ae_trace.indexOf(id)>=0;
     new Element('span', {text:id, 'class':Ezer.is_trace[id]?'ae_switch_on':'',
       title:title,
@@ -277,6 +290,28 @@ Ezer.Application= new Class({
           else {
             this.options.ae_trace+= id;
             Ezer.is_trace[id]= true;
+          }
+          this.send_status();
+        }.bind(this)
+      }
+    }).inject(this._barRightDom);
+  },
+  // ----------------------------------------------------------------------------- _barDump
+  // přidání ovladače trasování k status_bar
+  _barDump: function (id,title) {
+    Ezer.is_dump[id]= this.options.ae_dump.indexOf(id)>=0;
+    new Element('span', {text:id, 'class':Ezer.is_dump[id]?'ae_switch_on':'',
+      title:title,
+      events:{
+        click: function(event) {
+          event.target.toggleClass('ae_switch_on');
+          if ( this.options.ae_dump.indexOf(id)>=0 ) {
+            this.options.ae_dump= this.options.ae_dump.replace(id,'');
+            Ezer.is_dump[id]= false;
+          }
+          else {
+            this.options.ae_dump+= id;
+            Ezer.is_dump[id]= true;
           }
           this.send_status();
         }.bind(this)

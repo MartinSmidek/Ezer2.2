@@ -24,6 +24,7 @@ Ezer.process= 0;                // jednoznačné číslo procesu
 Ezer.calls= [];                 // fronta volání čekajících na Ezer.evals==0
 Ezer.excited= 0;                // >0 pokud bylo již použito Ezer.options.start
 Ezer.konst= Ezer.konst || {};   // hodnoty nedefinovaných konsta(const x;y;z)
+Ezer.curr= {panel:null};        // zobrazený panel
 // systémové proměnné (root,user,ezer,options)
 Ezer.sys= {root:Ezer.root,user:{},ezer:{},options:Ezer.options};
 // ------------------------------------------------------------------------------------------------- const_value
@@ -106,6 +107,7 @@ Ezer.Application.implement({
     show_trace: 0,                               // zobrazit trasovací okno
 //os: Application.ae_trace - seznam aktivovaných modů trasování
     ae_trace:   '',                              // typ trasované informace
+    ae_dump:    '',                              // typ vypisované informace
     mini_debug: true,                            // reload po kliknutí na ikonu
     skin: null,                                  // jméno skinu aplikace
 //os: Application.skin - je-li nenulové tak barvy jsou v souboru skins/colors.php a img v skins/$skin
