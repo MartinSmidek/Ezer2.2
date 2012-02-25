@@ -307,6 +307,7 @@ Ezer.Tabs.implement({
     }
     this.activePanel= this.part[panel_id];
     this.activePanel._tabDom.addClass('Active').removeClass('Pasive');
+    Ezer.panel= this.activePanel;               // informace o aktivním panelu pro dump etc.
   },
 // ------------------------------------------------------------------------------------ _hide
   _hide: function() {
@@ -328,12 +329,12 @@ Ezer.Tabs.implement({
         $each(this.part,function(desc,id) {
           if ( desc.type=='panel.plain' || desc.type=='panel.right' ) {
             desc._tabDom.setStyles({display:'block'});
-            Ezer.panel= desc;                   // informace o aktivním panelu pro dump etc.
           }
         },this);
       }
       this.active= true;
       if ( this.activePanel ) {
+        Ezer.panel= this.activePanel;           // informace o aktivním panelu pro dump etc.
         this.activePanel._show();
       }
     }

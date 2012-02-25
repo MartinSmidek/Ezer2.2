@@ -372,19 +372,38 @@ Ezer.Block= new Class({
 //      vytvoří objekt obsahující názvy a hodnoty proměnných, výpis lze ovlivnit řetězem opt:
 //      o: hodnoty objektů
   dump: function (opt) {
+    function dump_form(f) {
+      var dmp= {};
+      dmp['key '+(f._key_id||'?')]= f.key();
+      Object.append(dmp,f.dump());
+      return dmp;
+    }
+    function dump_area(a) {
+      return a.dump();
+    }
     var v= {};
     // projdi proměnné
     for(var i in this.part) {
       var part= this.part[i];
       if ( part instanceof Ezer.Var ) {
-        v[part.id]=
-          part._of=='form' ? (part.value && opt && opt.indexOf('f')>=0 ?
-            part.value.dump() : '<i>form</i>') :
-          part._of=='area' ? (part.value && opt && opt.indexOf('a')>=0 ?
-            part.value.dump() : '<i>area</i>') :
-          typeof(part.value)=='object' ? (part.value==null ? '<i>null</i>' :
-            ( opt && opt.indexOf('o')>=0 ? part.value : '<i>object</i>' ) ) :
-          part.value;
+        if ( part._of=='form' && opt && opt.indexOf('f')>=0 )
+          v['form '+part.id]= part.value ? dump_form(part.value) : null;
+        else if ( part._of=='area' && opt && opt.indexOf('a')>=0 )
+          v['area '+part.id]= part.value ? dump_area(part.value) : null;
+        else if ( part._of!='form' && part._of!='area' )
+          v[part._of+' '+part.id]=
+            typeof(part.value)=='object' ? (part.value==null ? null :
+              ( opt && opt.indexOf('o')>=0 ? part.value : '<i>object</i>' ) ) :
+            part.value;
+
+//         v[part._of+' '+part.id]=
+//           part._of=='form' ? (part.value && opt && opt.indexOf('f')>=0 ?
+//             dump_form(part.value) : '<i>form</i>') :
+//           part._of=='area' ? (part.value && opt && opt.indexOf('a')>=0 ?
+//             part.value.dump() : '<i>area</i>') :
+//           typeof(part.value)=='object' ? (part.value==null ? '<i>null</i>' :
+//             ( opt && opt.indexOf('o')>=0 ? part.value : '<i>object</i>' ) ) :
+//           part.value;
       }
     }
     return v;

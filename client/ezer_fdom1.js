@@ -246,7 +246,7 @@ Ezer.Application= new Class({
       }}).inject(this._barRightDom);
       this._barDump('f','zobrazit Form');
       this._barDump('a','zobrazit Area');
-      this._barDump('o','zobrazit objekty');
+      this._barDump('o','zobrazit strukturu objektů');
       // informace na konci
       new Element('span', {text:'| '+MooTools.lang.getCurrentLanguage()}).inject(this._barRightDom);
       // obsluha okna s chybami a trasováním
