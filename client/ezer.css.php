@@ -304,46 +304,46 @@ div.systable {
 div.PanelPopup div.body{
   font-size:11px; line-height: 13px;}
 div.PanelPopup div.top_ul {
-  background:url($path/clientcide/full.png) top left no-repeat; _background:url($path/clientcide/full.gif) top left no-repeat;
+  background:url($path/clientcide/stickyWinHTML/full.png) top left no-repeat; _background:url($path/clientcide/stickyWinHTML/full.gif) top left no-repeat;
   height:26px; width:15px; float:left}
 div.PanelPopup div.top_ur {
   position:relative; left:0px !important; left:-4px; height:26px;
-  background:url($path/clientcide/full.png) top right !important; _background:url($path/clientcide/full.gif) top right !important;
+  background:url($path/clientcide/stickyWinHTML/full.png) top right !important; _background:url($path/clientcide/stickyWinHTML/full.gif) top right !important;
   margin:0px 0px 0px 15px !important; margin-right:-4px; padding:0px}
 div.PanelPopup h1.caption {
   clear: none !important; margin:0px !important; overflow: hidden; padding:0 !important;
   font-weight:bold; color:#555; font-size:14px !important; position:relative; top:8px !important;
   left:5px !important; float: left; height: 19px !important;}
 div.PanelPopup div.middle, div.PanelPopup div.closeBody {
-  background:url($path/clientcide/body.png) top left repeat-y; _background:url($path/clientcide/body.gif) top left repeat-y;
+  background:url($path/clientcide/stickyWinHTML/body.png) top left repeat-y; _background:url($path/clientcide/stickyWinHTML/body.gif) top left repeat-y;
   margin:0px 20px 0px 0px !important;
   margin-bottom: -3px; position: relative; top: 0px !important; top: -3px;}
 div.PanelPopup div.body {
-  background:url($path/clientcide/body.png) top right repeat-y; _background:url($path/clientcide/body.gif) top right repeat-y;
+  background:url($path/clientcide/stickyWinHTML/body.png) top right repeat-y; _background:url($path/clientcide/stickyWinHTML/body.gif) top right repeat-y;
   padding:8px 30px 8px 0px !important; margin-left:5px !important; position:relative; right:-20px !important;}
 div.PanelPopup div.bottom {
   clear:both }
 div.PanelPopup div.bottom_ll {
-  background:url($path/clientcide/full.png) bottom left no-repeat; _background:url($path/clientcide/full.gif) bottom left no-repeat;
+  background:url($path/clientcide/stickyWinHTML/full.png) bottom left no-repeat; _background:url($path/clientcide/stickyWinHTML/full.gif) bottom left no-repeat;
   width:15px; height:15px; float:left}
 div.PanelPopup div.bottom_lr {
-  background:url($path/clientcide/full.png) bottom right; _background:url($path/clientcide/full.gif) bottom right;
+  background:url($path/clientcide/stickyWinHTML/full.png) bottom right; _background:url($path/clientcide/stickyWinHTML/full.gif) bottom right;
   position:relative; left:0px !important; left:-4px; margin:0px 0px 0px 15px !important; margin-right:-4px; height:15px}
 div.PanelPopup div.closeButtons {
-  background:url($path/clientcide/body.png) top right repeat-y; _background:url($path/clientcide/body.gif) top right repeat-y;
+  background:url($path/clientcide/stickyWinHTML/body.png) top right repeat-y; _background:url($path/clientcide/stickyWinHTML/body.gif) top right repeat-y;
   text-align: center; padding: 0px 30px 8px 0px; margin-left:5px; position:relative; right:-20px}
 div.PanelPopup a.button:hover {
-  background:url($path/clientcide/big_button_over.gif) repeat-x}
+  background:url($path/clientcide/stickyWinHTML/big_button_over.gif) repeat-x}
 div.PanelPopup a.button {
-  background:url($path/clientcide/big_button.gif) repeat-x; margin: 2px 8px 2px 8px;
+  background:url($path/clientcide/stickyWinHTML/big_button.gif) repeat-x; margin: 2px 8px 2px 8px;
   padding: 2px 12px; cursor:pointer; border: 1px solid #999 !important; text-decoration:none;
   color: #000 !important;}
 div.PanelPopup div.closeButton {
-  width:13px; height:13px; background:url($path/clientcide/closebtn.gif) no-repeat;
+  width:13px; height:13px; background:url($path/clientcide/stickyWinHTML/closebtn.gif) no-repeat;
   position: absolute; right: 0px; margin:10px 15px 0px 0px !important; cursor:pointer;top:0px}
 div.PanelPopup div.dragHandle {
   width:11px; height:22px; position:relative; top:5px; left:-3px; cursor: move;
-  background:url($path/clientcide/drag_corner.gif); float: left;}
+  background:url($path/clientcide/stickyWinHTML/drag_corner.gif); float: left;}
 
 /* klávesnice a změny */
 
