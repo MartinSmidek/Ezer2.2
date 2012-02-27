@@ -36,6 +36,14 @@ client/img/clientcide/drag_corner.gif -text
 client/img/clientcide/full.gif -text
 client/img/clientcide/full.png -text
 client/img/clientcide/icon_problems_sm.gif -text
+client/img/clientcide/stickyWinHTML/body.gif -text
+client/img/clientcide/stickyWinHTML/body.png -text
+client/img/clientcide/stickyWinHTML/calendar.gif -text
+client/img/clientcide/stickyWinHTML/closebtn.gif -text
+client/img/clientcide/stickyWinHTML/drag_corner.gif -text
+client/img/clientcide/stickyWinHTML/full.gif -text
+client/img/clientcide/stickyWinHTML/full.png -text
+client/img/clientcide/stickyWinHTML/icon_problems_sm.gif -text
 client/img/dbg.ico -text
 client/img/doc_form.gif -text
 client/img/doc_menu.gif -text

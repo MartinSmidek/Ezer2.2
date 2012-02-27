@@ -75,6 +75,7 @@ Element.implement({
       && (fn == undefined || myEvents[eventType].keys.contains(fn));
   }
 });
+Clientcide.setAssetLocation(Ezer.paths.images_cc);
 // ================================================================================================= Application
 //c: Application ([options])
 //      základní třída aplikace

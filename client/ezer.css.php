@@ -155,7 +155,7 @@ body {
 
 /* úpravy Clintcide a Mootools */
 .errorMsg {
-  background-color:#fefefe; }
+  background-color:transparent; }
 
 /* hlavní Menu a Tabs */
 
