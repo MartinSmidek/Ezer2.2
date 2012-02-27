@@ -16,7 +16,7 @@ Ezer.continuation= null;        // pokračování po stop-adrese
 Ezer.DOM= null;                 // uživatelská plocha
 Ezer.paths= Ezer.paths || {};   // parametry z nadřazené aplikace
 Ezer.paths.images_lib= './'+Ezer.version+'/client/img/';
-Ezer.paths.images_cc=  './'+Ezer.version+'/client/img/clientcide/'; // viz případná změna v initialize
+Ezer.paths.images_cc=  './'+Ezer.version+'/client/img/clientcide'; // viz případná změna v initialize
 ;
 Ezer.used= [];                  // seznam vyžádaných zdrojů ???
 Ezer.evals= 0;                  // počet aktivních objektů Ezer.Eval (nuluje i DblClick na trace)
@@ -75,6 +75,8 @@ Element.implement({
       && (fn == undefined || myEvents[eventType].keys.contains(fn));
   }
 });
+Ezer.paths.images_cc= (!Ezer.options.skin || Ezer.options.skin=='default'
+  ? './'+Ezer.version+'/client/skins/default' : './skins/'+Ezer.options.skin)+'/clientcide';
 Clientcide.setAssetLocation(Ezer.paths.images_cc);
 // ================================================================================================= Application
 //c: Application ([options])
@@ -124,7 +126,6 @@ Ezer.Application.implement({
       style:{opacity:0.2,backgroundColor:'#333',zIndex:2}});
     this.DOM_add();
     this.load();
-    Ezer.paths.images_cc= this.skin()+'/clientcide/';
   },
   // ------------------------------------------------------------------------------------ skin
   // vrátí cestu ke složce s background-image

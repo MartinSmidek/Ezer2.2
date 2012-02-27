@@ -1054,7 +1054,7 @@ Ezer.FieldDate.implement({
 //      zobrazí prvek field
   DOM_add: function() {
     this.DOM_Block= new Element('div',{'class':'FieldDate',styles:this.coord()}).adopt(
-        this.DOM_icon= new Element('img',{align:'right',src:Ezer.paths.images_cc+'calendar.gif'}),
+        this.DOM_icon= new Element('img',{align:'right',src:Ezer.paths.images_cc+'/calendar.gif'}),
         this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
           width:(this._w||87)-18,height:this._h||16}})
     ).inject(this.owner.DOM_Block);
@@ -2759,15 +2759,13 @@ Ezer.fce.DOM.error= function (str,nonl) {
 Ezer.fce.DOM.alert= function (str,continuation) {
   var win= null;
   if ( continuation ) {
-    win= new StickyWin.Alert('Upozornění',str,{
-      baseHref:Ezer.paths.images_cc,hideOnClick:false,closeOnEsc:true,
+    win= new StickyWin.Alert('Upozornění',str,{hideOnClick:false,closeOnEsc:true,
       uiOptions:{closeButton:false,buttons:[{text:'Ok',onClick: function(){ continuation();}}]},
       maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
     });
   }
   else {
     win= StickyWin.alert('Upozornění',str,{
-      baseHref:Ezer.paths.images_cc,
       uiOptions:{closeButton:false},
       maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
     });
