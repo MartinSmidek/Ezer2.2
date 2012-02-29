@@ -646,7 +646,7 @@ function call_stack($act,$n,$hloubka=2,$show_call=1) { #$this->debug($act,'call_
     $typ= gettype($arg);
     $val= '';
     switch ( $typ ) {
-    case 'bolean': case 'integer': case 'double': case 'string': case 'NULL':
+    case 'boolean': case 'integer': case 'double': case 'string': case 'NULL':
       $val= $arg; break;
     case 'array':
       $val= count($arg); break;
