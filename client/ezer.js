@@ -3109,7 +3109,7 @@ Ezer.Select= new Class({
 //      pokud je key>0 tak jej nastaví, pokud je key=0 pak vrátí aktuální hodnotu
   key: function (key) {
     var ret= 1;
-    if ( key!==undefined ) {
+    if ( key!==undefined && key!=0 ) {
       // definuj hodnotu klíče
       this._key= $type(key)=='string' ? Number(key) : key;
       Ezer.assert(this.Items,'nedefinované položky v select',this);

@@ -61,7 +61,13 @@ if ( Ezer.browser!='IE' )                               // IE nepodporuje HTML5
   });
 Ezer.pushState = Ezer.browser=='IE'
   ? function() {}
-  : function(href) { history.pushState(null,null,href); }
+  : function(href) {
+      // přidání $_GET parametru trace nebo jeho vynechání
+      if ( Ezer.to_trace ) {
+        href+= '&trace='+Ezer.app.options.ae_trace;
+      }
+      history.pushState(null,null,href);
+    }
 // ================================================================================================= ClientCide - úpravy
 Locale.use('cs-CZ');
 Element.NativeEvents = $merge(Element.NativeEvents, {dragover:2, dragleave:2, drop:2});

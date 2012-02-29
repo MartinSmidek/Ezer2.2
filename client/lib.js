@@ -30,10 +30,12 @@ function make_url_menu(menu) {
     url+= del+id;
     del= '.';
   });
-  // přidání původních $_GET parametrů
+  // přidání původních $_GET parametrů mimo trace, které je doplněno v pushState
   for (var tag in Ezer.get ) {
-    var val= Ezer.get[tag];
-    url+= '&'+tag+'='+val;
+    if ( tag!='trace' ) {
+      var val= Ezer.get[tag];
+      url+= '&'+tag+'='+val;
+    }
   }
 //                                                 Ezer.trace('*',url);
   return url;
