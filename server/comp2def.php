@@ -220,7 +220,7 @@ $attribs = array (
   'field'  =>  explode(",",'data:i,par:o,expr:s,map_pipe:m,sql_pipe:s,style:s,format:s,help:s,css:s,'
                           .'type:s,attribute:s,value:s,skill:s'),  // help_bg:s
   'button' =>  explode(",",'type:s,title:s,help:s,style:s,css:s,format:s,skill:s,par:o'),
-  'edit'   =>  explode(",",'type:s,data:i,expr:s,help:s,style:s,css:s,format:s,skill:s,par:o'),
+  'edit'   =>  explode(",",'type:s,data:i,value:s,expr:s,help:s,style:s,css:s,format:s,skill:s,par:o'),
   'select' =>  explode(",",'type:s,par:o,data:i,sql_pipe:s,options:m,labels:m,map_pipe:m,fkeys:i,fkey:i,expr:s,format:s,'
                           .'help:s,css:s,help_bg:s,auto:s,value:s,skill:s'),
   'chat'   =>  explode(",",'data:i,divide:n,format:s,skill:s'),
