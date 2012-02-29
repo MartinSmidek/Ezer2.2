@@ -67,14 +67,14 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
     edit ikona [4,221,392,95] { data:k.ikona },
     edit popis [4,335,392,95] { data:k.popis },
     # popisky
-    label [4,8,50,15] { title:'id_cis' },
-    label [102,8,50,15] { title:'druh' },
-    label [6,50,50,15] { title:'data' },
-    label [102,50,50,15] { title:'zkratka' },
-    label [4,90,65,15] { title:'hodnota 1' },
-    label [4,205,62,15] { title:'hodnota 2' },
-    label [294,50,50,15] { title:'pořadí' },
-    label [4,320,142,15] { title:'popis (do dokumentace)' },
+    label [4,8,50,15] { title:'id_cis', help:'_cis.id_cis' },
+    label [102,8,50,15] { title:'druh', help:'_cis.druh' },
+    label [6,50,50,15] { title:'data', help:'_cis.data' },
+    label [102,50,50,15] { title:'zkratka', help:'_cis.zkratka' },
+    label [4,90,65,15] { title:'hodnota 1', help:'_cis.hodnota' },
+    label [4,205,62,15] { title:'hodnota 2', help:'_cis.ikona' },
+    label [294,50,50,15] { title:'pořadí', help:'_cis.poradi' },
+    label [4,320,142,15] { title:'popis (do dokumentace)', help:'_cis.popis' },
     # procedury
     proc key_novy () {
       var count: number
