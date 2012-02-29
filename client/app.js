@@ -64,6 +64,7 @@ Ezer.pushState = Ezer.browser=='IE'
   : function(href) {
       // přidání $_GET parametru trace nebo jeho vynechání
       if ( Ezer.to_trace ) {
+        href+= '&theight='+$('kuk').getStyle('height').toInt();
         href+= '&trace='+Ezer.app.options.ae_trace;
       }
       history.pushState(null,null,href);

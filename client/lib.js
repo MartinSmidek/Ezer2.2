@@ -30,9 +30,9 @@ function make_url_menu(menu) {
     url+= del+id;
     del= '.';
   });
-  // přidání původních $_GET parametrů mimo trace, které je doplněno v pushState
+  // přidání původních $_GET parametrů mimo trace+theight, které je doplněno v pushState
   for (var tag in Ezer.get ) {
-    if ( tag!='trace' ) {
+    if ( tag!='trace' && tag!='theight' ) {
       var val= Ezer.get[tag];
       url+= '&'+tag+'='+val;
     }
