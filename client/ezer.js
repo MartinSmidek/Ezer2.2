@@ -2788,10 +2788,16 @@ Ezer.FieldDate= new Class({
 //      vstupní část formuláře - rozbalení obsahu podle oddělovače
 //t: Block,Elem,Field
 //s: Block
-//oo: FieldList.par - delim: oddělovač
+//oo: FieldList.par - delim: oddělovač jako regulární výraz, - width: šířka rozbaleného pole
 Ezer.FieldList= new Class({
   Extends: Ezer.Field,
-  options: {}
+  options: {},
+  _split: null,                         // z par.delim nebo default [,;]
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  initialize
+  initialize: function(owner,desc,DOM,id,skill) {
+    this.parent(owner,desc,DOM,id,skill);
+    this._split= new RegExp(this.options.par ? this.options.par.delim||'[,;]' : '[,;]');
+  }
 });
 // ================================================================================================= Edit
 //c: Edit ()

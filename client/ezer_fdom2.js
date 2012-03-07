@@ -1172,7 +1172,7 @@ Ezer.FieldList.implement({
     // odstraň předchozí hodnoty
     this.DOM_DropList.getChildren().destroy();
     // rozbal hodnotu s oddělovačem a vytvoř seznam
-    var values= this.DOM_Input.value.split(this.options.par ? this.options.par.delim||',' : ',');
+    var values= this.DOM_Input.value.split(this._split);
     var theFocus= null;
     this._values= [];
     values.each(function(value) {
