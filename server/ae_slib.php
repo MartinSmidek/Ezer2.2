@@ -621,7 +621,7 @@ function trace($note='',$coding='') {
   global $trace, $trace_parm;
   $time= date("H:i:s");
   $act= debug_backtrace();
-  $x= ($trace ? "<br/>" : '')."$time ".call_stack($act,1).($note?" /$note":'');
+  $x= ($trace ? "<br/>" : '')."$time ".call_stack($act,1).($note?" / $note":'');
   $x.= $trace_parm;
   $trace_parm= '';
   if ( $coding=='win1250' ) $x= wu($x);
