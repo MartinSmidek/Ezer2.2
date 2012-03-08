@@ -20,7 +20,7 @@
 Ezer.Area= new Class({
   Extends:Ezer.Block,
   tree: null,                   // vnořený objekt MooTreeControl
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  initialize
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - initialize
 // quiet způsobí potlačení události area_onstart
   initialize: function(owner,desc,DOM,options,id,par,quiet) {
     this.parent(owner,desc,DOM,id);
@@ -87,9 +87,17 @@ Ezer.Area= new Class({
 //     if ( !this.DOM_Area )
 //       Ezer.error(name.value+' nemá správný formát html kódu');
   },
-// ------------------------------------------------------------------------------------------- empty
-//fm: Area.empty ([all=0])
-//      vymaže obsah area, pokud je all=1 pak vymaže všechny instance (N.Y.I.)
+// ----------------------------------------------------------------------------------------- delete
+//fm: Area.delete ()
+//      vlastník objektu
+  delete: function () {
+    this.DOM_Block.destroy();
+    this.parent();
+    return 1;
+  },
+// ------------------------------------------------------------------------------------------ empty
+//fm: Area.empty ()
+//      vymaže obsah area
   empty: function (all) {
     if ( this.DOM_Area instanceof Element ) {
       this.DOM_Area.empty();
@@ -98,8 +106,9 @@ Ezer.Area= new Class({
       this.DOM_Block.set('html','');
       this.DOM_Area= null;
     }
+    return 1;
   },
-// -------------------------------------------------------------------------------------------- init
+// ------------------------------------------------------------------------------------------- init
 //fm: Area.init ([all=0])
 //      obnoví podle podle aktuálního obsahu proměnných
 //      pokud all=1 pak smaže obsah area
@@ -126,7 +135,7 @@ Ezer.Area= new Class({
     }
     return 1;
   },
-// --------------------------------------------------------------------------------------------- set
+// -------------------------------------------------------------------------------------------- set
 //fm: Area.set (id,html)
 //      vymění html elementu area daného ID
   set: function (id,html) {
@@ -160,7 +169,7 @@ Ezer.Area= new Class({
       }
     }.bind(this));
   },
-// ------------------------------------------------------------------------------------------- focus
+// ------------------------------------------------------------------------------------------ focus
 //fm: Area.focus (id_element)
 //      označí element a jeho rodičovský element jako aktivní tzn. definuje
 //      jim jako jediným v Area class='active'
@@ -179,7 +188,7 @@ Ezer.Area= new Class({
     return 1;
   },
 // ================================================================================================= AREA TREE
-// ------------------------------------------------------------------------------------- tree_insert
+// ------------------------------------------------------------------------------------ tree_insert
 //fm: Area.tree_insert (id)
 //      vloží uzel pod daný uzel
   tree_insert: function (id) {
@@ -190,7 +199,7 @@ Ezer.Area= new Class({
     }
     return node;
   },
-// --------------------------------------------------------------------------------------- tree_stub
+// -------------------------------------------------------------------------------------- tree_stub
 //fm: Area.tree_stub (id)
 //      odstraní všechny následníky
   tree_stub: function (id) {
@@ -200,7 +209,7 @@ Ezer.Area= new Class({
     }
     return 1;
   },
-// ------------------------------------------------------------------------------------- tree_remove
+// ------------------------------------------------------------------------------------ tree_remove
 //fm: Area.tree_remove (id)
 //      odstraní uzel, aktivní bude předchůdce
   tree_remove: function (id) {
@@ -212,7 +221,7 @@ Ezer.Area= new Class({
     }
     return 1;
   },
-// -------------------------------------------------------------------------------------- tree_shift
+// ------------------------------------------------------------------------------------- tree_shift
 //fm: Area.tree_shift (id,down)
 //      posune uzel pokud down=1 dolů, down=0 nahoru
   tree_shift: function (id,down) {
@@ -237,7 +246,7 @@ Ezer.Area= new Class({
     }
     return 1;
   },
-// ------------------------------------------------------------------------------------- tree_update
+// ------------------------------------------------------------------------------------ tree_update
 //fm: Area.tree_update (id,new_idn,data)
 //      zamění obsah uzlu daného id, poslední část se zamění za new_idn pouze, je-li neprázdné
   tree_update: function (id,new_idn,data) {
@@ -256,7 +265,7 @@ Ezer.Area= new Class({
     }
     return 1;
   },
-// --------------------------------------------------------------------------------------- tree_dump
+// -------------------------------------------------------------------------------------- tree_dump
 //fm: Area.tree_dump ()
 //      vytvoří obraz celého stromu ve formátu JSON
   tree_dump: function () {
@@ -279,7 +288,7 @@ Ezer.Area= new Class({
     walk(this.tree.root);
     return js;
   },
-// --------------------------------------------------------------------------------------- tree_show
+// -------------------------------------------------------------------------------------- tree_show
 //fm: Area.tree_show (desc[,id])
 //      zobrazí v area strom pomocí balíku MooTree, desc je popis ve formátu
 //      pokud je dáno id, bude strom pod tímto elementem
@@ -347,9 +356,10 @@ Ezer.Area= new Class({
   }
 });
 // ================================================================================================= STRUKTURY
-// ---------------------------------------------------------------------------------------- new_area
+// --------------------------------------------------------------------------------------- new_area
 //fs: str.new_area (name,parent[,par])
-//      vytvoření instance area dané stringem jako úplné jméno area nebo přímo area
+//      vytvoření instance area podle name, obsahujícím buďto string s úplným jménem area
+//      nebo Ezer objekt
 //      A) vnořené do parent zadaného jako ID (string) nebo jak Ezer objekt
 //         nebo jako DOM element (například výsledek volání new_area)
 //  ?   B) pokud není zadán parent, dojde k napojení nové area na element s ID=par1
@@ -415,7 +425,7 @@ Ezer.str.new_area= function() {
   that.eval();
 }
 // ================================================================================================= FCE
-// ----------------------------------------------------------------------------------------- url_get
+// ---------------------------------------------------------------------------------------- url_get
 //ff: fce.url_get ([get])
 //   vrátí aktuální url z window.history, pokud je definován parametr get
 //   vrátí se jen hodnota GET parametru jehož je jménem
@@ -423,7 +433,7 @@ Ezer.str.new_area= function() {
 Ezer.fce.url_get= function (get) {
   return get ? get_url_param(get) : location.href;
 }
-// ---------------------------------------------------------------------------------------- url_push
+// --------------------------------------------------------------------------------------- url_push
 //ff: fce.url_push (url)
 //   vloží url do zásobníku window.history
 //s: funkce
@@ -431,7 +441,7 @@ Ezer.fce.url_push= function (url) {
   history.pushState(null,null,url);
   return 1;
 }
-// ------------------------------------------------------------------------------------- json_decode
+// ------------------------------------------------------------------------------------ json_decode
 //ff: fce.json_decode (string)
 //   převede JSON zápis objektu na objekt
 //s: funkce
@@ -445,7 +455,7 @@ Ezer.fce.json_decode= function (string) {
   }
   return obj;
 }
-// ------------------------------------------------------------------------------------- json_encode
+// ------------------------------------------------------------------------------------ json_encode
 //ff: fce.json_encode (obj)
 //   převede objekt na jeho JSON zápis
 //s: funkce

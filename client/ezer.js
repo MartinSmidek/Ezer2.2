@@ -126,6 +126,14 @@ Ezer.Block= new Class({
   _owner: function () {
     return this.owner;
   },
+// ------------------------------------------------------------------------------------ delete
+//fm: Block.delete ()
+//      vlastník objektu
+  delete: function () {
+    this.owner.part[this.id]= null;
+    delete this;
+    return 1;
+  },
 // ------------------------------------------------------------------------------------ attach_code
 //fm: Block.attach_code (o)
   attach_code: function (o) {
@@ -1475,11 +1483,10 @@ Ezer.Var= new Class({
 // ------------------------------------------------------------------------------------ set
 //fm: Var.set (val[,part])
 //      nastaví hodnotu proměnné, pokud je typu object pak part určuje podsložku
-//      (part smí být jen jednoduché jméno)
   set: function (val,part) {
-    if ( part ) {
+    if ( part!==undefined ) {
       Ezer.assert($type(this.value)=='object','set s 2.parametrem lze použít jen na objekty',this);
-      var is= part.split('.'), v;
+      var is= typeof(part)=='string' ? part.split('.') : [part], v;
       v= this.value;
       for (var i= 0; i<is.length-1; i++) {
         if ( typeof(v[is[i]])!='object' )
@@ -6346,10 +6353,12 @@ Ezer.fce.contains= function (x,list,sep) {
 }
 // -------------------------------------------------------------------------------------- substr
 //ff: fce.substr (x,begin,length)
-//   funkce vrací podřetězec podle specifikace stejnojmenné funkce javascriptu
+//   funkce vrací podřetězec podle specifikace stejnojmenné funkce PHP
+//   Např:  substr("abcdef",0,-1) vrátí "abcde" narozdíl od javascriptu který vrátí ''
 //s: funkce
 Ezer.fce.substr= function (x,begin,length) {
-  return x ? (length ? x.substr(begin,length) : x.substr(begin)) : '';
+  return x ? (length>=0 ? x.substr(begin,length) :
+    (length<0 ? x.substr(begin,x.length+length) : x.substr(begin))) : '';
 }
 // -------------------------------------------------------------------------------------- sort
 //ff: fce.sort (list[,del[,comp]])
@@ -7059,7 +7068,7 @@ Ezer.fce.warning= function () {
   return str;
 };
 // -------------------------------------------------------------------------------------- debug
-//ff: fce.debug (o)
+//ff: fce.debug (o[,label=''[,depth=5]])
 //      vrací html kód přehledně zobrazující strukturu objektu nebo pole;
 //      zobrazit lze například pomocí fce echo v trasovacím části
 //s: funkce
@@ -7067,8 +7076,8 @@ Ezer.debug= function (o,label) {
   Ezer.trace('u',debug(o,label));
   return o;
 }
-Ezer.fce.debug= function (o,label) {
-  return "<div class='dbg'>"+debug(o,label)+"</div>";
+Ezer.fce.debug= function (o,label,depth) {
+  return "<div class='dbg'>"+debug(o,label,depth)+"</div>";
 };
 // -------------------------------------------------------------------------------------- assert
 //ff: fce.assert (test,msg[,block])

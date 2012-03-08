@@ -679,7 +679,7 @@ function call_stack($act,$n,$hloubka=2,$show_call=1) { #$this->debug($act,'call_
 # vygeneruje čitelný obraz pole nebo objektu
 # options:
 #   gettype=1 -- ve třetím sloupci bude gettype(hodnoty)
-function debug($gt,$label='',$options=null) {
+function debug($gt,$label=false,$options=null) {
   global $trace, $debug_level;
   $debug_level= 0;
   $html= ($options && $options->html) ? $options->html : 0;
@@ -701,13 +701,13 @@ function debug($gt,$label='',$options=null) {
   $trace.= $x;
   return $x;
 }
-function debugx(&$gt,$label='',$html=0,$depth=64,$length=64,$win1250=0,$gettype=0) {
+function debugx(&$gt,$label=false,$html=0,$depth=64,$length=64,$win1250=0,$gettype=0) {
   global $debug_level;
   if ( $debug_level > $depth ) return "<table class='dbg_over'><tr><td>...</td></tr></table>";
   if ( is_array($gt) ) {
     $debug_level++;
     $x= "<table class='dbg_array'>";
-    $x.= $label ? "<tr><td valign='top' colspan='".($gettype?3:2)."' class='title'>$label</td></tr>" : '';
+    $x.= $label!==false ? "<tr><td valign='top' colspan='".($gettype?3:2)."' class='title'>$label</td></tr>" : '';
     foreach($gt as $g => $t) {
       $x.= "<tr><td valign='top' class='label'>$g</td><td>"
       . debugx($t,NULL,$html,$depth,$length,$win1250,$gettype) //TEST==1 ? $t : htmlspecialchars($t)
@@ -720,7 +720,7 @@ function debugx(&$gt,$label='',$html=0,$depth=64,$length=64,$win1250=0,$gettype=
   else if ( is_object($gt) ) {
     $debug_level++;
     $x= "<table class='dbg_object'>";
-    $x.= $label ? "<tr><td valign='top' colspan='".($gettype?3:2)."' class='title'>$label</td></tr>" : '';
+    $x.= $label!==false ? "<tr><td valign='top' colspan='".($gettype?3:2)."' class='title'>$label</td></tr>" : '';
     $obj= get_object_vars($gt);
     $len= 0;
     foreach($obj as $g => $t) {
