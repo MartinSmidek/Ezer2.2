@@ -6150,26 +6150,25 @@ Ezer.fce.array= function () {
 }
 // ================================================================================================= fce objektové
 // ------------------------------------------------------------------------------------ copy_by_name
-//ff: fce.copy_by_name (form|browse|string,form|browse[,delimiters='|:'])
-//  Formát 1:
-//      zkopíruje do formuláře nebo aktuálního řádku browse hodnoty
-//      z jiného formuláře nebo aktuálního řádku browse. Kopíruje se zleva doprava.
+//ff: fce.copy_by_name (form|browse|object|string,form|browse|object[,delimiters='|:'])
+//      zkopíruje zleva doprava stejně pojmenované hodnoty.
 //      Pokud se kopíruje do form, je třeba touto operací naplnit form.key (použije se při definici
 //      originality hodnoty, pokud to není žádoucí, je třeba form.key definovat jako 0)
-//  Formát 2:
-//      Pokud je první parametr string oddělující pomocí '|' dvojice jméno:hodnota
-//      předpokládá se druhý parametr form.
-//      Hodnoty zkopírované do formuláře jsou nastaventy jako originální
-//      Po ukončení kopírování je nastane událost onload na formulář
+//      Pokud je první parametr string oddělující pomocí '|' dvojice jméno:hodnota.
+//      Hodnoty zkopírované do formuláře jsou nastaventy jako originální a
+//      po ukončení kopírování nastane událost onload na formulář.
+// Pozn.: implementovány jsou tyto kombinace parametrů: fb, bf, of, fo, sf.
 //s: funkce
 Ezer.fce.copy_by_name= function (x,y,delimiters) {
   var key= y instanceof Ezer.Form ? y._key : 0;
   if ( x.type=='var' ) x= x.value;
   if ( y.type=='var' ) y= y.value;
-  if ( typeof(x)=='string' ) {
+  var typ_x= x instanceof Ezer.Browse ? 'b' : x instanceof Ezer.Form ? 'f' :
+    typeof(x)=='string' ? 's' : typeof(x)=='object' ? 'o' : '?';
+  var typ_y= y instanceof Ezer.Browse ? 'b' : y instanceof Ezer.Form ? 'f' :
+    typeof(y)=='string' ? 's' : typeof(y)=='object' ? 'o' : '?';
+  if ( typ_x=='s' && typ_y=='f' ) {             // string --> form
     if ( x ) {
-      // Formát 1: kopírovat budeme string do form
-      Ezer.assert(y instanceof Ezer.Form,'copy_by_name: y musi byt form pokud je x string');
       var del1= '|', del2= ':';
       if ( delimiters ) {
         del1= delimiters[0]||'|';
@@ -6183,24 +6182,40 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
           y.part[id]._load(val,key);
         }
       });
+      y.fire('onload');                        // proveď akci formuláře po naplnění daty
     }
   }
-  else {
-    // Formát 2: kopírovat budeme mezi browse a form
-    Ezer.assert(x instanceof Ezer.Browse||x instanceof Ezer.Form,'copy_by_name: x musi byt browse nebo form');
-    Ezer.assert(y instanceof Ezer.Browse||y instanceof Ezer.Form,'copy_by_name: y musi byt browse nebo form');
+  else if ( typ_x=='f' && typ_y=='b' ) {        // form --> browse
     $each(y.part,function(field,id) {
-      if ( field instanceof Ezer.Show && x.part[id] && x.part[id].get ) {
-        // x.field -> y.show
+      if ( x.part[id] && x.part[id].get ) {
         field.let(x.part[id].get());
-      }
-      else if ( field._load && x.part[id] && x.part[id].get ) {
-        // x.show -> y.field
-        field._load(x.part[id].get(),key);
       }
     });
   }
-  y.fire('onload');                                  // proveď akci formuláře po naplnění daty
+  else if ( typ_x=='b' && typ_y=='f' ) {        // browse --> form
+    $each(y.part,function(field,id) {
+      if ( field._load && x.part[id] && x.part[id].get ) {
+        field._load(x.part[id].get(),key);
+      }
+    });
+    y.fire('onload');                           // proveď akci formuláře po naplnění daty
+  }
+  else if ( typ_x=='o' && typ_y=='f' ) {        // object --> form
+    $each(y.part,function(field,id) {
+      if ( field._load && x[id]!=undefined ) {
+        field._load(x[id],key);
+      }
+    });
+    y.fire('onload');                           // proveď akci formuláře po naplnění daty
+  }
+  else if ( typ_x=='f' && typ_y=='o' ) {        // form --> object
+    $each(x.part,function(field,id) {
+      if ( id[0]!='$' && field.get ) {
+        y[id]= field.get();
+      }
+    });
+  }
+  else Ezer.error('copy_by_name nelzed použít pro parametry typu '+typ_x+' a '+typ_y);
   return 1;
 };
 // ================================================================================================= fce user

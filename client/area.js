@@ -109,16 +109,19 @@ Ezer.Area= new Class({
     return 1;
   },
 // ------------------------------------------------------------------------------------------- init
-//fm: Area.init ([all=0])
-//      obnoví podle podle aktuálního obsahu proměnných
-//      pokud all=1 pak smaže obsah area
-  init: function (all) {
-    if ( all ) {
-      this.DOM_Block.set('html','');
-      this.DOM_Area= null;
+//fm: Area.init (values)
+//      obnoví obsah area podle title a obsahu objektu values={ai:vi,...}
+//      substitucí {ai} za vi, reference <a href='url'> uvnitř title budou generovat událost
+//      area_onclick(url,id) pokud x začíná stejně jako url aplikace samé
+  init: function (values) {
+    var title= this.desc.options.title;
+    if ( typeof(values)=='object' ) {
+      title= title.replace(/\\?\{([\w]+)\}/g, function(match, name) {
+        return values[name]||'';
+      }.bind(this));
     }
     else {
-      var title= this.desc.options.title.replace(/\\?\{([\w]+)\}/g, function(match, name) {
+      title= title.replace(/\\?\{([\w]+)\}/g, function(match, name) {
         var value= '';
         var area_var= this.part[name];
         if ( area_var && area_var instanceof Ezer.Var ) {
@@ -126,29 +129,15 @@ Ezer.Area= new Class({
         }
         return value;
       }.bind(this));
-      this.DOM_Block.set('html',title);
-
-      var path= location.protocol+'//'+location.hostname+(location.port?':'+location.port:'');
-      path+= location.pathname;
-      this._set_onclick(this.DOM_Block);
-      this.DOM_Area= this.DOM_Block.firstChild ? this.DOM_Block.firstChild : null;
     }
+    this.DOM_Block.set('html',title);
+
+    var path= location.protocol+'//'+location.hostname+(location.port?':'+location.port:'');
+    path+= location.pathname;
+    this._set_onclick(this.DOM_Block);
+    this.DOM_Area= this.DOM_Block.firstChild ? this.DOM_Block.firstChild : null;
     return 1;
   },
-// -------------------------------------------------------------------------------------------- set
-//fm: Area.set (id,html)
-//      vymění html elementu area daného ID
-  set: function (id,html) {
-    var elem= this.DOM_Block.getElementById(id);
-    if ( elem ) {
-      elem.set('html',html);
-      // doplnění lokálních odkazů o onclick s argumentem href a u globálních doplnění target
-      var path= location.protocol+'//'+location.hostname+(location.port?':'+location.port:'');
-      path+= location.pathname;
-      this._set_onclick(elem);
-    }
-    return 1;
- },
 // ------------------------------------------------------------------- _set_onclick
 // odkazům dovnitř aplikace zamění defaultní událost za area_onclick
   _set_onclick: function(elem) {
