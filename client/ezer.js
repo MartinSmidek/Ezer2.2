@@ -1485,9 +1485,10 @@ Ezer.Var= new Class({
 //      nastaví hodnotu proměnné, pokud je typu object pak part určuje podsložku
   set: function (val,part) {
     if ( part!==undefined ) {
-      Ezer.assert($type(this.value)=='object','set s 2.parametrem lze použít jen na objekty',this);
+      Ezer.assert(this.value===null || $type(this.value)=='object',
+        'set s 2.parametrem lze použít jen na objekty',this);
       var is= typeof(part)=='string' ? part.split('.') : [part], v;
-      v= this.value;
+      v= this.value||{};
       for (var i= 0; i<is.length-1; i++) {
         if ( typeof(v[is[i]])!='object' )
           v= v[is[i]]= {};
@@ -6888,8 +6889,10 @@ Ezer.fce.href= function (path) {
           case 'panel':
           case 'panel.plain':
           case 'panel.right':
-            part._focus();
-            part.fire('onpopstate',[location.href]);
+            if ( part.findProc('onpopstate') )
+              part.fire('onpopstate',[location.href]);
+            else
+              part._focus();
             break;
           case 'menu.left':
             break;
@@ -7108,6 +7111,7 @@ Ezer.fce.assert= function(test,msg,block) {
     Ezer.fce.error(msg+'<br/>',block?'S':'E',block);
     throw {level:block?'S':'E',msg:msg};
   }
+  return 1;
 }
 // -------------------------------------------------------------------------------------- error
 //ff: fce.error (msg,level[,block[,lc]])
