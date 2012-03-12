@@ -6370,7 +6370,7 @@ Ezer.fce.contains= function (x,list,sep) {
 // -------------------------------------------------------------------------------------- substr
 //ff: fce.substr (x,begin,length)
 //   funkce vrací podřetězec podle specifikace stejnojmenné funkce PHP
-//   Např:  substr("abcdef",0,-1) vrátí "abcde" narozdíl od javascriptu který vrátí ''
+//   Např:  substr('abcdef',0,-1) vrátí 'abcde' narozdíl od javascriptu který vrátí ''
 //s: funkce
 Ezer.fce.substr= function (x,begin,length) {
   return x ? (length>=0 ? x.substr(begin,length) :
