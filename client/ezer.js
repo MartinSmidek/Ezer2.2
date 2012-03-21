@@ -6203,8 +6203,8 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
   }
   else if ( typ_x=='o' && typ_y=='f' ) {        // object --> form
     $each(y.part,function(field,id) {
-      if ( field._load && x[id]!=undefined ) {
-        field._load(x[id],key);
+      if ( field.set && x[id]!=undefined ) {
+        field.set(x[id],key);
       }
     });
     y.fire('onload');                           // proveď akci formuláře po naplnění daty
