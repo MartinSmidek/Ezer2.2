@@ -2616,6 +2616,7 @@ Ezer.Show.implement({
               }}));
               browse._opened.setAttribute('tabIndex',0);
             }
+            return false;
           }.bind(this)
         });
       }
