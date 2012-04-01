@@ -1073,7 +1073,7 @@ Ezer.FieldDate.implement({
           this.DOM_Input.removeClass('empty');
           this.DOM_Input.value= this.DOM_Input2.value;
           this.DOM_changed(1,this._fc('t'));     // když není format:'t' se zvýrazněním změny
-          this.fire('onchange',[]);
+          this.fire('onchanged',[]);
         }.bind(this),
         onStart:function(){
           this.DOM_Input.value= this.value;
@@ -1752,6 +1752,7 @@ Ezer.Select.implement({
   DOM_noneItem: function (sel) {
     this.DOM_Input.setProperty('value',this.value);
     this.DOM_DropList.setStyle('display','none');
+    this.DOM_Block.setStyle('zIndex',2);
   },
 // ------------------------------------------------------------------------------------ DOM_seekItem
 //f: Select-DOM.DOM_seekItem
@@ -1776,6 +1777,7 @@ Ezer.Select.implement({
       this._key=  val==999998 ? 0 : sel.value;
     }
     this.DOM_DropList.setStyle('display','none');
+    this.DOM_Block.setStyle('zIndex',2);
     this.change();
   },
 // ------------------------------------------------------------------------------------ DOM_set
