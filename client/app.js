@@ -108,6 +108,7 @@ Ezer.Application.implement({
     user_record: true,                          // uživatelské údaje jsou v tabulce _user
     server_url: Ezer.version+'/server/ezer2.php',       // URL serveru
     login_interval: 60,                         // počet minut mezi obnovováním přihlášení - viz hits
+    session_interval: 20,                       // počet minut mezi obnovou SESSION < login_interval
     must_log_in: true,
 //--: Application.json - hlavní modul (standardně $)
     json:'$',

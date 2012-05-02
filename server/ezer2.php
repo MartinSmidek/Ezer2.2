@@ -132,7 +132,7 @@
   # chat : pravidelná relace s klientem se vzkazy: relogme
   case 'chat':
     $answer= (object)array();
-//     switch ( $x->op ) {
+    switch ( $x->op ) {
 //     case 'log_out':           // {op:'log_out});
 //       $answer->msg= "timeout";
 //       $answer->log_out= 1;
@@ -159,23 +159,19 @@
 //       session_write_close();
 // //       $x1= session_destroy();
 //       break;
-//     case 're_log_me':         // {op:'re_log_me',user_id:...,hits:n});
-//       $_SESSION[$ezer_root]['relog']++;
-//       $ezer_user_id= $x->user_id;
-//       if ( $ezer_session=='ezer' )
-//         sess_revive();
-//       $answer->msg= "relog {$x->hits}";
-//       // kontrola verze systému
-//       $verze= root_svn();
-//       $answer->verze= $verze;
-//       if ( $verze ) {
-//         $old= $_SESSION[$ezer_root]['svn_version'];
-//         if ( $verze!=$old )
-//           $answer->update= "Na serveru je k dispozici nová verze $verze systému (pracujete "
-//           . ($old?"s $old":"se starou")."), doporučuji obnovit okno prohlížeče (F5 nebo ctrl-r)";
-//       }
-//       break;
-//     }
+    case 're_log_me':         // {op:'re_log_me',user_id:...,hits:n});
+      $_SESSION[$ezer_root]['relog']++;
+      // obnova SESSION
+      $ezer_user_id= $x->user_id;
+      if ( $ezer_session=='ezer' )
+        sess_revive();
+      $_SESSION['ID']= session_id();
+      session_regenerate_id();
+      $answer->msg= "relog {$x->hits} ID:".session_id()." {$_SESSION[$ezer_root]['user_abbr']}";
+      // kontrola verze
+      check_version($answer);
+      break;
+    }
     header('Content-type: application/json; charset=UTF-8');
     echo $json->encode($answer);
     exit;
@@ -1115,15 +1111,7 @@
     else {
       $y->user_id= 0;
     }
-    // kontrola verze systému
-    $verze= root_svn();
-    if ( $verze ) {
-      $old= $_SESSION[$ezer_root]['svn_version'];
-      $y->verze= $verze;
-      if ( $verze!=$old )
-        $y->update= "Na serveru je k dispozici nová verze $verze systému (pracujete "
-          . ($old?"s $old":"se starou")."), doporučuji obnovit okno prohlížeče (F5 nebo ctrl-r).";
-    }
+    check_version($y);
     break;
   # ------------------------------------------------------------------------------------------------ user_group_login
   # přihlášení uživatele do sdružených aplikací
@@ -1499,6 +1487,20 @@ function browse_status($x) {
     'fields'=>$fields, 'table'=>$table, 'joins'=>$joins, 'cond'=>$cond,
     'group'=>$x->group, 'having'=>$x->having, 'order'=>$order
   );
+}
+# -------------------------------------------------------------------------------------------------- check_version
+# předá informaci o změně verze jádra při obnově přihlášení
+function check_version($y) {
+  // kontrola verze systému
+  global $ezer_root, $y;
+  $verze= root_svn();
+  if ( $verze ) {
+    $old= $_SESSION[$ezer_root]['svn_version'];
+    $y->verze= $verze;
+    if ( $verze!=$old )
+      $y->update= "Na serveru je k dispozici nová verze $verze systému (pracujete "
+        . ($old?"s $old":"se starou")."), doporučuji obnovit okno prohlížeče (F5 nebo ctrl-r).";
+  }
 }
 # -------------------------------------------------------------------------------------------------- answer
 function answer () {

@@ -320,6 +320,7 @@ Ezer.Application= new Class({
   },
   // =============================================================================================== CLOCK & CHAT
   clock_tics: 0,              // minutky: počet tiků (minut) od minulé činnosti
+  session_tics: 0,            // minutky: počet tiků (minut) od minulé obnovy SESSION
   hits: 0,                    // počet uživatelských interakcí (button, menu, ...)
   last_hits: 0,               // počet interakcí v minulé minutě
   waiting: false,             // je zobrazena výzva k prodloužení
@@ -334,6 +335,7 @@ Ezer.Application= new Class({
     if ( Ezer.sys.user.id_user && !quiet ) {
       // pokud je někdo přihlášený, podíváme se na změny během uplynulé minuty
       this.clock_tics++;
+      this.session_tics++;
 //                                                   Ezer.trace('*','bar_clock: ticks='+this.clock_tics+', hits+='+(this.hits-this.last_hits));
       if ( this.hits != this.last_hits ) {
         // uživatel byl aktivní => reset minutek
@@ -347,6 +349,11 @@ Ezer.Application= new Class({
 //                                                   Ezer.trace('*','bar_clock: logout');
         Ezer.fce.touch('logout');       // jako po kliknutí na Tabs.logoff
         return;
+      }
+      else if ( this.session_tics > Ezer.App.options.session_interval  ) {
+        // je čas obnovit SESSION
+        this.session_tics= 1;
+        this.bar_chat({op:'re_log_me'});
       }
       else if ( !this.waiting && this.clock_tics > Ezer.App.options.login_interval  ) {
         // čas uplynul a uživatel nic nedělal => zobrazení možnosti prodloužit sezení
@@ -395,7 +402,7 @@ Ezer.Application= new Class({
     x.cmd= 'chat';
     x.root= Ezer.root;          // název/složka aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
-                                                        Ezer.debug(x,'bar_chat');
+//                                                         Ezer.debug(x,'bar_chat');
     var ajax= new Request({url:this.options.server_url, data:x, method: 'post',
       onComplete: function(ay) {
         this._ajax(-1);
@@ -403,7 +410,7 @@ Ezer.Application= new Class({
         try { y= JSON.decode(ay); } catch (e) { y= null; }
         if ( !y )
           Ezer.error('EVAL: syntaktická chyba na serveru:'+ay,'E');
-                                                        Ezer.debug(y,'bar_chat (response)');
+//                                                         Ezer.debug(y,'bar_chat (response)');
         if ( y.update )
           Ezer.fce.warning(y.update);
         if ( y.log_out )
