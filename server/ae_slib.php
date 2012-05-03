@@ -537,6 +537,15 @@ function fce_warning ($msg,$send_mail='') { trace();
   }
   return false;
 }
+# -------------------------------------------------------------------------------------------------- set_limits
+# nastaví limity pro upload (MB,sec)
+function set_limits ($max_size=10,$max_time=300) { trace();
+  ini_set('upload_max_filesize', "{$max_size}M");
+  ini_set('post_max_size', "{$max_size}M");
+  ini_set('max_input_time', $max_time);
+  ini_set('max_execution_time', $max_time);
+  return true;
+}
 # -------------------------------------------------------------------------------------------------- send_mail
 # pošle systémový mail, pokud není určen adresát či odesílatel jde o mail správci aplikace
 # $to může být seznam adres oddělený čárkou

@@ -485,6 +485,7 @@ panel needs [,,770,] {type:'right', title:'Požadavky', _sys:'poz', skill:'sp'
       drop_init;
     }
     proc drop_init() {
+      ask('set_limits',10,300);                           // max=10MB,300sec
       form.file_drop(drop,°{css_hover:'drop_area_hover',css_run:'drop_area_run',transfer:'base64'});
     }
 
