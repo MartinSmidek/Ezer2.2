@@ -1323,7 +1323,7 @@ function stamp_date($x,$user2sql=0) { #trace();
   return $y;
 }
 # -------------------------------------------------------------------------------------------------- sql2stamp
-# na datum na stránce z timestamp v tabulce
+# na datum z tabulky na timestamp
 function sql2stamp($ymd) { #trace();
   if ( $ymd=='0000-00-00' )
     $t= 0;

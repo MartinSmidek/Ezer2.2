@@ -6203,7 +6203,10 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
   }
   else if ( typ_x=='o' && typ_y=='f' ) {        // object --> form
     $each(y.part,function(field,id) {
-      if ( field.set && x[id]!=undefined ) {
+      if ( field.key && x[id]!=undefined ) {
+        field.key(x[id],key);
+      }
+      else if ( field.set && x[id]!=undefined ) {
         field.set(x[id],key);
       }
     });
@@ -6211,12 +6214,15 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
   }
   else if ( typ_x=='f' && typ_y=='o' ) {        // form --> object
     $each(x.part,function(field,id) {
-      if ( id[0]!='$' && field.get ) {
+      if ( id[0]!='$' && field.key ) {          // přednost má definice klíče
+        y[id]= field.key();
+      }
+      else if ( id[0]!='$' && field.get ) {
         y[id]= field.get();
       }
     });
   }
-  else Ezer.error('copy_by_name nelzed použít pro parametry typu '+typ_x+' a '+typ_y);
+  else Ezer.error('copy_by_name nelze použít pro parametry typu '+typ_x+' a '+typ_y);
   return 1;
 };
 // ================================================================================================= fce user
