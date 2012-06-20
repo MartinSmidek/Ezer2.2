@@ -557,7 +557,7 @@ Ezer.Application.implement({
     x.root= Ezer.root;          // název/složka aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     var ajax= new Request({url:this.options.server_url, data:x, method: 'post',
-      onComplete: function(ay) {
+      onSuccess: function(ay) {
         Ezer.App._ajax(-1);
         var y;
         try { y= JSON.decode(ay); } catch (e) { y= null; }
@@ -572,7 +572,14 @@ Ezer.Application.implement({
           if ( then )
             app[then].apply(app,[y,parm]);
         }
-      }});
+      },
+      onFailure: function(xhr) {
+        if ( x.cmd=='source_line' && then )
+            app[then].apply(app,[{},parm]);
+        else
+          Ezer.error('SERVER failure (1)','C');
+      }
+    });
     ajax.send();
     this._ajax(1);
   }

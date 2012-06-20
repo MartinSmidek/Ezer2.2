@@ -794,7 +794,7 @@ Ezer.Block= new Class({
     x.root= Ezer.root;          // název/složka aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     var ajax= new Request({url:Ezer.App.options.server_url, data:x, method: 'post',
-      onComplete: function(ay) {
+      onSuccess: function(ay) {
         Ezer.App._ajax(-1);
         var y;
         try { y= JSON.decode(ay); } catch (e) { y= null; }
@@ -809,9 +809,12 @@ Ezer.Block= new Class({
           this[then](y);
         }
       }.bind(this),
-      onProgress: function(event,xhr) {                   // ve verzi 1.4
-          var loaded= event.loaded, total= event.total;
-          console.log(parseInt(total ? loaded / total * 100 : 0, 10));
+      onFailure: function(xhr) {
+        Ezer.error('SERVER failure (2)','C');
+//       }.bind(this),
+//       onProgress: function(event,xhr) {                   // ve verzi 1.4
+//           var loaded= event.loaded, total= event.total;
+//           console.log(parseInt(total ? loaded / total * 100 : 0, 10));
       }
     });
     ajax.send();
@@ -5695,7 +5698,13 @@ Ezer.Eval= new Class({
     x.root= Ezer.root;          // název/složka aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     var ajax= new Request({url:Ezer.App.options.server_url, data:x, method:'post',
-      onComplete: function(ay) { this.onComplete(ay,obj,fce,'x',ms); }.bind(this)},this);
+      onComplete: function(ay) {
+        this.onComplete(ay,obj,fce,'x',ms);
+      }.bind(this),
+      onFailure: function(xhr){
+        Ezer.error('SERVER failure (4)','s',this.proc,this.proc?this.proc.desc._lc:null);
+      }.bind(this)
+    },this);
     ajax.send();
     Ezer.App._ajax(1);
   },
@@ -5711,9 +5720,14 @@ Ezer.Eval= new Class({
     x.root= Ezer.root;          // název/složka aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     var ajax= new Request({url:Ezer.App.options.server_url, data:x, method:'post',
-      onComplete: function(ay){
+//       onComplete: function(ay){
+      onSuccess: function(ay){
         this.onComplete(ay,null,fce,'a',ms);
-      }.bind(this)},this);
+      }.bind(this),
+      onFailure: function(xhr){
+        Ezer.error('SERVER failure (3)','s',this.proc,this.proc?this.proc.desc._lc:null);
+      }.bind(this)
+    },this);
     ajax.send();
     Ezer.App._ajax(1);
   },

@@ -410,7 +410,7 @@ Ezer.Application= new Class({
     x.session= Ezer.options.session;    // způsob práce se SESSION
 //                                                         Ezer.debug(x,'bar_chat');
     var ajax= new Request({url:this.options.server_url, data:x, method: 'post',
-      onComplete: function(ay) {
+      onSuccess: function(ay) {
         this._ajax(-1);
         var y;
         try { y= JSON.decode(ay); } catch (e) { y= null; }
