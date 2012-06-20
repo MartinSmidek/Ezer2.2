@@ -134,7 +134,7 @@ Ezer.MenuMain.implement({
             events:{
               click: function(event) {
                 Ezer.pushState(href);
-                Ezer.fce.touch('block',this);     // informace do _touch na server
+                Ezer.fce.touch('block',this,'click');     // informace do _touch a trail na server
                 this._focus();
                 return false;
               }.bind(desc)
@@ -398,7 +398,7 @@ Ezer.Item.implement({
           if ( !el.target.hasClass('disabled') ) {
             Ezer.pushState(href);
             this._click(el);
-            Ezer.fce.touch('block',this);     // informace do _touch na server
+            Ezer.fce.touch('block',this,'click');     // informace do _touch na server
           }
           return false;
         }.bind(this)
@@ -429,7 +429,7 @@ Ezer.Item.implement({
         a.addEvents({
           click: function(el) {
             if ( !el.target.hasClass('disabled') ) {
-              Ezer.fce.touch('block',this);       // informace do _touch na server
+              Ezer.fce.touch('block',this,'click');       // informace do _touch na server
               this.fire('onclick',[],el);
             }
           }.bind(this)
@@ -542,7 +542,7 @@ Ezer.Panel.implement({
       if ( this.owner.activePanel ) this.owner.activePanel._hide();
       this.owner._setActivePanel(this.id);
       if ( this.owner.activePanel ) this.owner.activePanel._show(undefined,undefined,noevent);
-      Ezer.fce.touch('block',this);           // informace do _touch na server
+      Ezer.fce.touch('block',this,'focus');   // informace do _touch na server
       Ezer.fce.touch('panel',this);           // informace do _touch na server
       this.excite();
     }
@@ -779,7 +779,7 @@ Ezer.Label.implement({
       styles:this.coord({textAlign:align}),events:{
         click: function(el) {
           if ( !Ezer.design ) {
-            Ezer.fce.touch('block',this);           // informace do _touch na server
+            Ezer.fce.touch('block',this,'click');           // informace do _touch na server
             this.fire('onclick',[],el);
           }
         }.bind(this)
@@ -825,7 +825,7 @@ Ezer.Button.implement({
         mouseup: function(el) {
                                                       Ezer.trace('*','button:mouseup');
           if ( !Ezer.design ) {
-            Ezer.fce.touch('block',this);           // informace do _touch na server
+            Ezer.fce.touch('block',this,'click');     // informace do _touch na server
             this.fire('onclick',[],el);
           }
         }.bind(this)
@@ -884,7 +884,7 @@ Ezer.Elem.implement({
     if ( this.DOM_Input ) {
       // pokud má element zobrazení
       if ( on ) {
-        Ezer.fce.touch('block',this);     // informace do _touch na server
+        Ezer.fce.touch('block',this,'changed');     // informace do _touch na server
         if ( !quiet )
           this.DOM_Input.addClass('changed');
         this.DOM_Input.removeClass('empty').removeClass('empty_focus');
@@ -1340,7 +1340,7 @@ Ezer.EditHtml.implement({
     // pokud má element zobrazení
     if ( on ) {
       this._changed= true;
-      Ezer.fce.touch('block',this);     // informace do _touch na server
+      Ezer.fce.touch('block',this,'changed');     // informace do _touch na server
       if ( !quiet )
         div.addClass('changed');
       div.removeClass('empty').removeClass('empty_focus');
@@ -1454,7 +1454,7 @@ Ezer.Radio.implement({
 //      označení příznaku změny elementu formuláře, pokud je quiet=0
   DOM_changed: function(on,quiet) {
     if ( on ) {
-      Ezer.fce.touch('block',this);     // informace do _touch na server
+      Ezer.fce.touch('block',this,'changed');     // informace do _touch na server
       if ( !quiet )
         this.DOM_Block.addClass('changed');
       this._changed= true;
@@ -1646,7 +1646,7 @@ Ezer.Select.implement({
       focus: function(event) {
         if ( this.options.par && this.options.par.subtype=='browse' && this.Items[0]=='?' )
           this.owner._start2();         // owner obsahuje Show pokud je do něj vnořeno
-        Ezer.fce.touch('block',this);   // informace do _touch na server
+        Ezer.fce.touch('block',this,'focus');   // informace do _touch na server
         event.target.select();
         this.DOM_usedkeys= false;
         this.DOM_DropList.setStyle('display','block');
@@ -1888,7 +1888,7 @@ Ezer.SelectAuto.implement({
     if ( this.DOM_Input ) {
       // pokud má element zobrazení
       if ( on ) {
-        Ezer.fce.touch('block',this);     // informace do _touch na server
+        Ezer.fce.touch('block',this,'changed');     // informace do _touch na server
         if ( !quiet ) {
           this.DOM_Input.addClass(this._key||this._empty&&!this.DOM_Input ? 'changed_ok' : 'changed');
           this.DOM_Input.removeClass(this._key||this._empty&&!this.DOM_Input ? 'changed' : 'changed_ok');
@@ -2040,7 +2040,7 @@ Ezer.Browse.implement({
     for (var i= 1; i<=this.tmax; i++) {
       this.DOM_row[i].addEvents({
         click: function(el) {
-          Ezer.fce.touch('block',this);         // informace do _touch na server
+          Ezer.fce.touch('block',this,'click');         // informace do _touch na server
           var tr= el.target.tagName=='TD' ? el.target.parentNode : el.target;
           var i= tr.retrieve('i');
           if ( i && i <= this.tlen ) {
@@ -2070,7 +2070,7 @@ Ezer.Browse.implement({
         event.stop();
         if ( event.code==9 )                                    // tab
           return true;
-        Ezer.fce.touch('block',this);     // informace do _touch na server
+        Ezer.fce.touch('block',this,'keydown');     // informace do _touch na server
         switch (event.code) {
         case 18:                                                // 'alt':
           this.DOM_Input_state= 1;
@@ -2130,7 +2130,7 @@ Ezer.Browse.implement({
     // dvojklik vyvolá onsubmit
     this.DOM_table.addEvents({
       dblclick: function(el) {
-        Ezer.fce.touch('block',this);     // informace do _touch na server
+        Ezer.fce.touch('block',this,'dblclick');     // informace do _touch na server
         var tr= el.target.tagName=='TD' ? el.target.parentNode : el.target;
         var i= tr.retrieve('i');
         if ( i && i <= this.tlen ) {

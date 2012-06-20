@@ -247,6 +247,12 @@ Ezer.Application= new Class({
       this._barDump('f','zobrazit Form');
       this._barDump('a','zobrazit Area');
       this._barDump('o','zobrazit strukturu objektů');
+      // trail - uživatelská stopa
+      new Element('span', {text:'trail:',title:'vypíše uživatelskou stopu', events:{
+        click: function(event) {
+          Ezer.trace(null,Ezer.fce.trail('show'));
+        }.bind(this)
+      }}).inject(this._barRightDom);
       // informace na konci
       new Element('span', {text:'| '+MooTools.lang.getCurrentLanguage()}).inject(this._barRightDom);
       // obsluha okna s chybami a trasováním

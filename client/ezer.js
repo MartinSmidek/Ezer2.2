@@ -6124,6 +6124,7 @@ Ezer.str.if_= function (that,value) {
 };
 // ================================================================================================= fce
 // funkce dostávají jako argumenty hodnoty
+Ezer.obj= {};                                   // případné hodnoty k funkcím se stavem (trail ap.)
 Ezer.fce= {};
 // ------------------------------------------------------------------------------------ object
 //ff: fce.object (name1,value1,name2,value2,...)
@@ -7146,12 +7147,14 @@ Ezer.fce.error= function (str,level,block,lc,calls) {
       ok= fce({msg:str,level:level});
     }
   }
+  // přidání trail na konec výpisu
+  var trail= ' after '+Ezer.fce.trail('show_err');
   if ( !ok ) {
     // systémové zpracování chyby
     if ( level=='S' ) {
       // volání z funkce Ezer.Eval.eval
       inside= block ? ' in '+Ezer.App.block_info(block,lc,true) : '';
-      str= '<b>ERROR: '+str+'</b>'+inside;
+      str= '<b>ERROR: '+str+'</b>'+inside+trail;
       Ezer.trace(0,str);
       Ezer.fce.DOM.error(str);
       Ezer.fce.touch('error',str);
@@ -7177,6 +7180,7 @@ Ezer.fce.error= function (str,level,block,lc,calls) {
           }
         }
       }
+      str+= trail;
       Ezer.fce.DOM.error(str,true);
       Ezer.fce.touch('error',str);
     }
@@ -7185,12 +7189,14 @@ Ezer.fce.error= function (str,level,block,lc,calls) {
       if ( self.navigator.product=='Gecko' && block ) {
         str+= ' at line '+block.lineNumber+' in '+block.fileName;
       }
+      str+= trail;
       Ezer.trace(0,str);
       Ezer.fce.DOM.error(str);
       Ezer.fce.touch('error',str);
     }
     else {
       // jiná chyba (mimo Ezer.Eval.eval)
+      str+= trail;
       var estr= '<b>ERROR: '+str+'</b>';
       Ezer.fce.DOM.error(estr);
       if ( level!=='msg' ) throw {level:level,msg:str};
@@ -7252,6 +7258,10 @@ Ezer.fce.touch= function (type,block,args) {
 //                                                 Ezer.trace('*','touch block '+b.id);
             break;
           }
+        }
+        if ( args ) {
+          // pokud je definována metoda, zapíšeme do trail
+          Ezer.fce.trail('add',block,args);
         }
       }
       else {
@@ -7318,4 +7328,47 @@ Ezer.fce.touch= function (type,block,args) {
     }
   }
   return true;
+}
+// --------------------------------------------------------------------------------------- trail
+//ff: fce.trail (op,...)
+// funkce podle parametru op
+//    'show'     -- vrátí uživatelskou stopu
+//    'show_err' -- vrátí uživatelskou stopu ve formátu pro hlášení chyby
+//    'add',o,m  -- přidá záznam o použití objektu o metodou m do Ezer.obj.trail, spolu s časem
+//s: funkce
+Ezer.obj.trail= {max:5, elems:[]};              // kruhový seznam událostí
+Ezer.fce.trail= function (op) {
+  var ret= true, del0= '<br>';
+  switch (op) {
+  case 'show_err':
+    del0= ',';
+  case 'show':
+    var del= '', t, o;
+    ret= '';
+    try {                                       // kvůli použití v Ezer.error
+      Ezer.obj.trail.elems.each(function(ot){
+        var r= (ot.o.options.title || ot.o.id)+':'+ot.m;
+        if ( ot.o.type.substr(0,5)!='panel' ) {
+          // zkusíme zjistit panel
+          for (var o= ot.o; o; o= o.owner) {
+            if ( o.type.substr(0,5)=='panel' ) {
+              r= o.options.title+'.'+r;
+              break;
+            }
+          }
+        }
+        ret+= del+ot.t+' '+r;
+        del= del0;
+      });
+    } catch (e) {
+    }
+    break;
+  case 'add':
+    if ( Ezer.obj.trail.elems.length > Ezer.obj.trail.max ) {
+      Ezer.obj.trail.elems.shift();
+    }
+    Ezer.obj.trail.elems.push({o:arguments[1],m:arguments[2],t:new Date().format("%M:%S")});
+    break;
+  }
+  return ret;
 }
