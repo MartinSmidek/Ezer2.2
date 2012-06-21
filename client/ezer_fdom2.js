@@ -1086,7 +1086,7 @@ Ezer.FieldDate.implement({
       });
       this.DOM_Input2= this.DOM_Input.getNext();
       this.DOM_Input.setStyles({display:'block'});
-      this.DOM_Input2.setStyles({visibility:'hidden'});
+      this.DOM_Input2.setStyles({visibility:'hidden',position:'absolute'});
 //       this.DOM_Input2.setStyles({marginTop:20,backgroundColor:'#eeeeaa'});
     }
   }
