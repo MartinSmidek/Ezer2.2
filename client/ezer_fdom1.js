@@ -253,8 +253,8 @@ Ezer.Application= new Class({
           Ezer.trace(null,Ezer.fce.trail('show'));
         }.bind(this)
       }}).inject(this._barRightDom);
-      // informace na konci
-      new Element('span', {text:'| '+MooTools.lang.getCurrentLanguage()}).inject(this._barRightDom);
+//       // informace na konci
+//       new Element('span', {text:'| '+MooTools.lang.getCurrentLanguage()}).inject(this._barRightDom);
       // obsluha okna s chybami a trasováním
       $('kuk').addEvent('dblclick',this._clearTrace.bind(this))
               .setStyles({display:Ezer.to_trace ? 'block' : 'none'});
@@ -265,8 +265,30 @@ Ezer.Application= new Class({
           this.DOM_layout();
         }.bind(this)
       });
+      // okno pro zobrazení měření výkonu
+      var speed= new Element('span', {text:'speed:',title:'zobrazí okno s měřením výkonu', events:{
+        click: function(event) {
+          Ezer.obj.speed.on= 1-Ezer.obj.speed.on;
+          event.target[Ezer.obj.speed.on ? 'addClass':'removeClass']('ae_switch_on');
+          Ezer.obj.speed.span.setStyles({display:Ezer.obj.speed.on ? 'block' : 'none'});
+          Ezer.fce.speed('clear');
+          Ezer.obj.speed.msg= 'měření časové a datové náročnosti'; this._showSpeed();
+        }.bind(this)
+      }}).inject(this._barRightDom);
+      Ezer.obj.speed.span= new Element('span', {text:Ezer.obj.speed.msg, class:'measures',
+          styles:{display:'none'}, title:'časy jsou v s, data v KB, kliknutí vynuluje čitače', events:{
+        click: function(event) {
+          Ezer.fce.speed('clear');
+          return false;
+        }.bind(this)
+      }}).inject(speed);
     }
     $('error').addEvent('dblclick',this._clearError.bind(this));
+  },
+  // ----------------------------------------------------------------------------- _showSpeed
+  // ukázání Speed
+  _showSpeed: function() {
+    Ezer.obj.speed.span.set('text',Ezer.obj.speed.msg);
   },
   // ----------------------------------------------------------------------------- _clearTrace
   // smazání Trace

@@ -22,6 +22,7 @@
   # ------------------------------------------------------------------------------------------------ root.ini
   require_once("./../../$ezer_root.inc");
   require_once("$ezer_path_serv/ae_slib.php");
+  $php_start= getmicrotime();                        // měření času
 //                                                         debug(array($mysql_db,$ezer_db),'tabulka databází $mysql_db,$ezer_db');
 //                                                         debug($USER,"USER=$ezer_user_id,{$_SESSION['user_id']}");
 //                                                         debug($_SESSION,"USER=$ezer_user_id,{$_SESSION['user_id']}");
@@ -1421,7 +1422,11 @@
   $y->sys->user= $USER;
   $y->sys->ezer= $EZER;
   header('Content-type: application/json; charset=UTF-8');
-  echo json_encode($y);
+  $y->php_ms= round(getmicrotime() - $php_start,4);
+  $yjson= json_encode($y);
+  $y->php_b= strlen($yjson);
+  $yjson= json_encode($y);
+  echo $yjson;
   exit;
 
 # ================================================================================================== servis

@@ -5732,7 +5732,7 @@ Ezer.Eval= new Class({
     Ezer.App._ajax(1);
   },
   onComplete: function (ay,obj,fce,t,ms0) {
-    var ms= (new Date().valueOf()-ms0)/1000;
+    var ms= ((new Date().valueOf()-ms0)/1000).round();
 //                                                  Ezer.trace('*','ms:'+ms/1000);
     this.requests--;                   // sniž počet požadavků na server
     Ezer.App._ajax(-1);
@@ -5743,7 +5743,14 @@ Ezer.Eval= new Class({
     if ( !y )
       Ezer.error('EVAL: syntaktická chyba na serveru:'+ay,'s',this.proc,this.proc?this.proc.desc._lc:null);
     else {
-      if ( y.trace ) Ezer.trace('u',y.trace);
+      if ( Ezer.obj.speed.on ) {
+        Ezer.obj.speed.net+= ms;
+        Ezer.obj.speed.sql+= y.qry_ms;
+        Ezer.obj.speed.php+= y.php_ms;
+        Ezer.obj.speed.data+= y.php_b;
+        Ezer.fce.speed('show');
+      }
+      if ( y.trace ) Ezer.trace('u',y.trace,null,ms);
       if ( Ezer.App.options.ae_trace.indexOf('M')>=0 && y.qry )
         Ezer.trace('M',y.qry,null,Math.round(y.qry_ms*1000)/1000);
       if ( y.error ) {
@@ -6138,8 +6145,8 @@ Ezer.str.if_= function (that,value) {
 };
 // ================================================================================================= fce
 // funkce dostávají jako argumenty hodnoty
-Ezer.obj= {};                                   // případné hodnoty k funkcím se stavem (trail ap.)
-Ezer.fce= {};
+// Ezer.obj= {};                                   // případné hodnoty k funkcím se stavem (trail ap.)
+// Ezer.fce= {};                                // přesunuto do hlavního programu
 // ------------------------------------------------------------------------------------ object
 //ff: fce.object (name1,value1,name2,value2,...)
 //      zkonstruuje objekt {name1:value1,name2:value2,...
@@ -7385,4 +7392,38 @@ Ezer.fce.trail= function (op) {
     break;
   }
   return ret;
+}
+// --------------------------------------------------------------------------------------- speed
+//ff: fce.speed (op,...)
+// funkce pro zobrazení výsledku měření času a objemu dat;
+// čitače: on, sql,php,net,data,ezer;
+// funkce podle parametru op
+//    'on'      -- zapne sledování výkonu
+//    'off'     -- vypne sledování výkonu
+//    'show'    -- zobrazí aktuální stav čitačů v okně SPEED
+//    'clear'   -- vynuluje čitače
+//s: funkce
+Ezer.obj.speed= {on:0,sql:0,php:0,net:0,data:0,ezer:0,msg:'',span:null}; // čitače
+Ezer.fce.speed= function (op) {
+  var ret= true, del0= '<br>';
+  switch (op) {
+  case 'on':
+    Ezer.obj.speed.on= 1;
+    break;
+  case 'off':
+    Ezer.obj.speed.on= 0;
+    break;
+  case 'clear':
+    with (Ezer.obj.speed) {
+      sql= php= net= data= ezer= 0;
+      msg= '';
+    }
+  case 'show':
+    with (Ezer.obj.speed) {
+      msg= 'SQL:'+sql.round()+', PHP:'+php.round()+', Ezer:'+ezer.round()+', net:'+net.round();
+      msg+= ' / '+(data/1024).round();
+    }
+    Ezer.app._showSpeed();
+    break;
+  }
 }

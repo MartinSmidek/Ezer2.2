@@ -300,6 +300,7 @@ __EOD;
     Ezer.parm= location.hash.split(',');
     Ezer.fce= {};
     Ezer.str= {};
+    Ezer.obj= {};
     Ezer.root= '$ezer_root';
     Ezer.version= '{$EZER->version}';
     Ezer.options= { $options_txt

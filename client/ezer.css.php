@@ -567,6 +567,11 @@ __EOD
 
 #status, #status_left, #status_right {
   cursor:default; }
+#status_right {
+  position:absolute; right:0; }
+#status_right span.measures {
+  position:absolute; top:-15px; right:0;
+  background-color:$b_kuk; color:$c2_kuk;  }
 #status_bar {
   background:#eee url($path/foot_bg.png) repeat-x; color:$c2_kuk; }
 #dolni span {
