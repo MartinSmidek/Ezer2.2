@@ -1987,8 +1987,9 @@ function mysql_object($qry,$err=null) {
 }
 # -------------------------------------------------------------------------------------------------- getmicrotime
 function getmicrotime() {
-  list($usec, $sec) = explode(" ", microtime());
-  return ((float)$usec + (float)$sec);
+//   list($usec, $sec) = explode(" ", microtime());
+//   return ((float)$usec + (float)$sec);
+  return round(microtime(true)*1000);
 }
 # -------------------------------------------------------------------------------------------------- mysql_err
 # ošetření chyby a doplnění $y->error, $y->ok

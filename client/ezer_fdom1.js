@@ -276,7 +276,8 @@ Ezer.Application= new Class({
         }.bind(this)
       }}).inject(this._barRightDom);
       Ezer.obj.speed.span= new Element('span', {text:Ezer.obj.speed.msg, class:'measures',
-          styles:{display:'none'}, title:'časy jsou v s, data v KB, kliknutí vynuluje čitače', events:{
+          styles:{display:'none'},
+          title:'SQL, PHP, Ezer udává čas v ms, NET je s/KB, kliknutí vynuluje čitače', events:{
         click: function(event) {
           Ezer.fce.speed('clear');
           return false;
