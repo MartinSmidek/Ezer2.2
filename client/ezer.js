@@ -7437,7 +7437,7 @@ Ezer.fce.speed= function (op) {
     with (Ezer.obj.speed) {
       sql_g+= sql; php_g+= php; ezer_g+= ezer; net_g+= net; data_g+= data;
       x= sql_g.round()+','+php_g.round()+','+ezer_g.round()+',';
-      x+= (net_g/1000).round()+','+(data_g/1024).round();
+      x+= net_g.round()+','+(data_g/1024).round();
       sql_g= php_g= net_g= data_g= ezer_g= 0;
       sql= php= net= data= ezer= 0;
     }

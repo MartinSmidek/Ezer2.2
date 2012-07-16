@@ -1095,7 +1095,7 @@ function sys_days_table($touch,$days,$type,$color,$config_colors=false) { #trace
   // vykreslení tabulky
   $wt= '100%';
   $wt= '';
-  $wh= 100/count($xdays).'%';
+//   $wh= $xdays ? 100/count($xdays).'%' : '50';
   $wh= 50;
   // čas
   $tab.= "<table width='$wt' class='systable'><tr><th width='50'></th>";
