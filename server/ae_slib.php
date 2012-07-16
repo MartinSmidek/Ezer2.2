@@ -106,6 +106,7 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     'login_interval'    => 2*60,                // povolená nečinnost v minutách - default=2 hodiny
     'mini_debug'        => $ezer_template=='menu' ? 'true' : 'false',
     'status_bar'        => $ezer_template=='menu' ? 'true' : 'false',
+    'to_speed'          => 1,
     'to_trace'          => $ezer_template=='menu' ? 'true' : 'false'
   );
   $js_options->watch_ip= $EZER->options->watch_ip= $pars->watch_ip ? '1' : '0';

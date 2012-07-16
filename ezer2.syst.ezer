@@ -112,16 +112,22 @@ panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a'
     menu a { title:'Aktivní uživatelé',type:'group'
       item d { title:'dnes'               par:°{s:'uzivatele',c:'dnes',short:'1'}}
       item { title:'... podrobně'       par:°{s:'uzivatele',c:'dnes',short:'0'}}
+      item { title:'... prostředky'     par:°{s:'uzivatele',c:'dnes',short:'2'}}
       item { title:'včera'              par:°{s:'uzivatele',c:'vcera',short:'1'}}
       item { title:'... podrobně'       par:°{s:'uzivatele',c:'vcera',short:'0'}}
+      item { title:'... prostředky'     par:°{s:'uzivatele',c:'vcera',short:'2'}}
       item { title:'týden'              par:°{s:'uzivatele',c:'dny',days:'8',short:'1'}}
       item { title:'... podrobně'       par:°{s:'uzivatele',c:'dny',days:'8',short:'0'}}
+      item { title:'... prostředky'     par:°{s:'uzivatele',c:'dny',days:'8',short:'2'}}
       item { title:'dva týdny'          par:°{s:'uzivatele',c:'dny',days:'15',short:'1'}}
       item { title:'... podrobně'       par:°{s:'uzivatele',c:'dny',days:'15',short:'0'}}
+      item { title:'... prostředky'     par:°{s:'uzivatele',c:'dny',days:'15',short:'2'}}
       item { title:'měsíc'              par:°{s:'uzivatele',c:'dny',days:'30',short:'1'}}
       item { title:'... podrobně'       par:°{s:'uzivatele',c:'dny',days:'30',short:'0'}}
-      item { title:'nastavený den'      par:°{s:'uzivatele',c:'den',days:'30',short:'1'}}
-      item { title:'... podrobně'       par:°{s:'uzivatele',c:'den',days:'30',short:'0'}}
+      item { title:'... prostředky'     par:°{s:'uzivatele',c:'dny',days:'30',short:'2'}}
+      item { title:'nastavený den'      par:°{s:'uzivatele',c:'den',short:'1'}}
+      item { title:'... podrobně'       par:°{s:'uzivatele',c:'den',short:'0'}}
+      item { title:'... prostředky'     par:°{s:'uzivatele',c:'den',short:'2'}}
     }
     menu { title:'Aktivní moduly',type:'group'
       item { title:'dnes'               par:°{s:'moduly',c:'dnes',short:'1'}}

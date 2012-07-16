@@ -753,9 +753,11 @@ function sys_day_users($skip,$day,$short=false) {  trace();
   global $user_options, $USER;
   $touch= array();
   $hours= array();
-  $and=  $skip ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
-  $qry= "SELECT day,hour(time) as hour,user,module,menu,count(*) as c,sum(hits) as h FROM _touch
-         WHERE day='$day' AND user!='' $and GROUP BY user,module,menu,hour(time) ORDER BY user,hour";
+  $AND=  $skip     ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
+  $AND=  $short==2 ? "AND module='speed' " : '';
+  $qry= "SELECT day,hour(time) as hour,user,module,menu,count(*) as c,sum(hits) as h,
+         GROUP_CONCAT(msg SEPARATOR ';') AS _speed FROM _touch
+         WHERE day='$day' AND user!='' $AND GROUP BY user,module,menu,hour(time) ORDER BY user,hour";
   $res= mysql_qry($qry);
   while ( $res && $row= mysql_fetch_assoc($res) ) {
     $user= $row['user'];
@@ -763,10 +765,13 @@ function sys_day_users($skip,$day,$short=false) {  trace();
     $hours[$hour]= true;
     $module= $row['module'];
     $menu= $row['menu'];
-    if ( $short ) {
+    if ( $short==1 ) {
       $ids= explode('.',$menu);
       $menu= $ids[0];
       $menu= strtr($menu,array("login"=>"&lt;","timeout"=>'&gt;'));
+    }
+    elseif ( $short==2 ) {
+      $menu= str_replace(',','<br>',$row['_speed']);
     }
     $c= $row['c'];
     $h= $row['h'];
@@ -776,7 +781,8 @@ function sys_day_users($skip,$day,$short=false) {  trace();
       $touch[$user][$hour]['touch'][$menu]= 1;
     $touch[$user][$hour]['touch'][$menu]+= $h;
   }
-  $html= sys_table($touch,$hours,'user','#e7e7e7',true); // použít tabulku barev, je-li v config
+  // použít tabulku barev, je-li v config
+  $html= sys_table($touch,$hours,$short==2?'speed':'user','#e7e7e7',true);
   return $html;
 }
 # -------------------------------------------------------------------------------------------------- sys_days_users
@@ -785,9 +791,11 @@ function sys_days_users($skip,$day,$ndays,$short=false) {
   global $user_options, $USER;
   $touch= array();
   $days= array();
-  $and=  $skip ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
-  $qry= "SELECT day,user,module,menu,count(*) as c,sum(hits) as h FROM _touch
-         WHERE day BETWEEN '$day'-INTERVAL $ndays DAY AND '$day' AND user!='' $and
+  $AND=  $skip     ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
+  $AND=  $short==2 ? "AND module='speed' " : '';
+  $qry= "SELECT day,user,module,menu,count(*) as c,sum(hits) as h,
+         GROUP_CONCAT(msg SEPARATOR ';') AS _speed FROM _touch
+         WHERE day BETWEEN '$day'-INTERVAL $ndays DAY AND '$day' AND user!='' $AND
          GROUP BY user,module,menu,day ORDER BY user,day";
   $res= mysql_qry($qry);
   while ( $res &&$row= mysql_fetch_assoc($res) ) {
@@ -796,10 +804,28 @@ function sys_days_users($skip,$day,$ndays,$short=false) {
     $days[$day]= true;
     $module= $row['module'];
     $menu= $row['menu'];
-    if ( $short ) {
+    if ( $short==1 ) {
       $ids= explode('.',$menu);
       $menu= $ids[0];
       $menu= strtr($menu,array("login"=>'&lt;',"timeout"=>'&gt;'));
+    }
+    elseif ( $short==2 ) {
+      $menu= "";
+      $speeds= $row['_speed'];
+      $amenu= array();
+      if ( $speeds ) {
+        foreach (explode(';',$speeds) as $speed) {
+          foreach (explode(',',$speed) as $i=>$x) {
+            $amenu[$i]+= $x;
+          }
+        }
+//                                                 debug($amenu,$speeds);
+        $del= "";
+        foreach ($amenu as $x) {
+          $menu.= "$del$x";
+          $del= "<br>";
+        }
+      }
     }
     $c= $row['c'];
     $h= $row['h'];
@@ -811,7 +837,8 @@ function sys_days_users($skip,$day,$ndays,$short=false) {
       $touch[$user][$day]['touch'][$menu]+= $h;
   }
 //                                                 debug($touch,'$touch');
-  $html= sys_days_table($touch,$days,'user','#e7e7e7',true); // použít tabulku barev, je-li v config
+  // použít tabulku barev, je-li v config
+  $html= sys_days_table($touch,$days,$short==2?'speed':'user','#e7e7e7',true);
   return $html;
 }
 # -------------------------------------------------------------------------------------------------- sys_bugs
@@ -1002,6 +1029,7 @@ function sys_table($touch,$hours,$type,$color,$config_colors=false) { #trace();
           $bg= $act ? "bgcolor='$color'" : '';
           $tab.= "<td $bg>$act</td>";
           break;
+        case 'speed':
         case 'user':
           if ( $activity[$h] ) {
             $act= implode(' ',array_keys($activity[$h]['touch']));
@@ -1010,17 +1038,18 @@ function sys_table($touch,$hours,$type,$color,$config_colors=false) { #trace();
             foreach ($activity[$h]['touch'] as $menu => $menu_hit ) {
               $tit.= " $menu_hit*$menu ";
             }
-            $bg= '';
+            $bg= $type=='speed' ? "align='right' " : '';
             if ( $act ) {
               // volba barvy
               foreach ($colors as $mez => $clr) {
                 if ( $hit>=$mez ) {
-                  $bg= "bgcolor='$clr'";
+                  $bg.= "bgcolor='$clr'";
                   break;
                 }
               }
             }
-            $tab.= "<td $bg title='$tit, celkem $hit'>$act</td>";
+            $title= $type=='speed' ? "" : "$tit, celkem $hit";
+            $tab.= "<td $bg title='$title'>$act</td>";
           }
           else
             $tab.= "<td></td>";
@@ -1081,6 +1110,7 @@ function sys_days_table($touch,$days,$type,$color,$config_colors=false) { #trace
         $bg= $act ? "bgcolor='$color'" : '';
         $tab.= "<td $bg>$act</td>";
         break;
+      case 'speed':
       case 'user':
         if ( $activity[$h] ) {
           $act= implode(' ',array_keys($activity[$h]['touch']));
@@ -1089,17 +1119,18 @@ function sys_days_table($touch,$days,$type,$color,$config_colors=false) { #trace
           foreach ($activity[$h]['touch'] as $menu => $menu_hit ) {
             $tit.= " $menu_hit*$menu ";
           }
-          $bg= '';
+          $bg= $type=='speed' ? "align='right' " : '';
           if ( $act ) {
             // volba barvy
             foreach ($colors as $mez => $clr) {
               if ( $hit>=$mez ) {
-                $bg= "bgcolor='$clr'";
+                $bg.= "bgcolor='$clr'";
                 break;
               }
             }
           }
-          $tab.= "<td $bg title='$tit, celkem $hit'>$act</td>";
+          $title= $type=='speed' ? "" : "$tit, celkem $hit";
+          $tab.= "<td $bg title='$title'>$act</td>";
         }
         else
           $tab.= "<td></td>";

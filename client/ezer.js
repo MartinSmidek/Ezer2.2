@@ -5183,7 +5183,7 @@ Ezer.Eval= new Class({
 //   + [s] - pozice ve zdrojovém textu ve tvaru  l,c
 //r: this.value - pokud bylo vytvořeno nové vlákno (volání serveru, modální dialog, ...) pak je this.simple==false a tato hodnota ještě není dokončená
   eval: function(step,back) {
-    var eval_start= Ezer.is_trace['S'] ? new Date().valueOf() : 0;       // měření spotřebovaného času
+    var eval_start= Ezer.options.to_speed ? new Date().valueOf() : 0;       // měření spotřebovaného času
     try {
 //       // reaguj na stopadresu
 //             if ( this.proc && (this.proc.stop || this.proc.desc && this.proc.desc.stop) ) {
@@ -5373,7 +5373,7 @@ Ezer.Eval= new Class({
                 Ezer.continuation= this;
                 Ezer.App.stopped(this.proc);
                 this.simple= false;
-                if ( Ezer.is_trace['S'] ) this.speed(eval_start);
+                if ( Ezer.options.to_speed ) this.speed(eval_start);
                 return;
               }
               continue last_level;
@@ -5417,7 +5417,7 @@ Ezer.Eval= new Class({
               this.c= c+1;
               val= obj.apply(null,args);
               this.simple= false;
-              if ( Ezer.is_trace['S'] ) this.speed(eval_start);
+              if ( Ezer.options.to_speed ) this.speed(eval_start);
               return;
             // funkce na serveru přes 'ask': na zásobníku jsou argumenty - po volání hodnota funkce 'i'
             case 'e':
@@ -5430,7 +5430,7 @@ Ezer.Eval= new Class({
               this.ask(cc.i,args,cc.s);
               this.c= c;
               this.simple= false;
-              if ( Ezer.is_trace['S'] ) this.speed(eval_start);
+              if ( Ezer.options.to_speed ) this.speed(eval_start);
               return;
             // metoda: na zásobníku jsou argumenty a pod nimi objekt - po volání hodnota metody 'i'
             case 'm':
@@ -5485,7 +5485,7 @@ Ezer.Eval= new Class({
                 this.c= c;
                 obj.continuation= this;  // pokračování zajistí nějaká metoda z kontextu
                 this.simple= false;
-                if ( Ezer.is_trace['S'] ) this.speed(eval_start);
+                if ( Ezer.options.to_speed ) this.speed(eval_start);
                 return;
               }
             // přerušení: stav se uloží do context.continuation ... není metoda ale funkce
@@ -5504,7 +5504,7 @@ Ezer.Eval= new Class({
                 this.c= c;
                 Ezer.modal_fce= this;  // pokračování se zajistí voláním eval(this.step,true)
                 this.simple= false;
-                if ( Ezer.is_trace['S'] ) this.speed(eval_start);
+                if ( Ezer.options.to_speed ) this.speed(eval_start);
                 return;
               }
             // metoda na serveru: na zásobníku jsou argumenty a pod nimi objekt - po volání hodnota metody 'i'
@@ -5535,7 +5535,7 @@ Ezer.Eval= new Class({
                   this.c= c;
                   this.simple= false;
                   if ( Ezer.is_trace.q ) this.trace('wait...');  // trasování operace
-                  if ( Ezer.is_trace['S'] ) this.speed(eval_start);
+                  if ( Ezer.options.to_speed ) this.speed(eval_start);
                   return;
                 }
               }
@@ -5678,7 +5678,7 @@ Ezer.Eval= new Class({
         }
       }
     }
-    if ( Ezer.is_trace['S'] ) this.speed(eval_start);
+    if ( Ezer.options.to_speed ) this.speed(eval_start);
   },
   // počítání času stráveného interpretem
   speed: function(ms0) {
@@ -5757,8 +5757,8 @@ Ezer.Eval= new Class({
     if ( !y )
       Ezer.error('EVAL: syntaktická chyba na serveru:'+ay,'s',this.proc,this.proc?this.proc.desc._lc:null);
     else {
-      if ( Ezer.is_trace['S'] ) {
-        Ezer.obj.speed.net+= ms;
+      if ( Ezer.options.to_speed ) {
+        Ezer.obj.speed.net+= ms - y.php_ms;             // čistý čas přenosu dat
         Ezer.obj.speed.sql+= y.qry_ms;                  // měřeno jen v mysql_qry
         Ezer.obj.speed.php+= y.php_ms - y.qry_ms;
         Ezer.obj.speed.data+= y.php_b;
@@ -7249,6 +7249,7 @@ Ezer.fce.error_= function (info) {
 //              pokud type=='logout' pak odhlásí uživatele
 //              pokud type=='touch' předá cestu ke kořenu (pokud blok má jméno)
 //              pokud type=='server' zavolá funkci fce na serveru bez vrácení hodnoty, předá args
+//              pokud type=='speed' zapíše msg do _touch
 //      Ezer.sys.activity.touch_limit je počet dotyků (ae_hits) po kterých je nejpozději
 //        uskutečněn zápis do _touch
 //s: funkce
@@ -7416,28 +7417,38 @@ Ezer.fce.trail= function (op) {
 //    'off'     -- vypne sledování výkonu
 //    'show'    -- zobrazí aktuální stav čitačů v okně SPEED
 //    'clear'   -- vynuluje čitače
+//    'hour'    -- zobrazí aktuální stav globálních čitačů  a vynuluje čitače
 //s: funkce
-Ezer.obj.speed= {sql:0,php:0,net:0,data:0,ezer:0,msg:'',span:null}; // čitače
+Ezer.obj.speed= {
+  sql:0,   php:0,   net:0,   data:0,   ezer:0,          // lokální čitače
+  sql_g:0, php_g:0, net_g:0, data_g:0, ezer_g:0,        // globální čitače
+  msg:'', span:null};                                   // stavové informace
 Ezer.fce.speed= function (op) {
-  var ret= true, del0= '<br>';
+  var ret= true, del0= '<br>', x= null;
   switch (op) {
-  case 'on':
-    Ezer.is_trace['S']= 1;
-    break;
-  case 'off':
-    Ezer.is_trace['S']= 0;
-    break;
-  case 'clear':
+  case 'clear':                         // přičte lokální čitače ke globálním a vynuluje lokální
     with (Ezer.obj.speed) {
+      sql_g+= sql; php_g+= php; ezer_g+= ezer; net_g+= net; data_g+= data;
       sql= php= net= data= ezer= 0;
       msg= '';
     }
+    break;
+  case 'hour':                         // vrátí globální čitače a vynuluje je (spolu s lokálními)
+    with (Ezer.obj.speed) {
+      sql_g+= sql; php_g+= php; ezer_g+= ezer; net_g+= net; data_g+= data;
+      x= sql_g.round()+','+php_g.round()+','+ezer_g.round()+',';
+      x+= (net_g/1000).round()+','+(data_g/1024).round();
+      sql_g= php_g= net_g= data_g= ezer_g= 0;
+      sql= php= net= data= ezer= 0;
+    }
+    break;
   case 'show':
     with (Ezer.obj.speed) {
-      msg= 'SQL:'+sql.round()+', PHP:'+php.round()+', Ezer:'+ezer.round()+', net:';
-      msg+= (net/1000).round()+' / '+(data/1024).round();
+      msg= 'SQL:'+sql.round()+', PHP:'+php.round()+', Ezer:'+ezer.round();
+      msg+= ', NET:' + net.round()+' / '+(data/1024).round();
     }
     Ezer.app._showSpeed();
     break;
   }
+  return x;
 }

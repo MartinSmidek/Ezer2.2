@@ -281,14 +281,16 @@ Ezer.Application= new Class({
           }
           Ezer.obj.speed.span.setStyles({display:Ezer.is_trace['S'] ? 'block' : 'none'});
           Ezer.fce.speed('clear');
+          Ezer.fce.speed('show');
           Ezer.obj.speed.msg= 'měření časové a datové náročnosti'; this._showSpeed();
         }.bind(this)
       }}).inject(this._barRightDom);
       Ezer.obj.speed.span= new Element('span', {text:Ezer.obj.speed.msg, class:'measures',
           styles:{display:Ezer.is_trace['S'] ? 'block' : 'none'},
-          title:'SQL, PHP, Ezer udává čas v ms, NET je s/KB, kliknutí vynuluje čitače', events:{
+          title:'SQL, PHP, Ezer udává čas v ms, NET je ms/KB, kliknutí vynuluje čitače', events:{
         click: function(event) {
           Ezer.fce.speed('clear');
+          Ezer.fce.speed('show');
           return false;
         }.bind(this)
       }}).inject(speed);
@@ -405,10 +407,13 @@ Ezer.Application= new Class({
       else {
         // uživatel neaktivní ale nepřekročen limit NEBO čekáme
       }
-      this.bar_clock_show(true);
+      var hm= this.bar_clock_show(true);
+      if ( hm.substr(-2)=='59' )
+        this.bar_clock_hour();
     }
-    else
+    else {
       this.bar_clock_show(false);
+    }
     if ( !quiet )
       setTimeout("Ezer.App.bar_clock()",60*1000); // minutové kyvadlo
   },
@@ -419,10 +424,24 @@ Ezer.Application= new Class({
       ? "<span title='id="+Ezer.sys.user.id_user+' / '+Ezer.sys.user.skills+"'>"
         +(Ezer.sys.user.abbr||'---')+(Ezer.sys.user.note||'')+'</span>'
       : '';
-    this.domUser.innerHTML= ae_time()+' '+abbr;
+    var hm= ae_time();
+    this.domUser.innerHTML= hm+' '+abbr;
     if ( zbyva ) {
       this.domUser.innerHTML+= " ... <span title='minut do odhlášení'>"
         +(Ezer.App.options.login_interval-this.clock_tics)+' min</span> ... &nbsp;';
+    }
+    return hm;
+  },
+  // ----------------------------------------------------------------------------- bar_clock_hour
+  // akce na konci hodiny - zápis speed za hodinu do _TOUCH a vynulování hodinových čitačů
+  bar_clock_hour: function () {
+    if ( Ezer.sys.user.id_user ) {
+      var speeds= Ezer.fce.speed('hour');
+      // informace do _touch na server
+      var x= {cmd:'touch',user_id:Ezer.sys.user.id_user,user_abbr:Ezer.sys.user.abbr,root:Ezer.root,
+        session:Ezer.options.session,module:'speed',hits:0,menu:'',msg:speeds
+      };
+      var r= new Request({method:'post', url:Ezer.App.options.server_url, onComplete:null}).post(x);
     }
   },
   // ----------------------------------------------------------------------------- bar_clock_continue
