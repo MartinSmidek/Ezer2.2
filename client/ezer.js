@@ -214,7 +214,8 @@ Ezer.Block= new Class({
   },
 // ------------------------------------------------------------------------------------ _part
 //fm: Block.part/_part (name[,n,[attr,value]])
-//      pokud není uvedeno n vrátí podblok daného složeného jména;
+//      pokud není uvedeno n vrátí podblok daného složeného jména
+//        (pokud podblok začíná $ pak se chápe jako absolutní cesta);
 //      pokud je uvedeno n vrátí n-tý podblok jehož typ má jako prefix name;
 //      pokud je uvedeno attr a value, hledá podblok jehož atribut 'attr' má hodnotu 'value'
 //      při nenalezení vrací 0
@@ -247,7 +248,14 @@ Ezer.Block= new Class({
     }
     else {
       var ids= $type(name)=='string' ? name.split('.') : [name];
-      o= b;
+      if ( ids[0]=='$' ) {
+        // pokud name je absolutní
+        o= Ezer.run.$;
+        ids.shift();
+      }
+      else {
+        o= b;
+      }
       for (var i= 0; i<ids.length; i++) {
         if ( o.part && o.part[ids[i]] )
           o= o.part[ids[i]];
