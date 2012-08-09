@@ -6487,6 +6487,8 @@ Ezer.fce.repeat= function (x,n) {
 Ezer.fce.replace= function () {
   var x= arguments[0]||'', a, b, r;
   if ( x ) {
+    if ( typeof(x)!='string' && x.toString() )
+      x= x.toString();
     for (var i= 1; i<arguments.length; i+=2) {
       a= String(arguments[i]); b= arguments[i+1]==undefined?'':arguments[i+1];
       r= new RegExp(a.replace(/\$/,'\\\$'),'g');
