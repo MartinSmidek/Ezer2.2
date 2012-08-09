@@ -1423,9 +1423,19 @@
   $y->sys->ezer= $EZER;
   header('Content-type: application/json; charset=UTF-8');
   $y->php_ms= round(getmicrotime() - $php_start,4);
-  $yjson= json_encode($y);
+  $yjson= $json->encode($y);            // protože json_encode chybuje
+//   $yjson= json_encode($y);
+//   $yjson= json_encode($y,JSON_UNESCAPED_UNICODE);
+
+//   // test json_encode
+//   $_yjson= json_encode($y->value);
+//   if ( !json_decode($_yjson) ) {
+//     $y->json_last_error= 'ERROR'.json_last_error(); // vrací 0 i když nic nepřevede
+//   }
+
   $y->php_b= strlen($yjson);
-  $yjson= json_encode($y);
+//   $yjson= json_encode($y,JSON_UNESCAPED_UNICODE);
+  $yjson= $json->encode($y);            // protože json_encode chybuje
   echo $yjson;
   exit;
 

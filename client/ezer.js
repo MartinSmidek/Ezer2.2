@@ -129,7 +129,7 @@ Ezer.Block= new Class({
 // ------------------------------------------------------------------------------------ delete
 //fm: Block.delete ()
 //      vlastník objektu
-  delete: function () {
+  'delete': function () {
     this.owner.part[this.id]= null;
     delete this;
     return 1;
@@ -6359,7 +6359,7 @@ Ezer.fce.get_cookie= function (id,val,form,refs) {
 //   event - událost vyvolaná pravým tlačítkem myši
 //s: funkce
 Ezer.fce.contextmenu= function (menu,event) {
-  event= event||windows.event;
+  event= event||window.event;
   var DOM= new Element('ul',{'class':'ContextMenu'}).inject($('body'));
   menu.each(function(item) {
     new Element('li').adopt(

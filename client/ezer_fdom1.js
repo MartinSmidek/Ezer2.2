@@ -285,7 +285,7 @@ Ezer.Application= new Class({
           Ezer.obj.speed.msg= 'měření časové a datové náročnosti'; this._showSpeed();
         }.bind(this)
       }}).inject(this._barRightDom);
-      Ezer.obj.speed.span= new Element('span', {text:Ezer.obj.speed.msg, class:'measures',
+      Ezer.obj.speed.span= new Element('span', {text:Ezer.obj.speed.msg, 'class':'measures',
           styles:{display:Ezer.is_trace['S'] ? 'block' : 'none'},
           title:'SQL, PHP, Ezer udává čas v ms, NET je ms/KB, kliknutí vynuluje čitače', events:{
         click: function(event) {

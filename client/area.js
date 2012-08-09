@@ -90,7 +90,7 @@ Ezer.Area= new Class({
 // ----------------------------------------------------------------------------------------- delete
 //fm: Area.delete ()
 //      vlastník objektu
-  delete: function () {
+  'delete': function () {
     this.DOM_Block.destroy();
     this.parent();
     return 1;

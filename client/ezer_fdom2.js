@@ -2674,9 +2674,9 @@ Ezer.Show.implement({
         var dmy= val.split('.');
         val= dmy[0]+'.'+dmy[1];
       }
-      if ( val && Ezer.browser=='IE' ) {           // IE8 nezvládá white-space:nowrap
-        val= val.replace(/\n/g,' ').replace(/\r/g,'');
-      }
+//       if ( val && Ezer.browser=='IE' ) {           // IE8 nezvládá white-space:nowrap
+//         val= val.replace(/\n/g,' ').replace(/\r/g,'');
+//       }
       if ( this._fc('h') ) {
         // potlačení zobrazení HTML a PHP tagů
         val= Ezer.fce.strip_tags(val);
