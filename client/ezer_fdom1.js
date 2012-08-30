@@ -341,7 +341,7 @@ Ezer.Application= new Class({
       title:title,
       events:{
         click: function(event) {
-          this._setTraceOnOff(id,this.options.ae_trace.indexOf(id)>=0);
+          this._setTraceOnOff(id,!Ezer.is_trace[id]);
           this.send_status();
         }.bind(this)
       }
