@@ -206,6 +206,7 @@
   chdir($ezer_path_root);
   $y= (object)array();
   $y->cmd= $x->cmd;
+  $totrace= $x->totrace;                // kopie ae_trace: používá se k omezení trasovacích informací
   $y->qry_ms= 0;
   switch ( $x->cmd ) {
   # ================================================================================================ VOLÁNÍ z EZER
@@ -1077,6 +1078,8 @@
                                                 display("$res:$qry");
       }
     }
+    $y->sys->user= $USER;              // přenos do klienta
+    $y->sys->ezer= $EZER;
     break; /* user_login */
   # ------------------------------------------------------------------------------------------------ user_relogin
   # obnova přihlášení uživatele podle záznamů v session
@@ -1112,6 +1115,8 @@
     else {
       $y->user_id= 0;
     }
+    $y->sys->user= $USER;              // přenos do klienta
+    $y->sys->ezer= $EZER;
     check_version($y);
     break;
   # ------------------------------------------------------------------------------------------------ user_group_login
@@ -1416,11 +1421,13 @@
   }
 # ================================================================================================== answer
   global $trace, $warning;
-  if ( $trace ) $y->trace= $trace;
+  if ( $trace && strpos($x->totrace,'u')!==false )
+    $y->trace= $trace;
+//                                         $y->trace.= "\ntotrace={$x->totrace}";
   if ( $warning ) $y->warning= $warning;
-  $y->x= $x;
-  $y->sys->user= $USER;
-  $y->sys->ezer= $EZER;
+  $y->lc= $x->lc;                       // redukce informace místo $y->x= $x;
+//   $y->sys->user= $USER;              // redukce informace - přesunuto do user_relogin, user_login
+//   $y->sys->ezer= $EZER;              // redukce informace - přesunuto do user_relogin, user_login
   header('Content-type: application/json; charset=UTF-8');
   $y->php_ms= round(getmicrotime() - $php_start,4);
 //   $yjson= $json->encode($y);            // protože json_encode chybuje
@@ -1441,6 +1448,41 @@
   exit;
 
 # ================================================================================================== servis
+function json_encode_short($data) {
+  switch ($type = gettype($data)) {
+  case 'NULL':
+    return 'null';
+  case 'boolean':
+    return ($data ? 'true' : 'false');
+  case 'integer':
+  case 'double':
+  case 'float':
+    return $data;
+  case 'string':
+    return '"' . addslashes($data) . '"';
+  case 'object':
+    $data = get_object_vars($data);
+  case 'array':
+    $output_index_count = 0;
+    $output_indexed = array();
+    $output_associative = array();
+    foreach ($data as $key => $value) {
+      $output_indexed[] = json_encode_short($value);
+      $output_associative[] = json_encode_short($key) . ':' . json_encode_short($value);
+      if ($output_index_count !== NULL && $output_index_count++ !== $key) {
+        $output_index_count = NULL;
+      }
+    }
+    if ($output_index_count !== NULL) {
+      return '[' . implode(',', $output_indexed) . ']';
+    }
+    else {
+      return '{' . implode(',', $output_associative) . '}';
+    }
+  default:
+    return ''; // Not supported
+  }
+}
 # -------------------------------------------------------------------------------------------------- browse_status
 # doplněk metody browse.browse_status - z jejího výsledku zkonstruuje části dotazu a celý dotaz
 function browse_status($x) {

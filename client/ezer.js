@@ -5713,11 +5713,12 @@ Ezer.Eval= new Class({
   // askx(args): dotaz na server s pokračováním ve výpočtu po dokončení
   //             musí obsahovat položku cmd:operace kde operace je známá v ezer2.php
   askx: function(obj,fce,x) {
-    this.requests++;                   // zvyš počet požadavků na server
+    this.requests++;                    // zvyš počet požadavků na server
     var app= this;
     var ms= new Date().valueOf();
-    x.root= Ezer.root;          // název/složka aplikace
+    x.root= Ezer.root;                  // název/složka aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
+    x.totrace= Ezer.App.options.ae_trace;
     var ajax= new Request({url:Ezer.App.options.server_url, data:x, method:'post',
       onComplete: function(ay) {
         this.onComplete(ay,obj,fce,'x',ms);
@@ -5732,11 +5733,12 @@ Ezer.Eval= new Class({
   // ask(args): dotaz na server s pokračováním ve výpočtu po dokončení
   //            lc obsahuje informaci o řádku a sloupci ezerscriptu
   ask: function(fce,args,lc) {
-    this.requests++;                   // zvyš počet požadavků na server
+    this.requests++;                    // zvyš počet požadavků na server
     var app= this;
     var ms= new Date().valueOf();
 //                                                  Ezer.trace('*','ms:'+ms);
-    var x= {cmd:'ask',fce:fce,args:args,nargs:args.length,parm:Ezer.parm};
+    var x= {cmd:'ask',fce:fce,args:args,nargs:args.length,parm:Ezer.parm,
+      totrace:Ezer.App.options.ae_trace};
     if ( lc ) x.lc= lc;
     x.root= Ezer.root;          // název/složka aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
@@ -5792,7 +5794,7 @@ Ezer.Eval= new Class({
         Ezer.fce.warning(y.warning);
       }
       if ( Ezer.to_trace && Ezer.is_trace[t] )
-        this.trace_fce(y.x.lc?y.x.lc:'?',(obj?obj.id+'.':'')+fce,obj,null,t+'2',val,ms);
+        this.trace_fce(y.lc?y.lc:'?',(obj?obj.id+'.':'')+fce,obj,null,t+'2',val,ms);
       this.eval.apply(this,[this.step,true]);
     }
   }
@@ -6062,7 +6064,7 @@ Ezer.str['each']= function () {
   that.eval();
 };
 // -------------------------------------------------------------------------------------- new_form
-//fs: str.new_form (form_name,left,top)
+//fs: str.new_form (form_name,left,top[,relative=0])
 //      vytvoření instance form - volá se výrazem new_form
 //s: funkce
 Ezer.str.new_form= function() {
@@ -6071,11 +6073,17 @@ Ezer.str.new_form= function() {
   var name= new Ezer.Eval(arguments[2],that.context,args,'new_form-name');
   var _l= new Ezer.Eval(arguments[3],that.context,args,'new_form-l');
   var _t= new Ezer.Eval(arguments[4],that.context,args,'new_form-t');
-  var form= null;
+  var relative= arguments[5];
+  var owner= null, form= null;
   var ctx= Ezer.code_name(name.value,null,that.context);
   if ( ctx && ctx[0] && ctx[0].type=='form' ) {
     var panel= null;
     for (var o= that.context; o; o= o.owner) {
+      if ( relative && !owner && o.type.substr(0,5)=='form' ) {
+        owner= o;
+        _l.value+= o._l;
+        _t.value+= o._t;
+      }
       if ( o.type.substr(0,5)=='panel' ) {
         panel= o;
         break;
@@ -6375,6 +6383,16 @@ Ezer.fce.contextmenu= function (menu,event) {
   return 1;
 }
 // ================================================================================================= fce string
+// -------------------------------------------------------------------------------------- decode
+//ff: fce.decode (data[,code='base64'])
+//      dekódování řetězce ze zadaného kódování
+//a: data - zakódovaný řetězec
+//   code - kód (zatím jen 'base64')
+//s: funkce
+Ezer.fce.decode= function (data,code) {
+  var decoded= base64_decode(data);
+  return decoded;
+}
 // -------------------------------------------------------------------------------------- match
 //ff: fce.match (regexp,str[,flags])
 //      porovnání řetezce s regulárním výrazem - vrací objekt jehož složky s0,s1,... obsahují
@@ -7137,6 +7155,16 @@ Ezer.fce.warning= function () {
   Ezer.fce.DOM.warning(str);
   return str;
 };
+// -------------------------------------------------------------------------------------- set_trace
+//ff: fce.set_trace (id,on)
+//      změní chování systémového trasování podle parametrů
+//a: id - písmeno označující druh trasování
+//   on - 1 pro zapnutí, 0 pro vypnutí
+//s: funkce
+Ezer.fce.set_trace= function (id,on) {
+    Ezer.App._setTraceOnOff(id,on);
+  return 1;
+}
 // -------------------------------------------------------------------------------------- debug
 //ff: fce.debug (o[,label=''[,depth=5]])
 //      vrací html kód přehledně zobrazující strukturu objektu nebo pole;

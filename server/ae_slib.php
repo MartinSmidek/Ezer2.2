@@ -2019,7 +2019,7 @@ function mysql_err($qry) {
 #   $to_throw -- chyba způsobí výjimku
 #   $db       -- před dotazem je přepnuto na databázi daného jména v tabulce $ezer_db nebo na hlavní
 function mysql_qry($qry,$pocet=null,$err=null,$to_throw=false,$db='') {
-  global $y, $qry_del, $qry_count, $ezer_db;
+  global $y, $totrace, $qry_del, $qry_count, $ezer_db;
   $msg= ''; $abbr= '';
   $qry_count++;
   $myqry= str_replace('"',"U",$qry);
@@ -2074,7 +2074,8 @@ function mysql_qry($qry,$pocet=null,$err=null,$to_throw=false,$db='') {
       $res= null;
     }
   }
-  $y->qry.= (isset($y->qry)?"\n":'')."$ok $time \"$myqry\" ";
+  if ( strpos($totrace,'M')!==false )
+    $y->qry.= (isset($y->qry)?"\n":'')."$ok $time \"$myqry\" ";
   $y->qry_ms+= $time;
   $qry_del= "\n: ";
   if ( $msg ) {

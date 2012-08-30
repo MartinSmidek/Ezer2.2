@@ -1382,7 +1382,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       $code_top-= $npar;
     }
     elseif ( $c->op=='new_form' ) {
-      if ( $npar==3 && $c->par[0]->expr=='name' ) {
+      if ( ($npar==3 || $npar==4 ) && $c->par[0]->expr=='name' ) {
         $form= find_part_abs($c->par[0]->name,$fullname,'form');
         if ( $form && $form->type=='form' ) {
           $code[]= (object)array('o'=>'y','c'=>array((object)array('o'=>'v','v'=>$fullname)));
@@ -1392,7 +1392,12 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
           $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[2],0,$struct1),
             'str_c'=>$c->par[2],'str_s'=>$struct1);
           $struct->arr[]= $struct1;
-          $code[]= (object)array('o'=>'s','i'=>'new_form','a'=>3);
+          if ( isset($c->par[3]) ) {
+            $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[3],0,$struct1),
+              'str_c'=>$c->par[3],'str_s'=>$struct1);
+            $struct->arr[]= $struct1;
+          }
+          $code[]= (object)array('o'=>'s','i'=>'new_form','a'=>$npar);
         }
         else comp_error("CODE: výraz new_form nemá jako 1 parametr form");
       }

@@ -314,6 +314,25 @@ Ezer.Application= new Class({
     if ( $('error') ) $('error').set('text','').setStyle('display','none');
     this._ajax_init();
   },
+  // ----------------------------------------------------------------------------- _setTraceOnOff
+  // nastaví trasování podle klíče id - on=1 vypne, on=0 zapne
+  _setTraceOnOff: function (id,on) {
+    // uprav zobrazení
+    $('status_right').getChildren('span').each(function(el) {
+      if ( el.get('text')==id ) {
+        el.toggleClass('ae_switch_on');
+        return;
+      }
+    });
+    // uprav stav is_trace, ae_trace
+    Ezer.is_trace[id]= on;
+    if ( !on ) {
+      this.options.ae_trace= this.options.ae_trace.replace(id,'');
+    }
+    else {
+      this.options.ae_trace+= id;
+    }
+  },
   // ----------------------------------------------------------------------------- _barSwitch
   // přidání ovladače trasování k status_bar
   _barSwitch: function (id,title,dump) {
@@ -322,15 +341,7 @@ Ezer.Application= new Class({
       title:title,
       events:{
         click: function(event) {
-          event.target.toggleClass('ae_switch_on');
-          if ( this.options.ae_trace.indexOf(id)>=0 ) {
-            this.options.ae_trace= this.options.ae_trace.replace(id,'');
-            Ezer.is_trace[id]= false;
-          }
-          else {
-            this.options.ae_trace+= id;
-            Ezer.is_trace[id]= true;
-          }
+          this._setTraceOnOff(id,this.options.ae_trace.indexOf(id)>=0);
           this.send_status();
         }.bind(this)
       }
