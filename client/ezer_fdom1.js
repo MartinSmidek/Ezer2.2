@@ -244,9 +244,9 @@ Ezer.Application= new Class({
           }
         }.bind(this)
       }}).inject(this._barRightDom);
-      this._barDump('f','zobrazit Form');
-      this._barDump('a','zobrazit Area');
-      this._barDump('o','zobrazit strukturu objektů');
+      this._barDump('F','zobrazit Form');
+      this._barDump('A','zobrazit Area');
+      this._barDump('O','zobrazit strukturu objektů');
       // trail - uživatelská stopa
       new Element('span', {text:'trail:',title:'vypíše uživatelskou stopu', events:{
         click: function(event) {

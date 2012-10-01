@@ -327,8 +327,7 @@ Ezer.Block= new Class({
     var area= this.DOM_Block||this.value.DOM_Block;
     var goal= goal.DOM_Block;
     var ok= window.File && goal && area;
-    if ( ok ) ok= Ezer.run_name(options.handler,this,ctx) && ctx[0].type=='proc';
-    if ( ok ) {
+    if ( ok && 1==Ezer.run_name(options.handler,this,ctx) && ctx[0].type=='proc' ) {
       goal.removeClass(options.css_hover).removeClass(options.css_run);
       area.addEventListener('dragover', function(evt) {
         evt.preventDefault();
@@ -381,6 +380,8 @@ Ezer.Block= new Class({
         }
       }.bind(this),false);
     }
+    else
+      ok= 0;
     return ok;
   },
 //------------------------------------------------------------------------------------- dump
@@ -402,24 +403,15 @@ Ezer.Block= new Class({
     for(var i in this.part) {
       var part= this.part[i];
       if ( part instanceof Ezer.Var ) {
-        if ( part._of=='form' && opt && opt.indexOf('f')>=0 )
+        if ( part._of=='form' && opt && opt.indexOf('F')>=0 )
           v['form '+part.id]= part.value ? dump_form(part.value) : null;
-        else if ( part._of=='area' && opt && opt.indexOf('a')>=0 )
+        else if ( part._of=='area' && opt && opt.indexOf('A')>=0 )
           v['area '+part.id]= part.value ? dump_area(part.value) : null;
         else if ( part._of!='form' && part._of!='area' )
           v[part._of+' '+part.id]=
             typeof(part.value)=='object' ? (part.value==null ? null :
-              ( opt && opt.indexOf('o')>=0 ? part.value : '<i>object</i>' ) ) :
+              ( opt && opt.indexOf('O')>=0 ? part.value : '<i>object</i>' ) ) :
             part.value;
-
-//         v[part._of+' '+part.id]=
-//           part._of=='form' ? (part.value && opt && opt.indexOf('f')>=0 ?
-//             dump_form(part.value) : '<i>form</i>') :
-//           part._of=='area' ? (part.value && opt && opt.indexOf('a')>=0 ?
-//             part.value.dump() : '<i>area</i>') :
-//           typeof(part.value)=='object' ? (part.value==null ? '<i>null</i>' :
-//             ( opt && opt.indexOf('o')>=0 ? part.value : '<i>object</i>' ) ) :
-//           part.value;
       }
     }
     return v;
@@ -613,6 +605,8 @@ Ezer.Block= new Class({
                 id= ids[ids.length-1];
                 context= corr[0];
                 break;
+              case 3:
+                Ezer.error('složené jméno '+name+' obsahuje jméno objektové proměnné');
               default:
                 continue;
   //               Ezer.error('složené jméno '+name+' nelze v '+this.type+' '+this.id+' pochopit');
@@ -5260,7 +5254,10 @@ Ezer.Eval= new Class({
             case 'o':
               obj= [];
               val= Ezer.run_name(cc.i,this.context,obj);
-              if ( val!=1 )
+              if ( val==3 )
+                Ezer.error('jméno '+cc.i+' obsahuje nedefinovanou objektovou proměnnou '+obj[0],
+                  'S',this.proc,last_lc);
+              else if ( val!=1 )
                 Ezer.error('jméno '+cc.i+' nemá v "'+this.context.type+' '+this.context.id+'" smysl (o)',
                   'S',this.proc,last_lc);
               this.stack[++this.top]= obj[0];
@@ -5850,6 +5847,7 @@ Ezer.code_name= function (name,ids,context) {
 // name :: ( .+ | id ) ( . id )*
 // vrací 1 : pokud je celé jméno rozeznáno
 //       2 : pokud je jméno rozeznáno až na poslední id (může jít o deklaraci)
+//       3 : pokud nějaké id je objektová proměnná a nemá nastavenu hodnotu (bude v ctx[0])
 //       0 : jméno nedává smysl
 Ezer.run_name= function (name,run_context,ctx,ids0) {
   var c= -1, context= run_context, result= 0;
@@ -5930,6 +5928,15 @@ Ezer.run_name= function (name,run_context,ctx,ids0) {
         // pokud se nepozná poslední id, je navrácena hodnota 2 (u mapy 1)
         for (; i<ids.length; i++) {
           Ezer.assert(context,'run_name');
+          if ( context.type=='var' && context._of=='object' ) {
+            // dereference objektové proměnné
+            if ( !context.value ) {
+              result= 3;
+              ctx[0]= context._id;
+              return result;
+            }
+            context= context.value;
+          }
           if ( context.part && context.part[ids[i]] ) {
             ctx[++c]= context= context.part[ids[i]];
           }
@@ -6045,7 +6052,7 @@ Ezer.str['each']= function () {
   for(var i= 4; i<arguments.length; i++) {
     pars.push(arguments[i]);
   }
-  var obj= new Ezer.Eval(obj_code,that.context,args,'each-obj');
+  var obj= new Ezer.Eval(obj_code,that.context,args,'each-obj',that.no_trow,that.proc);
   if ( obj.value ) {
     var parts= obj.value instanceof Ezer.List ? obj.value.part : obj.value;
     $each(parts,function(p,k) {
@@ -6055,7 +6062,7 @@ Ezer.str['each']= function () {
         code.push({o:'v',v:pars[i]});
       }
       code.push({o:'c',i:fce_code[0].i,a:pars.length+2,s:fce_code[0].s});
-      new Ezer.Eval(code,that.context,args,'each-part');
+      new Ezer.Eval(code,that.context,args,'each-part',that.no_trow,that.proc);
       n++;
     });
   }
@@ -6133,7 +6140,7 @@ Ezer.str['switch']= function () {
     istmnt= len-2;
   if ( istmnt ) {
     new Ezer.Eval(arguments[istmnt+1],that.context,args,'switch-stmnt',
-      {fce:Ezer.str.switch_,args:[that],stack:true});
+      {fce:Ezer.str.switch_,args:[that],stack:true},that.no_trow,that.proc);
     that.eval();
   }
   else
@@ -6158,11 +6165,11 @@ Ezer.str['if']= function () {
     that.no_trow,that.proc,that.nvars);
   if ( test.value ) {
     new Ezer.Eval(arguments[3],that.context,args,'if-then',
-      {fce:Ezer.str.if_,args:[that],stack:true});
+      {fce:Ezer.str.if_,args:[that],stack:true},that.no_trow,that.proc);
   }
   else if ( arguments.length==5 ) {
     new Ezer.Eval(arguments[4],that.context,args,'if-else',
-      {fce:Ezer.str.if_,args:[that],stack:true});
+      {fce:Ezer.str.if_,args:[that],stack:true},that.no_trow,that.proc);
   }
   else {
     that.stack[++that.top]= 0;
