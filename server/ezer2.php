@@ -807,7 +807,8 @@
 //       $qry2= "SELECT $fields FROM $table $joins WHERE $cond $scond $group $order";
       $qry2= "SELECT count(*) as _pocet_ FROM $table $joins WHERE $cond $scond $group $order";
       $res2= mysql_qry($qry2);
-      $from= mysql_num_rows($res2);
+//       $from= mysql_num_rows($res2);
+      $from= mysql_result($res2,0);
       $from= max(0,$from-1);
 #      $from= intval($from/$rows)*$rows;  ### TZ, 12.1.2012, aby browse_seek odroloval tak že na prvním řádku bude požadovaný záznam
       if ( isset($x->group) || isset($x->having) && $x->having ) {
