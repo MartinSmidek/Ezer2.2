@@ -1734,7 +1734,7 @@ __XLS;
                 for ($i= $x; $i<= $y; $i++) {
                   if ( $ws )
                     $ws->getRowDimension($i)->setRowHeight($width);
-                    $html.= " R-$i:$width";
+                    if ( $list ) $html.= " R-$i:$width";
                 }
               }
             }
@@ -1742,7 +1742,7 @@ __XLS;
               $x= Excel5_col2n($co1);
               $y= $co2 ? Excel5_col2n($co2) : $x;
               if ( $x<=$y ) {
-                $html.= " C-$x-$y:$width";
+                if ( $list ) $html.= " C-$x-$y:$width";
                 for ($i= $x; $i<= $y; $i++) {
                   if ( $ws ) {
                     if ( $widthx=='*' )
@@ -1832,7 +1832,7 @@ __XLS;
       $context= $line;
     }
   }
-  $html= $list ? "<hr>".nl2br($desc)."<hr>$html" : ($err ? $html : '');
+  $html= $list ? "<hr>".nl2br($desc)."<hr>$html" : ($err ? "err=$err:$html" : '');
   return $html;
 }
 # -------------------------------------------------------------------------------------------------- Excel5_col2n
