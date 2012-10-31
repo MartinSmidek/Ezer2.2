@@ -619,8 +619,12 @@ Ezer.PanelInTabs_add= function(panel) {
     panel._tabDom= new Element('li',{styles:{display:'none'},
     events:{
       click: function(event) {
-        Ezer.pushState(href);
-        this._focus();
+        if ( !this.owner.activePanel
+          || (this.owner.activePanel && !this.owner.activePanel.is_fixed) ) {
+          // pokud panel není blokován proti ztrátě focusu
+          Ezer.pushState(href);
+          this._focus();
+        }
         return false;
       }.bind(panel)
     }

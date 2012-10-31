@@ -1310,15 +1310,30 @@ Ezer.Panel= new Class({
     this.DOM_add2();
   },
 // ------------------------------------------------------------------------------------ focus
-//fm: Panel.focus ([noevent])
-//      nastavení panelu jako zvoleného vč. vyvolání onfocus (pokud není noevent=1).
-//      Panel musí být zanořený do bloku Tabs
-  focus: function (noevent) {
+//fm: Panel.focus ([par])
+//      bez parametru nastaví panel jako aktivní vč. vyvolání onfocus
+//        (par=1 způsobí totéž ale bez onfocus).
+//      Pokud je par='fix' resp. 'unfix' zablokuje resp. odblokuje panel proti ztrátě fokusu při
+//         pokusu vybrat myší jiný panel v témže Tabs.
+//      Pokud par='fixed' pak funkce vrátí takto stav jako 1 pro 'fix' resp. 0 pro 'unfix'.
+//      Všechny funkce se týkají pouze panelů zanořených do bloku Tabs.
+//a: par - 1|'fix'|'unfix'
+  is_fixed: 0,
+  focus: function (par) {
+    var value= 1;
     if ( this.owner.type=='tabs' ) {
-      this.owner._focus();
-      this._focus(noevent);
+      if ( par=='fix' )
+        this.is_fixed= 1;
+      else if ( par=='unfix' )
+        this.is_fixed= 0;
+      else if ( par=='fixed' )
+        value= this.is_fixed;
+      else {
+        this.owner._focus();
+        this._focus(par);
+      }
     }
-    return true;
+    return value;
   },
 // ------------------------------------------------------------------------------------ popup
 //fm: Panel.popup (l,t)
