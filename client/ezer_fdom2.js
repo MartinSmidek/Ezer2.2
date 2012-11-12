@@ -1342,14 +1342,14 @@ Ezer.EditHtml.implement({
       ? this.DOM_Block.getElement('table.cke_editor')
       : this.DOM_Block;
     // pokud má element zobrazení
-    if ( on ) {
+    if ( div && on ) {
       this._changed= true;
       Ezer.fce.touch('block',this,'changed');     // informace do _touch na server
       if ( !quiet )
         div.addClass('changed');
       div.removeClass('empty').removeClass('empty_focus');
     }
-    else if ( !quiet )
+    else if ( div && !quiet )
       div.removeClass('changed');
   },
 // ------------------------------------------------------------------------------------ DOM_set
