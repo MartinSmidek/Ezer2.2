@@ -6696,6 +6696,16 @@ Ezer.fce.fdate= function (format,datetime) {
   return result;
 }
 // ================================================================================================= fce math
+// -------------------------------------------------------------------------------------- is_number
+//ff: fce.is_number (x)
+//   zjištění, zda x je číslo nebo string tvořící číslo
+//s: funkce
+//a: x - testovaná hodnota
+//r: 1 - je číslo
+//   0 - jinak
+Ezer.fce.is_number= function (x) {
+  return (x?1:0) && (isNaN(x)?0:1);
+}
 // -------------------------------------------------------------------------------------- lt
 //ff: fce.lt (x,y)
 //   porovnání čísel: x<y
