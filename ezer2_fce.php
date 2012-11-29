@@ -883,7 +883,7 @@ __JS
 # vygeneruje přehled přihlášení pro daný den
 #   $sign= 'all' => všechno
 function sys_day_logins($skip,$day,$sign='=') {
-//                                                         display("sys_day_errors($day,$sign)");
+//                                                         display("sys_day_logins($day,$sign)");
   global $user_options, $USER;
   $max_len= 512;
   $n= 0;
@@ -921,7 +921,7 @@ function sys_day_errors($skip,$day,$sign='=') {
   $cond= $sign=='all' ? '1' : "day$sign'$day'";
   $qry= "SELECT max(level) as bug, min(id_touch) as id, msg,
            group_concat($day1 time,' ',user,' ',module,' ',menu) as popis
-         FROM _touch WHERE $cond AND msg!='' AND user!='---' AND menu NOT IN ('speed','login') $and
+         FROM _touch WHERE $cond AND msg!='' AND user!='---' AND module!='speed' AND menu!='login' $and
          GROUP BY msg ORDER BY day DESC";
   $res= mysql_qry($qry);
   while ( $res &&$row= mysql_fetch_assoc($res) ) {

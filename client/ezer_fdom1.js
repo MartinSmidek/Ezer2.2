@@ -492,7 +492,11 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- bar_click
   bar_click: function () {
     var x= '', del= '';
+    // klik zobrazí resp. zhasne následující informace
     if ( !this.domFoot.get('text') ) {
+      // zjištění velikosti uživatelské plochy
+      x= 'window='+window.getSize().x+'x'+window.getSize().y+', ';
+      // přidání informací o uživateli
       for (var i in Ezer.sys.user) {
         if ( i!='skills' ) {
           x+= del+i+'='+Ezer.sys.user[i];
