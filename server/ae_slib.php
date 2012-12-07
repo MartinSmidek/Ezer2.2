@@ -688,6 +688,7 @@ function call_stack($act,$n,$hloubka=2,$show_call=1) { #$this->debug($act,'call_
 }
 # -------------------------------------------------------------------------------------------------- debug
 # vygeneruje čitelný obraz pole nebo objektu
+# pokud jsou data v kódování win1250 je třeba použít  debug($s,'s',(object)array('win1250'=>1));
 # options:
 #   gettype=1 -- ve třetím sloupci bude gettype(hodnoty)
 function debug($gt,$label=false,$options=null) {
