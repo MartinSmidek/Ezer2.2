@@ -719,6 +719,7 @@
     break;
   # ------------------------------------------------------------------------------------------------ browse_seek
   // stejná funkce jako browse_load, jako první bude vrácen řádek vyhovující podmínce x->seek
+  // CORR: pokud je celkový počet řádků <= tmax, vrací se všechny a
   // (které obsahuje nejvýše jednu podmínku)
   // pokud takový není, bude vráceno y->seek==0 jinak y->seek==key
   // ZATIM bez pořadi (jen podle key_id)
@@ -729,6 +730,7 @@
     $y->key_id= $x->key_id;
     $key_id= ($x->view ? "{$x->view}." : '').$x->key_id;
     $rows= $x->rows;
+    $tmax= $x->tmax;
     $db= $x->db ? $x->db : $mysql_db; $table= ($ezer_db[$db][5] ? $ezer_db[$db][5] : $db).'.'.$x->table;
     $atable= explode(' AS ',$table);
     $key_id= ($atable[1] ? "{$atable[1]}." : '') . $x->key_id;
@@ -804,17 +806,18 @@
         }
       }
       // zjištění počtu před záznamem, včetně něj
-//       $qry2= "SELECT $fields FROM $table $joins WHERE $cond $scond $group $order";
+      //       $qry2= "SELECT $fields FROM $table $joins WHERE $cond $scond $group $order";
       $qry2= "SELECT count(*) as _pocet_ FROM $table $joins WHERE $cond $scond $group $order";
       $res2= mysql_qry($qry2);
       $from= mysql_num_rows($res2);
       $from= max(0,$from-1);
+//                                                         display("from(1)=$from");
 #      $from= intval($from/$rows)*$rows;  ### TZ, 12.1.2012, aby browse_seek odroloval tak že na prvním řádku bude požadovaný záznam
       if ( isset($x->group) || isset($x->having) && $x->having ) {
-
-        // pokud je GROUP musíme použít SQL_CALC_FOUND_ROWS
-        $qry3= "SELECT SQL_CALC_FOUND_ROWS $fields FROM $table $joins
-                WHERE $cond $group $order LIMIT $from,$rows";
+        // ------------------------- pokud je GROUP musíme použít SQL_CALC_FOUND_ROWS
+        $qry3b= "SELECT SQL_CALC_FOUND_ROWS $fields FROM $table $joins
+                WHERE $cond $group $order";
+        $qry3= "$qry3b LIMIT $from,$rows";
         $res3= mysql_qry($qry3);
         $i= 0;
         if ( $res3 ) {
@@ -822,7 +825,22 @@
           $qry4= "SELECT FOUND_ROWS() AS count";
           $res4= mysql_qry($qry4);
           $row4= mysql_fetch_assoc($res4);
-          $y->count= $row4['count'];
+          $count= $row4['count'];
+//                                                         display("group: $count, $from, $tmax");
+          if ( $count<=$tmax ) {
+            // celý výběr se vejde do tabulky
+            $from= 0;
+            $rows= $count;
+            $qry3= "$qry3b LIMIT $from,$rows";
+            $res3= mysql_qry($qry3);
+          }
+          elseif ( $count-$from<$tmax ) {
+            // aby byla zaplněná celá tabulka, musíme načíst znovu
+            $from= $count-$tmax;
+            $rows= $tmax;
+            $qry3= "$qry3b LIMIT $from,$rows";
+            $res3= mysql_qry($qry3);
+          }
           // projití záznamů
           while ( $res3 && $row3= mysql_fetch_assoc($res3) ) {
             $i++;
@@ -832,24 +850,43 @@
               $y->values[$i][$f]= $a; //win2utf($a);
             }
           }
+          $y->count= $count;
         }
-
       }
       else {
-        // pokud není GROUP můžeme postupovat bez SQL_CALC_FOUND_ROWS
+        // ------------------------ pokud není GROUP můžeme postupovat bez SQL_CALC_FOUND_ROWS
+        $i= 0;
         $qry_base= "FROM $table $joins WHERE $cond ";
         // zjištění celkového počtu
         $y->count= 0;
         $qry= "SELECT count(*) as pocet $qry_base";
         $res= mysql_qry($qry);
-        $i= 0;
         if ( $res ) {
-          $y->count= mysql_result($res,0);
+          $y->count= 0+mysql_result($res,0);
+        }
+        $row2= mysql_fetch_assoc($res2);
+        $from= $row2['_pocet_'];
+//                                                         display("negroup: {$y->count}, $from, $tmax");
+        // úprava počátečního řádku, aby byl zobrazný konec konec tabulky, bude-li ve výběru
+        if ( $y->count<=$from+$tmax ) {
+          // za nalezeným řádkem lze všechny další zobrazit
+          $from= max($y->count-$tmax,0);
+//                                                         display("from(3)=$from");
+        }
+        else {
+          // za nalezeným řádkem je jich více než lze zobrazit => bude jako první
+          $from= max(0,$from-1);
         }
         if ( $y->count ) {
-          // projití záznamů
+          // projití záznamů, jsou-li
           $qry= "SELECT $fields $qry_base $order";
-          if ( $x->rows ) $qry.= " LIMIT $from,{$x->rows}";
+          if ( $y->count>$tmax && $tmax ) {
+            $qry.= " LIMIT $from,$tmax";
+          }
+          else {
+            // varianta pro malý počet záznamů
+            $from= 0;
+          }
           $res= mysql_qry($qry);
           $i= 0;
           while ( $res && $row= mysql_fetch_assoc($res) ) {
@@ -857,7 +894,6 @@
             foreach ($row as $f => $val) {
               $a= $val;
               if ( isset($pipe[$f]) ) $a= $pipe[$f][0]($a,$pipe[$f][1]);
-//               if ( $pipe[$f] ) $a= $pipe[$f]($a);
               $y->values[$i][$f]= $a;
             }
           }

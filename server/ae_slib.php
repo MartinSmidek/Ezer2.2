@@ -1943,7 +1943,7 @@ function Excel5_f(&$ws,$range,$v,&$err) {
 # spojení s databází
 # $db = jméno databáze uvedené v konfiguraci aplikace
 # $db = .main. pokud má být připojena první databáze z konfigurace
-function ezer_connect ($db='.main.') {
+function ezer_connect ($db='.main.',$even=false) {
   global $ezer_db;
   if ( $db=='.main.' ) {
     foreach ( $ezer_db as $db1=>$desc) {
@@ -1954,7 +1954,7 @@ function ezer_connect ($db='.main.') {
         $x= "db=$db";
   // vlastní připojení, pokud nebylo ustanoveno
   $db_name= $ezer_db[$db][5] ? $ezer_db[$db][5] : $db;
-  if ( !$ezer_db[$db][0] ) {
+  if ( !$ezer_db[$db][0] || $even ) {
     $ezer_db[$db][0]= @mysql_pconnect($ezer_db[$db][1],$ezer_db[$db][2],$ezer_db[$db][3]);
     if ( !$ezer_db[$db][0] ) {
       fce_error("$x|connect: server '{$ezer_db[$db][1]}' s databazi '"

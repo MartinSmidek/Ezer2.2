@@ -461,8 +461,8 @@ Ezer.Block= new Class({
 //   tags - regulární výraz popisující vyhovující tagy (např. 'f.|g')
   display: function (on,tags) {
     var ok= 1;
-    on= on=="0" ? 0 : on;
-    if ( on==undefined ) {
+    on= on=="0"||on===null ? 0 : on;
+    if ( on===undefined ) {
       var block= this instanceof Ezer.Var && this.value ? this.value.DOM_Block : this.DOM_Block;
       ok= block && block.getStyle('display')=='block' ? 1 : 0;
     }
@@ -4090,7 +4090,8 @@ Ezer.Browse= new Class({
   },
 // ------------------------------------------------------------------------------------ browse_seek-
 //fx: Browse.browse_seek ([seek_cond [,cond[,having]]])
-//      naplnění browse daty z tabulky
+//      naplnění browse daty z tabulky;
+//      pro správnou funkci musí browse obsahovat show s klíčem řídící tabulky
 //    1.pokud není definováno seek_cond, zopakuje předchozí browse_load včetně nastavení záznamu
 //      zobrazí tedy řádek s klíčem browse_key
 //      (i pokud nedošlo ke změně v datech dojde k překreslení browse);
@@ -4106,7 +4107,8 @@ Ezer.Browse= new Class({
   browse_seek: function(seek,cond,having,sql) {
     var x;
     if ( seek ) {
-      x= this._params({cmd:'browse_seek', seek:seek}, cond||null, null, having||null,null,null,null,sql||null);
+      x= this._params({cmd:'browse_seek', seek:seek, tmax:this.tmax},
+         cond||null, null, having||null,null,null,null,sql||null);
     }
     else {
       x= this._params({cmd:'browse_load'},null,null,null,this.b,-1,0,sql||null);
@@ -4208,7 +4210,7 @@ Ezer.Browse= new Class({
     var b= this.b, blen= this.blen, t= this.t, tlen= this.tlen, slen= this.slen;
     r= Math.min(Math.max(r,0),slen-1);
     if ( r!=this.r ) {
-      // pokud je pohyb uvnitř souboru a je jiná než současná
+      // pokud je pohyb uvnitř souboru a nová poloha je jiná než současná
       if ( t<=r && r<t+tlen ) {
         // pohyb v rámci tabulky                        // Ezer.trace('*','smarter row_move ['+b+'['+t+'[*'+r+'*]'+(t+tlen)+']'+(this.b+this.blen)+']'+slen+' - g');
         this.DOM_hi_row(r,noevent,true);
@@ -4269,7 +4271,7 @@ Ezer.Browse= new Class({
 // načtení pokračování buferu za/před stávající obsah
 //   t je začátek tabulky, r bude aktivní, len je potřeba načíst
   _browse_scroll: function(mode,r,b,blen,t,tlen,from,len) {
-//                                                         Ezer.trace('*','smarter _scroll r:'+r+',b:'+b+','+blen+',t:'+t+','+tlen+',S:'+from+','+len+' - '+mode);
+                                                        Ezer.trace('*','smarter _scroll r:'+r+',b:'+b+','+blen+',t:'+t+','+tlen+',S:'+from+','+len+' - '+mode);
     var x= this._params({cmd:'browse_scroll'},null,null,null,from,1);
     x.count= this.slen;                 // celkový počet záznamů select již známe
     //x.active= r;                      // záznam, který bude aktivní v tabulce
@@ -4308,10 +4310,16 @@ Ezer.Browse= new Class({
       this.keys= keys;
       break;
     case 2:                                     // část bloku je před buf => překrýt
-      // data je třeba vložit před začátek buferu - posledních rows zapomeneme
-      this.buf.splice(this.blen-rows,rows);
-      Array.prototype.splice.apply(this.buf,[0,0].concat(buf));
+      // data je třeba vložit před začátek buferu
+//       if ( this.blen+rows > this.bmax ) {
+//         // posledních rows zapomeneme
+//         var smazat= this.blen + rows - this.bmax;
+//         this.buf.splice(this.blen-1,smazat);
+//         this.keys.splice(this.blen-1,smazat);
+//       }
+      this.buf.splice(this.blen-rows,rows); // původní řešení: bylo místo předchozího if
       this.keys.splice(this.blen-rows,rows);
+      Array.prototype.splice.apply(this.buf,[0,0].concat(buf));
       Array.prototype.splice.apply(this.keys,[0,0].concat(keys));
       break;
     case 4:                                     // část bloku je za buf => překrýt
@@ -5139,11 +5147,14 @@ Ezer.Eval= new Class({
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  trace_fce
 // ms jsou nepovinné milisekundy
-  trace_fce: function(lc,str,context,args,typ,val,ms) {
+  trace_fce: function(lc,str,context,args,typ,val,ms,obj) {
     var tr= '', del= '';
     if ( str ) {
       while (tr.length < this.calls.length) tr+= ' ';
       if ( typ=='x2' || typ=='a2' ) tr+= '>';
+      if ( obj && obj.owner && obj.owner.id && obj.owner.type!='var' ) {
+        tr+= obj.owner.id+'.';
+      }
       tr+= str;
     }
     // argumenty
@@ -5484,7 +5495,8 @@ Ezer.Eval= new Class({
               }
               Ezer.calee= null;
               val= ( val===false ) ? obj : val;  // pokud není hodnota, zůstane objekt na zásobníku
-              if ( Ezer.to_trace && Ezer.is_trace.m ) this.trace_fce(cc.s,obj.id+'.'+cc.i,obj,args,'m',val);
+              if ( Ezer.to_trace && Ezer.is_trace.m )
+                this.trace_fce(cc.s,obj.id+'.'+cc.i,obj,args,'m',val,0,obj);
               this.stack[++this.top]= val;
               break;
             // přerušení: stav se uloží do context.continuation
@@ -6322,6 +6334,7 @@ Ezer.fce.sys= function () {
 // -------------------------------------------------------------------------------------- has_skill
 //ff: fce.has_skill (skills)
 //      zjistí zda přihlášený uživatel má aspoň jedno má z daných oprávnění
+//a: skills - hodnoty oddělené mezerou
 //r: 1 - ano
 //s: funkce
 Ezer.fce.has_skill= function (skills_query) {

@@ -241,7 +241,7 @@ ul.MainTabs {
 
 .ContextMenu   {
   border:1px solid #ccc; padding:2px; background:#fff; width:200px; list-style-type:none;
-  display:none; position:static; -moz-box-shadow:5px 5px 10px #567; cursor:default; }
+  display:none; position:static; box-shadow:5px 5px 10px #567; cursor:default; }
 .ContextMenu .separator   {
   border-top:1px solid #999; }
 .ContextMenu li   {
