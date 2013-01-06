@@ -849,6 +849,8 @@ function json_encode_simple($ao) {
   foreach ($ao as $o) {
     $js.= "$ad{"; $ad= ',';
     foreach ($o as $k => $v) {
+      if ( !mb_check_encoding($v, 'UTF-8') )
+        fce_error("json_encode_simple: invalid UTF string for $k:".urlencode($v));
       $js.= "$od\"$k\":\"".mysql_real_escape_string($v)."\""; $od= ',';
     }
     $js.=  '}';
@@ -863,6 +865,8 @@ function ezer_json_encode($ao) {
     $js.=  '['; $del= '';
     $n= 0; $indexy= false;
     foreach ($ao as $k => $v) {
+      if ( !mb_check_encoding($v, 'UTF-8') )
+        fce_error("json_encode_simple: invalid UTF string for $k:".urlencode($v));
       if ( !$indexy && $n!=$k ) $indexy= true;
       $i= $indexy ? (is_numeric($k) ? "$k=>" : "\"$k\"=>") : '';
       $js.= "$del$i".ezer_json_encode($v);
