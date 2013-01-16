@@ -33,9 +33,9 @@ Ezer.sys= {root:Ezer.root,user:{},ezer:{},options:Ezer.options};
 Ezer.const_value= function (id,val) {
   var value= null;
   // nedefinovaná konstanta musí být definována přes Ezer.konst
-  Ezer.assert(val!==null || Ezer.konst[id]!=undefined,
+  Ezer.assert(val!==null || Ezer.konst[id]!==undefined,
     Ezer.root+".php neobsahuje požadovanou definici konstanty '"+id+"'");
-  if ( Ezer.konst!={} && Ezer.konst[id]!=undefined ) {
+  if ( Ezer.konst!={} && Ezer.konst[id]!==undefined ) {
     // je použit mod přepisu konstant a konstanta s tímto jménem je v seznamu
     value= Ezer.konst[id];
   }
@@ -55,7 +55,7 @@ window.addEvent('load', function() {
 // ----------------------------------------------------------------------------- ON popstate
 if ( Ezer.browser!='IE' )                               // IE nepodporuje HTML5
   window.addEventListener("popstate", function(e) {
-  //                                                 Ezer.trace('*','the url has changed to '+location.href);
+//                                                  Ezer.trace('*','the url has changed to '+location.href+', state='+JSON.stringify(e.state));
     var re= /\?menu=([^&]*)&?/;
     var obj= re.exec(location.href);
     if ( obj && Ezer.run.$ ) Ezer.fce.href(obj[1]);
@@ -80,7 +80,7 @@ Element.implement({
     var myEvents = this.retrieve('events');
     //can we shoot this down?
     return myEvents && myEvents[eventType]
-      && (fn == undefined || myEvents[eventType].keys.contains(fn));
+      && (fn===undefined || myEvents[eventType].keys.contains(fn));
   }
 });
 Clientcide.setAssetLocation(Ezer.paths.images_cc);

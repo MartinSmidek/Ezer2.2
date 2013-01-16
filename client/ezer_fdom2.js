@@ -720,7 +720,7 @@ Ezer.PanelPopup.implement({
   // ---------------------------------------------------------------------------------- _show
   _show: function(l,t,noevent,title) {
     this.DOM.setStyles({display:'block'});
-    if ( !this.DOM_shown && l!=undefined && t!=undefined ) {
+    if ( !this.DOM_shown && l!==undefined && t!==undefined ) {
       // pokud není definován počátek, bude dialog centrální
       this.DOM.setStyles({left:l,top:t+Ezer.Shield.top});
     }
@@ -782,7 +782,7 @@ Ezer.Label.implement({
     this.DOM_Block= new Element('div',{'class':'Label',html:this.options.title||'',
       styles:this.coord({textAlign:align}),events:{
         click: function(el) {
-          if ( !Ezer.design ) {
+          if ( !Ezer.design && (this.options.enabled || this.options.enabled===undefined) ) {
             Ezer.fce.touch('block',this,'click');           // informace do _touch na server
             this.fire('onclick',[],el);
           }
@@ -812,6 +812,19 @@ Ezer.Label.implement({
   },
   DOM_get: function () {
     return this.DOM_Block.get('html');
+  },
+// ------------------------------------------------------------------------------------ DOM_enabled
+//f: Label-DOM.DOM_enabled (on)
+//      změní vzhled na enabled/disabled podle parametru nebo this.options.enabled
+  DOM_enabled: function(on) {
+    if ( this.DOM_Block ) {
+      if (on!==false && this.options.enabled) {
+        this.DOM_Block.removeClass('disabled');
+      }
+      else {
+        this.DOM_Block.addClass('disabled');
+      }
+    }
   }
 });
 // ================================================================================================= Button-DOM
@@ -1882,7 +1895,7 @@ Ezer.SelectAuto.implement({
 //      zobrazí hodnoty z this.Items a nastaví _empty=true pokud je jen jedna a to s nulovým klíčem
   DOM_addItems: function() {
     this.parent();
-    this._empty= this.Items[0]!=undefined;
+    this._empty= this.Items[0]!==undefined;
   },
 // ------------------------------------------------------------------------------------ DOM_changed
 //f: SelectAuto-DOM.DOM_changed (on[,quiet=0))

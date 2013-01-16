@@ -190,7 +190,7 @@ function debugx (gt,label,depth) {
   if ( $type(gt)=='array' || $type(gt)=='object' ) {
     c= $type(gt)=='array' ? '#ddeeff' : '#eeeeaa';
     x= "<table class='dbg' style='background-color:"+c+"'>";
-    x+= label!=undefined ? "<tr><td valign='top' colspan='2' class='title'>"+label+"</td></tr>" : '';
+    x+= label!==undefined ? "<tr><td valign='top' colspan='2' class='title'>"+label+"</td></tr>" : '';
     Object.each(gt,function(t,g){
       x+= "<tr><td valign='top' color='label'>"+g+"</td><td>"+debugx(t,null,depth-1)+"</td></tr>";
     });

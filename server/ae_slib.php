@@ -2020,7 +2020,8 @@ function mysql_err($qry) {
 #   $qry      -- SQL dotaz
 #   $pocet    -- pokud je uvedeno, testuje se a při nedodržení se ohlásí chyba
 #   $err      -- text chybové hlášky, která se použije místo standardní ... pokud končí znakem':'
-#                bude za ni doplněna standardní chybová hláška
+#                bude za ni doplněna standardní chybová hláška;
+#                pokud $err=='-' nebude generována chyba a funkce vrátí false
 #   $to_throw -- chyba způsobí výjimku
 #   $db       -- před dotazem je přepnuto na databázi daného jména v tabulce $ezer_db nebo na hlavní
 function mysql_qry($qry,$pocet=null,$err=null,$to_throw=false,$db='') {
@@ -2037,6 +2038,7 @@ function mysql_qry($qry,$pocet=null,$err=null,$to_throw=false,$db='') {
   $time= round(getmicrotime() - $time_start,4);
   $ok= $res ? 'ok' : '--';
   if ( !$res ) {
+    if ( $err=='-' ) goto end;
     $merr= mysql_error();
     $serr= "You have an error in your SQL";
     if ( $merr && substr($merr,0,strlen($serr))==$serr ) {
@@ -2087,6 +2089,7 @@ function mysql_qry($qry,$pocet=null,$err=null,$to_throw=false,$db='') {
     if ( $to_throw ) throw new Exception($err ? "$err$abbr" : $msg);
     else $y->error.= $msg;
   }
+end:
   return $res;
 }
 # -------------------------------------------------------------------------------------------------- ezer_qry

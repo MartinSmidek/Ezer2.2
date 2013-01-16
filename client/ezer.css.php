@@ -347,6 +347,8 @@ div.PanelPopup div.dragHandle {
 
 /* klávesnice a změny */
 
+.disabled {
+  color:#ccc !important; }
 .changed {
   outline:#f88 solid 2px !important; }
 .changed_ok {

@@ -732,7 +732,7 @@ Ezer.drag= {
   contextmenu: function (ev) {
     var form= $('drag_form');
     if ( form && (this instanceof Ezer.Button || this instanceof Ezer.Label ) ) {
-      if ( this.DOM_drag_menu==undefined ) {
+      if ( this.DOM_drag_menu===undefined ) {
         this.DOM_drag_menu=
           new ContextMenu({target:this.DOM_Block,menu:form,focus_css:null,
             offsets:{x:15,y:15,from:'target'}}).start();
@@ -807,7 +807,7 @@ Ezer.drag= {
           del= '+';
         }
       }
-      else if ( block.options[x]==undefined ) {
+      else if ( block.options[x]===undefined ) {
         // prázdná hodnota na místě width nebo height
         if ( change && change[x] && (x=='_w'||x=='_h')) {
           // pokud proběhla změna musí být nahrazena skutečnou hodnotou

@@ -178,8 +178,8 @@ Ezer.Block= new Class({
   set_attrib: function(name,val,desc) {
     Ezer.assert(typeof(name)=='string','první parametr není jménem atributu',this);
     var ids= name.split('.');
-    Ezer.assert(desc==undefined || this.desc.part[desc],desc+" není popsáno v "+this.id,this);
-    var o= desc==undefined ? this.options : this.desc.part[desc].options;
+    Ezer.assert(desc===undefined || this.desc.part[desc],desc+" není popsáno v "+this.id,this);
+    var o= desc===undefined ? this.options : this.desc.part[desc].options;
     for (var i= 0; i<ids.length-1; i++) {
       Ezer.assert(o[ids[i]],name+" je chybné jméno v set_attrib",this);
       o= o[ids[i]];
@@ -427,7 +427,7 @@ Ezer.Block= new Class({
   enable: function(enabled,tags) {
     var ok= 1;
     enabled= enabled=="0" ? 0 : enabled;
-    if ( enabled==undefined ) {
+    if ( enabled===undefined ) {
       ok= this.options.enabled;
 //       var block= this instanceof Ezer.Var && this.value ? this.value : this;
 //       ok= block && block.DOM_enabled();
@@ -548,7 +548,7 @@ Ezer.Block= new Class({
     if ( Ezer.options.autoskill )
       us+= ' '+Ezer.options.autoskill;
     if ( desc0 && desc0.part ) {
-      if ( !extend || this.part==undefined ) this.part= {};
+      if ( !extend || this.part===undefined ) this.part= {};
       for (var name in desc0.part) {
         var desc= desc0.part[name];
 //                                                 Ezer.trace('L','subBlocks of '+this.type+' '+this.id+': '+desc.type+' '+name);
@@ -1538,7 +1538,7 @@ Ezer.Var= new Class({
         if ( v[i]=='' )
           v= '';
         else
-          v= v[i]==undefined ? '' : v[i];
+          v= v[i]===undefined ? '' : v[i];
       },this)
     }
     else
@@ -1663,7 +1663,7 @@ Ezer.View= new Class({
       var field;
       $each(this.owner.part,function(field,id) {
         if ( field.data && field.view==this ) {
-          if ( y.values[id]==undefined )
+          if ( y.values[id]===undefined )
             field.init();                               // inicializuj hodnoty
           else
             field._load(y.values[id],this._key);        // ulož hodnoty
@@ -2033,7 +2033,7 @@ Ezer.Form= new Class({
               if ( top_view && lelem.view!=top_view )
                 continue;                       // pokud this=view testuj shodu
               if ( lelem.skill && lelem.get && (changed ? lelem.changed && lelem.changed() : 1)
-                && (lelem.data || lelem.options.expr || lelem.options.value!=undefined) ) {
+                && (lelem.data || lelem.options.expr || lelem.options.value!==undefined) ) {
                 subobj[lelem.id]= lelem instanceof Ezer.Select?lelem.key():lelem.get();
               }
             }
@@ -2041,7 +2041,7 @@ Ezer.Form= new Class({
           }
         }
         else if ( elem.skill && elem.get && (changed ? elem.changed && elem.changed() : 1)
-          && (elem.data || elem.options.expr || elem.options.value!=undefined) ) {
+          && (elem.data || elem.options.expr || elem.options.value!==undefined) ) {
           obj[elem.id]= elem instanceof Ezer.Select?elem.key():elem.get();
         }
       }
@@ -2121,7 +2121,7 @@ Ezer.Form= new Class({
           for (var iese in subform.part) {// projdi elementy podformuláře List
             var lelem= subform.part[iese];
             if ( lelem.changed && lelem.changed() ) {
-              if ( !all && lelem.data==undefined )
+              if ( !all && lelem.data===undefined )
                 continue;
               same= 0;
               break parts;
@@ -2130,7 +2130,7 @@ Ezer.Form= new Class({
         }
       }
       else if ( elem.changed && elem.changed() ) {
-        if ( !all && elem.data==undefined )
+        if ( !all && elem.data===undefined )
           continue;
         same= 0;
         break parts;
@@ -2167,7 +2167,7 @@ Ezer.Form= new Class({
       var field;
       $each(this.part,function(field,id) {
         if ( field.data || field.options.expr ) {
-          if ( y.values[id]==undefined /*|| y.values[id]==''*/ )
+          if ( y.values[id]===undefined /*|| y.values[id]==''*/ )
             field.init();                               // inicializuj hodnoty
           else
             field._load(y.values[id],this._key);        // ulož hodnoty
@@ -2655,7 +2655,7 @@ Ezer.Elem= new Class({
       this.DOM_changed(1,1);
     }
     else if ( init_values ) {
-      if ( this.options.value!=undefined ) {
+      if ( this.options.value!==undefined ) {
         this.set(this.options.value||'');
         if ( init_values==2 ) {
           this.change(1);
@@ -2900,7 +2900,7 @@ Ezer.Radio= new Class({
 //      naplní element hodnotou atributu 'value'
 //      pro init_values==2 s nastavením elementu jako change
   init: function (init_values) {
-    if ( this.options.value!=undefined ) {
+    if ( this.options.value!==undefined ) {
       this.value= this.options.value;
       this.DOM_set();
       if ( init_values==2 )
@@ -3149,7 +3149,7 @@ Ezer.Select= new Class({
       Ezer.assert(this.Items,'nedefinované položky v select',this);
       this.value= this.Items[this._key];
 //       this.empty= false;
-      if ( this.value==undefined )
+      if ( this.value===undefined )
         this.value= '';
       this.DOM_set();
     }
@@ -3385,7 +3385,7 @@ Ezer.SelectMap= new Class({
       }
       this.key(this._key);
       this.DOM_set();
-      if ( init_values==2 && this.options.value!=undefined)
+      if ( init_values==2 && this.options.value!==undefined)
         this.change(1);
       else
         this.DOM_changed(0);
@@ -3840,7 +3840,7 @@ Ezer.Browse= new Class({
 //      zruš všechny výběrové podmínky a provede základní výběr, pokud není reload=0
 //a: reload - pokud je reload=0 nebude po zrušení pomínek proveden dotaz
   init_queries: function (reload) {
-    reload= reload==undefined ? 1 : reload;
+    reload= reload===undefined ? 1 : reload;
     this.DOM_focus();
     for ( var ic in this.part ) {
       var clmn= this.part[ic];
@@ -3990,7 +3990,7 @@ Ezer.Browse= new Class({
       for (var vi in y.values[1]) {             // vi je identifikátor show
         // hodnota bude do buf transformována show._load
         this.buf[bi][vi]= this.part[vi]._load(y.values[1][vi]);
-        if ( this.keys[bi]==undefined && this.part[vi].data && this.part[vi].data.id==y.key_id ) {
+        if ( this.keys[bi]===undefined && this.part[vi].data && this.part[vi].data.id==y.key_id ) {
           // klíč je zapsán jen podle první položky, která jej má v data.id
           this.owner._key= this.keys[bi]= this.buf[bi][vi];
         }
@@ -4068,7 +4068,7 @@ Ezer.Browse= new Class({
         for (var vi in y.values[bi+1]) {        // vi je identifikátor show
           // hodnota bude do buf transformována show._load
           this.buf[bi][vi]= this.part[vi]._load(y.values[bi+1][vi]);
-          if ( this.keys[bi]==undefined && this.part[vi].data && this.part[vi].data.id==y.key_id ) {
+          if ( this.keys[bi]===undefined && this.part[vi].data && this.part[vi].data.id==y.key_id ) {
             // klíč je zapsán jen podle první položky, která jej má v data.id
             this.owner._key= this.keys[bi]= this.buf[bi][vi];
           }
@@ -4295,7 +4295,7 @@ Ezer.Browse= new Class({
         for (var vi in y.values[bi+1]) {        // vi je identifikátor show
           // hodnota bude do buf transformována show._load
           buf[bi][vi]= this.part[vi]._load(y.values[bi+1][vi]);
-          if ( keys[bi]==undefined && this.part[vi].data && this.part[vi].data.id==y.key_id ) {
+          if ( keys[bi]===undefined && this.part[vi].data && this.part[vi].data.id==y.key_id ) {
             // klíč je zapsán jen podle první položky, která jej má v data.id
             key= keys[bi]= buf[bi][vi];
           }
@@ -4389,7 +4389,7 @@ Ezer.Browse= new Class({
       if ( this.css_clmn ) {
         // obarvení řádku podle algoritmu css_alg (sloupec musí mít číselnou hodnotu)
         icss= Number(this.buf[this.t+i-1-this.b][this.css_clmn.id]);
-        if ( this.css[icss]==undefined ) {            // indexující styly
+        if ( this.css[icss]===undefined ) {            // indexující styly
           // defaultní styl, pokud je definován
           if ( this.css_default ) css+= ' '+this.css_default;
         }
@@ -4409,7 +4409,7 @@ Ezer.Browse= new Class({
             if ( clmn.css_clmn ) {
               // pokud je požadavek na barvení, najdi sloupec, který ho určuje a doplň barvu
               icss= Number(this.buf[this.t+i-1-this.b][clmn.css_clmn.id]);
-              if ( clmn.css[icss]==undefined ) {            // indexující styly
+              if ( clmn.css[icss]===undefined ) {            // indexující styly
                 // defaultní styl, pokud je definován
                 if ( clmn.css_default ) ccss+= ' '+clmn.css_default;
               }
@@ -4762,7 +4762,7 @@ Ezer.Show= new Class({
     // provedení změny
     var val= 1;
     if ( this.DOM_th ) {
-      if ( w==undefined )
+      if ( w===undefined )
         val= this.DOM_th.getStyle('width').toInt();
       else if ( Number(w)==0 ) {
         width_set.call(this,0);
@@ -4800,7 +4800,7 @@ Ezer.Show= new Class({
     if ( i>0 && i<=this.owner.options.qry_rows ) {
       this.DOM_qry_set(i,val);
     }
-    if ( reload==undefined || reload==1 )
+    if ( reload===undefined || reload==1 )
       x= this.owner.browse_load(null,null,null,null,-1);
     return x;
   },
@@ -5050,7 +5050,7 @@ Ezer.Eval= new Class({
   val: function(x) {
     var t= '?', tp= $type(x), tpi= '<i>'+tp+'</i>';
     if ( x==null ) t= '<b>null</b>';
-    else if ( x==undefined ) t= '<b>undefined</b>';
+    else if ( x===undefined ) t= '<b>undefined</b>';
     else switch (tp) {
     case 'string':
       t= htmlentities(x);
@@ -6050,7 +6050,7 @@ Ezer.obj_ref= function (name,obj) {
   // jednotlivá id již musí být obsaženy v postupně se upřesňujícím kontextu
   // pokud ne, je navrácena hodnota null
   for (var i= 0; i<ids.length; i++) {
-    if ( ctx && ctx[ids[i]]!=undefined ) {
+    if ( ctx && ctx[ids[i]]!==undefined ) {
       ctx= ctx[ids[i]];
     }
     else {
@@ -6289,10 +6289,10 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
   }
   else if ( typ_x=='o' && typ_y=='f' ) {        // object --> form
     $each(y.part,function(field,id) {
-      if ( field.key && x[id]!=undefined ) {
+      if ( field.key && x[id]!==undefined ) {
         field.key(x[id],key);
       }
-      else if ( field.set && x[id]!=undefined ) {
+      else if ( field.set && x[id]!==undefined ) {
         field.set(x[id],key);
       }
     });
@@ -6543,7 +6543,7 @@ Ezer.fce.replace= function () {
     if ( typeof(x)!='string' && x.toString() )
       x= x.toString();
     for (var i= 1; i<arguments.length; i+=2) {
-      a= String(arguments[i]); b= arguments[i+1]==undefined?'':arguments[i+1];
+      a= String(arguments[i]); b= arguments[i+1]===undefined?'':arguments[i+1];
       r= new RegExp(a.replace(/\$/,'\\\$'),'g');
       x= x.replace(r,b);
     }
@@ -6681,7 +6681,7 @@ Ezer.fce.now_sql= function (time_too) {
 //s: funkce
 Ezer.fce.fdate= function (format,datetime) {
   var result= '', x, y, d;
-  if ( datetime==undefined ) {
+  if ( datetime===undefined ) {
     d= new Date();
   }
   else {
@@ -6997,7 +6997,7 @@ Ezer.fce.href= function (path) {
     if ( part && part._focus ) {
       part._focus();
       for (var i=1; i<xs.length; i++) {
-        if ( (part.options.include==undefined || part.options.include=='onload'
+        if ( (part.options.include===undefined || part.options.include=='onload'
            || part.options.include=='loaded')
           && part.part && (part= part.part[xs[i]]) ) {
           switch (part.type) {
@@ -7036,7 +7036,7 @@ Ezer.fce.href= function (path) {
           }
         }
         else {
-          Ezer.fce.warning('odkaz '+path+' má nedostupnou ',i+1,'. část ',part==undefined?'':part);
+          Ezer.fce.warning('odkaz '+path+' má nedostupnou ',i+1,'. část ',part===undefined?'':part);
           break walk;
         }
       }
@@ -7203,11 +7203,13 @@ Ezer.fce.warning= function () {
 // -------------------------------------------------------------------------------------- set_trace
 //ff: fce.set_trace (id,on)
 //      změní chování systémového trasování podle parametrů
-//a: id - písmeno označující druh trasování
+//a: id - písmena označující druh trasování
 //   on - 1 pro zapnutí, 0 pro vypnutí
 //s: funkce
 Ezer.fce.set_trace= function (id,on) {
-    Ezer.App._setTraceOnOff(id,on);
+  for (var i=0; i<id.length; i++) {
+    Ezer.App._setTraceOnOff(id[i],on);
+  }
   return 1;
 }
 // -------------------------------------------------------------------------------------- debug
