@@ -201,20 +201,11 @@ Ezer.Application= new Class({
     if ( this.options.to_trace ) {
       this._barRightDom.getChildren().destroy();
       Ezer.to_trace= this.options.show_trace;
-      new Element('span', {text:'trace:','class':Ezer.to_trace?'ae_switch_on':'',
+      this._barTrace= new Element('span', {text:'trace:','class':Ezer.to_trace?'ae_switch_on':'',
         title:'zapíná/vypíná trasování',
         events:{
           click: function(event) {
-            Ezer.to_trace= 1-Ezer.to_trace;
-            event.target[Ezer.to_trace ? 'addClass':'removeClass']('ae_switch_on');
-            if ( Ezer.to_trace ) {
-              $('kuk').setStyle('display','block');
-              $('status_bar').setStyles({cursor:'ns-resize'});
-            }
-            else {
-              $('status_bar').setStyles({cursor:'default'});
-              $('kuk').setStyle('display','none');
-            }
+            this._showTrace(1-Ezer.to_trace);
             this.send_status();
             this.DOM_layout();
           }.bind(this)
@@ -313,6 +304,20 @@ Ezer.Application= new Class({
   _clearError: function() {
     if ( $('error') ) $('error').set('text','').setStyle('display','none');
     this._ajax_init();
+  },
+  // ----------------------------------------------------------------------------- _setTraceOnOff
+  // ovládá zobrazení okna trasování - on=1 zapne, on=0 vypne
+  _showTrace: function (on) {
+    Ezer.to_trace= on ? 1 : 0;
+    this._barTrace[on ? 'addClass':'removeClass']('ae_switch_on');
+    if ( Ezer.to_trace ) {
+      $('kuk').setStyle('display','block');
+      $('status_bar').setStyles({cursor:'ns-resize'});
+    }
+    else {
+      $('status_bar').setStyles({cursor:'default'});
+      $('kuk').setStyle('display','none');
+    }
   },
   // ----------------------------------------------------------------------------- _setTraceOnOff
   // nastaví trasování podle klíče id - on=1 vypne, on=0 zapne

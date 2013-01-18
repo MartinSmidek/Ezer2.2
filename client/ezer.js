@@ -7201,14 +7201,22 @@ Ezer.fce.warning= function () {
   return str;
 };
 // -------------------------------------------------------------------------------------- set_trace
-//ff: fce.set_trace (id,on)
-//      změní chování systémového trasování podle parametrů
-//a: id - písmena označující druh trasování
+//ff: fce.set_trace (id,on) nebo fce.set_trace (on)
+//      změní chování systémového trasování podle parametrů, je-li použit jen jeden parametr
+//      umožňuje zobrazit nebo skrýt testovací okno
+//a: id - písmeno označující druh trasování
 //   on - 1 pro zapnutí, 0 pro vypnutí
 //s: funkce
 Ezer.fce.set_trace= function (id,on) {
-  for (var i=0; i<id.length; i++) {
-    Ezer.App._setTraceOnOff(id[i],on);
+  if ( arguments.length==1 ) {
+    // ovládá zobrazení trasovacího okna
+    Ezer.App._showTrace(id);
+  }
+  else {
+    // ovládá jednotlivé přepínače
+    for (var i=0; i<id.length; i++) {
+      Ezer.App._setTraceOnOff(id[i],on);
+    }
   }
   return 1;
 }
