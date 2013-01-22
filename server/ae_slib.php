@@ -768,7 +768,7 @@ function debugx(&$gt,$label=false,$html=0,$depth=64,$length=64,$win1250=0,$getty
 # ================================================================================================== MySQL
 # -------------------------------------------------------------------------------------------------- select
 # navrácení hodnoty jednoduchého dotazu
-# pokud $expr obsahuje čárku, vrací pole hodnot
+# pokud $expr obsahuje čárku, vrací pole hodnot, pokud $expr je hvězdička vrací objekt
 # příklad 1: $id= select("id","tab","x=13")
 # příklad 2: list($id,$x)= select("id,x","tab","x=13")
 function select($expr,$table,$cond=1,$db='.main.') {
@@ -778,6 +778,12 @@ function select($expr,$table,$cond=1,$db='.main.') {
     $res= mysql_qry($qry,0,0,0,$db);
     if ( !$res ) fce_error(wu("chyba funkce select:$qry"));
     $result= mysql_fetch_row($res);
+  }
+  elseif ( $expr=='*' ) {
+    $qry= "SELECT * FROM $table WHERE $cond";
+    $res= mysql_qry($qry,0,0,0,$db);
+    if ( !$res ) fce_error(wu("chyba funkce select:$qry"));
+    $result= mysql_fetch_object($res);
   }
   else {
     $result= '';
