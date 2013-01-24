@@ -137,7 +137,14 @@ Ezer.Block= new Class({
 // ------------------------------------------------------------------------------------ attach_code
 //fm: Block.attach_code (o)
   attach_code: function (o) {
-    this.DOM_destroy();
+    // odstraň všechny mimo procedur a proměnných
+    for (var i in this.part) {
+      var p= this.part[i];
+      if ( p instanceof Ezer.Block && p.type!='proc' ) {
+        p.delete();
+      }
+    }
+    this.DOM_destroy();                                   // vymaž viditelné prvky
     if ( this.DOM_re1 ) this.DOM_re1();                   //
     this.subBlocks(o,this.DOM,null,'rewrite');            // true => doplnění a přepis
     if ( this.DOM_re2 ) this.DOM_re2();                   // specificky doplní menu

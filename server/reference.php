@@ -193,6 +193,25 @@ function i_doc_ini($ini_filename,$proj) {
     }
   }
 }
+# -------------------------------------------------------------------------------------------------- i_glob
+# vybere do pole soubory podle masky
+# maska: složka/regexpr
+function i_glob($mask) {
+  $dirname = preg_replace('~[^/]*$~', '', $mask);
+  $dir = opendir(strlen($dirname) ? $dirname : ".");
+  $return = array();
+  if ($dir) {
+    $pattern = "~^$mask\$~";
+    while (($filename = readdir($dir)) !== false) {
+      if ($filename != "." && $filename != ".." && preg_match($pattern, "$dirname$filename")) {
+        $return[] = "$dirname$filename";
+      }
+    }
+    closedir($dir);
+    sort($return);
+  }
+  return $return;
+}
 # -------------------------------------------------------------------------------------------------- i_doc_app
 # $fnameslist je maska souborů s dokumentací aplikace ve wiki formátu
 # tyto soubory jsou uloženy vzhledem k cestě $ezer_path_root
@@ -237,7 +256,7 @@ function i_doc_app($fnameslist,$chapter,$to_save=true) {
   if ( $fnameslist=='.test.' ) $text= $parser->test();
   elseif ( $fnameslist=='.wiki.' ) $text= i_doc_wiky('try');
   else {
-    $fnames= simple_glob("$ezer_path_root/$fnameslist");
+    $fnames= i_glob("$ezer_path_root/$fnameslist");
     $text= '';
     foreach ( $fnames as $fname ) if ( substr($fname,-10)!='/todo.wiki' ) {
       $text.= "<h3>modul $fname</h3>";
@@ -729,9 +748,12 @@ function i_doc_lang() { //trace();
 }
 # -------------------------------------------------------------------------------------------------- i_doc_reset
 # inicializuje generovanou část dokumentace
-function i_doc_reset() {
+function i_doc_reset($chapter=null) {
   global $mysql_db; $db= $mysql_db;
-  $qry= "TRUNCATE TABLE $db.ezer_doc2";
+  if ( $chapter )
+    $qry= "DELETE FROM $db.ezer_doc2 WHERE chapter='$chapter'";
+  else
+    $qry= "TRUNCATE TABLE $db.ezer_doc2";
   $res= mysql_qry($qry);
   return $text;
 }
@@ -1016,6 +1038,7 @@ function i_doc_menu($chapters,$section0,$class0) {
       if ( $id ) $gr->part->$id= $tm;
     }
   }
+                                                debug($mn);
   return $mn;
 }
 // =================================================================================================

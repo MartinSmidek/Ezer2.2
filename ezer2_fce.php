@@ -241,7 +241,7 @@ function sys_user_skills($file='') {
 #   $path_backup     -- složka záloh databází
 #   $ezer_mysql_path -- cesta k utilitě mysql
 # -------------------------------------------------------------------------------------------------- sys_backup_make
-# BACKUP: uloží obrazy databází do příslušných složek
+# BACKUP: uloží obrazy databází do příslušných složek, pro lokální systém připojí postfix -local
 # parametry
 #   listing  - přehled existujících záloh
 #   download - přehled existujících záloh s možností downloadu
@@ -252,9 +252,11 @@ function sys_user_skills($file='') {
 #   special  - uložení okamžité zálohy do složky special
 #   kontrola - kontrola existence dnešní zálohy
 function sys_backup_make($par) {  trace();
-  global $path_backup, $ezer_root;
+  global $path_backup, $ezer_root, $EZER;
   $html= '';
   $sign= date("Ymd_Hi");
+  if ( $EZER->options->local )
+    $sign.= "-local";
   switch ($par->typ) {
   case 'download':
   case 'listing':

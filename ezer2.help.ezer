@@ -7,8 +7,10 @@ panel apl [,,770,] {type:'right', title:'Dokumentace', _sys:'dok'
     }
   }
   use u: form f [0,0,,]
-  proc onstart() {
+  proc onstart() { set_apl_menu }
+  proc set_apl_menu() {
     var g: object
+    apl.focus;
     m.attach_code(ask('i_doc_menu','application','',''));
     g.set(m.part('menu.group',1));
     g.get; g.part('item',1); g.part('item',1).click
@@ -52,29 +54,33 @@ panel gen [,,770,] {type:'right', title:'Generování', _sys:'gen', skill:'m'
 #         proc onclick ()  u.hresult.set(ask('i_doc','javascript','ezer'));
 #         proc onclick ()  u.hresult.set(ask('i_doc','javascript','app'));
           ref.m.attach_code(ask('i_doc_menu','reference','',''))
-        }
-      }
+      }}
       item b {title:'reference jazyka'
-        proc onclick () { u.hresult.set(ask('i_doc','ezerscript'));
+        proc onclick () {
+          u.hresult.set(ask('i_doc_reset','ezerscript'));
+          u.hresult.set(ask('i_doc','ezerscript'));
           ref.m.attach_code(ask('i_doc_menu','reference','',''))
-        }
-      }
+      }}
       item c {title:'dokumentace Ezer'
-        proc onclick () { u.hresult.set(ask('i_doc','reference','ezer2/wiki/*.wiki'));
+        proc onclick () {
+          u.hresult.set(ask('i_doc_reset','reference'));
+          u.hresult.set(ask('i_doc','reference','ezer2/wiki/*.wiki'));
           ref.m.attach_code(ask('i_doc_menu','reference','',''))
-        }
-      }
+      }}
       item d {title:'dokumentace aplikace'
-        proc onclick () { u.hresult.set(ask('i_doc','application','wiki/*.wiki'));
-          apl.m.attach_code(ask('i_doc_menu','application','',''))
-        }
-      }
+        proc onclick () {
+          u.hresult.set(ask('i_doc_reset','application'));
+          u.hresult.set(ask('i_doc','application',conc('wiki/(',sys('root'),'|ezer)_.*\.wiki')));
+          apl.set_apl_menu;
+#           apl.m.attach_code(ask('i_doc_menu','application','',''))
+      }}
     }
     menu dele {title:'údržba',type:'group'
       item a {title:'smazat vše'
         proc onclick () { u.hresult.set(ask('i_doc_reset'));
-          ref.m.attach_code(ask('i_doc_menu','reference','',''))
-        }}
+          ref.m.attach_code(ask('i_doc_menu','reference','',''));
+          apl.m.attach_code(ask('i_doc_menu','application','',''))
+      }}
     }
     proc onclick(x) { echo('menu',x._id) }
   }
