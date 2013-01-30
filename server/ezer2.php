@@ -1,4 +1,5 @@
 <?php # (c) 2008 Martin Smidek <martin@smidek.eu>
+  error_reporting(E_ALL & ~E_NOTICE);
   # ------------------------------------------------------------------------------------------------ paths, globals
   # globální objekty ($json bude v PHP6 zrušeno)
   global $ezer_root, $ezer_path_serv, $ezer_path_appl, $ezer_path_root, $ezer_db, $ezer_system;
@@ -1114,6 +1115,7 @@
                                                 display("$res:$qry");
       }
     }
+    if ( !$y->sys ) $y->sys= (object)array();
     $y->sys->user= $USER;              // přenos do klienta
     $y->sys->ezer= $EZER;
     break; /* user_login */
@@ -1151,6 +1153,7 @@
     else {
       $y->user_id= 0;
     }
+    if ( !$y->sys ) $y->sys= (object)array();
     $y->sys->user= $USER;              // přenos do klienta
     $y->sys->ezer= $EZER;
     check_version($y);

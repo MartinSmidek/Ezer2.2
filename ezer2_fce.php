@@ -317,7 +317,7 @@ function sys_backup_make($par) {  trace();
     break;
   case 'kontrola':
     $d= date('N');                                              // dnešní den v týdnu (pondělí=1)
-    sys_backup_test("$path_backup/days/$d",date("Ymd_*"),&$backs,$ok);
+    sys_backup_test("$path_backup/days/$d",date("Ymd_*"),$backs,$ok);
 //                                         display("$ok:$backs");
     $html.= $backs && $ok ? "Dnešní zálohy byly vytvořeny v pořádku"
       : ($backs ? "Některé":"Žádné") . " dnešní zálohy nebyly vytvořeny";
@@ -326,7 +326,7 @@ function sys_backup_make($par) {  trace();
   case 'kaskada':
     $d= date('N');                                              // dnešní den v týdnu (pondělí=1)
     // kontrola existence záloh - aby nedošlo k přepsání
-    sys_backup_test("$path_backup/days/$d",date("Ymd_*"),&$backs,$ok);
+    sys_backup_test("$path_backup/days/$d",date("Ymd_*"),$backs,$ok);
     if ( $ok ) {
       $html.= "<br>dnešní zálohy již v 'days/$d' existují";
     }
@@ -698,7 +698,7 @@ function sys_day_modules($skip,$day,$short=false) {
          WHERE day='$day' AND user!='' $and
          GROUP BY module,menu,user,hour(time) ORDER BY module,menu";
   $res= mysql_qry($qry);
-  while ( $res &&$row= mysql_fetch_assoc($res) ) {
+  while ( $res && $row= mysql_fetch_assoc($res) ) {
     $user= $row['user'];
     $hour= $row['hour'];
     $hours[$hour]= true;
@@ -728,7 +728,7 @@ function sys_days_modules($skip,$day,$ndays,$short=false) {
          WHERE day BETWEEN '$day'-INTERVAL $ndays DAY AND '$day' AND user!='' /*AND module='block'*/ $and
          GROUP BY module,menu,user,day ORDER BY module,menu";
   $res= mysql_qry($qry);
-  while ( $res &&$row= mysql_fetch_assoc($res) ) {
+  while ( $res && $row= mysql_fetch_assoc($res) ) {
     $user= $row['user'];
     $day= $row['day'];
     $days[$day]= true;
@@ -800,7 +800,7 @@ function sys_days_users($skip,$day,$ndays,$short=false) {
          WHERE day BETWEEN '$day'-INTERVAL $ndays DAY AND '$day' AND user!='' $AND
          GROUP BY user,module,menu,day ORDER BY user,day";
   $res= mysql_qry($qry);
-  while ( $res &&$row= mysql_fetch_assoc($res) ) {
+  while ( $res && $row= mysql_fetch_assoc($res) ) {
     $user= $row['user'];
     $day= $row['day'];
     $days[$day]= true;
@@ -855,7 +855,7 @@ function sys_bugs($level) {
            group_concat(day,' ',time,' ',user,' ',module,' ',menu) as popis
          FROM _touch WHERE msg!='' GROUP BY msg HAVING bug=$level ORDER BY day DESC";
   $res= mysql_qry($qry);
-  while ( $res &&$row= mysql_fetch_assoc($res) ) {
+  while ( $res && $row= mysql_fetch_assoc($res) ) {
     $n++;
     $popis= $row['popis'];
     $id= $row['id'];
@@ -926,7 +926,7 @@ function sys_day_errors($skip,$day,$sign='=') {
          FROM _touch WHERE $cond AND msg!='' AND user!='---' AND module!='speed' AND menu!='login' $and
          GROUP BY msg ORDER BY day DESC";
   $res= mysql_qry($qry);
-  while ( $res &&$row= mysql_fetch_assoc($res) ) {
+  while ( $res && $row= mysql_fetch_assoc($res) ) {
     $n++;
     $popis= $row['popis'];
     $id= $row['id'];
@@ -974,7 +974,7 @@ function sys_day_error($id,$akce) {
     $qry= "SELECT group_concat(id_touch) AS ids FROM _touch WHERE msg="
       . "(SELECT msg FROM _touch WHERE id_touch=$id)";
     $res= mysql_qry($qry);
-    if ( $res &&$row= mysql_fetch_assoc($res) ) {
+    if ( $res && $row= mysql_fetch_assoc($res) ) {
       $ids= $row['ids'];
       $qry= "DELETE FROM _touch WHERE FIND_IN_SET(id_touch,'$ids')";
       $res= mysql_qry($qry);

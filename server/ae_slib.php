@@ -483,10 +483,12 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
   $ezer_path_todo= "$ezer_path_root/wiki";
   $ezer_path_pspad= $path_pspad[$sada];
   // parametrizace standardních modulů
+  if ( !$EZER->options ) $EZER->options= (object)array();
   $EZER->options->root= $ezer_root;
   $EZER->options->app=  $ezer_root;
   $EZER->options->index= "$ezer_root.php";
   $EZER->options->docs_ref= "docs";
+  if ( !$EZER->activity ) $EZER->activity= (object)array();
   $EZER->activity->touch_limit= 50; // počet dotyků (ae_hits) po kterých je uskutečněn zápis do _touch
   $EZER->activity->colors= "80:#f0d7e4,40:#e0d7e4,20:#dce7f4,0:#e7e7e7";  // viz system.php::sys_table
   // knihovní moduly
@@ -2032,6 +2034,7 @@ function mysql_err($qry) {
 #   $db       -- před dotazem je přepnuto na databázi daného jména v tabulce $ezer_db nebo na hlavní
 function mysql_qry($qry,$pocet=null,$err=null,$to_throw=false,$db='') {
   global $y, $totrace, $qry_del, $qry_count, $ezer_db;
+  if ( !isset($y) ) $y= (object)array();
   $msg= ''; $abbr= '';
   $qry_count++;
   $myqry= str_replace('"',"U",$qry);

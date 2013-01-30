@@ -970,6 +970,7 @@ function walk_struct($down,$pcode,$beg,$end,$ift,$iff) {
   $icode= $beg;
   $i_next= $icode;
   $typ= $down->typ;
+  if (!$down)   $down=   (object)array();
   $down->i= $icode;
   $down->ift= $ift;
   $down->iff= $iff;
@@ -1019,6 +1020,7 @@ function def_jumps($c,$pcode) {
   // definice skoků s optimalizací
   if ( $t || $f ) {
     $i= $c->i + $c->len - 1;
+    if ( !$pcode[$i] ) $pcode[$i]= (object)array();
 //                                         debug($pcode,"jmp:$len,{$c->typ},{$c->len},$i/$e");
 //                                         display("jmp:$len,{$c->typ},{$c->len},$i/$e");
     // úprava skoku pro kódy, které nedávají stavovou hodnotu na zásobník: 'w'
@@ -1557,7 +1559,10 @@ function get_ezer (&$top) {
 //     $top= new stdClass;
     while ( $ok && !$errors ) {
       $ok= get_if_block($top,$block,$id);
-      if ( $ok ) $top->part->$id= $block;
+      if ( $ok ) {
+        if ( !$top->part ) $top->part= (object)array();
+        $top->part->$id= $block;
+      }
     }
     $nlex= count($lex);
     $ok= true;
@@ -1613,7 +1618,7 @@ function get_if_block ($root,&$block,&$id) {
 //     if ( in_array($key,$blocs2[$root]) ) {
     $block= new stdClass;
     $block->type= $key;
-    $block->options= null;
+    $block->options= (object)array();
     if ( isset($specs[$key]) ) {
       if ( in_array('map_table' ,$specs[$key])
            && get_delimiter(':') && get_keyed_name('table',$copy,$lc,$nt) ) $block->table= $copy;
@@ -1672,6 +1677,7 @@ function get_if_block ($root,&$block,&$id) {
           // atributy
           while ( $ok ) {
             if ( $ok= get_if_attrib($key,$aid,$aval)) {
+              if ( !$block->options ) $block->options= (object)array();
               $block->options->$aid= $aval;
             }
             get_if_delimiter(',');
@@ -1709,6 +1715,7 @@ function get_if_block ($root,&$block,&$id) {
           while ( $ok ) {
             $ok= get_if_block($block,$xblock,$xid);
             if ( $ok ) {
+              if ( !$block->part ) $block->part= (object)array();
               $block->part->$xid= $xblock;
             }
             get_if_delimiter(',');
@@ -1852,6 +1859,7 @@ function get_if_coorp ($block) {
   $ok= get_if_delimiter('[');
   $block->_c= $pos[$head-1];
   if ( $ok ) {
+    if ( !$block->options ) $block->options= (object)array();
     if ( get_cexpr($cexpr,'^') ) $block->options->_l= $cexpr;
     get_delimiter(',');
     if ( get_cexpr($cexpr,'^','~') ) $block->options->_t= $cexpr;
@@ -2169,7 +2177,7 @@ function get_code($context,&$code,&$vars,&$prior) {
   $start= $head;
   if ( get_if_delimiter ('/') ) {
     // priorita onstart
-    $ok= get_if_number (&$prior);
+    $ok= get_if_number ($prior);
   }
 //   else {
     get_delimiter('{');

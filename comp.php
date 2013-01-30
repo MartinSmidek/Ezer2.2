@@ -2,6 +2,8 @@
 
 # screen=1 zobrazí rozměr klientské části
 
+  error_reporting(E_ALL & ~E_NOTICE);
+
   # identifikace ostrého serveru
   $ezer_local= preg_match('/^\w+\.ezer/',$_SERVER["SERVER_NAME"]);
   $favicon= $ezer_local ? "comp_local.png" : "comp.png";
