@@ -1131,6 +1131,23 @@ Ezer.MenuLeft= new Class({
     this.parent(codes,oneval);
     this.owner.menuleft= this;
   },
+// ------------------------------------------------------------------------------------ attach_code
+//fm: MenuLeft.attach_code (o)
+  attach_code: function (o) {
+    // odstraň všechny mimo procedur a proměnných
+    for (var i in this.part) {
+      var p= this.part[i];
+      if ( p instanceof Ezer.Block && p.type!='proc' ) {
+        p.delete();
+      }
+    }
+    this.DOM_destroy();                                   // vymaž viditelné prvky
+    if ( this.DOM_re1 ) this.DOM_re1();                   //
+    this.subBlocks(o,this.DOM,null,'rewrite');            // true => doplnění a přepis
+    this.DOM_excite();
+//     if ( this.DOM_re2 ) this.DOM_re2();                   // specificky doplní menu
+    return true;
+  },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  excite
 //f: MenuLeft.excite ()
 //      zajistí prvotní zobrazení levého menu, vyznačí item s active, nebo první item
@@ -1143,9 +1160,9 @@ Ezer.MenuLeft= new Class({
         Ezer.excited= 3;
         var ids= Ezer.options.start.split('.');
         if ( ids.length==5 ) {
-          Ezer.assert(1==Ezer.run_name(ids[2]+'.'+ids[3]+'.'+ids[4],this,ctx)
-            ,'LOAD: atribut active neoznačuje item menu');
-          obj= ctx[0];
+          var ok= Ezer.run_name(ids[2]+'.'+ids[3]+'.'+ids[4],this,ctx);
+          if ( ok )
+            obj= ctx[0];
         }
       }
       if ( !obj && (id= this.options.active) ) {

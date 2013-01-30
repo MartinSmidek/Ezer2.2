@@ -1,16 +1,15 @@
 #pragma library
 panel apl [,,770,] {type:'right', title:'Dokumentace', _sys:'dok'
-  menu m {type:'left', active:*
+  menu m {type:'left'                   // nesmí mít active
     proc onclick(x) {
       u.hresult.set(ask('i_doc_show','application',x.owner._id,x._id))
 #      echo(u,apl.u)
     }
   }
   use u: form f [0,0,,]
-  proc onstart() { set_apl_menu }
+  proc onfirstfocus() { set_apl_menu }  // nesmí být v onstart
   proc set_apl_menu() {
     var g: object
-    apl.focus;
     m.attach_code(ask('i_doc_menu','application','',''));
     g.set(m.part('menu.group',1));
     g.get; g.part('item',1); g.part('item',1).click
@@ -71,6 +70,7 @@ panel gen [,,770,] {type:'right', title:'Generování', _sys:'gen', skill:'m'
         proc onclick () {
           u.hresult.set(ask('i_doc_reset','application'));
           u.hresult.set(ask('i_doc','application',conc('wiki/(',sys('root'),'|ezer)_.*\.wiki')));
+          apl.focus;
           apl.set_apl_menu;
 #           apl.m.attach_code(ask('i_doc_menu','application','',''))
       }}
