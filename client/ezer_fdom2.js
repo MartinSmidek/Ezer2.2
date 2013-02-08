@@ -1890,6 +1890,17 @@ Ezer.SelectAuto.implement({
       }.bind(this)
     });
   },
+// ------------------------------------------------------------------------------------ DOM_seekItem
+//f: SelectAuto-DOM.DOM_seekItem
+//      konec select výběrem hodnoty
+  DOM_seekItem: function (sel) {
+    this.value= !sel.value || sel.value>999990 ? '' : $(sel).get('text');
+    this._key=  !sel.value || sel.value>999990 ? 0 : sel.value;
+    this.DOM_set();
+    this.DOM_DropList.setStyle('display','none');
+    this.DOM_Block.setStyle('zIndex',2);
+    this.change();
+  },
 // ------------------------------------------------------------------------------------ DOM_addItems
 //f: SelectAuto-DOM.DOM_addItems
 //      zobrazí hodnoty z this.Items a nastaví _empty=true pokud je jen jedna a to s nulovým klíčem

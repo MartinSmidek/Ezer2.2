@@ -1627,8 +1627,9 @@ Ezer.View= new Class({
     this._key= null;                      // vynuluj klíč view => místo save bude insert
     for (var ie in this.owner.part) {     // projdi elementy fomuláře a nastav je jako změněné
       var field= this.owner.part[ie];
-      if ( field._load && field.data && field.view==this ) {
-        if ( ['field','field.date','edit','select.map','check','radio','chat'].contains(field.type) )
+      if ( field.view==this && field.change && field.data ) {
+//       if ( field._load && field.data && field.view==this ) {
+//         if ( ['field','field.date','edit','select.map','check','radio','chat'].contains(field.type) )
           field.change(1);
       }
     }
@@ -1687,7 +1688,7 @@ Ezer.View= new Class({
       var field;
       $each(this.owner.part,function(field,id) {
         if ( field.data && field.view==this ) {
-          if ( y.values[id]===undefined )
+          if ( y.values[id]===undefined || y.values[id]===null )
             field.init();                               // inicializuj hodnoty
           else
             field._load(y.values[id],this._key);        // ulož hodnoty
@@ -2079,7 +2080,8 @@ Ezer.Form= new Class({
   copy: function () {
     this._key= null;                      // vynuluj klíč => místo save bude insert
     for (var ie in this.part) {           // projdi elementy a nastav je jako změněné
-      if ( ['field','field.date','edit','select.map','check','radio','chat'].contains(this.part[ie].type) )
+//       if ( ['field','field.date','edit','select.map','check','radio','chat'].contains(this.part[ie].type) )
+      if ( this.part[ie].change )
         this.part[ie].change(1);
     }
     return true;
@@ -2191,7 +2193,7 @@ Ezer.Form= new Class({
       var field;
       $each(this.part,function(field,id) {
         if ( field.data || field.options.expr ) {
-          if ( y.values[id]===undefined /*|| y.values[id]==''*/ )
+          if ( y.values[id]===undefined || y.values[id]===null )
             field.init();                               // inicializuj hodnoty
           else
             field._load(y.values[id],this._key);        // ulož hodnoty
