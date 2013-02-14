@@ -245,7 +245,7 @@ Ezer.Block= new Class({
       var k= 1;
       for (var i in b.part) {
         var p= b.part[i];
-        if ( p.type.substr(0,name.length)==name ) {
+        if ( p && p.type.substr(0,name.length)==name ) {
           if ( n==k++ ) {
             o= p;
             break;

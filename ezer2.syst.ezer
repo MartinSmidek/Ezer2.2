@@ -568,7 +568,7 @@ panel needs [,,770,] {type:'right', title:'Požadavky', _sys:'poz', skill:'sp'
       form.same
     | form.key;
       // změna požadavku
-      form.save; todo.browse_seek; form.load;
+      form.save; form.key(todo.browse_seek); form.load;
       [ do_notify; old_notify; ask('sys_todo_notify','upd',form.key,form.json(1)) ];
     | // nový požadavek
       fields.set(form.json(1)); form.insert; form.load;

@@ -103,7 +103,9 @@ function i_doc($typ,$fnames='') {
     break;
   case 'application':
     $text.= "<h1>Generování popisu modulů: $fnames</h1>";
-    $text.= i_doc_app($fnames,$typ);
+                                                display($fnames);
+    $app_text= i_doc_app($fnames,$typ);
+    $text= $app_text ? $app_text : "";
     break;
   case 'survay':
     $text.= "<h1>Přehled stavu dokumentace</h1>";
@@ -113,7 +115,7 @@ function i_doc($typ,$fnames='') {
     break;
   }
 //   debug($i_doc_info);
-  return "<div id='Content'>$text</div>";
+  return $text;
 }
 # -------------------------------------------------------------------------------------------------- i_doc_wiky
 # vytvoří automatickou wiki-dokumentaci ze zdrojového textu (pokud existuje)
@@ -374,7 +376,7 @@ function i_doc_app($fnameslist,$chapter,$to_save=true) {
       }
     }
   }
-  return $text;
+  return $text ? $text : "";
 }
 # -------------------------------------------------------------------------------------------------- i_doc_line
 # ln== [ all, letter|- , -* , $info ]
@@ -755,7 +757,7 @@ function i_doc_reset($chapter=null) {
   else
     $qry= "TRUNCATE TABLE $db.ezer_doc2";
   $res= mysql_qry($qry);
-  return $text;
+  return "Nápověda ".($chapter ? "pro $chapter" : "")." byla resetována";
 }
 # -------------------------------------------------------------------------------------------------- i_doc_show_chapter
 # vrátí vygenerovaný text dokumentace ezerscriptu
@@ -1003,7 +1005,7 @@ function i_doc_show($chapter,$section,$class) {
     }
     break;
   }
-  return "<div id='Content'>$text</div>";
+  return $text;
 }
 # -------------------------------------------------------------------------------------------------- i_doc_menu
 # vygeneruje menu pro danou kapitolu ve formátu pro menu_fill

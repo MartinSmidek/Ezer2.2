@@ -210,7 +210,6 @@ Ezer.MenuLeft.implement({
 //f: MenuLeft-DOM.DOM_excite ()
 //      prvotní zobrazení levého menu
   DOM_excite: function (active) {
-
     var DOM= this.DOM_Block, div;
     // nalezení aktivního
     if ( active && active.type=='item' ) {
@@ -228,7 +227,7 @@ Ezer.MenuLeft.implement({
     DOM.getElements('.MGroupContent').setStyle('display', 'block');
     var selected= DOM.getElement('.MSelected');
     var current= (selected) ? selected.getParent() : false;
-    $each(this.part,function(group) { if ( group.type=='menu.group' ) {
+    $each(this.part,function(group) { if ( group instanceof Ezer.MenuGroup ) {
       var link= group.domA;
       var block= group.DOM_Block;
       if (block != current )
