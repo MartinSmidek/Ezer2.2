@@ -910,7 +910,7 @@ function sys_day_logins($skip,$day,$sign='=') {
   return $result.$html;
 }
 # -------------------------------------------------------------------------------------------------- sys_day_errors
-# vygeneruje přehled chyb pro daný den
+# vygeneruje přehled chyb pro dané období
 #   $sign= 'all' => všechno
 function sys_day_errors($skip,$day,$sign='=') {
 //                                                         display("sys_day_errors($day,$sign)");
@@ -921,10 +921,10 @@ function sys_day_errors($skip,$day,$sign='=') {
   $html.= '<dl>';
   $day1= $sign=='=' ? '' : "day,' ',";
   $cond= $sign=='all' ? '1' : "day$sign'$day'";
-  $qry= "SELECT max(level) as bug, min(id_touch) as id, msg,
+  $qry= "SELECT max(level) as bug, min(id_touch) as id, msg, inside, after, module,
            group_concat($day1 time,' ',user,' ',module,' ',menu) as popis
          FROM _touch WHERE $cond AND msg!='' AND user!='---' AND module!='speed' AND menu!='login' $and
-         GROUP BY msg ORDER BY day DESC";
+         GROUP BY id_touch /*msg*/ ORDER BY day DESC";
   $res= mysql_qry($qry);
   while ( $res && $row= mysql_fetch_assoc($res) ) {
     $n++;
@@ -933,6 +933,8 @@ function sys_day_errors($skip,$day,$sign='=') {
     $bug= $row['bug'];
     $msg= $row['msg'];
     $msg= strtr($msg,array('<'=>'&lt;','>'=>'&gt;'));
+    if ( $row['inside'] ) $msg.= " <b>in</b> {$row['inside']}";
+    if ( $row['after'] ) $msg.= " <b>after</b> {$row['after']}";
     if ( strlen($msg)>$max_len ) $msg= substr($msg,0,$max_len).' ...';
     // generování
     $color= $bug==1 ? '#fb6' : ($bug==2 ? '#6f6' : '#eee');

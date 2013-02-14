@@ -94,7 +94,7 @@
       ezer_connect('ezer_system');      // používá se kvůli mysql_query
       $qry= "SELECT options FROM $ezer_system._user WHERE id_user={$x->user_id}";
       try {
-        $res= @mysql_query($qry);       // nelze použit mysql_qry - neohlásila by se chyba
+        $res= @mysql_query($qry);       // nelze použít mysql_qry - neohlásila by se chyba
         if ( $res ) {
           $u= mysql_fetch_object($res);
           $options= $json->decode($u->options);
@@ -116,6 +116,14 @@
       if ( $x->msg ) {
         $text1= ",msg";
         $text2= ',"'.strtr($x->msg,'"',"'").'"';
+      }
+      if ( $x->inside ) {
+        $text1.= ",inside";
+        $text2.= ',"'.strtr($x->inside,'"',"'").'"';
+      }
+      if ( $x->after ) {
+        $text1.= ",after";
+        $text2.= ',"'.strtr($x->after,'"',"'").'"';
       }
 //       if ( 1 ) {
 //         $qry= "SELECT options FROM $ezer_system._user WHERE id_user={$x->user_id} ";
@@ -1481,8 +1489,8 @@
 
   $y->php_b= strlen($yjson);
 //   $yjson= json_encode($y,JSON_UNESCAPED_UNICODE);
-//   $yjson= $json->encode($y);            // protože json_encode chybuje
-  $yjson= json_encode($y);
+  $yjson= $json->encode($y);            // protože json_encode chybuje pro non UTF-8 znaky
+//   $yjson= json_encode($y);
   echo $yjson;
   exit;
 

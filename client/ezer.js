@@ -5829,9 +5829,6 @@ Ezer.Eval= new Class({
         Ezer.trace('M',y.qry,null,Math.round(y.qry_ms*1000)/1000);
       if ( y.error ) {
         Ezer.error('EVAL: '+y.error,'s',this.proc,this.proc?this.proc.desc._lc:null);
-//         Ezer.trace(0,y.error);
-//         Ezer.fce.DOM.error(y.error);
-//         Ezer.fce.touch('error',y.error);
       }
       else if ( obj ) {
         val= obj[fce+'_'].call(obj,y);
@@ -7302,57 +7299,57 @@ Ezer.fce.error= function (str,level,block,lc,calls) {
     }
   }
   // přidání trail na konec výpisu
-  var trail= ' after '+Ezer.fce.trail('show_err');
+  var estr= "<b>ERROR:</b> "+str;
+  var inside= "";
+  var trail= Ezer.fce.trail('show_err');
   if ( !ok ) {
     // systémové zpracování chyby
     if ( level=='S' ) {
       // volání z funkce Ezer.Eval.eval
-      inside= block ? ' in '+Ezer.App.block_info(block,lc,true) : '';
-      str= '<b>ERROR: '+str+'</b>'+inside+trail;
+      if ( block )
+        inside= Ezer.App.block_info(block,lc,true);
       Ezer.trace(0,str);
-      Ezer.fce.DOM.error(str);
-      Ezer.fce.touch('error',str);
+      Ezer.fce.DOM.error(estr+(inside?(" <b>in</b> "+inside):'')+" <b>after</b> "+trail);
+      Ezer.fce.touch('error',str,[inside,trail]);
       throw 'S';
     }
     else if ( level=='C') {
       // hlášení kompilátoru o syntaktické chybě
+      inside= "compiler";
       Ezer.fce.DOM.error(str);
+      Ezer.fce.DOM.error(estr+" <b>in compiler</b>");
     }
     else if ( level=='s' ) {
       // s: volání z funkce volané z Ezer.Eval.eval
       Ezer.trace(0,str);
       if ( block ) {
-        str+= ' in '+block.id;
-        str+= ' at '+Ezer.App.block_info(block,lc,true);
+        inside= block.id;
+        inside+= ' at '+Ezer.App.block_info(block,lc,true);
         // pokud je to možné zobraz zásobník volání
         if ( calls ) {
-          str+= ' called ';
+          inside+= ' called ';
           for(var i= calls.length-1; i>0; i--) {
             if ( calls[i].proc ) {
-              str+= ' from '+calls[i].proc.id;
+              inside+= ' from '+calls[i].proc.id;
             }
           }
         }
       }
-      str+= trail;
-      Ezer.fce.DOM.error(str,true);
-      Ezer.fce.touch('error',str);
+      Ezer.fce.DOM.error(estr+(inside?(" <b>in</b> "+inside):'')+" <b>after</b> "+trail);
+      Ezer.fce.touch('error',str,[inside,trail]);
     }
     else if ( level=='E') {
       // zachycená chybová hláška
       if ( self.navigator.product=='Gecko' && block ) {
-        str+= ' at line '+block.lineNumber+' in '+block.fileName;
+        inside= ' line '+block.lineNumber+' in '+block.fileName;
       }
-      str+= trail;
       Ezer.trace(0,str);
-      Ezer.fce.DOM.error(str);
-      Ezer.fce.touch('error',str);
+      Ezer.fce.DOM.error(estr+(inside?(" <b>in</b> "+inside):'')+" <b>after</b> "+trail);
+      Ezer.fce.touch('error',str,[inside,trail]);
     }
     else {
       // jiná chyba (mimo Ezer.Eval.eval)
-      str+= trail;
-      var estr= '<b>ERROR: '+str+'</b>';
-      Ezer.fce.DOM.error(estr);
+      Ezer.fce.DOM.error(estr+" <b>after</b> "+trail);
       if ( level!=='msg' ) throw {level:level,msg:str};
     }
   }
@@ -7448,6 +7445,10 @@ Ezer.fce.touch= function (type,block,args) {
       x.module= type;
       x.msg= block;
       to_send= true;
+      if ( args ) {
+        x.inside= args[0];
+        x.after= args[1];
+      }
 //                                                 Ezer.trace('*','touch error '+x.msg);
       break;
     }
