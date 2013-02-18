@@ -1489,8 +1489,8 @@
 
   $y->php_b= strlen($yjson);
 //   $yjson= json_encode($y,JSON_UNESCAPED_UNICODE);
-  $yjson= $json->encode($y);            // protože json_encode chybuje pro non UTF-8 znaky
-//   $yjson= json_encode($y);
+//   $yjson= $json->encode($y);            // protože json_encode chybuje pro non UTF-8 znaky
+  $yjson= json_encode($y);
   echo $yjson;
   exit;
 
