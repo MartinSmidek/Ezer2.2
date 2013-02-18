@@ -28,8 +28,10 @@
 //                                                         debug($USER,"USER=$ezer_user_id,{$_SESSION['user_id']}");
 //                                                         debug($_SESSION,"USER=$ezer_user_id,{$_SESSION['user_id']}");
   // licensované knihovny I
-  require_once("$ezer_path_serv/licensed/JSON.php");
-  $json= new Services_JSON();
+//   require_once("$ezer_path_serv/licensed/JSON.php");
+//   $json= new Services_JSON();
+  require_once("$ezer_path_serv/licensed/JSON_Ezer.php");
+  $json= new Services_JSON_Ezer();
   ezer_connect();
   # ------------------------------------------------------------------------------------------------ json ...
   if ( !function_exists("json_encode") ) {
@@ -1477,20 +1479,14 @@
 //   $y->sys->ezer= $EZER;              // redukce informace - přesunuto do user_relogin, user_login
   header('Content-type: application/json; charset=UTF-8');
   $y->php_ms= round(getmicrotime() - $php_start,4);
-//   $yjson= $json->encode($y);            // protože json_encode chybuje
-  $yjson= json_encode($y);
-//   $yjson= json_encode($y,JSON_UNESCAPED_UNICODE);
 
-//   // test json_encode
-//   $_yjson= json_encode($y->value);
-//   if ( !json_decode($_yjson) ) {
-//     $y->json_last_error= 'ERROR'.json_last_error(); // vrací 0 i když nic nepřevede
-//   }
-
-  $y->php_b= strlen($yjson);
-//   $yjson= json_encode($y,JSON_UNESCAPED_UNICODE);
-//   $yjson= $json->encode($y);            // protože json_encode chybuje pro non UTF-8 znaky
-  $yjson= json_encode($y);
+  // nový konec - zvlášť pro trasování, kvůli odchytu non UTF-8
+  if ( $x->totrace ) {
+    $yjson= $json->encode($y);          // pomalejší ale předá i non UTF-8
+  }
+  else {
+    $yjson= json_encode($y);
+  }
   echo $yjson;
   exit;
 
