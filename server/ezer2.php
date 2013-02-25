@@ -1529,65 +1529,66 @@ function json_encode_short($data) {
 # -------------------------------------------------------------------------------------------------- browse_status
 # doplněk metody browse.browse_status - z jejího výsledku zkonstruuje části dotazu a celý dotaz
 function browse_status($x) {
-  $fields= ''; $clmns= ''; $del= '';
+  $clmns= ''; $del= '';
+  $y= (object)array();
   $y->par= $x->par;
-  $db= $x->db ? $x->db : $mysql_db; $table= ($ezer_db[$db][5] ? $ezer_db[$db][5] : $db).'.'.$x->table;
-  $atable= explode(' AS ',$table);
+  $db= $x->db ? $x->db : $mysql_db; $y->table= ($ezer_db[$db][5] ? $ezer_db[$db][5] : $db).'.'.$x->table;
+  $atable= explode(' AS ',$y->table);
   $key_id= ($atable[1] ? "{$atable[1]}." : '') . $x->key_id;
   $pipe= array();
+  // přenos parametrů
+  $y->fields= '';
+  $y->group= $x->group;
+  $y->having= $x->having;
+  $y->cond= stripslashes($x->cond);
   // konstrukce JOIN
-  $joins= '';
+  $y->joins= '';
   if ( isset($x->joins) ) {
-    foreach ( $x->joins as $join ) $joins.= " $join";
+    foreach ( $x->joins as $join ) $y->joins.= " $join";
   }
   // konstrukce ORDER
-  $order= $x->optimize->qry=='noseek'
+  $y->order= $x->optimize->qry=='noseek'
   ? ($x->order ? " ORDER BY {$x->order}" : '')
   : ($x->order ? " ORDER BY {$x->order},$key_id" : " ORDER BY $key_id");
   // seznam čtených polí
   foreach ($x->fields as $desc) {
     if ( isset($desc->expr) ) {
       $f= $desc->id;
-      $fields.= "$del{$desc->expr} as {$desc->id}";
+      $y->fields.= "$del{$desc->expr} as {$desc->id}";
       $clmns.= "$del{$desc->id}";
     }
     else {
       $fld= isset($x->joins) && strpos($desc->field,'.')===false
-        ? "$del{$table}.{$desc->field}"
+        ? "$del{$y->table}.{$desc->field}"
         : "$del{$desc->field}";
       if ( isset($desc->id) ) {
         $f= $desc->id;
-        $fields.= "$fld as {$desc->id}";
+        $y->fields.= "$fld as {$desc->id}";
         $clmns.= "$del{$desc->id}";
       }
       else {
         $f= $desc->field;
-        $fields.= $fld;
+        $y->fields.= $fld;
         $clmns.= "$del$f";
       }
     }
-    if ( isset($desc->pipe) ) {
-      list($paf,$parg)= explode(':',$desc->pipe);
-      if ( !function_exists($paf) )
-        $y->error.= "$paf není PHP funkce";
-      else
-        $pipe[$f]= array($paf,$parg);
-    }
+//     if ( isset($desc->pipe) ) {
+//       list($paf,$parg)= explode(':',$desc->pipe);
+//       if ( !function_exists($paf) )
+//         $y->error.= "$paf není PHP funkce";
+//       else
+//         $pipe[$f]= array($paf,$parg);
+//     }
     $del= ',';
   }
-  $cond= stripslashes($x->cond);
   // redakce odpovědi
-  $qry= "SELECT $fields FROM $table $joins WHERE $cond ";
+  $y->qry= "SELECT {$y->fields} FROM {$y->table} {$y->joins} WHERE {$y->cond} ";
   if ( $x->group ) {
-    $qry.= " GROUP BY {$x->group}";
-    if ( $x->having ) $qry.= " HAVING {$x->having}";
+    $y->qry.= " GROUP BY {$x->group}";
+    if ( $x->having ) $y->qry.= " HAVING {$x->having}";
   }
-  $qry.= $order;
-  return (object)array(
-    'qry'=>$qry,
-    'fields'=>$fields, 'table'=>$table, 'joins'=>$joins, 'cond'=>$cond,
-    'group'=>$x->group, 'having'=>$x->having, 'order'=>$order
-  );
+  $y->qry.= $y->order;
+  return $y;
 }
 # -------------------------------------------------------------------------------------------------- check_version
 # předá informaci o změně verze jádra při obnově přihlášení
