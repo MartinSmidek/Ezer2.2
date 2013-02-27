@@ -392,19 +392,31 @@ function sys_backup_into($into,$sign) {   trace();
         $cmd.= "> $path";
         if (substr(php_uname(), 0, 7) == "Windows" ) {
                                                 display("windows rise:$cmd");
-          $WshShell= new COM("WScript.Shell");
+          try {
+//             $WshShell= new COM("WScript.Shell");
 //                                                 debug($WshShell,"windows shell");
-          $oExec= $WshShell->Run($cmd, 1, false);
-          $pid= @popen("start /B ". $cmd, "r");
-          if ( $pid ) {
-            $msg= fread($pid, 2096);
-            $dbs.= "$name:<br>$file -- ukládání bylo odstartováno ($msg)";
-            @pclose($pid);
-                                                display("windows rised:$cmd");
+//             $oExec= $WshShell->Run($cmd, 1, false);
+            $pid= @popen("start /B ". $cmd, "r");
+            if ( $pid ) {
+              $msg= fread($pid, 2096);
+              $dbs.= "$name:<br>$file -- ukládání bylo odstartováno ($msg)";
+              @pclose($pid);
+                                                  display("windows rised:$cmd");
+            }
+            else {
+              $dbs.= "$name:<br>$file -- start ukládání zhavaroval ";
+            }
           }
-          else {
-            $dbs.= "$name:<br>$file -- start ukládání zhavaroval ";
-          }
+          catch (Exception $e) {
+            // zkusíme podle https://bugs.php.net/bug.php?id=44942
+            session_write_close();  //Close the session before proc_open()
+            $proc= proc_open($cmd,"r");
+            //do stuff with pipes...
+            //... and close pipes
+            $retval= proc_close($proc);
+            session_start(); //restore session
+                                                display("windows proc_close:$retval");
+           }
         }
         else {
                                                 display("linux:$cmd");
