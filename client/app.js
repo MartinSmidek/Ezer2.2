@@ -27,7 +27,7 @@ Ezer.excited= 0;                // >0 pokud bylo již použito Ezer.options.star
 Ezer.konst= Ezer.konst || {};   // hodnoty nedefinovaných konsta(const x;y;z)
 Ezer.curr= {panel:null};        // zobrazený panel
 // systémové proměnné (root,user,ezer,options)
-Ezer.sys= {root:Ezer.root,user:{},ezer:{},options:Ezer.options};
+Ezer.sys= {root:Ezer.root,user:{},ezer:{},version:Ezer.version,options:Ezer.options};
 // ------------------------------------------------------------------------------------------------- const_value
 // vrátí hodnotu konstanty případně opravenou o hodnotu z Ezer.konst
 Ezer.const_value= function (id,val) {

@@ -654,7 +654,7 @@ hr.cleaner {
 /* dokumentace */
 
 #Content, #Index{ background: #fff; /*margin-left: 10px; margin-left: 210px;*/ padding:15px;
-                /*font-size: 13px;*/ min-height: 400px;}
+                /*font-size: 13px;*/ /*min-height: 400px;*/}
 #MainTopic .CTitle, .IPageTitle
          	{ padding: 5px 10px; background: #78ba91; color: #fff; margin-bottom: 10px;
                   /*text-shadow: 2px 2px 1px #679956;*/ }

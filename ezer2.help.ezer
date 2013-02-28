@@ -42,7 +42,10 @@ panel str [,,770,] {type:'right', title:'Struktura', _sys:'str', skill:'m'
 panel gen [,,770,] {type:'right', title:'Generování', _sys:'gen', skill:'m'
   menu m {type:'left', active:*
     menu stav {title:'stav',type:'group'
-      item {title:'přehled' proc onclick () { u.fill(ask('i_doc','survay')) } }
+      item {title:'přehled' proc onclick () {
+        u.fill("<h1>Přehled systémové dokumentace</h1>");
+        u.append(ask('i_doc','survay'))
+      } }
 #       item {title:'tabulka funkcí' proc onclick () { u.fill(ask('i_doc','funcs')) } }
 #       item {title:'tabulka atributů' proc onclick () { u.fill(ask('i_doc','attrs')) } }
     }
@@ -52,41 +55,36 @@ panel gen [,,770,] {type:'right', title:'Generování', _sys:'gen', skill:'m'
       }
     }
     menu refr {title:'obnovit',type:'group'
-      item a {title:'dokumentace z komentářů'
-        proc onclick () { u.fill(ask('i_doc','javascript','app,ezer,ezer_report,ezer_fdom1,ezer_fdom2'));
-#         proc onclick ()  u.fill(ask('i_doc','javascript','ezer'));
-#         proc onclick ()  u.fill(ask('i_doc','javascript','app'));
-          ref.m.attach_code(ask('i_doc_menu','reference','',''))
-      }}
-      item b {title:'reference jazyka'
+      item {title:'systémová dokumentace'
         proc onclick () {
-          u.fill(ask('i_doc_reset','ezerscript'));
-          u.fill(ask('i_doc','ezerscript'));
+          u.fill("<h1>Reset systémové dokumentace</h1>");
+          u.append(ask('i_doc_reset','ezerscript'));
+          u.append(ask('i_doc_reset','reference'));
+          u.append(ask('i_doc','ezerscript'));
+          u.append(ask('i_doc','reference',conc(sys('version'),'/wiki/.*\.wiki')));
+          u.append(ask('i_doc','javascript','app,ezer,ezer_report,ezer_fdom1,ezer_fdom2'));
           ref.m.attach_code(ask('i_doc_menu','reference','',''))
       }}
-      item c {title:'dokumentace Ezer'
-        proc onclick () {
-          u.fill(ask('i_doc_reset','reference'));
-          u.fill(ask('i_doc','reference','ezer2/wiki/*.wiki'));
-          ref.m.attach_code(ask('i_doc_menu','reference','',''))
-      }}
-      item d {title:'dokumentace aplikace'
+      item {title:'dokumentace aplikace'
         proc onclick () {
           var txt: text
           var patt: text
+          u.fill("<h1>Reset aplikační dokumentace</h1>");
           patt.set(conc('wiki/(',sys('root'),'|ezer)_.*\.wiki'));
-          u.fill(ask('i_doc_reset','application'));
+          u.append(ask('i_doc_reset','application'));
           txt.set(ask('i_doc','application',patt));
           txt.get;
-          u.fill(txt);
+          u.append(txt);
           apl.focus;
           apl.set_apl_menu
-        | u.fill(conc("Nebyly nalezeny žádné soubory nápovědy vyhovující: <b>/",patt,"/</b>"))
+        | u.append(conc("Nebyly nalezeny žádné soubory nápovědy vyhovující: <b>/",patt,"/</b>"))
       }}
     }
     menu dele {title:'údržba',type:'group'
       item a {title:'smazat vše'
-        proc onclick () { u.fill(ask('i_doc_reset'));
+        proc onclick () {
+          u.fill("<h1>Reset dokumentace</h1>");
+          u.fill(ask('i_doc_reset'));
           ref.m.attach_code(ask('i_doc_menu','reference','',''));
           apl.m.attach_code(ask('i_doc_menu','application','',''))
       }}
@@ -118,6 +116,9 @@ panel nov [,,770,] {type:'right', title:'Novinky', _sys:'new'
 form f {
   proc fill(txt) {
     hresult.set(conc("<div id='Content'>",txt,"</div>"));
+  }
+  proc append(txt) {
+    hresult.set(conc(hresult.get,"<div id='Content'>",txt,"</div>"));
   }
   label hresult [0,0,*,] { title:'--' }
 }

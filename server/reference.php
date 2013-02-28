@@ -99,16 +99,23 @@ function i_doc($typ,$fnames='') {
     break;
   case 'reference':
     $text.= "<h1>Generování systémové dokumentace: $fnames</h1>";
-    $text.= i_doc_app($fnames,$typ);
+    $app_text= i_doc_app($fnames,$typ);
+                                                display("i_doc_app($fnames,$typ)='$app_text'");
+    $text.= $app_text ? $app_text : "";
     break;
   case 'application':
     $text.= "<h1>Generování popisu modulů: $fnames</h1>";
                                                 display($fnames);
     $app_text= i_doc_app($fnames,$typ);
-    $text= $app_text ? $app_text : "";
+    $text.= $app_text ? $app_text : "";
     break;
   case 'survay':
-    $text.= "<h1>Přehled stavu dokumentace</h1>";
+    $qry= "SELECT chapter,COUNT(*) AS _pocet FROM $db.ezer_doc2 GROUP BY chapter";
+    $res= mysql_qry($qry);
+    while ( $res && ($o= mysql_fetch_object($res)) ) {
+      $text.= "{$o->chapter} má {$o->_pocet} záznamů<br>";
+    }
+    $text= $text ? $text : "dokumentace je prázdná";
     break;
   default:
     $text.= "doc: zatím nerealizovaný požadavek: $typ";
@@ -205,6 +212,7 @@ function i_glob($mask) {
   if ($dir) {
     $pattern = "~^$mask\$~";
     while (($filename = readdir($dir)) !== false) {
+                                                        display("'$filename'?$pattern");
       if ($filename != "." && $filename != ".." && preg_match($pattern, "$dirname$filename")) {
         $return[] = "$dirname$filename";
       }
@@ -219,7 +227,7 @@ function i_glob($mask) {
 # tyto soubory jsou uloženy vzhledem k cestě $ezer_path_root
 # soubor todo.wiki přitom přeskakuje - ten se zobrazuje zpravidla v sekci Novinky
 function i_doc_app($fnameslist,$chapter,$to_save=true) {
-//                                                 display("i_doc_app($fnameslist,$chapter,$to_save)");
+                                                display("i_doc_app($fnameslist,$chapter,$to_save)");
   global $i_doc_info, $i_doc_class, $i_doc_id, $i_doc_ref, $i_doc_err, $i_doc_n, $i_doc_file;
   global $i_doc_text, $form, $map, $ezer_path_root,$ezer_path_serv;
   require_once("$ezer_path_serv/licensed/class_WikiParser.php");
@@ -255,12 +263,15 @@ function i_doc_app($fnameslist,$chapter,$to_save=true) {
   // navrácení pro wiki speciálních znaků
   $subst_back= array( '{#3A}' => ':' );
   // test
-  if ( $fnameslist=='.test.' ) $text= $parser->test();
-  elseif ( $fnameslist=='.wiki.' ) $text= i_doc_wiky('try');
+  if ( $fnameslist=='.test.' )
+    $text= $parser->test();
+  elseif ( $fnameslist=='.wiki.' )
+    $text= i_doc_wiky('try');
   else {
     $fnames= i_glob("$ezer_path_root/$fnameslist");
+                                                debug($fnames,"'$ezer_path_root/$fnameslist'");
     $text= '';
-    foreach ( $fnames as $fname ) if ( substr($fname,-10)!='/todo.wiki' ) {
+    foreach ( $fnames as $fname ) /*if ( substr($fname,-10)!='/todo.wiki' )*/ {
       $text.= "<h3>modul $fname</h3>";
       $fpath= $fname;
       $fname= substr(basename($fname),0,strpos(basename($fname),'.'));
@@ -1040,7 +1051,7 @@ function i_doc_menu($chapters,$section0,$class0) {
       if ( $id ) $gr->part->$id= $tm;
     }
   }
-                                                debug($mn);
+//                                                 debug($mn);
   return $mn;
 }
 // =================================================================================================
