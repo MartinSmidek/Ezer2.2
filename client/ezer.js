@@ -3805,7 +3805,7 @@ Ezer.Browse= new Class({
 //   noevent - pokud je 1 nevyvolá se uživatelská obsluha onrowclick
   raise: function (event,key,info,row,noevent) {
 //                                                 Ezer.trace('*','onrowclick:'+row);
-    var irow, ok= 1;
+    var irow, ok= 1, bkey= this.browse_key();
    raised:
     switch ( event ) {
     case 'onrowclick':
@@ -3818,18 +3818,17 @@ Ezer.Browse= new Class({
         info= info||0;
        with_key:
         if ( key ) { // je požadováno nastavení řádku s určitým klíčem, nebo nic
-          for (var ir= 0; ir<this.blen; ir++) {
-            if ( this.keys[ir]==key ) {  // projdi klíče načtených řádků browse
-              this.owner._key= key;
-              if ( ir!=this.r ) {
+          for (var ib= 0; ib<this.blen; ib++) {
+            if ( this.keys[ib]==key ) {  // projdi klíče načtených řádků browse v bufferu
+              this.owner._key= key;      // nastav aktiální klíč formuláře (jako po kliknutí)
+              irow= ib;
+              if ( ib != (this.r-this.b) ) {
                 // funkce _row_move zajistí viditelnost záznamu r (0..slen-1) včetně onrowclick
-                irow= ir;
-                this._row_move(ir,noevent);
+                this._row_move(this.b+ib,noevent);
               }
               else {
                 // zajisti provedení onrowclik i při neposunutí záznamu
-                irow= ir;
-                this.DOM_hi_row(ir,noevent,true);
+                this.DOM_hi_row(this.b+ib,noevent,true);
               }
               break with_key;
             }
