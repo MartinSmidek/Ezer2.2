@@ -1718,6 +1718,7 @@ Ezer.Select.implement({
           case 'enter':
             if (li)
               this.DOM_seekItem(li);
+              this.fire('onchanged');
             break;
           }
         }
