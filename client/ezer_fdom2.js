@@ -1278,18 +1278,31 @@ Ezer.EditHtml.implement({
 // ------------------------------------------------------------------------------------ DOM_add
 //f: EditHtml-DOM.DOM_add ()
 //      zobrazí prvek field
+//      Ezer.options.CKEditor.version prázdné nebo 4
   DOM_add: function() {
     if ( window.CKEDITOR ) {
       // v aplikaci je použit CKeditor
       this.DOM_Block= new Element('div',{'class':'EditHtml',styles:this.coord()}).adopt(
           this.DOM_Input= new Element('textarea')
         ).inject(this.owner.DOM_Block);
-      // základní nastavení editoru
-      var options= {
-        width:this._w, height:this._h-60, resize_enabled:false,
-        entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
-        skin:'office2003'
-      };
+      // --------------------------------- ošetření rozdílu mezi verzemi před startem
+      if ( Ezer.options.CKEditor.version=='4' ) {
+        // základní nastavení editoru verze 4.0.1
+        var options= {
+          width:this._w, height:this._h-60, resize_enabled:false,
+          entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
+          skin:'version3'
+        };
+      }
+      else {
+        // základní nastavení editoru verze do 3.6.2
+        var options= {
+          width:this._w, height:this._h-60, resize_enabled:false,
+          entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
+          skin:'office2003'
+        };
+      }
+      // ---------------------------------------------- společná část pro verze 3 i 4
       // úprava options z nastavení aplikace podle options.toolbar z Ezerscriptu
       Object.append(options,this.options.par||{});
       Object.append(options,options.toolbar && Ezer.options.CKEditor[options.toolbar]
@@ -1301,6 +1314,14 @@ Ezer.EditHtml.implement({
             '-','OrderedList','UnorderedList',
             '-','Source','ShowBlocks','RemoveFormat' ]]});
       this.ckeditor= CKEDITOR.replace(this.DOM_Input,options);
+      // ------------------------------------ ošetření rozdílu mezi verzemi po startu
+      if ( Ezer.options.CKEditor.version=='4' ) {
+        // dokončení nastavení editoru verze 4.0.1
+      }
+      else {
+      // dokončení nastavení editoru verze 3.6.2
+      }
+      // ----------------------------------------------- dokončení nastavení po startu
       this.ckeditor.on('focus', function(ev) {
         this._value= this.ckeditor.getData();
         if ( Ezer.browser!='CH' )
@@ -1350,7 +1371,7 @@ Ezer.EditHtml.implement({
 //f: EditHtml-DOM.DOM_changed (on[,quiet=0))
 //      označení příznaku změny elementu formuláře, pokud je quiet=0
   DOM_changed: function(on,quiet) {
-    var div= Ezer.browser=='CH'
+    var div= Ezer.browser=='CH' && Ezer.options.CKEditor.version!='4'
       ? this.DOM_Block.getElement('table.cke_editor')
       : this.DOM_Block;
     // pokud má element zobrazení
