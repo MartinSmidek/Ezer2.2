@@ -333,7 +333,7 @@ Ezer.Block= new Class({
     var ctx= [];
     var area= this.DOM_Block||this.value.DOM_Block;
     var goal= goal.DOM_Block;
-    var ok= window.File && goal && area;
+    var ok= window.File && goal && area ? 1 : 0;
     if ( ok && 1==Ezer.run_name(options.handler,this,ctx) && ctx[0].type=='proc' ) {
       goal.removeClass(options.css_hover).removeClass(options.css_run);
       area.addEventListener('dragover', function(evt) {
