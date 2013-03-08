@@ -946,7 +946,7 @@ Ezer.LabelDrop.implement({
     xhr.setRequestHeader("EZER-FILE-PATH", 'docs/');
     xhr.onload = function(e) {
       if (e.target.status == 200) {
-//         Ezer.fce.echo('*',e.target.response);
+                                                        Ezer.trace('*',e.target.response);
         if ( n < max ) {
           var value= Math.round(100*(n*CHUNK/f.data.size));
           if (bar) bar.value= value;
