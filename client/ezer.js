@@ -279,7 +279,7 @@ Ezer.Block= new Class({
   },
 // ------------------------------------------------------------------------------------ call
 //fm: Block.call/_call (name,a1,...)
-//      zavolá proceduru daného složeného jména vnořenou do bloku a předá argumenty
+//      asynchronně zavolá proceduru daného složeného jména vnořenou do bloku a předá argumenty
 //      (interně má jméno _call)
 //r: objekt
   _call: function(lc,name) {
@@ -641,6 +641,7 @@ Ezer.Block= new Class({
               case 'item.clipboard':part= new Ezer.Item(this,desc,DOM,id,skill); break;
               case 'list':          part= new Ezer.List(this,desc,DOM,id,skill); break;
               case 'label':         part= new Ezer.Label(this,desc,DOM,id,skill); break;
+              case 'label.drop':    part= new Ezer.LabelDrop(this,desc,DOM,id,skill); break;
               case 'menu.main':     part= new Ezer.MenuMain(this,desc,DOM,id,skill); break;
               case 'menu.left':     part= new Ezer.MenuLeft(this,desc,DOM,id,skill); break;
               case 'menu.group':    part= new Ezer.MenuGroup(this,desc,DOM,id,skill); break;
@@ -2544,6 +2545,35 @@ Ezer.Label= new Class({
 //fm: Label.get ()
   get: function () {
     return this.DOM_get();
+  }
+});
+// ======================================================================================= LabelDrop
+//c: LabelDrop ()
+//      prvek pro kontrolovaný upload souborů na server, kliknutí přeruší přenos
+//t: Block,Label
+//s: Block
+//i: Label.onclick - kliknutí na text (nebo obrázek)
+Ezer.LabelDrop= new Class({
+  Extends:Ezer.Label,
+//os: Label.title - zobrazovaný text
+  options: {
+//     ondrop:'ondrop', // funkce zavolaná po dokončení vložení souboru
+//     onload:'onload', // funkce zavolaná po dokončení přenosu na server
+  },
+//-
+//os: Label.par - umožňuje změnit standardní options
+// -------------------------------------------------------------------------------- LabelDrop.set
+// inicializace oblasti pro drop souborů, set(0) ji deaktivuje, set(1) aktivuje
+//fm: LabelDrop.set (0/1)
+  set: function (val) {
+    this.DOM_init(val);
+    return 1;
+  },
+// -------------------------------------------------------------------------------- LabelDrop.get
+// vrátí seznam souborů oddělených svislítkem
+//fm: LabelDrop.get ()
+  get: function () {
+    return "file1|file2|...";
   }
 });
 // ================================================================================================= Button
@@ -5021,7 +5051,7 @@ Ezer.Show= new Class({
 //   context -  objekt, ke kterému se vztahují relativní odkazy (např. vlastník procedury) a který je potenciálním nositelem procedur onready|onbusy
 //   args - seznam hodnot parametrů
 //   id - nepovinné jméno (použije se jen v trasování a hlášení chyb)
-//   continuation - {fce:funkce, která se provede po skončení interpretace kódu,args:parametry}
+//   continuation - {fce:funkce, která se provede po skončení kódu,args:parametry,obj:this pro apply}
 //   no_trow - true pokud nemá být vyvolána vyjímka při chybě (jen volání Ezer.error)
 //   proc -
 //   calls - aktivační záznam (jen při volání ze struktur)
@@ -5703,7 +5733,7 @@ Ezer.Eval= new Class({
         if ( this.continuation.stack )
           // a pokud je .stack==true přidej na konec hodnotu
           this.continuation.args.push(this.value);
-        this.continuation.fce.apply(this,this.continuation.args);
+        this.continuation.fce.apply(this.continuation.obj||this,this.continuation.args);
       }
       this.eval_();                                       // ukončení objektu Eval
 //       Ezer.eval_list[this.process]= null;

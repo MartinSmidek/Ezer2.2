@@ -122,6 +122,7 @@ server/comp2.php -text
 server/comp2def.php -text
 server/comp2tab.php -text
 server/ezer2.php -text
+server/file_send.php -text
 server/licensed/JSON.php -text
 server/licensed/JSON_Ezer.php -text
 server/licensed/class_WikiParser.php -text

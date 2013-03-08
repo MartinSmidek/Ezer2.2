@@ -55,7 +55,7 @@ $blocs2 = array (                                    // překládají se na AE_<
 #  area
   'area'        =>  explode(",",'var,proc,panel.popup'),
 #  form
-  'form'        =>  explode(",",'view,var,proc,browse,browse.smart,radio,label,edit,edit.html,'
+  'form'        =>  explode(",",'view,var,proc,browse,browse.smart,radio,label,label.drop,edit,edit.html,'
                                .'button,button.submit,button.reset,button.upload,select,select.auto,'
                                .'select.map,select.map0,field,field.date,field.list,menu,chat,check,list'
                                .($pragma_attrs?',select':'')),
@@ -216,7 +216,7 @@ $attribs = array (
 #  form
   'form'   =>  explode(",",'style:s,css:s,tabindex:n,title:s,key:s'),
   'view'   =>  explode(",",'join:s,join_type:s'),
-  'label'  =>  explode(",",'data:i,expr:s,title:s,style:s,css:s,help:s,format:s,attribute:s,skill:s'),
+  'label'  =>  explode(",",'type:s,data:i,expr:s,title:s,style:s,css:s,help:s,format:s,attribute:s,skill:s'),
   'field'  =>  explode(",",'data:i,par:o,expr:s,map_pipe:m,sql_pipe:s,style:s,format:s,help:s,css:s,'
                           .'type:s,attribute:s,value:s,skill:s'),  // help_bg:s
   'button' =>  explode(",",'type:s,title:s,help:s,style:s,css:s,format:s,skill:s,par:o'),

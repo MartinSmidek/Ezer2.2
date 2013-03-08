@@ -384,6 +384,22 @@ border:2px dotted #ff0 !important; left:-1px; top:-1px;]
   color:$c_kuk /*!important;*/ }
 .Label a:hover {
   background-color:$b_kuk !important; }
+
+div.LabelDrop {
+  position:absolute; z-index:1; border:1px dashed #fff; }
+div.LabelDropHover {
+  border:3px dashed #fff; }
+div.LabelDrop > div {
+  color:#fff; padding:0 5px; }
+div.LabelDrop > div + div {
+  height:100%; overflow-x:hidden; overflow-y:auto; color:#000; }
+div.LabelDrop table {
+  width:100%; table-layout: fixed; }
+div.LabelDrop tr > td {
+  overflow:hidden; text-overflow:ellipsis; }
+div.LabelDrop progress {
+  width:100%; }
+
 .Field {
   position:absolute; height:16px !important; border:1px solid #aaa; z-index:1; }
 .FieldDate {

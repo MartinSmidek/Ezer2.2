@@ -755,7 +755,7 @@ Ezer.PanelPopup.implement({
   }
 });
 // ================================================================================================= Form, View
-// ------------------------------------------------------------------------------------------------- Form
+// -------------------------------------------------------------------------------------------- Form
 Ezer.Form.implement({
   Implements: [Ezer.Drag,Ezer.Help],
   DOM_add1: function() {
@@ -771,7 +771,7 @@ Ezer.Form.implement({
   }
 });
 // ================================================================================================= části Form
-// ------------------------------------------------------------------------------------------------- Label
+// ------------------------------------------------------------------------------------------- Label
 Ezer.Label.implement({
   Implements: [Ezer.Drag,Ezer.Help],
   DOM_add: function() {
@@ -812,7 +812,7 @@ Ezer.Label.implement({
   DOM_get: function () {
     return this.DOM_Block.get('html');
   },
-// ------------------------------------------------------------------------------------ DOM_enabled
+// ------------------------------------------------------------------------------- Label.DOM_enabled
 //f: Label-DOM.DOM_enabled (on)
 //      změní vzhled na enabled/disabled podle parametru nebo this.options.enabled
   DOM_enabled: function(on) {
@@ -824,6 +824,146 @@ Ezer.Label.implement({
         this.DOM_Block.addClass('disabled');
       }
     }
+  }
+});
+// ======================================================================================= LabelDrop
+Ezer.LabelDrop.implement({
+  Implements: [Ezer.Drag,Ezer.Help],
+  DOM_files: [],
+  DOM_BlockRows: null,
+  DOM_add: function() {
+    // zobrazení prázdného label.drop
+    var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
+    this.DOM_Block= new Element('div',{'class':'LabelDrop',styles:this.coord(),
+      events:{
+        dragover: function(evt) {
+          evt.preventDefault();
+          this.DOM_Block.addClass('LabelDropHover');
+        }.bind(this),
+        dragleave: function(evt) {
+          evt.preventDefault();
+          this.DOM_Block.removeClass('LabelDropHover');
+        }.bind(this),
+        drop: function(evt) {
+          evt.stopPropagation();
+          evt.preventDefault();
+          this.DOM_Block.removeClass('LabelDropHover');
+          for (var i= 0; i<evt.event.dataTransfer.files.length; i++) {
+            var f= evt.event.dataTransfer.files[i];
+            this.DOM_addFile(f);
+            var r= new FileReader();
+            r.Ezer= {file:f,bind:this};
+            r.onload= function(e) {
+              var tf= this.Ezer.file;
+              tf.data= new Blob([e.target.result],{type:tf.type});
+              tf.orig= 'drop';
+              this.Ezer.bind.DOM_ondrop(tf);
+            }
+            r.readAsArrayBuffer(f);
+          };
+        }.bind(this)
+      }})
+      .adopt(new Element('div',{html:this.options.title||'',styles:{height:15}}))
+      .adopt(new Element('div',{styles:{height:this._h-15}})
+        .adopt(new Element('table',{cellspacing:0})
+          .adopt(this.DOM_BlockRows= new Element('tbody'))))
+      .inject(owners_block);
+    this.DOM_optStyle(this.DOM_Block);
+    if ( this.options.help )
+      this.DOM_Block.set('title',this.options.help);
+  },
+// ------------------------------------------------------------------------------ LabelDrop.DOM_init
+//f: LabelDrop-DOM.DOM_init (on)
+//      inicializace dat a oblasti pro drop - set(0) ji deaktivuje, set(1) aktivuje
+  DOM_init: function() {
+    this.DOM_files= [];
+    this.DOM_BlockRows.getChildren().destroy();
+  },
+// ------------------------------------------------------- LabelDrop.DOM_addFile
+// přidá řádek pro informaci o vkládaném souboru
+// obohatí f o td1,td2 a volitelně td3
+  DOM_addFile: function(f) {
+    var td3w= 0; // nebo volitelně šířka třetího informačního sloupce
+    var td2w= 60;
+    var td1w= this._w - (td2w + td3w + (td3w?16:14) + 16);
+    var tr= new Element('tr').adopt(
+      f.td1= new Element('td',{width:td1w,html:f.name}),
+      f.td2= new Element('td',{width:td2w,html:"čekám"})
+    ).inject(this.DOM_BlockRows);
+    if ( td3w )
+      tr.adopt(f.td3= new Element('td',{width:60}));
+    this.DOM_files.push(f);
+  },
+// -------------------------------------------------------- LabelDrop.DOM_ondrop
+// zavolá proc ondrop, pokud existuje - vrátí-li 1 bude zahájen upload;
+// pokud proc ondrop neexistuje, zahájí upload
+  DOM_ondrop: function(f) {
+    // zavolání funkce ondrop ex-li
+    if ( this.part && (obj= this.part['ondrop']) ) {
+      var continuation= {fce:this.DOM_upload,args:[f],stack:true,obj:this};
+      new Ezer.Eval(obj.code,this,[f],'ondrop',continuation,false,obj,obj.desc.nvar);
+    }
+    else {
+      // nebo přímo zavolat upload
+      this.DOM_added(f,1);
+    }
+  },
+// -------------------------------------------------------- LabelDrop.DOM_upload
+// konec vkládání a případný upload
+  DOM_upload: function(f,do_upload) {
+    if ( do_upload ) {
+      // upload rozdělený na části s referováním do <progrress>
+      f.td2.innerHTML= "";
+      var bar= new Element('progress',{max:100,value:0,title:"kliknutí přeruší přenos",events:{
+        click: function(evt) {
+          f.cancel= true;
+        }.bind(this)
+      }}).inject(f.td2);
+      const CHUNK= 100000; //512 * 1024; // 0.5MB chunk sizes.
+      if (bar) bar.value= 0;
+      var max= Math.ceil(f.data.size/CHUNK);
+      this.DOM_upload_chunk(1,max,CHUNK,f,bar);
+    }
+    else {
+      // zrušení progress
+      f.td2.innerHTML= "zrušeno";
+    }
+  },
+// --------------------------------------------------- LabelDrop.DOM_upload_chunk
+// konec vkládání a případný upload s volání funkce onload po ukončení přesunu na server
+  DOM_upload_chunk: function(n,max,CHUNK,f,bar) {
+    if ( f.cancel ) {
+      f.td2.innerHTML= "přerušeno";
+      return 0;
+    }
+    // postupné poslání dat
+    var data= f.data.slice((n-1)*CHUNK,n*CHUNK);
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', Ezer.version+'/server/file_send.php', true);
+    xhr.setRequestHeader("EZER-FILE-NAME", encodeURIComponent(f.name));
+    xhr.setRequestHeader("EZER-FILE-CHUNK", n);
+    xhr.setRequestHeader("EZER-FILE-CHUNKS", max);
+    xhr.setRequestHeader("EZER-FILE-PATH", 'docs/');
+    xhr.onload = function(e) {
+      if (e.target.status == 200) {
+//         Ezer.fce.echo('*',e.target.response);
+        if ( n < max ) {
+          var value= Math.round(100*(n*CHUNK/f.data.size));
+          if (bar) bar.value= value;
+          this.DOM_upload_chunk(n+1,max,CHUNK,f,bar);
+        }
+        else {
+          if ( bar ) bar.value= 100;
+          // zavolání funkce onload ex-li
+          if ( this.part && (obj= this.part['onload']) ) {
+            new Ezer.Eval(obj.code,this,[f],'onload',null,false,obj,obj.desc.nvar);
+          }
+          f.td2.innerHTML= "hotovo";
+        }
+      }
+    }.bind(this);
+    xhr.send(data);
+    return 1;
   }
 });
 // ================================================================================================= Button-DOM

@@ -1464,10 +1464,6 @@
     uses($x->files);
     $y->code= $code;
     break;
-  # ------------------------------------------------------------------------------------------------ file_send
-  case 'file_send': // (files)
-    $y->sent= 'ok';
-    break;
   default:
     $y->error= "SERVER: příkaz '{$x->cmd}' není implementován";
     break;
