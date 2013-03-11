@@ -215,7 +215,7 @@ $attribs = array (
   'area'   =>  explode(",",'title:s,style:s,css:s'),
 #  form
   'form'   =>  explode(",",'style:s,css:s,tabindex:n,title:s,key:s'),
-  'view'   =>  explode(",",'join:s,join_type:s'),
+  'view'   =>  explode(",",'order:s,join:s,join_type:s'),
   'label'  =>  explode(",",'type:s,data:i,expr:s,title:s,style:s,css:s,help:s,format:s,attribute:s,skill:s'),
   'field'  =>  explode(",",'data:i,par:o,expr:s,map_pipe:m,sql_pipe:s,style:s,format:s,help:s,css:s,'
                           .'type:s,attribute:s,value:s,skill:s'),  // help_bg:s
@@ -232,7 +232,7 @@ $attribs = array (
   'item'   =>  explode(",",'type:s,title:s,skill:s,par:o,format:s'),
 #  browse
   'browse' =>  explode(",",'key_id:s,type:s,buf_rows:n,qry_rows:n,wheel:n,css_rows:s,rows:nc,group_by:s,optimize:o'),
-  'show'   =>  explode(",",'title:s,css_cell:s,data:i,expr:s,map_pipe:m,bgcolor:m,js_pipe:s,sql_pipe:s,format:s,help:s,skill:s'),
+  'show'   =>  explode(",",'order:s,title:s,css_cell:s,data:i,expr:s,map_pipe:m,bgcolor:m,js_pipe:s,sql_pipe:s,format:s,help:s,skill:s'),
 #  radio
   'radio'  =>  explode(",",'data:i,expr:s,style:s,css:s,help:s,title:s,value:s,format:s'),
   'case'   =>  explode(",",'title:s,expr:s,value:s,css:s'),
