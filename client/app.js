@@ -434,7 +434,6 @@ Ezer.Application.implement({
         Ezer.trace('L',id+' skončila se stavem '+this.value);
         if ( end )
           Ezer.app[end](top);
-        Ezer.app.DOM_layout();  // přepočet layoutu
       },args:['inicializace '+top.id],stack:true},true);
     }
     else if ( end ) {
@@ -457,6 +456,11 @@ Ezer.Application.implement({
 //         }
 //       }
 //     })
+  },
+// ------------------------------------------------------------------------------------------------- onfirstfocus
+// je voláno v případě prvního focus panelu - obdoba události domready
+  onfirstfocus: function(panel) {
+    Ezer.app.DOM_layout();  // přepočet layoutu
   },
 // ------------------------------------------------------------------------------------------------- block_info
 // vrátí informaci o místě ve zdrojovém textu bloku

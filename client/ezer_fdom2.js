@@ -514,6 +514,7 @@ Ezer.Panel.implement({
     if ( !noevent ) {
       if ( this.virgin ) {
         this.virgin= false;
+        Ezer.app.onfirstfocus(this);
         if ( this.part && this.part['onfirstfocus'] )
           this.fire('onfirstfocus',[]);
         else
@@ -645,6 +646,7 @@ Ezer.PanelPlain.implement({
     if ( !noevent ) {
       if ( this.virgin ) {
         this.virgin= false;
+        Ezer.app.onfirstfocus(this);
         if ( this.part && this.part['onfirstfocus'] )
           this.fire('onfirstfocus',[]);
         else
@@ -730,6 +732,7 @@ Ezer.PanelPopup.implement({
     if ( !noevent ) {
       if ( this.virgin ) {
         this.virgin= false;
+        Ezer.app.onfirstfocus(this);
         if ( this.part && this.part['onfirstfocus'] )
           this.fire('onfirstfocus',[]);
         else
