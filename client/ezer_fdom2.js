@@ -601,7 +601,7 @@ Ezer.fce._DOM_size= function(top,block) {
     }
   }
 };
-// ------------------------------------------------------------------------------------------------- PanelMain-DOM
+// ----------------------------------------------------------------------------------- PanelMain-DOM
 // panel jako hlavní plocha aplikace
 Ezer.PanelMain.implement({
   DOM_add1: function() {
@@ -612,7 +612,7 @@ Ezer.PanelMain.implement({
   }
 });
 // ================================================================================================= Panel pod Tabs
-// ------------------------------------------------------------------------------------------------- fce pro panely v Tabs
+// --------------------------------------------------------------------------- fce pro panely v Tabs
 Ezer.PanelInTabs_add= function(panel) {
     var href= make_url_menu([panel.owner.id,panel.id]); // 'ezer://'+panel.owner.id+'.'+panel.id;
     new Element('a',{href:href,html:panel.options.title||panel.id}).inject(new Element('div').inject(
@@ -630,7 +630,7 @@ Ezer.PanelInTabs_add= function(panel) {
     }
   }).inject(panel.owner._tabsDom)));
 }
-// ------------------------------------------------------------------------------------------------- PanelPlain-DOM
+// ---------------------------------------------------------------------------------- PanelPlain-DOM
 // panel vnořený do Tabs
 Ezer.PanelPlain.implement({
   _tabDom: null,                                // li-element zanořený do Tabs nebo null
@@ -663,7 +663,7 @@ Ezer.PanelPlain.implement({
     return this;
   }
 });
-// ------------------------------------------------------------------------------------------------- PanelRight-DOM
+// ---------------------------------------------------------------------------------- PanelRight-DOM
 // panel vnořený do Tabs společně s MenuLeft
 Ezer.PanelRight.implement({
   DOM_add1: function() {
@@ -692,7 +692,7 @@ Ezer.PanelRight.implement({
     return this;
   }
 });
-// ------------------------------------------------------------------------------------------------- PanelPopup-DOM
+// ---------------------------------------------------------------------------------- PanelPopup-DOM
 Ezer.PanelPopup.implement({
   DOM_shown: false,                           // true - pokud bylo poprvé ukázáno
   // ---------------------------------------------------------------------------------- DOM_add1

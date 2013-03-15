@@ -56,7 +56,7 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   $ezer_root= $app;
   $title= $pars->title ? $pars->title : '';
   $title_right= $pars->title_right ? $pars->title_right : $app_name;
-  $ezer_template= $pars->template ? $pars->template : 'menu';
+  $ezer_template= $browser=='IE' ? 'IE' : ($pars->template ? $pars->template : 'menu');
   $post_server= $pars->post_server ? $pars->post_server[$ezer_local] : null;
   // ikona aplikace
   $favicon= $ezer_local ? "favicon_local.ico" : "favicon.ico";
@@ -166,7 +166,18 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
       }
     }
   }
-  $login= $ip_ok
+  $login= $browser=='IE'
+    ? <<<__EOD
+        <form id='watch_key' action='$app.php' method='post'>
+          <input id='watch_try' name='watch_try' type='hidden' value='nic' />
+          Z tohoto počítače se do aplikace <b>$app_name</b> není možné přihlásit
+          bez vložení $key_msg klíče.
+          <br/><br/>O zřízení přístupu je možné v&nbsp;oprávněných případech
+          požádat správce systému.
+          <br/><br/>Kontaktní údaje jsou uvedeny vpravo.<br><small>$ip_msg</small>
+        </form>
+__EOD
+    : ( $ip_ok
     ? <<<__EOD
         <form  method="post" onsubmit="return false;" enctype="multipart/form-data">
           <span>uživatelské jméno</span><br />
@@ -194,7 +205,7 @@ __EOD
         požádat správce systému.
         <br/><br/>Kontaktní údaje jsou uvedeny vpravo.<br><small>$ip_msg</small>
 __EOD
-  );
+  ));
   // PŘIHLAŠOVACÍ DIALOG
   $kontakt= $pars->contact ? $pars->contact
     : " V případě zjištění problému nebo potřeby konzultace mi prosím:<br/>
@@ -260,7 +271,7 @@ __EOD
       </ul>
 __EOD;
   // spojení všech CSS a JS do jediného souboru pokud je $minify==true a $_GET['dbg'] je prázdné
-  if ( $minify && !$dbg ) {
+  if ( $browser!='IE' && $minify && !$dbg ) {
     if ( !$ezer_local ) define('MINIFY_BASE_DIR',$ezer_path_serv);
     require_once('ezer2.2/server/licensed/minify.php');
     $minifyCSS= new Minify(TYPE_CSS);
@@ -278,8 +289,10 @@ __EOD;
   else {
     // header pro běh s laděním
     $head= "";
-    foreach($js as $x) {
-      $head.= "\n  <script src='$x' type='text/javascript' charset='utf-8'></script>";
+    if ( $browser!='IE' ) {
+      foreach($js as $x) {
+        $head.= "\n  <script src='$x' type='text/javascript' charset='utf-8'></script>";
+      }
     }
     foreach($css as $x) {
       $head.= "\n  <link rel='stylesheet' href='$x' type='text/css' media='screen' charset='utf-8' />";
@@ -323,6 +336,53 @@ __EOD;
   // definice možných HTML template stránky
   $version= "title='jádro {$EZER->version}'";
   switch ($ezer_template) {
+  case 'IE':
+# ------------------------------------------------------------------------------- HTML IE
+# template pro zobrazení zprávy o nepodpoře IE
+$template= <<<__EOD
+$html_header
+<body id="body" class='nogrid'>
+<!-- menu a submenu -->
+IE!!!
+  <div id='horni' class="MainBar">
+    <div id="appl" $version>$title_right</div>
+    <div id='logo'>
+      <img class="StatusIcon" id="StatusIcon_server" src="./$ezer_root/img/+logo.gif" />
+    </div>
+    <ul id="menu" class="MainMenu"></ul>
+    <ul id="submenu" class="MainTabs"></ul>
+  </div>
+<!-- upozornění -->
+  <div id="login" style="display:block;enabled:false;">
+    <div id="login_1">
+      <h1>Přihlášení ...</h1>
+      <div class="login_a">
+        Tuto aplikaci je možné používat v jakémkoliv prohlížeči respektujícím mezinárodní
+        standardy - například
+        <a href='http://https://www.google.com/intl/cs/chrome/browser/'>Chrome</a>,
+        <a href='http://http://www.mozilla.org/cs/firefox/new/'>FireFox</a>,
+        <a href='http://www.opera.com'>Opera</a> nebo
+        <a href='http://www.apple.com/safari'>Safari</a>.
+        <br><br><br><br>
+        Prohlížeč Microsoft Internet Explorer pro práci v této aplikace bohužel používat nelze.
+      </div>
+    </div>
+    <div id="login_2">
+      <h1 style='text-align:right'>... informace</h1>
+      <div class="login_a">
+        $info
+      </div>
+    </div>
+  </div>
+<!-- paticka -->
+  <div id="dolni">
+    <div id="status_bar" style="width:100%;height:16px;padding: 1px 0pt 0pt;"></div>
+  </div>
+<!-- konec -->
+</body>
+$html_footer
+__EOD;
+    break;
   case 'menu':
 # ------------------------------------------------------------------------------- HTML menu
 # template pro zobrazení Ezer.MenuMain jako hlavního objektu aplikace
