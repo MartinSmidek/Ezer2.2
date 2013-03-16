@@ -217,6 +217,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
       }
       if ($start->part) foreach ($start->part as $id=>$spart) {
         proc($spart,'');
+//                                                         debug($spart,'po proc (1)');
       }
 //       link($start->part->$root,'$');
 //       proc($start->part->$root,'');
@@ -231,6 +232,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
         }
         foreach ($start->part as $id=>$spart) {
           proc($spart,"$top.$id");
+//                                                         debug($spart,'po proc (2)');
         }
       }
     }
@@ -349,6 +351,10 @@ function xcode($x,$ind=0) {
         $tr.= xcode($cci,$ind+2);
         $tr.= ' }';
       }
+//       elseif ( $i=='nojmp')
+//         $tr.= " nojmp=$cci";
+//       elseif ( $i=='trace')
+//         $tr.= " trace=$cci";
       elseif ( $i!='s' && $i!='o' && (is_string($cci)||is_int($cci)))
         $tr.= " $cci";
     }
@@ -922,14 +928,19 @@ function gen_proc($c,&$desc,$name) {
   };
 // prázdná procedura obsahuje jen return
   $path= "";
-  $c= $c->code ? gen($c->par,$c->var,$c->code,0,$struct) : array((object)array('o'=>'0'));
+//                                          debug($c->code,"A");
+  $c= $c->code ? gen($c->par,$c->var,$c->code,0,$struct) : array((object)array('o'=>'f','i'=>'stop'));
   $desc->code= $c;
 //                       debug($c);
 //                       debug($struct,'před walk');
 //                       debug($c,'před walk');
+//                                          debug($struct,"před walk_struct");
   walk_struct($struct,$desc->code,0,$struct->len,$struct->len,$struct->len);
+//                                         display("po walk_struct:<pre>".xcode($desc->code)."</pre>");
+//                                          debug($desc->code,"C");
   walk_y($desc->code);
-//                       debug($c,'po walk_y');
+  clean_code($desc->code);
+//                       debug($desc->code,'po walk_y');
 //                       debug($struct);
 //   walk_subs($struct,$desc->code);
 //                     if ($trace_me) {
@@ -958,19 +969,42 @@ function walk_y($code) {
     }
   }
 }
+# -------------------------------------------------------------------------------------------------- clean_code
+# odstraní atributy skoku, pokud je přítomno nojmp (tzn. výpočet argumentu)
+function clean_code($code) {
+  if ( is_array($code) ) {
+    foreach ($code as $i => $c) {
+      if ( $c->nojmp ) {
+        unset($code[$i]->ift);
+        unset($code[$i]->iff);
+        unset($code[$i]->jmp);
+        unset($code[$i]->go);
+      }
+      unset($code[$i]->nojmp);
+      unset($code[$i]->str_c);
+      unset($code[$i]->str_s);
+      clean_code($c);
+    }
+  }
+  elseif ( $code->o=='y' ) {
+    clean_code($code->c);
+  }
+}
 # -------------------------------------------------------------------------------------------------- walk_struct
 # definuje v kódu vygenerovaném z $down pole ift, iff jako pokračování pro úspěch či neúspěch
 # down - struktura
 # pcode - celé pole kódu
 # beg - index začátku kódu
-# end - index konce kódy
+# end - index konce kódu
 # ift, iff - indexy pro skok na nejvyšší úroveň
-function walk_struct($down,$pcode,$beg,$end,$ift,$iff) {
+function walk_struct($down,$pcode,$beg,$end,$ift,$iff,$is_arg=0) {
 //                                                 trace();
+//                                                 debug($pcode,"..,$beg,$end,$ift,$iff)");
+  if (!$down) $down= (object)array();
   $icode= $beg;
   $i_next= $icode;
   $typ= $down->typ;
-  if (!$down)   $down=   (object)array();
+  $argx= $down->argx;
   $down->i= $icode;
   $down->ift= $ift;
   $down->iff= $iff;
@@ -996,10 +1030,11 @@ function walk_struct($down,$pcode,$beg,$end,$ift,$iff) {
         default:    $t= 0; $f= 0; break;
         }
       }
-      walk_struct($sub,$pcode,$icode,$end,$t,$f);
+      walk_struct($sub,$pcode,$icode,$end,$t,$f,$typ=='call'?1:0);
       $icode+= $sub->len;
       if ( $typ!='alt' && $typ!='seq' && $typ!='may' )
         def_jumps($down,$pcode);
+//                                         display("<pre>".xcode($pcode)."</pre>");
     }
   }
   else {
@@ -1012,12 +1047,15 @@ function walk_struct($down,$pcode,$beg,$end,$ift,$iff) {
 # definuje v kódu iff, ift, jmp
 function def_jumps($c,$pcode) {
 //                                         trace();
-//                                         debug($c);
+//                                         if ( $c->argx)debug($c,"def_jumps A");
   $t= $c->ift;
   $f= $c->iff;
   $e= $c->len-1;
   $len= count($pcode);
+  $beg= $c->argx ? $c->argx-1 : 0;
   // definice skoků s optimalizací
+//                                         $pcode[$c->i + $c->len + $beg - 1]->trace.= $c->argx ? "({$c->i}+$beg,{$c->len})" : '.';
+  $pcode[$c->i + $c->len + $beg - 1]->nojmp+= $c->argx ? 1 : 0; // zabráníme testu skoku po výpočty argumentu
   if ( $t || $f ) {
     $i= $c->i + $c->len - 1;
     if ( !$pcode[$i] ) $pcode[$i]= (object)array();
@@ -1051,6 +1089,8 @@ function def_jumps($c,$pcode) {
       }
     }
   }
+//                                         debug($pcode,"def_jumps B");
+//                                         display("<pre>".xcode($pcode)."</pre>");
 }
 # -------------------------------------------------------------------------------------------------- plain
 # odstraní vnořenost polí
@@ -1322,7 +1362,7 @@ function gen_name($name,$pars,$vars,$first,$c=null,$nargs=null) {  #trace();
 # -------------------------------------------------------------------------------------------------- gen
 # generuje kód výrazu
 #   $i je použit pro překladu call
-#   $struct = {...}
+#   $struct = {...} výstup
 function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
   $struct= (object)array('typ'=>$c->expr,'i'=>-1,'ift'=>-1,'iff'=>-1,'len'=>-1);
   global $trace_me;
@@ -1480,6 +1520,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       $code[]= $call;
     }
     else {
+//                                                     display("*** {$c->op}");
       if ( ($cname= substr($c->op,-5))=='.make' || ($cname= substr($c->op,-11))=='.browse_map') {
         if ( $c->par[0] && $c->par[0]->value && $c->par[0]->type=='s' ) {
           $make= $c->par[0]->value;
@@ -1489,11 +1530,14 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
         else comp_error("CODE: metoda '$cname' má chybné jméno funkce na serveru");
       }
       $code= gen_name($c->op,$pars,$vars,$icall==0,$c,$npar);
+//                                                     debug($code,"** call");
       $cend= count($code)-1;
       $call= $code[$cend];
       for ($i= 0; $i<$npar; $i++) {
         $code[$i+$cend]= gen($pars,$vars,$c->par[$i],0,$struct1);
+        $struct1->argx= $cend+1;                       // zabránění vložení IFT nebo IFF do kódu
         $struct->arr[]= $struct1;
+//                                                     debug(array($code[$i+$cend],$struct1),"* argx $i");
       }
       if ( $call->o!='w' )
         $call->a= $npar;
