@@ -2552,16 +2552,14 @@ Ezer.Label= new Class({
 //      prvek pro kontrolovaný upload souborů na server, kliknutí přeruší přenos
 //t: Block,Label
 //s: Block
-//i: Label.onclick - kliknutí na text (nebo obrázek)
+//i: LabelDrop.ondrop - funkce zavolaná po dokončení vložení souboru
+//i: LabelDrop.onload - funkce zavolaná po dokončení přenosu na server
 Ezer.LabelDrop= new Class({
   Extends:Ezer.Label,
-//os: Label.title - zobrazovaný text
+//os: LabelDrop.title - text zobrazovaný v záhlaví DropBoxu
   options: {
-//     ondrop:'ondrop', // funkce zavolaná po dokončení vložení souboru
-//     onload:'onload', // funkce zavolaná po dokončení přenosu na server
   },
 //-
-//os: Label.par - umožňuje změnit standardní options
 // -------------------------------------------------------------------------------- LabelDrop.set
 // inicializace oblasti pro drop souborů, set(0) ji deaktivuje, set(1) aktivuje
 //fm: LabelDrop.set (0/1)
