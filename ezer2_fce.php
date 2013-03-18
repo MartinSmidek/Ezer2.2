@@ -863,9 +863,10 @@ function sys_bugs($level) {
   global $user_options;
   $n= 0;
   $html.= '<dl>';
-  $qry= "SELECT max(level) as bug, min(id_touch) as id, msg,
+  $qry= "SELECT max(level) as bug, min(id_touch) as id, msg, inside, after,
            group_concat(day,' ',time,' ',user,' ',module,' ',menu) as popis
-         FROM _touch WHERE msg!='' GROUP BY msg HAVING bug=$level ORDER BY day DESC";
+         FROM _touch WHERE msg!='' AND menu!='ip?'
+         GROUP BY msg HAVING bug=$level ORDER BY day DESC";
   $res= mysql_qry($qry);
   while ( $res && $row= mysql_fetch_assoc($res) ) {
     $n++;
@@ -873,6 +874,9 @@ function sys_bugs($level) {
     $id= $row['id'];
     $bug= $row['bug'];
     $msg= $row['msg'];
+    $msg= strtr($msg,array('<'=>'&lt;','>'=>'&gt;'));
+    if ( $row['inside'] ) $msg.= " <b>in</b> {$row['inside']}";
+    if ( $row['after'] ) $msg.= " <b>after</b> {$row['after']}";
     // generování
     $color= $bug==1 ? '#fb6' : ($bug==2 ? '#6f6' : '#eee');
     $mark= $bug>0 ? "BUG#$id" : '';
@@ -905,7 +909,7 @@ function sys_day_logins($skip,$day,$sign='=') {
   $html.= '<dl>';
   $cond= $sign=='all' ? '1' : "day$sign'$day'";
   $qry= "SELECT id_touch, msg, day, time, user, menu
-         FROM _touch WHERE $cond AND msg!='' AND menu IN ('login','acount?') $and
+         FROM _touch WHERE $cond AND msg!='' AND menu IN ('login','acount?','ip?') $and
          ORDER BY day DESC,time DESC";
   $res= mysql_qry($qry);
   while ( $res && $t= mysql_fetch_object($res) ) {
@@ -927,6 +931,7 @@ function sys_day_logins($skip,$day,$sign='=') {
 function sys_day_errors($skip,$day,$sign='=') {
 //                                                         display("sys_day_errors($day,$sign)");
   global $user_options, $USER;
+  $group_len= 40;
   $max_len= 512;
   $n= 0;
   $and=  $skip ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
@@ -935,8 +940,9 @@ function sys_day_errors($skip,$day,$sign='=') {
   $cond= $sign=='all' ? '1' : "day$sign'$day'";
   $qry= "SELECT max(level) as bug, min(id_touch) as id, msg, inside, after, module,
            group_concat($day1 time,' ',user,' ',module,' ',menu) as popis
-         FROM _touch WHERE $cond AND msg!='' AND user!='---' AND module!='speed' AND menu!='login' $and
-         GROUP BY id_touch /*msg*/ ORDER BY day DESC";
+         FROM _touch WHERE $cond AND msg!='' AND user!='---' AND module!='speed' AND menu!='login'
+           AND menu!='ip?' $and
+         GROUP BY LEFT(msg,$group_len) ORDER BY day DESC";
   $res= mysql_qry($qry);
   while ( $res && $row= mysql_fetch_assoc($res) ) {
     $n++;
@@ -968,7 +974,7 @@ __JS
     ;                                           //<dd>$msg</dd>
   }
   $html.= '</dl>';
-  $result= $n ? "$n hlášení chyb" : "bez hlášení chyby";
+  $result= $n ? "hlášení $n chyb" : "bez hlášení chyby";
   return $result.$html;
 }
 # -------------------------------------------------------------------------------------------------- sys_day_error

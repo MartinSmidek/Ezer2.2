@@ -160,8 +160,9 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
       if ( !$ip_ok ) {
         // zapiš pokus o neautorizovaný přístup
         $day= date('Y-m-d'); $time= date('H:i:s');
+        $browser= $_SERVER['HTTP_USER_AGENT'];
         $qry= "INSERT _touch (day,time,user,module,menu,msg)
-               VALUES ('$day','$time','','error','ip?','$my_ip')";
+               VALUES ('$day','$time','','error','ip?','|$my_ip||$browser')";
         $res= mysql_query($qry);
       }
     }
