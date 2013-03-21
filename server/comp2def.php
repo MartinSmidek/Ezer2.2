@@ -55,12 +55,12 @@ $blocs2 = array (                                    // překládají se na AE_<
 #  area
   'area'        =>  explode(",",'var,proc,panel.popup'),
 #  form
-  'form'        =>  explode(",",'view,var,proc,browse,browse.smart,radio,label,label.drop,edit,edit.html,'
+  'form'        =>  explode(",",'view,var,proc,browse,browse.smart,radio,label,label.drop,label.map,edit,edit.html,'
                                .'button,button.submit,button.reset,button.upload,select,select.auto,'
                                .'select.map,select.map0,field,field.date,field.list,menu,chat,check,list'
                                .($pragma_attrs?',select':'')),
   'view'        =>  explode(",",''),
-  'var'         =>  explode(",",'button,select,select.map,label,label.drop,edit,field'), //??????????
+  'var'         =>  explode(",",'button,select,select.map,label,label.drop,label.map,edit,field'), //??????????
   'field'       =>  explode(",",'proc,menu'),
   'field.date'  =>  explode(",",'proc,menu'),
   'field.list'  =>  explode(",",'proc,menu'),

@@ -387,7 +387,7 @@ Ezer.str.new_area= function() {
       }
     }
     if ( !panel )
-      Ezer.error('výraz new_form není zanořen do panelu','S');
+      Ezer.error('výraz new_area není zanořen do panelu','S');
     if ( !parent.value ) {
     }
     else {

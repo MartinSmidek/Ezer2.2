@@ -353,8 +353,8 @@ function xcode($x,$ind=0) {
       }
 //       elseif ( $i=='nojmp')
 //         $tr.= " nojmp=$cci";
-//       elseif ( $i=='trace')
-//         $tr.= " trace=$cci";
+      elseif ( $i=='trace')
+        $tr.= " trace=$cci";
       elseif ( $i!='s' && $i!='o' && (is_string($cci)||is_int($cci)))
         $tr.= " $cci";
     }
@@ -1423,6 +1423,61 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       $code[]= $call;
       $code_top-= $npar;
     }
+    // -------------------------------------- while p {s}
+    elseif ( $c->op=='while' ) {
+      // {expr:'call',op:'while',par:[p,s]}
+      if ( count($c->par)==2 ) {
+        $p= gen($pars,$vars,$c->par[0],0,$struct1);
+        $s= gen($pars,$vars,$c->par[1],0,$struct1);
+        $iff= (object)array('o'=>0,'iff'=>count($s)+2,'trace'=>count($s));
+        $go= (object)array('o'=>0,'go'=>-count($p)-count($s)-1,'trace'=>count($p));
+        $code[]= array($p,$iff,$s,$go);
+      }
+      else comp_error("CODE: while musí mít 2 parametry");
+    }
+    // -------------------------------------- foreach x fce
+    elseif ( $c->op=='foreach' ) {
+      // {expr:'call',op:'foreach',par:[x,{expr:'name',name:fce}]}
+      if ( count($c->par)==2 ) {
+        $x= gen($pars,$vars,$c->par[0],0,$struct1);
+        if ( $c->par[1]->expr=='name' ) {
+          $fce= find_part_abs($c->par[1]->name,$fullname,'proc');
+          if ( $fce && $fce->type=='proc' && 1==count((array)$fce->par) ) {
+            $x= gen($pars,$vars,$c->par[0],0,$struct1);
+            $f= gen_name($c->par[1]->name,$pars,$vars,true,$c->par[1]);
+            $f[count($f)-1]->a= 1;
+            $test= (object)array('o'=>'L','go'=>count($f)+2,'trace'=>count($f));
+            $jmp= (object)array('o'=>0,'jmp'=>-count($f)-1);
+            $code[]= array($x,$test,$f,$jmp);
+          }
+          else comp_error("CODE: procedura použitá ve foreach musí mít jeden parametr");
+        }
+        else comp_error("CODE: foreach musí mít 2 parametry: seznam a jméno procedury");
+      }
+      else comp_error("CODE: foreach musí mít 2 parametry: seznam a jméno procedury");
+    }
+    // -------------------------------------- each x fce
+    elseif ( $c->op=='each' ) {
+      $np_each= count($c->par);
+      if ( $c->par[1]->expr=='name' ) {
+        $fce= find_part_abs($c->par[1]->name,$fullname,'proc');
+        $np_fce= count((array)$fce->par);
+        if ( $fce && $fce->type=='proc' && $np_fce==$np_each ) {
+          $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[0],0,$struct1),
+            'str_c'=>$c->par[0],'str_s'=>$struct1);
+          $struct->arr[]= $struct1;
+          $code[]= (object)array('o'=>'y','c'=>gen_name($c->par[1]->name,$pars,$vars,true,$c->par[1]));
+          for ($i= 2; $i<count($c->par); $i++) {
+            $code[]= gen($pars,$vars,$c->par[$i],0,$struct1);
+            $struct->arr[]= $struct1;
+          }
+          $code[]= (object)array('o'=>'s','i'=>'each','a'=>count($c->par));
+        }
+        else comp_error("CODE: procedura použitá v each nemá správný počet parametrů ($np_each)");
+      }
+      else comp_error("CODE: each má chybné parametry");
+    }
+    // -------------------------------------- new_form
     elseif ( $c->op=='new_form' ) {
       if ( ($npar==3 || $npar==4 ) && $c->par[0]->expr=='name' ) {
         $form= find_part_abs($c->par[0]->name,$fullname,'form');
@@ -1445,6 +1500,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       }
       else comp_error("CODE: new_form má chybné parametry");
     }
+    // -------------------------------------- new_area
     elseif ( $c->op=='new_area' ) {
       if ( count($c->par)>=2  ) {
         $area_ok= false;
@@ -1485,26 +1541,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
 //       }
 //       else comp_error("CODE: new_area má chybné parametry");
 //     }
-    elseif ( $c->op=='each' ) {
-      $np_each= count($c->par);
-      if ( $c->par[1]->expr=='name' ) {
-        $fce= find_part_abs($c->par[1]->name,$fullname,'proc');
-        $np_fce= count((array)$fce->par);
-        if ( $fce && $fce->type=='proc' && $np_fce==$np_each ) {
-          $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[0],0,$struct1),
-            'str_c'=>$c->par[0],'str_s'=>$struct1);
-          $struct->arr[]= $struct1;
-          $code[]= (object)array('o'=>'y','c'=>gen_name($c->par[1]->name,$pars,$vars,true,$c->par[1]));
-          for ($i= 2; $i<count($c->par); $i++) {
-            $code[]= gen($pars,$vars,$c->par[$i],0,$struct1);
-            $struct->arr[]= $struct1;
-          }
-          $code[]= (object)array('o'=>'s','i'=>'each','a'=>count($c->par));
-        }
-        else comp_error("CODE: procedura použitá v each nemá správný počet parametrů ($np_each)");
-      }
-      else comp_error("CODE: each má chybné parametry");
-    }
+    // -------------------------------------- call fs
     elseif ( $names[$c->op]->op=='fs' ) {
       $code_top0= $code_top;
       for ($i= 0; $i<$npar; $i++) {
@@ -1963,11 +2000,11 @@ function get_if_coord ($block) {
   return $ok;
 }
 # -------------------------------------------------------------------------------------------------- type
-# type  :: number | text
+# type  :: number | text | form | area | object | array
 function get_type (&$type) {
   global $head, $lex, $typ, $tree;
   $type= $lex[$head];
-  $ok= ($type=='number'||$type=='text'||$type=='object'||$type=='form'||$type=='area');
+  $ok= ($type=='number'||$type=='text'||$type=='array'||$type=='object'||$type=='form'||$type=='area');
   $head++;
   $tree.= " t";
   if ( !$ok ) comp_error("SYNTAX: bylo očekáváno jméno typu");
@@ -2154,7 +2191,12 @@ function get_value (&$val,&$type) {
   else if ( $val=='°' ) {         // objektová konstanta
     $ok= true;
     $head++;
-    get_object($val,$type);
+    if ( $typ[$head]=='del' && $lex[$head]=='{' )
+      get_object($val,$type);
+    elseif ( $typ[$head]=='del' && $lex[$head]=='[' )
+      get_array($val,$type);
+    else
+      comp_error("SYNTAX: byl očekáván objekt nebo pole");
   }
   else if ( $typ[$head]=='key' && ($val=='this' || $val=='panel' || $val=='area') ) {
     $ok= true;
@@ -2177,7 +2219,26 @@ function look_value () {
   $ok= $typ[$head]=='num' || $typ[$head]=='str' || ($typ[$head]=='del' && $lex[$head]=='°');
   return $ok;
 }
-# -------------------------------------------------------------------------------------------------- object
+# -------------------------------------------------------------------------------------------- array
+# array :: '[' value ( ',' value )* ']'          --> $array
+function get_array (&$obj,&$type) {
+  global $head, $lex, $typ, $tree;
+  get_delimiter('[');
+  $obj= array();
+  $type= 'o';
+  $ok= true;
+  while ( true ) {
+    get_value($val,$tp);
+    $obj[]= $val;
+    $comma= get_if_delimiter(',');
+    if ( !$comma ) break;
+  }
+  get_delimiter(']');
+  $tree.= ' a';
+  if ( !$ok ) comp_error("SYNTAX: byl očekáván literál pole");
+  return true;
+}
+# ------------------------------------------------------------------------------------------- object
 # object :: '{' pair ( ',' pair )* '}'          --> $object
 # pair   :: id ':' value
 function get_object (&$obj,&$type) {

@@ -642,6 +642,7 @@ Ezer.Block= new Class({
               case 'list':          part= new Ezer.List(this,desc,DOM,id,skill); break;
               case 'label':         part= new Ezer.Label(this,desc,DOM,id,skill); break;
               case 'label.drop':    part= new Ezer.LabelDrop(this,desc,DOM,id,skill); break;
+              case 'label.map':     part= new Ezer.LabelMap(this,desc,DOM,id,skill); break;
               case 'menu.main':     part= new Ezer.MenuMain(this,desc,DOM,id,skill); break;
               case 'menu.left':     part= new Ezer.MenuLeft(this,desc,DOM,id,skill); break;
               case 'menu.group':    part= new Ezer.MenuGroup(this,desc,DOM,id,skill); break;
@@ -2574,6 +2575,175 @@ Ezer.LabelDrop= new Class({
     return "file1|file2|...";
   }
 });
+// ======================================================================================== LabelMap
+//c: LabelMap ()
+//      prvek pro práci s GoogleMaps a s geo-objekty
+//t: Block,Label
+//s: Block
+Ezer.LabelMap= new Class({
+  Extends:Ezer.Label,
+  options: {
+  },
+  continuation: null,   // bod pokračování pro geocode,...
+  geocoder: null,       // Google objekt
+  geo: null,            // běžný gobjekt pro asynchronní metody
+  map: null,            // Google mapa
+  poly: null,           // seznam aktuálních polygonů
+  mark: null,           // seznam aktuálních značek
+// ------------------------------------------------------------------------------- LabelMap.init
+// inicializace oblasti se zobrazením mapy ČR
+//fm: LabelMap.init ([TERRAIN|ROADMAP])
+  init: function (type) {
+    var stredCR= new google.maps.LatLng(49.8, 15.6);
+    var map_id= google.maps.MapTypeId[type||'TERRAIN'];
+    var g_options= {zoom:7, center:stredCR, mapTypeId:map_id};
+    this.map= new google.maps.Map(this.DOM_Block,g_options);
+    this.poly= null;
+    this.mark= [];
+    return 1;
+  },
+// -------------------------------------------------------------------------------- LabelMap.set
+// zapíše do mapy informaci předanou gobjektem
+//   set({mark:'',...)       - vymaže z mapy všechny značky
+//   set({mark:mark*,...})   - doplní do mapy značky podle seznamu oddělovaného středníky, kde
+// mark = lat,ltd[,title[,ikona]]
+//fm: LabelMap.set (gobject)
+  set: function (geo) {
+    Ezer.assert(geo && typeof(geo.mark)=='string',"LabelMap.set má chybný argument");
+    if ( geo.mark == '' ) {
+      this.mark.each(function(m){m.setMap(null)});
+      this.mark= [];
+    }
+    else {
+      geo.mark.split(';').map(function(xy) {
+        var x_y= xy.split(',');
+        var ll= new google.maps.LatLng(x_y[0],x_y[1]);
+        var map_opts= {position:ll,map:this.map};
+        if ( x_y[2] ) map_opts.title= x_y[2];     // přidá label
+        if ( x_y[3] ) map_opts.icon= x_y[3];      // přidá ikonu
+        this.mark.push(new google.maps.Marker(map_opts));
+      }.bind(this));
+    }
+    return 1;
+  },
+// --------------------------------------------------------------------------- LabelMap.geocode
+// doplní do gobjektu souřadnice obsažené adresy nebo je vymaže,
+// pokud adresa nebyla poznána
+//   geocode({address:x,...}) => {address:x,mark:'lat,ltd',...}
+//fi: LabelMap.geocode (gobject)
+  geocode: function (geo) {
+    if ( !this.geocoder ) this.geocoder= new google.maps.Geocoder();
+    this.geo= geo;
+    this.geocoder.geocode({address:geo.address},this._geocode.bind(this));
+    return this;
+  },
+  _geocode: function (results, status) {
+    this.geo.mark= '';
+    if (status == google.maps.GeocoderStatus.OK) {
+      var ll= results[0].geometry.location;
+      this.geo.mark= ll.lat()+','+ll.lng();
+    }
+    // návrat z asynchronní funkce
+    Ezer.assert(this.continuation,"_geocode bez volání");
+    this.continuation.stack[++this.continuation.top]= this.geo;
+    this.continuation.eval.apply(this.continuation,[0,1]);
+    this.continuation= null;
+    return 1;
+  }
+});
+/*
+// ------------------------------------------------------------------------------------- google_maps
+//ff: test.google_maps (fce,label[,options])
+Ezer.obj.google_maps= {};                       // obsahuje: poly,mark
+Ezer.fce.google_maps= function (fce,options) {
+  var ret= 1;
+  switch (fce) {
+  case 'mapa_cr':                                       // zobrazí prázdnou mapu ČR
+    var stredCR= new google.maps.LatLng(49.8, 15.6);
+    var map_id= google.maps.MapTypeId[options.type||'TERRAIN'];
+    var g_options= {zoom:7, center:stredCR, mapTypeId:map_id};
+    Ezer.obj.google_maps.map= new google.maps.Map(options.label.DOM_Block,g_options);
+    Ezer.obj.google_maps.poly= null;
+    Ezer.obj.google_maps.mark= [];
+    break;
+  case 'geocode':                                       // najde lat,ltd podle adresy
+    var geocoder= new google.maps.Geocoder();
+    geocoder.geocode({address:options.address}, function(results, status) {
+      var ans= '';
+      if (status == google.maps.GeocoderStatus.OK) {
+        var ll= results[0].geometry.location;
+        ans= ll.lat()+','+ll.lng();
+      }
+      options.onresult
+    });
+    break;
+  case 'mark_new':                                      // vymaže všechny markery
+    if ( Ezer.obj.google_maps.mark )
+      Ezer.obj.google_maps.mark.each(function(m){m.setMap(null)});
+    Ezer.obj.google_maps.mark= [];
+    break;
+  case 'mark_put':                                      // přidá markery podle textu x,y;..
+    options.mark.split(';').map(function(xy) {
+      var x_y= xy.split(',');
+      var ll= new google.maps.LatLng(x_y[0],x_y[1]);
+      var map_opts= {position:ll,map:Ezer.obj.google_maps.map};
+      if ( x_y[2] ) map_opts.title= x_y[2];     // přidá label
+      if ( x_y[3] ) map_opts.icon= x_y[3];     // přidá ikonu
+      Ezer.obj.google_maps.mark.push(new google.maps.Marker(map_opts));
+    });
+    break;
+  case 'poly_new':                                      // vymaže všechny polygony
+    if ( Ezer.obj.google_maps.poly )
+      Ezer.obj.google_maps.poly.setMap(null);
+    Ezer.obj.google_maps.poly= null;
+    break;
+  case 'poly_spec':                                     // umožní editaci, je-li options.edit:1
+    if ( Ezer.obj.google_maps.poly )
+      Ezer.obj.google_maps.poly.setEditable(options.edit?true:false);
+    break;
+  case 'poly_put':                                      // přidá polygony podle textu x,y;..|..
+    // transformace z textu na LatLng
+    if ( typeof(options.poly)=='string' ) {
+      options.poly.split('|').each(function(poly) {
+        var coords= poly.split(';').map(function(xy) {
+          var ll= xy.split(',');
+          return new google.maps.LatLng(ll[0],ll[1]);
+        });
+        if ( Ezer.obj.google_maps.poly ) {
+          // přidej k existující
+          var paths= Ezer.obj.google_maps.poly.getPaths();
+          paths.push(new google.maps.MVCArray(coords));
+          Ezer.obj.google_maps.poly.setPaths(paths);
+        }
+        else {
+          // vytvoř první
+          Ezer.obj.google_maps.poly= new google.maps.Polygon({paths:coords,strokeColor:"#FF0000",
+            strokeOpacity:0.8,strokeWeight:3,fillColor:"#FF0000",fillOpacity:0.35,editable:false});
+        }
+      });
+      Ezer.obj.google_maps.poly.setMap(Ezer.obj.google_maps.map);
+    }
+    break;
+  case 'poly_get':                                      // vrátí textovou formu polygonů x,y;..|..
+    var ret= '', del= '';
+    if ( Ezer.obj.google_maps.poly ) {
+      var paths= Ezer.obj.google_maps.poly.getPaths();
+      for (var n= 0; n < paths.length; n++) {
+        var vertices= paths.getAt(n);
+        for (var i= 0; i < vertices.length; i++) {
+          ret+= del+vertices.getAt(i).toUrlValue();
+          del= ';';
+        }
+        del= '|'
+      }
+    }
+    break;
+  default:
+    Ezer.error("ve funkci google_maps byla použita neznámá podfunkce '"+fce+"'");
+  }
+  return ret;
+}
+*/
 // ================================================================================================= Button
 //c: Button ()
 //      tlačítko
@@ -5122,7 +5292,7 @@ Ezer.Eval= new Class({
       t= x ? '<b>true</b>' : '<b>false</b>';
       break;
     case 'array':
-      t= '<b>code</b>';
+      t= '<b>array</b>';
       break;
     case 'element':    case 'event':  case 'textnode':  case 'whitespace':  case 'arguments':
     case 'date':   case 'function':  case 'regexp':      case 'class':
@@ -5259,6 +5429,8 @@ Ezer.Eval= new Class({
 //   e i a   - zavolá (pomocí ask) funkci c.i na serveru s a argumenty a na zásobník dá její hodnotu
 //   m i a   - sníží zásobník o referenci objektu a zavolá jeho metodu c.i s a argumenty a na zásobník dá její hodnotu
 //   a i     - sníží zásobník o referenci objektu a na zásobník dá hodnotu jeho atributu c.i
+//   L       - test pro foreach: na zásobníku je pole p, pokud je prázdné sníží zásobník a skočí,
+//             pokud je p neprázdné dá na vrchol p.pop
 //   + [jmp] [iff] [ift] - obsahují offset pro posun čitače v závislosti na hodnotě na vrcholu zásobníku
 //   + [go] - obsahuje offset pro posun čitače (bez změny a závislosti na zásobníku)
 //   + [s] - pozice ve zdrojovém textu ve tvaru  l,c
@@ -5411,6 +5583,7 @@ Ezer.Eval= new Class({
               if ( $type(o)!='object' )
                 Ezer.error('EVAL: '+cc.i+' nemá definovaný objekt','S',this.proc,last_lc);
               obj= Ezer.obj_ref(cc.i,o);
+              obj= obj===null ? '' : obj;
               this.stack[++this.top]= obj;
               break;
             //   c|C i a v - Ezer funkce: na zásobníku jsou argumenty - po volání hodnota funkce 'i'
@@ -5565,6 +5738,7 @@ Ezer.Eval= new Class({
               if ( $type(obj[cc.i])!='function' )
                 Ezer.error('EVAL: '+cc.i+' není metoda '+obj.type,'S',this.proc,last_lc);
               obj= obj[cc.i].apply(obj,args);
+              if ( Ezer.to_trace && Ezer.is_trace.x ) this.trace_fce(cc.s,obj.id+'.'+cc.i,obj,args,'x1');
               if ( obj ) {
                 // pokud se start přerušení povedl
                 this.c= c;
@@ -5636,6 +5810,21 @@ Ezer.Eval= new Class({
               else
                 val= obj.options[cc.i];
               this.stack[++this.top]= val;
+              break;
+            // L - test pro foreach: na zásobníku je pole p, pokud je prázdné sníží zásobník a skočí,
+            //     pokud je p neprázdné dá na vrchol p.pop
+            case 'L':
+              obj= this.stack[this.top];                // pole
+              if ( $type(obj)!='array' )
+                Ezer.error('EVAL: '+cc.i+' nemá definované pole','S',this.proc,last_lc);
+              if ( !obj.length ) {                      // pokud je prázdné
+                this.top--;                             // tak je odstraň ze zásobníku
+                Ezer.eval_jump= '*';                    // bude ukončeno skokem za foreach
+              }
+              else {                                    // jinak na vrchol dej
+                this.stack[++this.top]= obj.pop();      // element pole a zkrať pole
+                c-= cc.go-1;                            // a eliminuj příkaz skoku
+              }
               break;
             default:
               Ezer.error('EVAL: '+cc.o+' není kód','S',this.proc,last_lc);
@@ -5758,7 +5947,12 @@ Ezer.Eval= new Class({
             Ezer.error('Ezerscript error in '+this.id+msg,'s',this.proc);
           }
           else {
-            Ezer.error(e?'Javascript '+(e.msg||e):'error in eval','E',e);
+            if ( Ezer.browser=='CH' ) {
+              var astack= e.stack.split("\n");
+              Ezer.error(e?'Javascript '+(astack[0]+astack[1]||e):'error in eval','E',e);
+            }
+            else
+              Ezer.error(e?'Javascript '+(e.msg||e):'error in eval','E',e);
           }
         }
       }
