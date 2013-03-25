@@ -2626,6 +2626,31 @@ Ezer.LabelMap= new Class({
     }
     return 1;
   },
+// --------------------------------------------------------------------------- LabelMap.getBounds
+// vrátí souřadnice severovýchodního a jihozápadního rohu mapy
+//fm: LabelMap.getbounds ()
+  getbounds: function () {
+    var ret= {};
+    var bounds= this.map.getBounds();
+    if ( bounds ) {
+      ret.rect= bounds.getNorthEast()+','+bounds.getSouthWest();
+    }
+    return ret;
+  },
+// --------------------------------------------------------------------------- LabelMap.fitBounds
+// zvolí měřítko a polohu mapy tak, aby byly vidět všechny nastavené značky
+//fm: LabelMap.fitbounds (gobject)
+  fitbounds: function (geo) {
+    if ( this.mark.length ) {
+      var box= new google.maps.LatLngBounds();
+      this.mark.each(function(point) {
+        box.extend(point.getPosition());
+      }.bind(this));
+      this.map.fitBounds(box);
+    }
+    return 1;
+  },
+// (setBounds,panToBounds, getZoom, setZoom)
 // --------------------------------------------------------------------------- LabelMap.geocode
 // doplní do gobjektu souřadnice obsažené adresy nebo je vymaže,
 // pokud adresa nebyla poznána
@@ -5822,7 +5847,7 @@ Ezer.Eval= new Class({
                 Ezer.eval_jump= '*';                    // bude ukončeno skokem za foreach
               }
               else {                                    // jinak na vrchol dej
-                this.stack[++this.top]= obj.pop();      // element pole a zkrať pole
+                this.stack[++this.top]= obj.shift();    // element pole a zkrať pole
                 c-= cc.go-1;                            // a eliminuj příkaz skoku
               }
               break;
