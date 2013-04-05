@@ -107,7 +107,7 @@
     closedir($dh);
   }
   ksort($files);
-  // ------------------------------------------------------------------------------------ obnova tabulek
+  // -------------------------------------------------------------------------------- obnova tabulek
   if ( $_GET['refresh']=='tables' ) {
     require_once("server/reference.php");
     require_once("$ezer_path_root/$root.inc");
@@ -177,7 +177,7 @@ __EOD
     // ? debug a trace
     $lst.= $calls;
   }
-/** ************************************************************************************************ generování HTML */
+/** ***************************************************************************** generování HTML */
 echo <<<__EOF
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 4.01 Strict">

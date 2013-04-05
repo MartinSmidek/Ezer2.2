@@ -33,7 +33,7 @@ function comp ($src) {
 # přeloží $aname do $cname pokud je překlad bez chyby
 # v případě chyby nechá $cname beze změny
 # $root je jméno hlavního objektu aplikace a může být uvedeno jen pro $name='$'
-# $list_only omezí listing kódu procedur na dané jméno
+# $list_only omezí listing kódu procedur na daná jména (oddělená čárkou)
 function comp_file ($name,$root='',$list_only='') {  #trace();
   global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
     $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes, $onloads;
@@ -308,7 +308,7 @@ function xlist($x,$ind,$list_only='') {
   $sp= str_repeat('  ',$ind);
   if ( $x->part ) foreach ($x->part as $id=>$desc) {
     $type= $desc->type;
-    if ( $list_only=='' || $list_only==$id ) {
+    if ( $list_only=='' || strstr(",$list_only,",",$id,") ) {
       $lst.= "\n$sp$type $id";
       if ( $type=='proc' ) {
   //                                                 debug($desc);
@@ -1444,11 +1444,13 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
           $fce= find_part_abs($c->par[1]->name,$fullname,'proc');
           if ( $fce && $fce->type=='proc' && 1==count((array)$fce->par) ) {
             $x= gen($pars,$vars,$c->par[0],0,$struct1);
+            $test= (object)array('o'=>'L','go'=>count($f)+3);
             $f= gen_name($c->par[1]->name,$pars,$vars,true,$c->par[1]);
             $f[count($f)-1]->a= 1;
-            $test= (object)array('o'=>'L','go'=>count($f)+2,'trace'=>count($f));
-            $jmp= (object)array('o'=>0,'jmp'=>-count($f)-1);
-            $code[]= array($x,$test,$f,$jmp);
+            $f[count($f)-1]->ift= -count($f);
+            $popx= (object)array('o'=>'z','i'=>1,'nojmp'=>1);
+            $code[]= array($x,$test,$f,$popx);
+            $struct->arr[]= $struct1;
           }
           else comp_error("CODE: procedura použitá ve foreach musí mít jeden parametr");
         }

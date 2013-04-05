@@ -317,7 +317,9 @@ DoubleQuote=1
 KeyWordChars=_
 CodeExplorer=ftUnknown
 [KeyWords]
+array=
 desc=
+foreach=
 object=
 return=
 this=$key1
@@ -337,6 +339,7 @@ onchoice=
 onload=
 onready=
 onbusy=
+onmarkclick=
 onrowclick=
 onsave=
 onstart=
