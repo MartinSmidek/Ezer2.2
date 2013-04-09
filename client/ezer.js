@@ -2808,9 +2808,9 @@ Ezer.LabelMap= new Class({
     var ms= 0;
                                                 Ezer.trace('*','geocode '+this.geocode_counter+': '+geo.address);
     if ( (this.geocode_counter % 10) == 0 ) {
-      ms= 20000;
-      if ( (this.geocode_counter % 100) == 0 )
-        ms+= 20000;
+      ms= 10000;
+//       if ( (this.geocode_counter % 100) == 0 )
+//         ms+= 20000;
     }
     if ( ms )
       this.geocoder.geocode.delay(ms,this,[{address:geo.address},this._geocode.bind(this)]);
@@ -2829,6 +2829,14 @@ Ezer.LabelMap= new Class({
     // regulérní návrat z asynchronní funkce
     this.geo.mark= '';
     if (status == google.maps.GeocoderStatus.OK) {
+      // navrácení výsledku: jednoznačnost, psč, poloha první volby
+      this.geo.found= {diff:results.length,addr:results[0].formatted_address};
+      for (var i in results[0].address_components) {
+        var c= results[0].address_components[i];
+          if ( c.types && c.types[0]=="postal_code" ) {
+            this.geo.found.psc= c.long_name;
+          }
+      }
       var ll= results[0].geometry.location;
       delete this.geo.address;
       this.geo.mark= this.geo.id+','+ll.lat()+','+ll.lng();
