@@ -982,7 +982,7 @@ Ezer.Button.implement({
       styles:this.coord({height:undefined,width:undefined}),
       type:this.type=='button.submit'?'submit':'submit',events:{
         mouseup: function(el) {
-                                                      Ezer.trace('*','button:mouseup');
+//                                                       Ezer.trace('*','button:mouseup');
           if ( !Ezer.design ) {
             Ezer.fce.touch('block',this,'click');     // informace do _touch na server
             this.fire('onclick',[],el);

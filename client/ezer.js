@@ -2611,18 +2611,38 @@ Ezer.LabelMap= new Class({
 //fm: LabelMap.dump ()
   dump: function () {
     var visible= 0;
-    var viewPort= this.map.getBounds();
-    for (var i in this.mark) {
-      var point= this.mark[i];
-      if ( viewPort.contains(point.getPosition()) ) {
-        visible++;
+    var viewPort= this.map ? this.map.getBounds() : null;
+    if ( viewPort ) {
+      for (var i in this.mark) {
+        var point= this.mark[i];
+        if ( viewPort.contains(point.getPosition()) ) {
+          visible++;
+        }
       }
     }
     return info= {
       marks: this.mark ? Object.getLength(this.mark) : 0,
       visible: visible,
-      polys: this.poly ? this.poly.length : 0
-    };
+      polys: this.poly ? this.poly.length : 0,
+      bounds: viewPort ? this.get_bounds() : ",;,"
+    }
+  },
+// -------------------------------------------------------------------------------- LabelMap.get
+// get('ids') vrátí seznam zobrazených značek
+//fm: LabelMap.get (op)
+  get: function (op) {
+    var ret= del= '';
+    switch (op) {
+    case 'ids':
+      for (var i in this.mark) {
+        if ( this.mark[i].id && this.mark[i].id!==undefined ) {
+          ret+= del+this.mark[i].id;
+          del= ',';
+        }
+      }
+      break;
+    }
+    return ret;
   },
 // -------------------------------------------------------------------------------- LabelMap.set
 // zobrazí v mapě informace předané objektem geo
@@ -2834,12 +2854,14 @@ Ezer.LabelMap= new Class({
       for (var i in results[0].address_components) {
         var c= results[0].address_components[i];
           if ( c.types && c.types[0]=="postal_code" ) {
-            this.geo.found.psc= c.long_name;
+            this.geo.found.psc= c.long_name.replace(/\s/,'');
           }
       }
       var ll= results[0].geometry.location;
       delete this.geo.address;
-      this.geo.mark= this.geo.id+','+ll.lat()+','+ll.lng();
+      this.geo.lat= ll.lat();
+      this.geo.lng= ll.lng();
+      this.geo.mark= this.geo.id+','+this.geo.lat+','+this.geo.lng;
     }
     this.continuation.stack[++this.continuation.top]= this.geo;
     this.continuation.eval.apply(this.continuation,[0,1]);
@@ -4447,7 +4469,7 @@ Ezer.Browse= new Class({
     if ( y.cmd=='browse_load' ) {
       // volání browse_seek bez parametrů
       var oldkey= this.browse_key();
-                                                        Ezer.trace('*','browse_seek() key:'+oldkey);
+//                                                         Ezer.trace('*','browse_seek() key:'+oldkey);
       this.browse_load_(y,-1);  // nebude provedeno _row_move
       var indx= this.keys.indexOf(oldkey);
       if ( indx!=-1 ) {
@@ -4459,7 +4481,7 @@ Ezer.Browse= new Class({
     }
     else if ( y.seek ) {
       seek= y.seek
-                                                        Ezer.trace('*','browse_seek(...) key:'+seek);
+//                                                         Ezer.trace('*','browse_seek(...) key:'+seek);
       // volání browse_seek s parametry
       this.browse_load_(y,-1);  // nebude provedeno _row_move
 //       this.raise('onrowclick',Number(y.seek),0,0,1);
@@ -4598,7 +4620,7 @@ Ezer.Browse= new Class({
 // načtení pokračování buferu za/před stávající obsah
 //   t je začátek tabulky, r bude aktivní, len je potřeba načíst
   _browse_scroll: function(mode,r,b,blen,t,tlen,from,len) {
-                                                        Ezer.trace('*','smarter _scroll r:'+r+',b:'+b+','+blen+',t:'+t+','+tlen+',S:'+from+','+len+' - '+mode);
+//                                                         Ezer.trace('*','smarter _scroll r:'+r+',b:'+b+','+blen+',t:'+t+','+tlen+',S:'+from+','+len+' - '+mode);
     var x= this._params({cmd:'browse_scroll'},null,null,null,from,1);
     x.count= this.slen;                 // celkový počet záznamů select již známe
     //x.active= r;                      // záznam, který bude aktivní v tabulce
