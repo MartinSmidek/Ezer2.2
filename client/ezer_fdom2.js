@@ -1767,7 +1767,7 @@ Ezer.Chat.implement({
     }
   }
 });
-// ================================================================================================= Select-DOM
+// ====================================================================================== Select-DOM
 //c: Select-DOM
 //      Select má společné zobrazení a implementuje třídu Drag
 //t: Block-DOM,Elem-DOM
@@ -2033,7 +2033,7 @@ Ezer.Select.implement({
     }
   }
 });
-// ================================================================================================= SelectAuto-DOM
+// ================================================================================== SelectAuto-DOM
 //c: SelectAuto-DOM ([options])
 //      výběrový element formuláře definovaný mapou (blok 'select' typ 'map' atribut 'options')
 //t: Block-DOM,Elem-DOM,Select-DOM
