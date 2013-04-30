@@ -1773,6 +1773,7 @@ Ezer.Chat.implement({
 //t: Block-DOM,Elem-DOM
 //s: Block-DOM
 Ezer.Select.implement({
+  _value: '',                                   // pomocná hodnota iniciovaná při focus
 // ------------------------------------------------------------------------------------ DOM_add
 //f: Select-DOM.DOM_add ()
 //      zobrazí prvek select
@@ -1832,7 +1833,7 @@ Ezer.Select.implement({
         this.DOM_DropList.setStyle('display','block');
         this.DOM_Block.setStyle('zIndex',999);
         this.DOM_focus();
-        this._value= this.DOM_Input.value;
+        this.value= this._value= this.DOM_Input.value;  // pro změny klávesnicí
       }.bind(this),
       blur: function (event) {
         if ( !this._drop_focus ) {

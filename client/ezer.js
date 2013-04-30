@@ -3108,13 +3108,13 @@ Ezer.Elem= new Class({
 // ------------------------------------------------------------------------------------ blur
 //fm: Elem.blur ()
 //      vyvolá událost onblur a pokud došlo ke změně tak i událost onchanged (s 'd' na konci)
-//      pokud element nemá format=='t'
+//      (i když element má format=='t')
 //e: onblur, onchanged
   blur: function () {
-    if ( this._f('t')==-1 ) {
+//     if ( this._f('t')==-1 ) { změna 130413g
       this.fire('onblur');     // když není format:'t'
       if ( this._changed ) this.fire('onchanged');
-    }
+//     }
     return true;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _data
@@ -6176,7 +6176,7 @@ Ezer.Eval= new Class({
         Ezer.obj.speed.net+= ms - y.php_ms;             // čistý čas přenosu dat
         Ezer.obj.speed.sql+= y.qry_ms;                  // měřeno jen v mysql_qry
         Ezer.obj.speed.php+= y.php_ms - y.qry_ms;
-        Ezer.obj.speed.data+= y.php_b;
+        Ezer.obj.speed.data+= ay.length;
         Ezer.fce.speed('show');
       }
       if ( y.trace ) Ezer.trace('u',y.trace,null,ms);
