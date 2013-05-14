@@ -23,8 +23,8 @@ Ezer.Application= new Class({
     this.domAjax= $('ajax_bar');
     this.mooWarn= new Fx.Slide('warning');
     this.mooWarn.element.addEvent('click',function(){Ezer.App.mooWarn.slideOut()});
-    if ( this.options.to_trace )
-      this._setTrace();
+//     if ( this.options.to_trace )
+//       this._setTrace();
     window.addEvent('resize',function(e){ this.DOM_layout(); }.bind(this));
     this.DOM_layout();
     // V template stránky musí být div-element s id='drag' pro design-subsystém
@@ -193,7 +193,7 @@ Ezer.Application= new Class({
     this._barRightDom.getChildren().destroy();
   },
   // ----------------------------------------------------------------------------- _setTrace
-  // vytvoření ovládání trasování a hlášení chyb
+  // vytvoření ovládání trasování, hlášení chyb, FAQ
   _setTrace: function() {
     this._barRightDom= $('status_right');
     this._bar= {};
@@ -286,12 +286,23 @@ Ezer.Application= new Class({
         }.bind(this)
       }}).inject(speed);
     }
+    // FAQ
+    new Element('span', {text:'HELP!',title:'kontextový help formou FAQ', events:{
+      click: function(event) {
+        if ( Ezer.App.hits_block ) {
+          var id= Ezer.App.hits_block.self_sys();
+          Ezer.trace(null,Ezer.fce.debug("FAQ "+id+" ("+Ezer.App.hits_block.id+")"));
+          Ezer.App.help_text(id);
+        }
+      }.bind(this)
+    }}).inject(this._barRightDom);
     $('error').addEvent('dblclick',this._clearError.bind(this));
   },
   // ----------------------------------------------------------------------------- _showSpeed
   // ukázání Speed
   _showSpeed: function() {
-    Ezer.obj.speed.span.set('text',Ezer.obj.speed.msg);
+    if ( Ezer.obj.speed.span )
+      Ezer.obj.speed.span.set('text',Ezer.obj.speed.msg);
   },
   // ----------------------------------------------------------------------------- _clearTrace
   // smazání Trace

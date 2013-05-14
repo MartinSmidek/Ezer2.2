@@ -506,6 +506,14 @@ Ezer.Application.implement({
     if ( y.text )
       Ezer.fce.source_(y.text,parm.file,parm.app,parm.l,parm.c,true,parm.root);
   },
+// ------------------------------------------------------------------------------------------------- help_text
+// zobrazí helptext s daným klíčem
+  help_text: function(k) {
+    this.ask({cmd:'help_text',key:k},'help_text_',{});
+  },
+  help_text_: function(y,parm) {
+    Ezer.trace(null,Ezer.fce.debug(y.text));
+  },
 // ------------------------------------------------------------------------------------- save_drag
 // po skončené inicializaci z include a load_$
   save_drag: function() {

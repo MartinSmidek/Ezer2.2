@@ -162,6 +162,19 @@ Ezer.Block= new Class({
     if ( window.top.dbg && window.top.dbg.show_run ) window.top.dbg.show_run();
     return true;
   },
+// ------------------------------------------------------------------------------------ self_sys
+//fm: Block.self_sys ()
+//      vrátí jméno this vytvořené zřetězením atributu _sys
+  self_sys: function() {
+    var id= '';
+    for (var o= this; o.owner; o= o.owner) {
+      if ( o.options._sys ) {
+        id= (o.options._sys=='*'?o.id:o.options._sys)+(id ? '.'+id : '');
+      }
+    }
+    if ( !id ) id= '@';
+    return id;
+  },
 // ------------------------------------------------------------------------------------ self
 //fm: Block.self ()
 //      vrátí absolutní jméno this
@@ -2553,7 +2566,7 @@ Ezer.Label= new Class({
 //      prvek pro kontrolovaný upload souborů na server, kliknutí přeruší přenos
 //t: Block,Label
 //s: Block
-//i: LabelDrop.ondrop - funkce zavolaná po dokončení vložení souboru
+ //i: LabelDrop.ondrop - funkce zavolaná po dokončení vložení souboru
 //i: LabelDrop.onload - funkce zavolaná po dokončení přenosu na server
 Ezer.LabelDrop= new Class({
   Extends:Ezer.Label,
@@ -7779,7 +7792,7 @@ Ezer.fce.touch= function (type,block,args) {
         for (var b= block; b.owner; b= b.owner) {
           if ( b.options && b.options._sys ) {
             block_sys= b;
-//                                                 Ezer.trace('*','touch block '+b.id);
+                                                Ezer.trace('*','touch block '+b.id);
             break;
           }
         }
@@ -7794,13 +7807,14 @@ Ezer.fce.touch= function (type,block,args) {
       // vlastní zápis se provede při odchodu na jiný nadřazený blok
       if ( Ezer.App.hits_block && Ezer.App.hits_block!=block_sys ) {
         // čitelná cesta ke kořenu zapamatovaného bloku
-        var id= '';
-        for (var o= Ezer.App.hits_block; o.owner; o= o.owner) {
-          if ( o.options._sys ) {
-            id= (o.options._sys=='*'?o.id:o.options._sys)+(id ? '.'+id : '');
-          }
-        }
-        if ( !id ) id= '@';
+        var id= Ezer.App.hits_block.self_sys();
+//         var id= '';                                                                              SMAZAT
+//         for (var o= Ezer.App.hits_block; o.owner; o= o.owner) {
+//           if ( o.options._sys ) {
+//             id= (o.options._sys=='*'?o.id:o.options._sys)+(id ? '.'+id : '');
+//           }
+//         }
+//         if ( !id ) id= '@';
         Ezer.App.hits_block= block_sys;
         Ezer.App.hits_block_id= id;
         to_send= true;
