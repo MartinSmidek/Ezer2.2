@@ -1300,6 +1300,33 @@
 //       if ( "{$x->app}/{$x->file}"==$path ) $y->text= $text;
     }
     break;
+  # ------------------------------------------------------------------------------------------------ help_text
+  # vrátí text z tabulky _help podle klíče
+  case 'help_text':
+    $y->text= "K této kartě zatím nebyl položen dotaz, můžete být první :-)";
+    $y->key= $x->key;
+    // postupné zkracování klíče
+    $akey= explode('.',$x->key);
+    while (count($akey)) {
+      $key= implode('.',$akey);
+      $qh= "SELECT help FROM _help WHERE topic='{$key}'";
+      $rh= @mysql_query($qh);
+      if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
+        $y->text= $h->help;
+        $y->key= $key;
+        break;
+      }
+      array_pop($akey);
+    }
+    break;
+  # ------------------------------------------------------------------------------------------------ help_save
+  # zapíše text do tabulky _help
+  case 'help_save':
+    $text= mysql_real_escape_string($x->text);
+    $qh= "REPLACE INTO _help (topic,help) VALUES ('{$x->key}','$text') ";
+    $rh= mysql_qry($qh);
+    $y->ok= $rh ? 1 : 0;
+    break;
   # ------------------------------------------------------------------------------------------------ load_code2
   # zavede modul včetně modulů vnořených pomocí options.include:onload[,fname]
   # pokud je zdrojový text modulu novější než přeložený json-text, pak jej napřed přeloží.

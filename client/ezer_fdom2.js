@@ -890,8 +890,9 @@ Ezer.LabelDrop.implement({
     var td2w= 60;
     var td1w= this._w - (td2w + td3w + (td3w?16:14) + 16);
     var tr= new Element('tr').adopt(
-      f.td1= new Element('td',{width:td1w,html:f.name}),
-      f.td2= new Element('td',{width:td2w,html:"čekám"})
+      f.td1= new Element('td',{width:td1w,html:
+        "<a target='docs' href='docs/"+f.name+"'>"+f.name+"</a>"}),
+      f.td2= new Element('td',{width:td2w,align:'right',html:f.status||"čekám"})
     ).inject(this.DOM_BlockRows);
     if ( td3w )
       tr.adopt(f.td3= new Element('td',{width:60}));
@@ -949,7 +950,9 @@ Ezer.LabelDrop.implement({
     xhr.setRequestHeader("EZER-FILE-PATH", 'docs/');
     xhr.onload = function(e) {
       if (e.target.status == 200) {
+        // vraci pole:name|chunk/chunks|path|strlen
                                                         Ezer.trace('*',e.target.response);
+        var resp= e.target.response.split('|');
         if ( n < max ) {
           var value= Math.round(100*(n*CHUNK/f.data.size));
           if (bar) bar.value= value;
@@ -961,7 +964,9 @@ Ezer.LabelDrop.implement({
           if ( this.part && (obj= this.part['onload']) ) {
             new Ezer.Eval(obj.code,this,[f],'onload',null,false,obj,obj.desc.nvar);
           }
-          f.td2.innerHTML= "hotovo";
+          f.td2.innerHTML= resp[3]+"B";
+          // záměna jména souboru za odkaz
+          f.td1.innerHTML= "<a target='docs' href='docs/"+f.td1.innerHTML+"'>"+f.td1.innerHTML+"</a>";
         }
       }
     }.bind(this);
@@ -2901,6 +2906,7 @@ Ezer.Show.implement({
 // ================================================================================================= fce
 // části standardních funkcí závislé na DOM architektuře
 Ezer.fce.DOM= {};
+Ezer.obj.DOM= {};
 // -------------------------------------------------------------------------------------- warning
 // zobrazí varovnou hlášku místo případné staré
 // Ezer.fce.DOM.warning_status= 0;
@@ -2967,6 +2973,60 @@ Ezer.fce.DOM.alert= function (str,continuation) {
     });
   }
   return win;
+};
+// -------------------------------------------------------------------------------------- help
+// zobrazení helpu v popup okně s možností editace
+Ezer.obj.DOM.help= null;                                // popup StickyWin
+Ezer.fce.DOM.help= function (html,ykey,xkey) {
+  if ( !Ezer.obj.DOM.help ) {
+    Ezer.obj.DOM.help= {};
+    var _w= 500, _h= 300;
+    Ezer.obj.DOM.help.sticky= $(new StickyWin({draggable:true,
+      relativeTo: document.id('work'),position:'upperLeft',
+      content:StickyWin.ui('help','',{
+        cornerHandle:true, width:_w+55,
+        cssClassName:'PanelPopup',closeButton:true
+      })
+    }));
+    Ezer.obj.DOM.help.cap= Ezer.obj.DOM.help.sticky.getElement('.caption');
+    Ezer.obj.DOM.help.sticky.getElement('.body')
+      .setStyles({width:_w,height:_h})
+      .adopt(Ezer.obj.DOM.help.txt= new Element('div',{styles:{
+        width:'100%',height:'100%',overflow:'auto'}}));
+  }
+  Ezer.obj.DOM.help.sticky.show();
+  Ezer.obj.DOM.help.cap.innerHTML=
+    "<span title='"+(xkey==ykey ? ykey : xkey+"=>"+ykey)+"'>HELP</span>";
+  Ezer.obj.DOM.help.txt.innerHTML= html;
+  if ( window.CKEDITOR.version[0]=='4' ) {
+    Ezer.obj.DOM.help.cap.addEvents({
+      contextmenu: function(event) {
+        Ezer.fce.contextmenu([
+          ['editovat obsah',function(el) {
+            CKEDITOR.disableAutoInline= true;
+            Ezer.obj.DOM.help.txt.innerHTML=
+              "<div id='editable' contenteditable='true'>"+Ezer.obj.DOM.help.txt.innerHTML+"</div>";
+            window.CKEDITOR.inline('editable',{
+              resize_enabled:false, skin:'version3',
+              entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs'
+            });
+          }],
+          ["uložit pod '"+ykey+"'",function(el) {
+            var data= window.CKEDITOR.instances.editable.getData();
+            Ezer.obj.DOM.help.txt.innerHTML= data;
+            Ezer.App.help_save(ykey,data);
+          }],
+          ykey==xkey ? null :
+          ["uložit pod '"+xkey+"'",function(el) {
+            var data= window.CKEDITOR.instances.editable.getData();
+            Ezer.obj.DOM.help.txt.innerHTML= data;
+            Ezer.App.help_save(xkey,data);
+          }]
+        ],arguments[0]);
+        return false;
+      }.bind(this)
+    });
+  }
 };
 // -------------------------------------------------------------------------------------- trace
 // b označuje (nepovinný) blok, který je ukázán při kliknutí na trasovací řádek

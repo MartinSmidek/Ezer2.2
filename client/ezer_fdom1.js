@@ -197,9 +197,9 @@ Ezer.Application= new Class({
   _setTrace: function() {
     this._barRightDom= $('status_right');
     this._bar= {};
+    this._barRightDom.getChildren().destroy();
     // pokud je povolen ovladač trasování
     if ( this.options.to_trace ) {
-      this._barRightDom.getChildren().destroy();
       Ezer.to_trace= this.options.show_trace;
       this._barTrace= new Element('span', {text:'trace:','class':Ezer.to_trace?'ae_switch_on':'',
         title:'zapíná/vypíná trasování',
@@ -256,46 +256,48 @@ Ezer.Application= new Class({
           this.DOM_layout();
         }.bind(this)
       });
-      // okno pro zobrazení měření výkonu - zachází se s ním jako s trasováním 'S'
-      Ezer.is_trace['S']= this.options.ae_trace.indexOf('S')>=0;
-      var speed= new Element('span', {text:'speed:','class':Ezer.is_trace['S']?'ae_switch_on':'',
-          title:'zobrazí okno s měřením výkonu', events:{
-        click: function(event) {
-          event.target.toggleClass('ae_switch_on');
-          if ( this.options.ae_trace.indexOf('S')>=0 ) {
-            this.options.ae_trace= this.options.ae_trace.replace('S','');
-            Ezer.is_trace['S']= false;
-          }
-          else {
-            this.options.ae_trace+= 'S';
-            Ezer.is_trace['S']= true;
-          }
-          Ezer.obj.speed.span.setStyles({display:Ezer.is_trace['S'] ? 'block' : 'none'});
-          Ezer.fce.speed('clear');
-          Ezer.fce.speed('show');
-          Ezer.obj.speed.msg= 'měření časové a datové náročnosti'; this._showSpeed();
-        }.bind(this)
-      }}).inject(this._barRightDom);
-      Ezer.obj.speed.span= new Element('span', {text:Ezer.obj.speed.msg, 'class':'measures',
-          styles:{display:Ezer.is_trace['S'] ? 'block' : 'none'},
-          title:'SQL, PHP, Ezer udává čas v ms, NET je ms/KB, kliknutí vynuluje čitače', events:{
-        click: function(event) {
-          Ezer.fce.speed('clear');
-          Ezer.fce.speed('show');
-          return false;
-        }.bind(this)
-      }}).inject(speed);
     }
-    // FAQ
-    new Element('span', {text:'HELP!',title:'kontextový help formou FAQ', events:{
+    // pro všechny okno pro zobrazení měření výkonu - zachází se s ním jako s trasováním 'S'
+    Ezer.is_trace['S']= this.options.ae_trace.indexOf('S')>=0;
+    var speed= new Element('span', {text:'speed:','class':Ezer.is_trace['S']?'ae_switch_on':'',
+        title:'zobrazí okno s měřením výkonu', events:{
       click: function(event) {
-        if ( Ezer.App.hits_block ) {
-          var id= Ezer.App.hits_block.self_sys();
-          Ezer.trace(null,Ezer.fce.debug("FAQ "+id+" ("+Ezer.App.hits_block.id+")"));
-          Ezer.App.help_text(id);
+        event.target.toggleClass('ae_switch_on');
+        if ( this.options.ae_trace.indexOf('S')>=0 ) {
+          this.options.ae_trace= this.options.ae_trace.replace('S','');
+          Ezer.is_trace['S']= false;
         }
+        else {
+          this.options.ae_trace+= 'S';
+          Ezer.is_trace['S']= true;
+        }
+        Ezer.obj.speed.span.setStyles({display:Ezer.is_trace['S'] ? 'block' : 'none'});
+        Ezer.fce.speed('clear');
+        Ezer.fce.speed('show');
+        Ezer.obj.speed.msg= 'měření časové a datové náročnosti'; this._showSpeed();
       }.bind(this)
     }}).inject(this._barRightDom);
+    Ezer.obj.speed.span= new Element('span', {text:Ezer.obj.speed.msg, 'class':'measures',
+        styles:{display:Ezer.is_trace['S'] ? 'block' : 'none'},
+        title:'SQL, PHP, Ezer udává čas v ms, NET je ms/KB, kliknutí vynuluje čitače', events:{
+      click: function(event) {
+        Ezer.fce.speed('clear');
+        Ezer.fce.speed('show');
+        return false;
+      }.bind(this)
+    }}).inject(speed);
+    // FAQ - zatím jen vývojář
+    if ( Ezer.sys.user.skills.contains('m',' ') ) {
+      new Element('span', {text:'HELP!',title:'kontextový help formou FAQ', events:{
+        click: function(event) {
+          if ( Ezer.App.hits_block ) {
+            var key= Ezer.App.hits_block.self_sys();
+            Ezer.trace('*',"FAQ "+key);
+            Ezer.App.help_text(key);
+          }
+        }.bind(this)
+      }}).inject(this._barRightDom);
+    }
     $('error').addEvent('dblclick',this._clearError.bind(this));
   },
   // ----------------------------------------------------------------------------- _showSpeed

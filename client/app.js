@@ -145,7 +145,7 @@ Ezer.Application.implement({
 //      zavede do paměti kód
 //s: system
   load: function () {
-    Ezer.trace('L','load root');
+    //Ezer.trace('L','load root');
     if ( this.options.must_log_in ) {
       if (this.options.refresh ) {
         this.ask({cmd:'user_relogin'},'logged');
@@ -396,7 +396,7 @@ Ezer.Application.implement({
       else Ezer.error(e);      // neošetřená chyba
     };*/
   },
-// ------------------------------------------------------------------------------------------------- include
+// ----------------------------------------------------------------------------------------- include
 // voláním 'include' bude natažen kód
 // po jeho inicializaci bude pokračováno 'continue' v témže objektu
   include: function(sender) {
@@ -414,7 +414,7 @@ Ezer.Application.implement({
     sender.options.include= 'loaded';
 //     this.start_code_continue();
   },
-// ------------------------------------------------------------------------------------------------- start_code
+// -------------------------------------------------------------------------------------- start_code
 // provede kód pro načtení 1.map,2.select,3.includes,4.onstart a inicializuje novou část systému
   start_code: function(top,end) {
     var codes= {map:[],select:[],onstart:[]/*,include:[]*/};
@@ -425,7 +425,7 @@ Ezer.Application.implement({
       this.start_code_seq(top,codes.map,'start_href_modify');
     }
   },
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start_code_seq
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start_code_seq
 // top je kořenný blok, code je kód, end je this.funkce volaná na závěr
 // následovat mohou parametry oddělené /
   start_code_seq: function(top,code,end) {
@@ -440,7 +440,7 @@ Ezer.Application.implement({
       Ezer.app[end](top);
     }
   },
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start_href_modify
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - start_href_modify
 // přidá obsluhu elementům <a href='ezer://....'>
 // obdobný kód je v Ezer.Label.set
   start_href_modify: function () {
@@ -457,12 +457,12 @@ Ezer.Application.implement({
 //       }
 //     })
   },
-// ------------------------------------------------------------------------------------------------- onfirstfocus
+// ------------------------------------------------------------------------------------ onfirstfocus
 // je voláno v případě prvního focus panelu - obdoba události domready
   onfirstfocus: function(panel) {
     Ezer.app.DOM_layout();  // přepočet layoutu
   },
-// ------------------------------------------------------------------------------------------------- block_info
+// -------------------------------------------------------------------------------------- block_info
 // vrátí informaci o místě ve zdrojovém textu bloku
 // vychází ze záznamů Ezer.code..._file a Ezer.run..._lc
 // s touto informací se zavolá funkce Ezer.fce.error_ pokud ask_source=true
@@ -482,7 +482,7 @@ Ezer.Application.implement({
     if ( y && y.text )
       Ezer.fce.error_(y.text);
   },
-// ------------------------------------------------------------------------------------------------- source_text
+// ------------------------------------------------------------------------------------- source_text
 // zabezpečí zobrazení zdrojového textu bloku b
   source_text: function(b,lc) {
     var info= '?';
@@ -506,15 +506,20 @@ Ezer.Application.implement({
     if ( y.text )
       Ezer.fce.source_(y.text,parm.file,parm.app,parm.l,parm.c,true,parm.root);
   },
-// ------------------------------------------------------------------------------------------------- help_text
+// --------------------------------------------------------------------------------------- help_text
 // zobrazí helptext s daným klíčem
   help_text: function(k) {
-    this.ask({cmd:'help_text',key:k},'help_text_',{});
+    this.ask({cmd:'help_text',key:k},'help_text_',{key:k});
   },
   help_text_: function(y,parm) {
-    Ezer.trace(null,Ezer.fce.debug(y.text));
+    Ezer.fce.help(y.text,y.key,parm.key);
   },
-// ------------------------------------------------------------------------------------- save_drag
+// --------------------------------------------------------------------------------------- help_save
+// zapíše helptext s daným klíčem
+  help_save: function(k,t) {
+    this.ask({cmd:'help_save',key:k,text:t});
+  },
+// --------------------------------------------------------------------------------------- save_drag
 // po skončené inicializaci z include a load_$
   save_drag: function() {
     var drag= Ezer.drag.save();
@@ -525,7 +530,7 @@ Ezer.Application.implement({
     Ezer.fce.DOM.alert(y.warning||"Zdrojový text byl změněn. <br>Bude obnoveno okno prohlížeče!",
       function(){window.location.href= window.location.href;});
   },
-// ------------------------------------------------------------------------------------- started
+// ----------------------------------------------------------------------------------------- started
 // po skončené inicializaci z include a load_$
   started: function() {
     if ( this.options.debug /*window.top.dbg*/ && window.top.dbg.show_run ) {
@@ -533,9 +538,9 @@ Ezer.Application.implement({
       window.top.dbg.show_run();
     }
   },
-// ------------------------------------------------------------------------------------------------- evals & calls
+// =================================================================================== evals & calls
 // obsluha fronty volání aktivované uklidněním interpreta
-// ------------------------------------------------------------------------------------- evals_init
+// -------------------------------------------------------------------------------------- evals_init
 // obnoví klid interpreta
   evals_init: function () {
     Ezer.evals= 0;
@@ -557,12 +562,12 @@ Ezer.Application.implement({
     Ezer.calls.push({obj:obj,metd:metd,args:args});
     this.evals_check();
   },
-// ------------------------------------------------------------------------------------- putFoot
+// ----------------------------------------------------------------------------------------- putFoot
 // putFoot: přidat text do patičky
   putFoot: function(x) {
     if ( this.options.status_bar ) this.putFootDom(x);
   },
-// ------------------------------------------------------------------------------------------------- ask
+// --------------------------------------------------------------------------------------------- ask
 // ask(x,then): dotaz na server se jménem funkce po dokončení
   ask: function(x,then,parm,env) {
     var app= this;

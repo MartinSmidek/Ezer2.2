@@ -9,13 +9,14 @@
   $path.=  $_SERVER['HTTP_EZER_FILE_PATH'];
   $data= file_get_contents("php://input");
   $end= "";//"<br>saved:".count($_SESSION['upload'][$name]);
-  // nastavenÌ zaË·tku
+  // nastaven√≠ zaƒç√°tku
+  $size= 0;
   if ( $chunk==1 ) {
     $_SESSION['upload'][$name]= array();
   }
   // test konce
   if ( count($_SESSION['upload'][$name])==($chunks-1) ) {
-    // poskl·dej a uloû soubor
+    // poskl√°dej a ulo≈æ soubor
     $f= fopen("$path$name",'w');
     for  ($i= 1; $i<=$chunks; $i++) {
       if ( $i==$chunk) {
@@ -29,14 +30,17 @@
       }
     }
     fclose($f);
+    if ( file_exists("$path$name") ) {
+      $size= filesize("$path$name");
+    }
   }
   else {
-    // uloûenÌ Ë·sti
+    // ulo≈æen√≠ ƒç√°sti
     $_SESSION['upload'][$name][$chunk]= $data;
   }
-  // n·vrat hodnoty
+  // n√°vrat hodnoty
 //   $ret= "$name  $chunk/$chunks $path '$data' ? '{$_SESSION['upload'][$name][$chunk]}' ".strlen($data).$end;
-  $ret= "$name  $chunk/$chunks $path ".strlen($data).$end;
+  $ret= "$name|$chunk/$chunks|$path|$size|$end";
   echo $ret;
   exit;
 ?>

@@ -586,7 +586,7 @@ __EOD
 #status, #status_left, #status_right {
   cursor:default; }
 #status_right {
-  position:absolute; right:0; }
+  right:0; }
 #status_right span.measures {
   position:absolute; top:-15px; right:0;
   background-color:$b_kuk; color:$c2_kuk;  }
