@@ -251,7 +251,7 @@ var ContextMenu = new Class({
           top: (pos.y + this.options.offsets.y),
           left: (pos.x + this.options.offsets.x),
           position: 'absolute',
-          'z-index': '9008'
+          'z-index': '12000'
         });
         this.show();                                            //show the menu
       }

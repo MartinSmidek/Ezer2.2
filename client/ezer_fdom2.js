@@ -1888,7 +1888,12 @@ Ezer.Select.implement({
           case 'enter':
             if (li)
               this.DOM_seekItem(li);
-              this.fire('onchanged');
+            else {
+              this.value= '';
+              this._key=  0;
+              this.DOM_noneItem();
+            }
+            this.fire('onchanged');
             break;
           }
         }
