@@ -286,18 +286,16 @@ Ezer.Application= new Class({
         return false;
       }.bind(this)
     }}).inject(speed);
-    // FAQ - zatím jen vývojář
-    if ( Ezer.sys.user.skills.contains('m',' ') ) {
-      new Element('span', {text:'HELP!',title:'kontextový help formou FAQ', events:{
-        click: function(event) {
-          if ( Ezer.App.hits_block ) {
-            var key= Ezer.App.hits_block.self_sys();
-            Ezer.trace('*',"FAQ "+key);
-            Ezer.App.help_text(key);
-          }
-        }.bind(this)
-      }}).inject(this._barRightDom);
-    }
+    // HELP a FAQ
+    new Element('span', {text:'HELP!',title:'kontextový help formou FAQ', events:{
+      click: function(event) {
+        if ( Ezer.App.hits_block ) {
+          var key= Ezer.App.hits_block.self_sys();
+          Ezer.trace('*',"FAQ "+key);
+          Ezer.App.help_text(key);
+        }
+      }.bind(this)
+    }}).inject(this._barRightDom);
     $('error').addEvent('dblclick',this._clearError.bind(this));
   },
   // ----------------------------------------------------------------------------- _showSpeed
