@@ -113,6 +113,7 @@ echo <<<__EOD
 body {
   font-family:Arial,Helvetica,sans-serif; padding:0; margin:0; font-size:9pt;
   position:static; overflow:hidden; }
+textarea { resize: none; }
 #logo {
   z-index:11001; position:relative; }
 #ajax_bar {
@@ -739,6 +740,16 @@ h4.CHeading, .STitle
 .SClass, .SSection
          	{ font-size: 14px; background: #ffd599;}
 .SGroup 	{ font-size: 13px; background: #ffdfb2;}
+
+/*help*/
+
+div.Help   	{ position: absolute; width:300px; height:150px; right:30px; top:15px;
+                  background-color:silver; box-shadow:5px 5px 10px #567; }
+.Help input     { float:right; font-size: 8pt; margin-top:3px; }
+.Help span      { position:absolute; background-color: silver;
+                  border: 3px solid silver; height: 17px; padding-top: 3px; }
+.Help textarea  { position:absolute; width:294px; height:120px; top:23px;
+                  font-family:Arial,Helvetica,sans-serif; font-size:9pt }
 
 __EOD;
 ?>

@@ -891,7 +891,7 @@ Ezer.LabelDrop.implement({
     var td1w= this._w - (td2w + td3w + (td3w?16:14) + 16);
     var tr= new Element('tr').adopt(
       f.td1= new Element('td',{width:td1w,html:
-        "<a target='docs' href='docs/"+f.name+"'>"+f.name+"</a>"}),
+        "<a target='docs' href='docs"+this.path+f.name+"'>"+f.name+"</a>"}),
       f.td2= new Element('td',{width:td2w,align:'right',html:f.status||"čekám"})
     ).inject(this.DOM_BlockRows);
     if ( td3w )
@@ -899,7 +899,8 @@ Ezer.LabelDrop.implement({
     this.DOM_files.push(f);
   },
 // -------------------------------------------------------- LabelDrop.DOM_ondrop
-// zavolá proc ondrop, pokud existuje - vrátí-li 1 bude zahájen upload;
+// zavolá proc ondrop, pokud existuje - vrátí-li 0 bude upload zrušen,
+// jinak jej provede s předaným jménem (možnost odstranit diakritiku)
 // pokud proc ondrop neexistuje, zahájí upload
   DOM_ondrop: function(f) {
     // zavolání funkce ondrop ex-li
@@ -916,6 +917,7 @@ Ezer.LabelDrop.implement({
 // konec vkládání a případný upload
   DOM_upload: function(f,do_upload) {
     if ( do_upload ) {
+      f.name= do_upload;
       // upload rozdělený na části s referováním do <progrress>
       f.td2.innerHTML= "";
       var bar= new Element('progress',{max:100,value:0,title:"kliknutí přeruší přenos",events:{
@@ -947,11 +949,11 @@ Ezer.LabelDrop.implement({
     xhr.setRequestHeader("EZER-FILE-NAME", encodeURIComponent(f.name));
     xhr.setRequestHeader("EZER-FILE-CHUNK", n);
     xhr.setRequestHeader("EZER-FILE-CHUNKS", max);
-    xhr.setRequestHeader("EZER-FILE-PATH", 'docs/');
+    xhr.setRequestHeader("EZER-FILE-PATH", 'docs'+this.path);
     xhr.onload = function(e) {
       if (e.target.status == 200) {
         // vraci pole:name|chunk/chunks|path|strlen
-                                                        Ezer.trace('*',e.target.response);
+//                                                         Ezer.trace('*',e.target.response);
         var resp= e.target.response.split('|');
         if ( n < max ) {
           var value= Math.round(100*(n*CHUNK/f.data.size));
@@ -960,13 +962,14 @@ Ezer.LabelDrop.implement({
         }
         else {
           if ( bar ) bar.value= 100;
+          // záměna jména souboru za odkaz a aktualizace délky
+          f.status= resp[3];
+          f.td2.innerHTML= f.status;
+          f.td1.innerHTML= "<a target='docs' href='docs"+this.path+f.td1.innerHTML+"'>"+f.td1.innerHTML+"</a>";
           // zavolání funkce onload ex-li
           if ( this.part && (obj= this.part['onload']) ) {
             new Ezer.Eval(obj.code,this,[f],'onload',null,false,obj,obj.desc.nvar);
           }
-          f.td2.innerHTML= resp[3]+"B";
-          // záměna jména souboru za odkaz
-          f.td1.innerHTML= "<a target='docs' href='docs/"+f.td1.innerHTML+"'>"+f.td1.innerHTML+"</a>";
         }
       }
     }.bind(this);
@@ -2982,56 +2985,97 @@ Ezer.fce.DOM.alert= function (str,continuation) {
 // -------------------------------------------------------------------------------------- help
 // zobrazení helpu v popup okně s možností editace
 Ezer.obj.DOM.help= null;                                // popup StickyWin
-Ezer.fce.DOM.help= function (html,ykey,xkey) {
+Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
+  // konstrukce elementů pro Help při prvním volání
   if ( !Ezer.obj.DOM.help ) {
     Ezer.obj.DOM.help= {};
-    var _w= 500, _h= 300;
+    var _w= 500, _h= 300, dotaz= null;
     Ezer.obj.DOM.help.sticky= $(new StickyWin({draggable:true,
       relativeTo: document.id('work'),position:'upperLeft',
-      content:StickyWin.ui('help','',{
+      content:StickyWin.ui('HELP: informace, otázky a odpovědi k této kartě','',{
         cornerHandle:true, width:_w+55,
         cssClassName:'PanelPopup',closeButton:true
       })
     }));
     Ezer.obj.DOM.help.cap= Ezer.obj.DOM.help.sticky.getElement('.caption');
-    Ezer.obj.DOM.help.sticky.getElement('.body')
-      .setStyles({width:_w,height:_h})
-      .adopt(Ezer.obj.DOM.help.txt= new Element('div',{styles:{
-        width:'100%',height:'100%',overflow:'auto'}}));
+    Ezer.obj.DOM.help.sticky.getElement('.body').setStyles({width:_w,height:_h}).adopt(
+        // formulář dotazu
+        Ezer.obj.DOM.help.dotaz= new Element('div',{'class':'Help',styles:{display:'none'}}).adopt(
+          new Element('input',{type:'button',value:'Zpět',events:{
+            click: function(el) { // zrušení dotazu
+              Ezer.obj.DOM.help.dotaz.getElement('textarea').value= '';
+              Ezer.obj.DOM.help.dotaz.setStyles({display:'none'});
+            }
+          }}),
+          new Element('input',{type:'button',value:'Uložit',events:{
+            click: function(el) { // uložení dotazu na server, skrytí formuláře a obnovení helpu
+              Ezer.App.help_ask(Ezer.obj.DOM.help.xkey,
+                Ezer.obj.DOM.help.dotaz.getElement('textarea').value,Ezer.fce.DOM.help_);
+            }
+          }}),
+          new Element('span',{text:'Zapište svůj dotaz'}),
+          new Element('textarea')),
+        // elementy textu helpu
+        Ezer.obj.DOM.help.txt= new Element('div',{styles:{
+          width:'100%',height:'100%',overflow:'auto'}})
+    );
+    Ezer.obj.DOM.help.sticky.getElement('div.top_ur').adopt(
+      // část pro načtení dotazu
+      new Element('input',{type:'button','class':'Button',value:'Chci se zeptat k této kartě',
+        title:"dotaz zde bude zobrazen a od autora bude interním mailem vyžádána odpověď",
+        styles:{float:'right', position:'absolute',fontSize:'8pt',
+          right:'40px',marginTop:'5px',zIndex:5},events:{
+          click: function(el) {
+            // zobrazení formuláře pro dotaz
+            Ezer.obj.DOM.help.dotaz.setStyles({display:'block'});
+          }
+        }}));
+    if ( Ezer.options.CKEditor.version=='4' ) {
+      Ezer.obj.DOM.help.cap.addEvents({
+        contextmenu: function(event) {
+          // kontextové menu pro administraci helpu
+          Ezer.fce.contextmenu([
+            ['editovat obsah',function(el) {
+              CKEDITOR.disableAutoInline= true;
+              Ezer.obj.DOM.help.txt.innerHTML=
+                "<div id='editable' contenteditable='true'>"+Ezer.obj.DOM.help.txt.innerHTML+"</div>";
+              window.CKEDITOR.inline('editable',{
+                resize_enabled:false, skin:'version3',
+                entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs'
+              });
+            }],
+            ["uložit pod '"+Ezer.obj.DOM.help.ykey.title+"'",function(el) {
+              var data= window.CKEDITOR.instances.editable.getData();
+              Ezer.obj.DOM.help.txt.innerHTML= data;
+              Ezer.App.help_save(Ezer.obj.DOM.help.ykey.sys,data);
+            }],
+            Ezer.obj.DOM.help.ykey.sys==Ezer.obj.DOM.help.xkey.sys ? null :
+            ["uložit pod '"+Ezer.obj.DOM.help.xkey.title+"'",function(el) {
+              var data= window.CKEDITOR.instances.editable.getData();
+              Ezer.obj.DOM.help.txt.innerHTML= data;
+              Ezer.App.help_save(Ezer.obj.DOM.help.xkey.sys,data);
+            }]
+          ],arguments[0]);
+          return false;
+        }
+      });
+    }
   }
-  Ezer.obj.DOM.help.sticky.show();
-  Ezer.obj.DOM.help.cap.innerHTML=
-    "<span title='"+(xkey==ykey ? ykey : xkey+"=>"+ykey)+"'>HELP</span>";
+  // zobrazení Helpu podle zadaných parametrů
+  Ezer.obj.DOM.help.xkey= xkey;
+  Ezer.obj.DOM.help.ykey= ykey;
+  Ezer.obj.DOM.help.cap.setProperty('text',title);
+  Ezer.obj.DOM.help.cap.title= xkey.sys==ykey.sys ? ykey.sys : xkey.sys+"=>"+ykey.sys;
   Ezer.obj.DOM.help.txt.innerHTML= html;
-  if ( window.CKEDITOR.version[0]=='4' ) {
-    Ezer.obj.DOM.help.cap.addEvents({
-      contextmenu: function(event) {
-        Ezer.fce.contextmenu([
-          ['editovat obsah',function(el) {
-            CKEDITOR.disableAutoInline= true;
-            Ezer.obj.DOM.help.txt.innerHTML=
-              "<div id='editable' contenteditable='true'>"+Ezer.obj.DOM.help.txt.innerHTML+"</div>";
-            window.CKEDITOR.inline('editable',{
-              resize_enabled:false, skin:'version3',
-              entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs'
-            });
-          }],
-          ["uložit pod '"+ykey+"'",function(el) {
-            var data= window.CKEDITOR.instances.editable.getData();
-            Ezer.obj.DOM.help.txt.innerHTML= data;
-            Ezer.App.help_save(ykey,data);
-          }],
-          ykey==xkey ? null :
-          ["uložit pod '"+xkey+"'",function(el) {
-            var data= window.CKEDITOR.instances.editable.getData();
-            Ezer.obj.DOM.help.txt.innerHTML= data;
-            Ezer.App.help_save(xkey,data);
-          }]
-        ],arguments[0]);
-        return false;
-      }.bind(this)
-    });
+  Ezer.obj.DOM.help.sticky.show();
+};
+Ezer.fce.DOM.help_= function (y) {
+  Ezer.obj.DOM.help.txt.innerHTML= y.text;
+  if ( y.mail!='ok' ) {
+    Ezer.fce.alert("dotaz byl zapsán, ale nepodařilo se odeslat mail autorovi aplikace ("+y.mail+").");
   }
+  Ezer.obj.DOM.help.dotaz.getElement('textarea').value= '';
+  Ezer.obj.DOM.help.dotaz.setStyles({display:'none'});
 };
 // -------------------------------------------------------------------------------------- trace
 // b označuje (nepovinný) blok, který je ukázán při kliknutí na trasovací řádek

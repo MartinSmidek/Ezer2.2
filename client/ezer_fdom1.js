@@ -291,7 +291,7 @@ Ezer.Application= new Class({
       click: function(event) {
         if ( Ezer.App.hits_block ) {
           var key= Ezer.App.hits_block.self_sys();
-          Ezer.trace('*',"FAQ "+key);
+          Ezer.trace('*',"FAQ "+key.sys+'  '+key.title);
           Ezer.App.help_text(key);
         }
       }.bind(this)

@@ -238,6 +238,19 @@ var ContextMenu = new Class({
     }
     ContextMenus.push(this);
   },
+  // re-initialization
+  reinitialize: function(options) {
+    this.setOptions(options);                                   // set options
+//     this.clear();
+    this.menu = $(this.options.menu);                           // option diffs menu
+    this.target = $(this.options.target);
+    this.hide().startListener();                                // hide and begin the listener
+    this.menu.setStyles({position:'absolute',/*top:'-900000px',*/display:'none'});
+    if ( this.options.event ) {
+      this.start(this.options.event);                           // show the menu now
+    }
+//     ContextMenus.push(this);
+  },
   // get things started
   startListener: function() {
     this.target.addEvent(this.options.trigger,function(e) {     // show the menu

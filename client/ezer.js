@@ -164,16 +164,18 @@ Ezer.Block= new Class({
   },
 // ------------------------------------------------------------------------------------ self_sys
 //fm: Block.self_sys ()
-//      vrátí jméno this vytvořené zřetězením atributu _sys
+//      vrátí objekt {sys:...,title:...} kde sys je vytvořené zřetězením atributu _sys
+//      od this ke kořenu aplikace a title je zřetězením odpovídajících title
   self_sys: function() {
-    var id= '';
+    var id= tit= '';
     for (var o= this; o.owner; o= o.owner) {
       if ( o.options._sys ) {
         id= (o.options._sys=='*'?o.id:o.options._sys)+(id ? '.'+id : '');
+        tit= (o.options.title||'') + (tit ? '|'+tit : '');
       }
     }
     if ( id=='' ) id= '@';
-    return id;
+    return {sys:id,title:tit};
   },
 // ------------------------------------------------------------------------------------ self
 //fm: Block.self ()
@@ -2573,22 +2575,26 @@ Ezer.LabelDrop= new Class({
 //os: LabelDrop.title - text zobrazovaný v záhlaví DropBoxu
   options: {
   },
+  path: '/',
 //-
 // ------------------------------------------------------------------------------- LabelDrop.init
-// inicializace oblasti pro drop souborů, init() ji vyprázdní,
-//   init(0) oblast deaktivuje, init(1) aktivuje
-//fm: LabelDrop.init (0/1)
-  init: function (val) {
-    this.DOM_init(val);
+// inicializace oblasti pro drop souborů, definice cesty
+// (začínající a končící lomítkem a relativní k root/docs) pro soubory
+//fm: LabelDrop.init (path)
+  init: function (path) {
+    this.path= path;
+    this.DOM_init();
     return 1;
   },
 // -------------------------------------------------------------------------------- LabelDrop.set
 // do oblasti zapíše jména souborů podle parametru
 //fm: LabelDrop.set (lst)
-//a: lst - seznam jmen souborů (ve složce docs) oddělených svislítkem
+//a: lst - seznam jmen souborů (ve složce docs) oddělených svislítkem, za jménem souboru může
+// následovat po dvojtečce status (např. délka)
   set: function (lst) {
     lst.split('|').each(function(lst_i) {
-      this.DOM_addFile({name:lst_i,status:'ok'});
+      var alst_i= lst_i.split(':');
+      this.DOM_addFile({name:alst_i[0],status:alst_i[1]||'ok'});
     }.bind(this));
     return 1;
   },
@@ -2598,7 +2604,7 @@ Ezer.LabelDrop= new Class({
   get: function () {
     var lst= '', del= '';
     this.DOM_files.each(function(f){
-      lst+= del+f.name;
+      lst+= del+f.name+':'+f.status;
       del= '|';
     });
     return lst;
@@ -6808,6 +6814,7 @@ Ezer.fce.get_cookie= function (id,val,form,refs) {
 //a: menu - [[text_položky_menu,funkce],...]
 //   event - událost vyvolaná pravým tlačítkem myši
 //s: funkce
+Ezer.obj.contextmenu= null;
 Ezer.fce.contextmenu= function (menu,event) {
   event= event||window.event;
   var DOM= new Element('ul',{'class':'ContextMenu'}).inject($('body'));
@@ -6823,7 +6830,13 @@ Ezer.fce.contextmenu= function (menu,event) {
       })
     }
   });
-  new ContextMenu({event:event,target:event.originalTarget||event.target,menu:DOM});
+  if ( Ezer.obj.contextmenu ) {
+    Ezer.obj.contextmenu.reinitialize({event:event,target:event.originalTarget||event.target,menu:DOM});
+  }
+  else {
+    Ezer.obj.contextmenu=
+      new ContextMenu({event:event,target:event.originalTarget||event.target,menu:DOM});
+  }
   return 1;
 }
 // ================================================================================================= fce string
@@ -7627,12 +7640,13 @@ Ezer.fce.warning= function () {
   return str;
 };
 // -------------------------------------------------------------------------------------- help
-//ff: fce.help (html[,ykey[,xkey]])
+//ff: fce.help (html,title[,ykey[,xkey]])
 //   zobrazí v systémovém popup menu předané html, pokud jsou předány i klíče, je možná editace
 //   ykey=klíč zobrazeného helpu, xkey=klíč z místa vyvolání (různý pokud nebyl přesný help)
+//   kde klíč je hodnota získaná funkcí self_sys
 //s: funkce
-Ezer.fce.help= function (html,ykey,xkey) {
-  Ezer.fce.DOM.help(html,ykey,xkey);
+Ezer.fce.help= function (html,title,ykey,xkey) {
+  Ezer.fce.DOM.help(html,title,ykey,xkey);
   return 1;
 };
 // -------------------------------------------------------------------------------------- set_trace
@@ -7834,7 +7848,7 @@ Ezer.fce.touch= function (type,block,args) {
       // vlastní zápis se provede při odchodu na jiný nadřazený blok
       if ( Ezer.App.hits_block && Ezer.App.hits_block!=block_sys ) {
         // čitelná cesta ke kořenu zapamatovaného bloku
-        var id= Ezer.App.hits_block.self_sys();
+        var id= Ezer.App.hits_block.self_sys().sys;
 //         var id= '';                                                                              SMAZAT
 //         for (var o= Ezer.App.hits_block; o.owner; o= o.owner) {
 //           if ( o.options._sys ) {

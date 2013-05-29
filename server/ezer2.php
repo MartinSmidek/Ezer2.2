@@ -1306,17 +1306,20 @@
     $y->text= "K této kartě zatím nebyl položen dotaz, můžete být první :-)";
     $y->key= $x->key;
     // postupné zkracování klíče
-    $akey= explode('.',$x->key);
+    $akey= explode('.',$x->key->sys);
+    $atit= explode('|',$x->key->title);
     while (count($akey)) {
       $key= implode('.',$akey);
+      $tit= implode('|',$atit);
       $qh= "SELECT help FROM _help WHERE topic='{$key}'";
       $rh= @mysql_query($qh);
       if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
         $y->text= $h->help;
-        $y->key= $key;
+        $y->key= (object)array('sys'=>$key,'title'=>$tit);
         break;
       }
       array_pop($akey);
+      array_pop($atit);
     }
     break;
   # ------------------------------------------------------------------------------------------------ help_save
@@ -1326,6 +1329,29 @@
     $qh= "REPLACE INTO _help (topic,help) VALUES ('{$x->key}','$text') ";
     $rh= mysql_qry($qh);
     $y->ok= $rh ? 1 : 0;
+    break;
+  # ------------------------------------------------------------------------------------------------ help_ask
+  # připíše text dotazu do tabulky _help
+  case 'help_ask':
+    $text= mysql_real_escape_string($x->text);
+    $prefix= "[{$_SESSION[$ezer_root]['user_abbr']} ".date('d/m H:i')."]";
+    $qh= "UPDATE _help SET help=CONCAT('$prefix $text','<hr>',help) WHERE topic='{$x->key->sys}' ";
+    $rh= mysql_qry($qh);
+    $y->ok= $rh ? 1 : 0;
+    $y->mail= '?';
+    if ( $rh ) {
+      $qh= "SELECT help FROM _help WHERE topic='{$x->key->sys}'";
+      $rh= @mysql_query($qh);
+      if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
+        $y->text= $h->help;
+        // pošli mail
+        if ( $EZER->options->mail ) {
+          $subject= "Ezer/$ezer_root HELP: {$x->key->title}";
+          $sent= send_mail($subject,"$prefix $text");
+          $y->mail= $sent ? 'ok' : 'fail';
+        }
+      }
+    }
     break;
   # ------------------------------------------------------------------------------------------------ load_code2
   # zavede modul včetně modulů vnořených pomocí options.include:onload[,fname]

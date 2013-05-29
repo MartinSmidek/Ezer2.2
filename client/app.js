@@ -507,17 +507,25 @@ Ezer.Application.implement({
       Ezer.fce.source_(y.text,parm.file,parm.app,parm.l,parm.c,true,parm.root);
   },
 // --------------------------------------------------------------------------------------- help_text
-// zobrazí helptext s daným klíčem
+// zobrazí helptext s daným klíčem získaným funkcí self_sys
   help_text: function(k) {
     this.ask({cmd:'help_text',key:k},'help_text_',{key:k});
   },
   help_text_: function(y,parm) {
-    Ezer.fce.help(y.text,y.key,parm.key);
+    Ezer.fce.help(y.text,'HELP: '+y.key.title,y.key,parm.key);
   },
 // --------------------------------------------------------------------------------------- help_save
 // zapíše helptext s daným klíčem
   help_save: function(k,t) {
     this.ask({cmd:'help_save',key:k,text:t});
+  },
+// ---------------------------------------------------------------------------------------- help_ask
+// zapíše otázku do helptextu s daným klíčem - po skončení předá zpět výsledek
+  help_ask: function(k,t,c) {
+    this.ask({cmd:'help_ask',key:k,text:t},'help_ask_',{continuation:c});
+  },
+  help_ask_: function(y,parm) {
+    parm.continuation(y);
   },
 // --------------------------------------------------------------------------------------- save_drag
 // po skončené inicializaci z include a load_$
