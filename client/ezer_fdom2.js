@@ -949,7 +949,7 @@ Ezer.LabelDrop.implement({
     xhr.setRequestHeader("EZER-FILE-NAME", encodeURIComponent(f.name));
     xhr.setRequestHeader("EZER-FILE-CHUNK", n);
     xhr.setRequestHeader("EZER-FILE-CHUNKS", max);
-    xhr.setRequestHeader("EZER-FILE-PATH", 'docs'+this.path);
+    xhr.setRequestHeader("EZER-FILE-PATH", Ezer.options.path_docs+this.path);
     xhr.onload = function(e) {
       if (e.target.status == 200) {
         // vraci pole:name|chunk/chunks|path|strlen
@@ -963,11 +963,15 @@ Ezer.LabelDrop.implement({
         else {
           if ( bar ) bar.value= 100;
           // záměna jména souboru za odkaz a aktualizace délky
-          f.status= resp[3];
+          f.status= resp[5] ? "error" : resp[3];
           f.td2.innerHTML= f.status;
           f.td1.innerHTML= "<a target='docs' href='docs"+this.path+f.td1.innerHTML+"'>"+f.td1.innerHTML+"</a>";
-          // zavolání funkce onload ex-li
-          if ( this.part && (obj= this.part['onload']) ) {
+          // kontrola korektnosti
+          if ( resp[5] ) {
+            Ezer.error(resp[5],'S',this);
+          }
+          else if ( this.part && (obj= this.part['onload']) ) {
+            // zavolání funkce onload ex-li
             new Ezer.Eval(obj.code,this,[f],'onload',null,false,obj,obj.desc.nvar);
           }
         }

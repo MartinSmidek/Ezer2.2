@@ -6506,7 +6506,7 @@ Ezer.str['each']= function () {
       n++;
     });
   }
-  else Ezer.error('operátor each není použit na korektní objekt',that);
+  else Ezer.error('operátor each není použit na korektní objekt','S',that);
   that.stack[++that.top]= n;
   that.eval();
 };

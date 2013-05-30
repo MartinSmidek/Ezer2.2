@@ -37,7 +37,7 @@
 #   $ezer_path_serv     -- string: cesta ke skriptům
 # -------------------------------------------------------------------------------------------------- root_php
 function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$const=null) {
-  global $EZER, $ezer_root, $ezer_path_serv, $ezer_local, $ezer_system, $gc_maxlifetime;
+  global $EZER, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system, $gc_maxlifetime;
   // převzetí url-parametrů
   $menu=    $_GET['menu'] ? $_GET['menu'] : '';
   $xtrace=  $_GET['trace'];
@@ -107,7 +107,8 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     'mini_debug'        => $ezer_template=='menu' ? 'true' : 'false',
     'status_bar'        => $ezer_template=='menu' ? 'true' : 'false',
     'to_speed'          => 1,
-    'to_trace'          => $ezer_template=='menu' ? 'true' : 'false'
+    'to_trace'          => $ezer_template=='menu' ? 'true' : 'false',
+    'path_docs'         => "'$ezer_path_docs'"  // složka pro upload skrze LabelDrop
   );
   $js_options->watch_ip= $EZER->options->watch_ip= $pars->watch_ip ? '1' : '0';
   $js_options->watch_key= $EZER->options->watch_key= $pars->watch_key ? '1' : '0';
