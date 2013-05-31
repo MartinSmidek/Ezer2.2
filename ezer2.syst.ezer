@@ -323,7 +323,10 @@ panel users [,,,543] {type:'plain', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     button zrus_clena [199,8,50,37] { title:'Smazat', format:'d' }
     button obnov_clena [275,8,50,15] { title:'Obnovit', format:'d' }
     button watch_key [355,8,50,15] { title:'Vygenerovat klíč', format:'n'
-      proc onclick() { watch_ref.set(ask('sys_watch_key')) }
+      proc onclick() {
+        confirm("Vygenerování nového klíče znemožní přístup současným uživatelům. Pokračovat?");
+        watch_ref.set(ask('sys_watch_key'))
+      }
     }
     label watch_ref [474,15,250,15]
   }

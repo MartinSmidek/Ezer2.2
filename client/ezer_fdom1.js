@@ -141,37 +141,42 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- _mini_debug
   // ikona má název *logo.gif kde * je '+' nebo '-'
   _mini_debug: function (on) {
-  // trik k rozlišení click a dblclk pomocí timeru
-  // viz http://groups.google.com/group/mootools-users/browse_thread/thread/f873371716d338c9
     var timer;
     this.domIcon_idle= $('StatusIcon_idle');
     this.domIcon_server= $('StatusIcon_server');
     this.idle= true;                            // není běžící požadavek na server
     this.logo= $('logo');
     if ( this.logo ) {
-      if ( on ) {
+      this.logo.addEvents({
+        // vyvolání kontextového helpu
+        click: function(e) {
+          this._help();
+        }.bind(this),
+      });
+      if ( on && Ezer.sys.user.skills && Ezer.sys.user.skills.contains('m',' ') ) {
         this.logo.addEvents({
-//           click: function(e) {
-//             if ( !e.rightClick ) {
-//               $clear(timer);
-//               // přeložit kód
-//               timer= (function(){
-//                 this.reload();
-//               }).delay(200, this);
-//             }
-//           }.bind(this),
-          dblclick: function(e) {
-//             $clear(timer);
-            // zrušit session
-            Cookie.dispose('PHPSESSID',{path: '/'});   //http://mootools-users.660466.n2.nabble.com/Moo-Cookie-write-and-dispose-acting-flaky-td3970737.html
-            alert('Obnovte prosím svoje přihlášení do systému...');
-            window.location.href= window.location.href;
-          }
+          // kontextové menu pro ladění aplikace pro vývojáře
+          contextmenu: function(e) {
+            Ezer.fce.contextmenu([
+              ['recompile',             function(el) { Ezer.app.reload() }],
+              ['-drag',                 function(el) { Ezer.run.$.dragBlock(true,false) }],
+              ['save',                  function(el) { Ezer.App.save_drag() }],
+              ['-help mode start',      function(el) { Ezer.run.$.helpBlock(1) }],
+              ['help mode end',         function(el) { Ezer.run.$.helpBlock(0) }],
+              ['-relogin',              function(el) {
+                Cookie.dispose('PHPSESSID',{path: '/'});
+                alert('Obnovte prosím svoje přihlášení do systému...');
+                window.location.href= window.location.href;}],
+              ['-stop',                 function(el) { Ezer.dbg.stop=true }],
+              ['continue',              function(el) { Ezer.dbg.stop=false }]
+            ],arguments[0]);
+            return false;
+          }.bind(this)
         });
       }
-      else {
-        this.logo.removeEvents('click,dblclick');
-      }
+//       else {
+//         this.logo.removeEvents('click,dblclick');
+//       }
     }
   },
   // ----------------------------------------------------------------------------- putFootDom
@@ -289,14 +294,19 @@ Ezer.Application= new Class({
     // HELP a FAQ
     new Element('span', {text:'HELP!',title:'kontextový help formou FAQ', events:{
       click: function(event) {
-        if ( Ezer.App.hits_block ) {
-          var key= Ezer.App.hits_block.self_sys();
-          Ezer.trace('*',"FAQ "+key.sys+'  '+key.title);
-          Ezer.App.help_text(key);
-        }
+        this._help();
       }.bind(this)
     }}).inject(this._barRightDom);
     $('error').addEvent('dblclick',this._clearError.bind(this));
+  },
+  // ----------------------------------------------------------------------------- _help
+  // ukázání kontextového helpu
+  _help: function() {
+    if ( Ezer.App.hits_block ) {
+      var key= Ezer.App.hits_block.self_sys();
+      Ezer.trace('*',"FAQ "+key.sys+'  '+key.title);
+      Ezer.App.help_text(key);
+    }
   },
   // ----------------------------------------------------------------------------- _showSpeed
   // ukázání Speed

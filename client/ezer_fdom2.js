@@ -2633,7 +2633,7 @@ Ezer.Show.implement({
   DOM_add: function() {
     this.owner._clmns++;
     // přidání záhlaví sloupce
-    var w= this._w+(this._w && Browser.Engine.webkit?1:0);
+    var w= this._w;
     var title= this.options.title||'';
     this.owner.DOM_head.adopt(
       this.DOM_th= new Element('td',{'class':'th',title:this.help,styles:{width:w}}).adopt(
@@ -3049,18 +3049,25 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
             Ezer.obj.DOM.help.dotaz.setStyles({display:'block'});
           }
         }}));
-    if ( Ezer.options.CKEditor.version=='4' ) {
+    if ( Ezer.options.CKEditor.version=='4' && Ezer.sys.user.skills.contains('ah',' ') ) {
       Ezer.obj.DOM.help.cap.addEvents({
         contextmenu: function(event) {
           // kontextové menu pro administraci helpu
           Ezer.fce.contextmenu([
             ['editovat obsah',function(el) {
-              CKEDITOR.disableAutoInline= true;
               Ezer.obj.DOM.help.txt.innerHTML=
                 "<div id='editable' contenteditable='true'>"+Ezer.obj.DOM.help.txt.innerHTML+"</div>";
-              window.CKEDITOR.inline('editable',{
-                resize_enabled:false, skin:'version3',
-                entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs'
+              CKEDITOR.disableAutoInline= true;
+              CKEDITOR.inline('editable',{
+                resize_enabled:false, //skin:'Kama',
+                entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
+                toolbar:Ezer.options.CKEditor['EzerHelp']
+                  ? Ezer.options.CKEditor['EzerHelp'].toolbar
+                  : [['PasteFromWord','-','Format','Bold','Italic',
+                    '-','JustifyLeft','JustifyCenter','JustifyRight',
+                    '-','Link','Unlink','HorizontalRule','Image',
+                    '-','NumberedList','BulletedList','-','Outdent','Indent',
+                    '-','Source','ShowBlocks','RemoveFormat']]
               });
             }],
             ["uložit pod '"+Ezer.obj.DOM.help.ykey.title+"'",function(el) {

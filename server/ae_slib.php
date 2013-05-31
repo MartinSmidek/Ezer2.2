@@ -248,30 +248,6 @@ __EOD
       $info.= "<hr/>$kontakt";
     break;
   }
-  // kontextové menu pro ladění aplikace
-  $dbg_menu= <<<__EOD
-      <ul id='DbgMenu' class="ContextMenu" style="position:absolute; top:5px; display:none; left:15px; z-index:2000; visibility:visible; opacity:1;">
-        <li onclick="Ezer.app.reload();$('DbgMenu').setStyle('display','none');"
-            style="border-bottom:1px solid #AAAAAA">
-          <a>recompile</a></li>
-        <li onclick="Ezer.run.$.dragBlock(true,false);$('DbgMenu').setStyle('display','none');">
-          <a>drag</a></li>
-        <li onclick="Ezer.App.save_drag();$('DbgMenu').setStyle('display','none');"
-            style="border-bottom:1px solid #AAAAAA">
-          <a>save</a></li>
-        <li onclick="Ezer.run.$.helpBlock(1);$('DbgMenu').setStyle('display','none');">
-          <a>help mode start</a></li>
-        <li onclick="Ezer.run.$.helpBlock(0);$('DbgMenu').setStyle('display','none');"
-            style="border-bottom:1px solid #AAAAAA">
-          <a>help mode end</a></li>
-        <li onclick="Cookie.dispose('PHPSESSID',{path: '/'});alert('Obnovte prosím svoje přihlášení do systému...');window.location.href= window.location.href;">
-          <a>relogin</a></li>
-        <li onclick="Ezer.dbg.stop=true;$('DbgMenu').setStyle('display','none');">
-          <a>stop</a></li>
-        <li onclick="Ezer.dbg.stop=false;$('DbgMenu').setStyle('display','none');">
-          <a>continue</a></li>
-      </ul>
-__EOD;
   // spojení všech CSS a JS do jediného souboru pokud je $minify==true a $_GET['dbg'] je prázdné
   if ( $browser!='IE' && $minify && !$dbg ) {
     if ( !$ezer_local ) define('MINIFY_BASE_DIR',$ezer_path_serv);
@@ -390,14 +366,13 @@ __EOD;
 # template pro zobrazení Ezer.MenuMain jako hlavního objektu aplikace
 $template= <<<__EOD
 $html_header
-<body id="body" class='nogrid' onclick="$('DbgMenu').setStyle('display','none');/*Ezer.app.bodyClick();*/">
+<body id="body" class='nogrid' onclick="if($('DbgMenu'))$('DbgMenu').setStyle('display','none');">
 <!-- menu a submenu -->
   <div id='horni' class="MainBar">
     <div id="appl" $version>$title_right</div>
-    <div id='logo' oncontextmenu="$('DbgMenu').setStyle('display','block');return false;">
+    <div id='logo'>
       <img class="StatusIcon" id="StatusIcon_idle" src="./$ezer_root/img/-logo.gif" />
       <img class="StatusIcon" id="StatusIcon_server" src="./$ezer_root/img/+logo.gif" />
-      $dbg_menu
     </div>
     <ul id="menu" class="MainMenu"></ul>
     <ul id="submenu" class="MainTabs"></ul>

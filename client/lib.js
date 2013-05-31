@@ -202,8 +202,8 @@ function debugx (gt,label,depth) {
   return x;
 }
 // ================================================================================================= ContextMenu
-//  Class:ContextMenu, Author:David Walsh, Website:http://davidwalsh.name, Version:1.0, Date:1/20/2009
-var ContextMenus = [];
+// Class:ContextMenu, Author:David Walsh, Website:http://davidwalsh.name, Version:1.0, Date:1/20/2009
+// simplified by Martin Smidek
 var ContextMenu = new Class({
   // implements
   Implements: [Options,Events],
@@ -211,6 +211,7 @@ var ContextMenu = new Class({
   ezer_owner: null,                              //120130 ezer owner
   // options
   options: {
+    own_listener: false,                        //130531gn
     actions: {},
     menu: 'contextmenu',
     stopEvent: true,
@@ -230,54 +231,43 @@ var ContextMenu = new Class({
     this.clear();
     this.menu = $(this.options.menu);                           // option diffs menu
     this.target = $(this.options.target);
-//     this.fx = new Fx.Tween(this.menu, { property: 'opacity', duration:this.options.fadeSpeed });
     this.hide().startListener();                                // hide and begin the listener
-    this.menu.setStyles({position:'absolute',/*top:'-900000px',*/display:'none'});
+    this.menu.setStyles({position:'absolute',display:'none'});
     if ( this.options.event ) {
       this.start(this.options.event);                           // show the menu now
     }
-    ContextMenus.push(this);
   },
   // re-initialization
   reinitialize: function(options) {
     this.setOptions(options);                                   // set options
-//     this.clear();
     this.menu = $(this.options.menu);                           // option diffs menu
     this.target = $(this.options.target);
     this.hide().startListener();                                // hide and begin the listener
-    this.menu.setStyles({position:'absolute',/*top:'-900000px',*/display:'none'});
+    this.menu.setStyles({position:'absolute',display:'none'});
     if ( this.options.event ) {
       this.start(this.options.event);                           // show the menu now
     }
-//     ContextMenus.push(this);
   },
   // get things started
   startListener: function() {
-    this.target.addEvent(this.options.trigger,function(e) {     // show the menu
-      if(!this.options.disabled) {                              // enabled?
-        if(this.options.stopEvent) {                            // prevent default, if told to
-          e.stop();
+    if ( !this.options.own_listener ) {
+      this.target.addEvent(this.options.trigger,function(e) {     // show the menu
+        if(!this.options.disabled) {                              // enabled?
+          if(this.options.stopEvent) {                            // prevent default, if told to
+            e.stop();
+          }
+          this.options.element= this.target;                      // record this as the trigger
+          var pos= this.options.offsets.from=='mouse' ? e.page : this.target.getPosition();
+          this.menu.setStyles({                                   // position the menu
+            top: (pos.y + this.options.offsets.y),
+            left: (pos.x + this.options.offsets.x),
+            position: 'absolute',
+            'z-index': '12000'
+          });
+          this.show();                                            //show the menu
         }
-        this.options.element= this.target;                      // record this as the trigger
-        var pos= this.options.offsets.from=='mouse' ? e.page : this.target.getPosition();
-        this.menu.setStyles({                                   // position the menu
-          top: (pos.y + this.options.offsets.y),
-          left: (pos.x + this.options.offsets.x),
-          position: 'absolute',
-          'z-index': '12000'
-        });
-        this.show();                                            //show the menu
-      }
-    }.bind(this));
-    // menu items
-    // this.menu.getElements('a').each(function(item) {
-    //   item.addEvent('click',function(e) {
-    //     if(!item.hasClass('disabled')) {
-    //       this.execute(item.get('href').split('#')[1],$(this.options.element));
-    //       this.fireEvent('click',[item,e]);
-    //     }
-    //   }.bind(this));
-    // },this);
+      }.bind(this));
+    };
     // hide on body click
     $(document.body).addEvent('click', function(e) {
       if ( e.target!=this.target )
@@ -316,16 +306,13 @@ var ContextMenu = new Class({
   },
   // remove all menus but this
   clear: function() {
-    $each(ContextMenus,function(menu) {
-      if ( menu!=this && menu.shown )
-        menu.hide()
-    }.bind(this));
+    $$('.ContextMenu').each(function(menu) {
+      menu.setStyle('display','none');
+    });
   },
   // show menu
   show: function() {
     this.clear();
-//     this.fx.start(1);
-//     this.fireEvent('show');
     this.menu.setStyle('display','block');
     this.shown= true;
     if ( this.options.focus_css ) this.target.addClass(this.options.focus_css);
@@ -334,8 +321,6 @@ var ContextMenu = new Class({
   // hide the menu
   hide: function() {
     if(this.shown) {
-//       this.fx.start(0);
-//       this.fireEvent('hide');
       this.menu.setStyle('display','none');
       this.shown= false;
       if ( this.options.focus_css ) this.target.removeClass(this.options.focus_css);

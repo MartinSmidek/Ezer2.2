@@ -6811,33 +6811,47 @@ Ezer.fce.get_cookie= function (id,val,form,refs) {
   return ret;
 }
 //--------------------------------------------------------------------------------------- contextmenu
-//ff: fce.contextmenu (menu,el)
+//ff: fce.contextmenu (menu,el[,id])
 //      zobrazení kontextového menu
 //a: menu - [[text_položky_menu,funkce],...]
 //   event - událost vyvolaná pravým tlačítkem myši
+//   id - nepovinné id
 //s: funkce
-Ezer.obj.contextmenu= null;
-Ezer.fce.contextmenu= function (menu,event) {
+Ezer.obj.contextmenu= {DOM:null,menu:null};
+Ezer.fce.contextmenu= function (menu,event,id) {
   event= event||window.event;
-  var DOM= new Element('ul',{'class':'ContextMenu'}).inject($('body'));
+  if ( Ezer.obj.contextmenu.DOM ) {
+    Ezer.obj.contextmenu.DOM.getChildren().destroy();
+  }
+  else {
+    Ezer.obj.contextmenu.DOM= new Element('ul',{'class':'ContextMenu'}).inject($('body'));
+  }
+  if ( id )
+    Ezer.obj.contextmenu.DOM.set('id',id);
   menu.each(function(item) {
     if ( item ) {
+      var a, title= item[0], fce= item[1];
       new Element('li').adopt(
-        a= new Element('a',{text:item[0]})
-      ).inject(DOM);
+        a= new Element('a',{text:title[0]=='-' ? title.substr(1) : title})
+      ).inject(Ezer.obj.contextmenu.DOM);
+      if ( title[0]=='-' ) {
+        a.setStyles({borderTop:"1px solid #AAAAAA"});
+      }
       a.addEvents({
-        'click': function(el) {
-          item[1](event.originalTarget||event.target);
+        click: function(el) {
+          fce(event.originalTarget||event.target);
         }
       })
     }
   });
-  if ( Ezer.obj.contextmenu ) {
-    Ezer.obj.contextmenu.reinitialize({event:event,target:event.originalTarget||event.target,menu:DOM});
+  if ( Ezer.obj.contextmenu.menu ) {
+    Ezer.obj.contextmenu.menu.reinitialize({event:event,target:event.originalTarget||event.target,
+      menu:Ezer.obj.contextmenu.DOM,own_listener:true});
   }
   else {
-    Ezer.obj.contextmenu=
-      new ContextMenu({event:event,target:event.originalTarget||event.target,menu:DOM});
+    Ezer.obj.contextmenu.menu=
+      new ContextMenu({event:event,target:event.originalTarget||event.target,
+        menu:Ezer.obj.contextmenu.DOM,own_listener:true});
   }
   return 1;
 }
