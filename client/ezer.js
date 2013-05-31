@@ -2589,23 +2589,25 @@ Ezer.LabelDrop= new Class({
 // -------------------------------------------------------------------------------- LabelDrop.set
 // do oblasti zapíše jména souborů podle parametru
 //fm: LabelDrop.set (lst)
-//a: lst - seznam jmen souborů (ve složce docs) oddělených svislítkem, za jménem souboru může
+//a: lst - seznam jmen souborů (ve složce docs) oddělených čárkou, za jménem souboru může
 // následovat po dvojtečce status (např. délka)
   set: function (lst) {
-    lst.split('|').each(function(lst_i) {
-      var alst_i= lst_i.split(':');
-      this.DOM_addFile({name:alst_i[0],status:alst_i[1]||'ok'});
-    }.bind(this));
+    if ( lst ) {
+      lst.split(',').each(function(lst_i) {
+        var alst_i= lst_i.split(':');
+        this.DOM_addFile({name:alst_i[0],status:alst_i[1]||'ok'});
+      }.bind(this));
+    }
     return 1;
   },
 // -------------------------------------------------------------------------------- LabelDrop.get
-// vrátí seznam souborů oddělených svislítkem
+// vrátí seznam souborů oddělených čárkou
 //fm: LabelDrop.get ()
   get: function () {
     var lst= '', del= '';
     this.DOM_files.each(function(f){
       lst+= del+f.name+':'+f.status;
-      del= '|';
+      del= ',';
     });
     return lst;
   }

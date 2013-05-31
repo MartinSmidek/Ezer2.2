@@ -3,6 +3,7 @@
   session_start();
   # -------------------------------------------------------------------------------------- file_send
   $name=   $_SERVER['HTTP_EZER_FILE_NAME'];
+  $name=   utf2ascii(urldecode($name));
   $chunk=  $_SERVER['HTTP_EZER_FILE_CHUNK'];
   $chunks= $_SERVER['HTTP_EZER_FILE_CHUNKS'];
   $path=   $_SERVER['HTTP_EZER_FILE_PATH'];
@@ -50,4 +51,21 @@ end:
   $ret= "$name|$chunk/$chunks|$path|$size|$end|$err";
   echo $ret;
   exit;
+# ---------------------------------------------------------------------------------------- utf2ascii
+# konverze z UTF-8 do písmen, číslic, teček a podtržítka, konvertují se i html entity
+function utf2ascii($val) {
+  $txt= preg_replace('~&(.)(?:acute|caron);~u', '\1', $val);
+  $txt= preg_replace('~&(?:nbsp|amp);~u', '_', $txt);
+  $ref= preg_replace('~[^\\pL0-9_\.]+~u', '_', $txt);
+  $ref= trim($ref, "_");
+//     setLocale(LC_CTYPE, "cs_CZ.utf-8");                      bohužel nebývá nainstalováno
+//     $url= iconv("utf-8", "us-ascii//TRANSLIT", $url);
+  $ref= strtr($ref,array('ě'=>'e','š'=>'s','č'=>'c','ř'=>'r','ž'=>'z','ý'=>'y','á'=>'a','í'=>'i',
+                         'é'=>'e','ů'=>'u','ú'=>'u','ó'=>'o','ď'=>'d','ť'=>'t','ň'=>'n'));
+  $ref= strtr($ref,array('Ě'=>'E','Š'=>'S','Č'=>'C','Ř'=>'R','Ž'=>'Z','Ý'=>'Y','Á'=>'A','Í'=>'I',
+                         'É'=>'E','Ů'=>'U','Ú'=>'U','Ó'=>'O','Ď'=>'D','Ť'=>'T','Ň'=>'N'));
+  $ref= mb_strtolower($ref);
+  $ref= preg_replace('~[^-a-z0-9_\.]+~', '', $ref);
+  return $ref;
+}
 ?>

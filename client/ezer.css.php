@@ -387,9 +387,10 @@ border:2px dotted #ff0 !important; left:-1px; top:-1px;]
   background-color:$b_kuk !important; }
 
 div.LabelDrop {
-  position:absolute; z-index:1; border:1px dashed #fff; }
+  position:absolute; z-index:1; border:1px dashed #fff;
+  outline:3px solid $b_doc_form; background-color:$b_doc_form; }
 div.LabelDropHover {
-  border:3px dashed #fff; }
+  border:3px dashed #fff; outline:1px solid $b_doc_form; }
 div.LabelDrop > div {
   color:#fff; padding:0 5px; }
 div.LabelDrop > div + div {

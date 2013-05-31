@@ -837,6 +837,7 @@ Ezer.LabelDrop.implement({
   DOM_add: function() {
     // zobrazení prázdného label.drop
     var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
+    var h= this.options.title ? 15 : 0;
     this.DOM_Block= new Element('div',{'class':'LabelDrop',styles:this.coord(),
       events:{
         dragover: function(evt) {
@@ -866,8 +867,8 @@ Ezer.LabelDrop.implement({
           };
         }.bind(this)
       }})
-      .adopt(new Element('div',{html:this.options.title||'',styles:{height:15}}))
-      .adopt(new Element('div',{styles:{height:this._h-15}})
+      .adopt(new Element('div',{html:this.options.title||'',styles:{height:h}}))
+      .adopt(new Element('div',{styles:{height:this._h-h}})
         .adopt(new Element('table',{cellspacing:0})
           .adopt(this.DOM_BlockRows= new Element('tbody'))))
       .inject(owners_block);
@@ -882,6 +883,20 @@ Ezer.LabelDrop.implement({
     this.DOM_files= [];
     this.DOM_BlockRows.getChildren().destroy();
   },
+// ------------------------------------------------------- LabelDrop.DOM_href
+// přidá odkaz na soubor s případným kontextovým menu
+  DOM_href: function(fname) {
+    // kontextové menu, pokud je přítomna procedura onremove
+    var m= '';
+    if ( this.part && (obj= this.part['onmenu']) ) {
+      m= " oncontextmenu=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
+      + "obj=obj[0].value||obj[0];Ezer.fce.contextmenu(["
+        + "['vyjmout',function(el){obj.callProc('onmenu',['remove','"+fname+"'])}],"
+        + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all',''])}]"
+      + "],arguments[0])};return false;\"";
+    }
+    return "<a target='docs' href='docs"+this.path+fname+"'"+m+">"+fname+"</a>";
+  },
 // ------------------------------------------------------- LabelDrop.DOM_addFile
 // přidá řádek pro informaci o vkládaném souboru
 // obohatí f o td1,td2 a volitelně td3
@@ -890,8 +905,7 @@ Ezer.LabelDrop.implement({
     var td2w= 60;
     var td1w= this._w - (td2w + td3w + (td3w?16:14) + 16);
     var tr= new Element('tr').adopt(
-      f.td1= new Element('td',{width:td1w,html:
-        "<a target='docs' href='docs"+this.path+f.name+"'>"+f.name+"</a>"}),
+      f.td1= new Element('td',{width:td1w,html:f.status ? this.DOM_href(f.name) : f.name}),
       f.td2= new Element('td',{width:td2w,align:'right',html:f.status||"čekám"})
     ).inject(this.DOM_BlockRows);
     if ( td3w )
@@ -910,7 +924,7 @@ Ezer.LabelDrop.implement({
     }
     else {
       // nebo přímo zavolat upload
-      this.DOM_added(f,1);
+      this.DOM_upload(f,1);
     }
   },
 // -------------------------------------------------------- LabelDrop.DOM_upload
@@ -962,17 +976,18 @@ Ezer.LabelDrop.implement({
         }
         else {
           if ( bar ) bar.value= 100;
-          // záměna jména souboru za odkaz a aktualizace délky
+          // záměna jména souboru za vrácené, obohacení o odkaz a délku
           f.status= resp[5] ? "error" : resp[3];
           f.td2.innerHTML= f.status;
-          f.td1.innerHTML= "<a target='docs' href='docs"+this.path+f.td1.innerHTML+"'>"+f.td1.innerHTML+"</a>";
+          f.td1.innerHTML= this.DOM_href(resp[0]);
           // kontrola korektnosti
           if ( resp[5] ) {
             Ezer.error(resp[5],'S',this);
           }
           else if ( this.part && (obj= this.part['onload']) ) {
-            // zavolání funkce onload ex-li
-            new Ezer.Eval(obj.code,this,[f],'onload',null,false,obj,obj.desc.nvar);
+            // zavolání funkce onload ex-li s kopií f
+            var ff= {name:resp[0], size:f.size, status:f.status};
+            new Ezer.Eval(obj.code,this,[ff],'onload',null,false,obj,obj.desc.nvar);
           }
         }
       }
