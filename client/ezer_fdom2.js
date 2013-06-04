@@ -160,7 +160,8 @@ Ezer.MenuMain.implement({
 //      zruší zobrazení hlavního menu
   DOM_destroy: function () {
     Ezer.app.domMenu.getChildren().destroy();
-    $('submenu').getChildren().destroy();
+//     $('submenu').getChildren().destroy();
+    $('submenu').getElements('li[id^=_help]').destroy();
     $('work').getChildren().destroy();
     $('body').getElements('div[id^=StickyWin]').destroy();
     $('body').getElements('ul.ContextMenu[id^=DbgMenu]');

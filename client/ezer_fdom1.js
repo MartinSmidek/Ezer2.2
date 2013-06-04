@@ -145,14 +145,18 @@ Ezer.Application= new Class({
     this.domIcon_idle= $('StatusIcon_idle');
     this.domIcon_server= $('StatusIcon_server');
     this.idle= true;                            // není běžící požadavek na server
-    this.logo= $('logo');
-    if ( this.logo ) {
-      this.logo.addEvents({
+    // kontextový help
+    if ( $('submenu') ) {
+      $('submenu').addEvents({
         // vyvolání kontextového helpu
         click: function(e) {
           this._help();
         }.bind(this),
       });
+    }
+    // kontextové men loga pro ladění
+    this.logo= $('logo');
+    if ( this.logo ) {
       if ( on && Ezer.sys.user.skills && Ezer.sys.user.skills.contains('m',' ') ) {
         this.logo.addEvents({
           // kontextové menu pro ladění aplikace pro vývojáře

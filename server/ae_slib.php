@@ -328,7 +328,7 @@ IE!!!
       <img class="StatusIcon" id="StatusIcon_server" src="./$ezer_root/img/+logo.gif" />
     </div>
     <ul id="menu" class="MainMenu"></ul>
-    <ul id="submenu" class="MainTabs"></ul>
+    <ul id="submenu" class="MainTabs"><li id="_help" style="display:block;float:right">HELP</li></ul>
   </div>
 <!-- upozornění -->
   <div id="login" style="display:block;enabled:false;">
@@ -375,7 +375,9 @@ $html_header
       <img class="StatusIcon" id="StatusIcon_server" src="./$ezer_root/img/+logo.gif" />
     </div>
     <ul id="menu" class="MainMenu"></ul>
-    <ul id="submenu" class="MainTabs"></ul>
+    <ul id="submenu" class="MainTabs">
+      <li id="_help" style="display:block;float:right"><a>HELP</a></li>
+    </ul>
   </div>
   <div id='ajax_bar'></div>
 <!-- login -->
