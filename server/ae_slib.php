@@ -366,7 +366,7 @@ __EOD;
 # template pro zobrazení Ezer.MenuMain jako hlavního objektu aplikace
 $template= <<<__EOD
 $html_header
-<body id="body" class='nogrid' onclick="if($('DbgMenu'))$('DbgMenu').setStyle('display','none');">
+<body id="body" class='nogrid'>
 <!-- menu a submenu -->
   <div id='horni' class="MainBar">
     <div id="appl" $version>$title_right</div>

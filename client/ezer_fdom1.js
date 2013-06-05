@@ -137,6 +137,8 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- bodyClick
   // nastane při kliknutí na html.body
   bodyClick: function() {
+    this._help(false);
+    return false;
   },
   // ----------------------------------------------------------------------------- _mini_debug
   // ikona má název *logo.gif kde * je '+' nebo '-'
@@ -150,7 +152,7 @@ Ezer.Application= new Class({
       $('submenu').addEvents({
         // vyvolání kontextového helpu
         click: function(e) {
-          this._help();
+          this._help(true);
         }.bind(this),
       });
     }
@@ -178,9 +180,6 @@ Ezer.Application= new Class({
           }.bind(this)
         });
       }
-//       else {
-//         this.logo.removeEvents('click,dblclick');
-//       }
     }
   },
   // ----------------------------------------------------------------------------- putFootDom
@@ -295,21 +294,24 @@ Ezer.Application= new Class({
         return false;
       }.bind(this)
     }}).inject(speed);
-    // HELP a FAQ
-    new Element('span', {text:'HELP!',title:'kontextový help formou FAQ', events:{
-      click: function(event) {
-        this._help();
-      }.bind(this)
-    }}).inject(this._barRightDom);
+//     // HELP a FAQ
+//     new Element('span', {text:'HELP!',title:'kontextový help formou FAQ', events:{
+//       click: function(event) {
+//         this._help(true);
+//       }.bind(this)
+//     }}).inject(this._barRightDom);
     $('error').addEvent('dblclick',this._clearError.bind(this));
   },
   // ----------------------------------------------------------------------------- _help
   // ukázání kontextového helpu
-  _help: function() {
-    if ( Ezer.App.hits_block ) {
+  _help: function(on) {
+    if ( on && Ezer.App.hits_block ) {
       var key= Ezer.App.hits_block.self_sys();
       Ezer.trace('*',"FAQ "+key.sys+'  '+key.title);
       Ezer.App.help_text(key);
+    }
+    else if ( !on && Ezer.obj.DOM.help.sticky ) {
+      Ezer.obj.DOM.help.sticky.hide();
     }
   },
   // ----------------------------------------------------------------------------- _showSpeed

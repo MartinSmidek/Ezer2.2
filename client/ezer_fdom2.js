@@ -164,7 +164,7 @@ Ezer.MenuMain.implement({
     $('submenu').getElements('li[id^=_help]').destroy();
     $('work').getChildren().destroy();
     $('body').getElements('div[id^=StickyWin]').destroy();
-    $('body').getElements('ul.ContextMenu[id^=DbgMenu]');
+    $('body').getElements('ul.ContextMenu');
 //     $('shield').setStyles({visibility:'hidden'});
     Ezer.app.clearDom();
   },
@@ -3010,7 +3010,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
   if ( !Ezer.obj.DOM.help ) {
     Ezer.obj.DOM.help= {};
     var _w= 500, _h= 300, dotaz= null;
-    Ezer.obj.DOM.help.sticky= $(new StickyWin({draggable:true,
+    Ezer.obj.DOM.help.sticky= $(new StickyWin({draggable:true,closeOnClickOut:true,
       relativeTo: document.id('work'),position:'upperLeft',
       content:StickyWin.ui('HELP: informace, otázky a odpovědi k této kartě','',{
         cornerHandle:true, width:_w+55,

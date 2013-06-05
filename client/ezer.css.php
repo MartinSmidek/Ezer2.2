@@ -209,6 +209,8 @@ ul.MainTabs {
 .MainTabs a:hover {
   background:transparent url($path/menu_off_hover.png) repeat-x scroll 0 0 !important;  }
 .MainTabs span { }
+li#_help a {
+  color:#ef7f13 !important; font-weight:bold !important; }
 
 /* accordion */
 
