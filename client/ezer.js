@@ -166,12 +166,13 @@ Ezer.Block= new Class({
 //fm: Block.self_sys ()
 //      vrátí objekt {sys:...,title:...} kde sys je vytvořené zřetězením atributu _sys
 //      od this ke kořenu aplikace a title je zřetězením odpovídajících title
+//      s odstraněnými formátovacími znaky
   self_sys: function() {
     var id= tit= '';
     for (var o= this; o.owner; o= o.owner) {
       if ( o.options._sys ) {
         id= (o.options._sys=='*'?o.id:o.options._sys)+(id ? '.'+id : '');
-        tit= (o.options.title||'') + (tit ? '|'+tit : '');
+        tit= (Ezer.fce.strip_tags(o.options.title)||'') + (tit ? '|'+tit : '');
       }
     }
     if ( id=='' ) id= '@';
