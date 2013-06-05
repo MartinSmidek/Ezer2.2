@@ -403,6 +403,8 @@ div.LabelDrop tr > td {
   overflow:hidden; text-overflow:ellipsis; }
 div.LabelDrop progress {
   width:100%; }
+.LabelDrop td, .LabelDrop a {
+  color:$fc_item }
 
 .Field {
   position:absolute; height:16px !important; border:1px solid #aaa; z-index:1; }
