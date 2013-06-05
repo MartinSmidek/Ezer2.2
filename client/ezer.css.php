@@ -748,7 +748,7 @@ h4.CHeading, .STitle
 
 /*help*/
 
-div.Help   	{ position: absolute; width:300px; height:150px; right:30px; top:15px;
+div.Help   	{ position: absolute; z-index:2; width:300px; height:150px; right:30px; top:15px;
                   background-color:silver; box-shadow:5px 5px 10px #567; }
 .Help input     { float:right; font-size: 8pt; margin-top:3px; }
 .Help span      { position:absolute; background-color: silver;
