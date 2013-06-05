@@ -1333,24 +1333,24 @@
   # ------------------------------------------------------------------------------------------------ help_ask
   # připíše text dotazu do tabulky _help
   case 'help_ask':
-    $text= mysql_real_escape_string($x->text);
-    $prefix= "[{$_SESSION[$ezer_root]['user_abbr']} ".date('d/m H:i')."]";
-    $qh= "UPDATE _help SET help=CONCAT('$prefix $text','<hr>',help) WHERE topic='{$x->key->sys}' ";
+    $help= "";
+    $qh= "SELECT help FROM _help WHERE topic='{$x->key->sys}'";
+    $rh= @mysql_query($qh);
+    if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
+      $help= "<hr>{$h->help}";
+    }
+    $abbr= $_SESSION[$ezer_root]['user_abbr'];
+    $text= mysql_real_escape_string("[$abbr ".date('j/n/Y H:i')."] {$x->text}");
+    $qh= "REPLACE INTO _help (topic,help) VALUES ('{$x->key->sys}','$text$help') ";
     $rh= mysql_qry($qh);
     $y->ok= $rh ? 1 : 0;
     $y->mail= '?';
-    if ( $rh ) {
-      $qh= "SELECT help FROM _help WHERE topic='{$x->key->sys}'";
-      $rh= @mysql_query($qh);
-      if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
-        $y->text= $h->help;
-        // pošli mail
-        if ( $EZER->options->mail ) {
-          $subject= "Ezer/$ezer_root HELP: {$x->key->title}";
-          $sent= send_mail($subject,"$prefix $text");
-          $y->mail= $sent ? 'ok' : 'fail';
-        }
-      }
+    $y->text= "$text$help";
+    // pošli mail
+    if ( $EZER->options->mail ) {
+      $subject= "Ezer/$ezer_root HELP: {$x->key->title}";
+      $sent= send_mail($subject,$text);
+      $y->mail= $sent ? 'ok' : 'fail';
     }
     break;
   # ------------------------------------------------------------------------------------------------ load_code2
