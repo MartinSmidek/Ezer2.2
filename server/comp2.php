@@ -1055,6 +1055,8 @@ function def_jumps($c,$pcode) {
   $beg= $c->argx ? $c->argx-1 : 0;
   // definice skoků s optimalizací
 //                                         $pcode[$c->i + $c->len + $beg - 1]->trace.= $c->argx ? "({$c->i}+$beg,{$c->len})" : '.';
+  if ( !isset($pcode[$c->i + $c->len + $beg - 1]) )
+    $pcode[$c->i + $c->len + $beg - 1]= (object)array();
   $pcode[$c->i + $c->len + $beg - 1]->nojmp+= $c->argx ? 1 : 0; // zabráníme testu skoku po výpočty argumentu
   if ( $t || $f ) {
     $i= $c->i + $c->len - 1;
