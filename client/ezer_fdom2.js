@@ -3009,14 +3009,14 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
   // konstrukce elementů pro Help při prvním volání
   if ( !Ezer.obj.DOM.help ) {
     Ezer.obj.DOM.help= {};
-    var _w= 500, _h= 300, dotaz= null;
-    Ezer.obj.DOM.help.sticky= $(new StickyWin({draggable:true,closeOnClickOut:true,
+    var _w= 500, _h= 300, dotaz= null, options= {draggable:true,
+      closeOnClickOut:!Ezer.sys.user.skills.contains('ah',' '), // způsobí hide při editaci
       relativeTo: document.id('work'),position:'upperLeft',
       content:StickyWin.ui('HELP: informace, otázky a odpovědi k této kartě','',{
         cornerHandle:true, width:_w+55,
         cssClassName:'PanelPopup',closeButton:true
-      })
-    }));
+    })};
+    Ezer.obj.DOM.help.sticky= $(new StickyWin(options));
     Ezer.obj.DOM.help.cap= Ezer.obj.DOM.help.sticky.getElement('.caption');
     Ezer.obj.DOM.help.sticky.getElement('.body').setStyles({width:_w,height:_h}).adopt(
         // formulář dotazu
