@@ -3041,7 +3041,8 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
     );
     Ezer.obj.DOM.help.sticky.getElement('div.top_ur').adopt(
       // část pro načtení dotazu
-      new Element('input',{type:'button','class':'Button',value:'Chci se zeptat k této kartě',
+      Ezer.obj.DOM.help.dotaz_butt=
+        new Element('input',{type:'button','class':'Button',value:'Chci se zeptat k této kartě',
         title:"dotaz zde bude zobrazen a od autora bude interním mailem vyžádána odpověď",
         styles:{float:'right', position:'absolute',fontSize:'8pt',
           right:'40px',marginTop:'5px',zIndex:5},events:{
@@ -3056,6 +3057,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
           // kontextové menu pro administraci helpu
           Ezer.fce.contextmenu([
             ['editovat obsah',function(el) {
+              Ezer.obj.DOM.help.dotaz_butt.setStyles({display:'none'});
               Ezer.obj.DOM.help.txt.innerHTML=
                 "<div id='editable' contenteditable='true'>"+Ezer.obj.DOM.help.txt.innerHTML+"</div>";
               CKEDITOR.disableAutoInline= true;
@@ -3072,15 +3074,21 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
               });
             }],
             ["uložit pod '"+Ezer.obj.DOM.help.ykey.title+"'",function(el) {
-              var data= window.CKEDITOR.instances.editable.getData();
+              var data= CKEDITOR.instances.editable.getData();
               Ezer.obj.DOM.help.txt.innerHTML= data;
               Ezer.App.help_save(Ezer.obj.DOM.help.ykey.sys,data);
+              Ezer.obj.DOM.help.sticky.hide();
             }],
             Ezer.obj.DOM.help.ykey.sys==Ezer.obj.DOM.help.xkey.sys ? null :
             ["uložit pod '"+Ezer.obj.DOM.help.xkey.title+"'",function(el) {
               var data= window.CKEDITOR.instances.editable.getData();
               Ezer.obj.DOM.help.txt.innerHTML= data;
               Ezer.App.help_save(Ezer.obj.DOM.help.xkey.sys,data);
+              Ezer.obj.DOM.help.sticky.hide();
+            }],
+            ["-neukládat změny",function(el) {
+              Ezer.obj.DOM.help.txt.innerHTML= html;
+              Ezer.obj.DOM.help.sticky.hide();
             }]
           ],arguments[0]);
           return false;
@@ -3093,7 +3101,19 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
   Ezer.obj.DOM.help.ykey= ykey;
   Ezer.obj.DOM.help.cap.setProperty('text',title);
   Ezer.obj.DOM.help.cap.title= xkey.sys==ykey.sys ? ykey.sys : xkey.sys+"=>"+ykey.sys;
-  Ezer.obj.DOM.help.txt.innerHTML= html;
+  Ezer.obj.DOM.help.txt.innerHTML= html; // načtení HTML helpu
+  Ezer.obj.DOM.help.dotaz_butt.setStyles({display:'block'});
+  // přidá obsluhu vnořeným elementům <a href='help://....'>
+  Ezer.obj.DOM.help.txt.getElements('a').each(function(el) {
+    if ( el.href && el.href.substr(0,7)=='help://' ) {
+      el.addEvents({
+        click: function(ev) {
+          Ezer.app.help_text({sys:ev.target.href.substr(7)});
+          return false;
+        }
+      })
+    }
+  });
   Ezer.obj.DOM.help.sticky.show();
 };
 Ezer.fce.DOM.help_= function (y) {

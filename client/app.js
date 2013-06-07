@@ -444,18 +444,18 @@ Ezer.Application.implement({
 // přidá obsluhu elementům <a href='ezer://....'>
 // obdobný kód je v Ezer.Label.set
   start_href_modify: function () {
-//     $$('a').each(function(el) {
-//       if ( el.href && el.href.substr(0,7)=='ezer://' ) {
-//         if ( !el.hasEvent('click') ) {
-//           el.addEvents({
-//             click: function(ev) {
-//               Ezer.fce.href(ev.target.href.substr(7));
-//               return false;
-//             }
-//           })
-//         }
-//       }
-//     })
+    $$('a').each(function(el) {
+      if ( el.href && el.href.substr(0,7)=='ezer://' ) {
+        if ( !el.hasEvent('click') ) {
+          el.addEvents({
+            click: function(ev) {
+              Ezer.fce.href(ev.target.href.substr(7));
+              return false;
+            }
+          })
+        }
+      }
+    })
   },
 // ------------------------------------------------------------------------------------ onfirstfocus
 // je voláno v případě prvního focus panelu - obdoba události domready
