@@ -256,8 +256,7 @@ div.PanelPopup div.dragHandle {
 .Chat .focus {
   outline-color:#f88 !important;; }
 table.focus {
-[outline:#ff0 dotted 2px !important;
-border:#ff0 dotted 2px !important; left:-1px; top:-1px;]
+  outline:#ff0 dotted 2px !important;
 }
 
 /* form, elem */
@@ -527,4 +526,3 @@ hr.cleaner {
   width:69px; margin:0; padding:0; float:left; left:0; }
 #kuk span.trace_click {
   background-color:#ddd; }
-

@@ -371,8 +371,7 @@ div.PanelPopup div.dragHandle {
 .Chat .focus {
   outline-color:#f88 !important;; }
 table.focus {
-[outline:#ff0 dotted 2px !important;
-border:2px dotted #ff0 !important; left:-1px; top:-1px;]
+  outline:#ff0 dotted 2px !important;
 }
 
 /* form, elem */

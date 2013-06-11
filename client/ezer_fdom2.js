@@ -896,7 +896,7 @@ Ezer.LabelDrop.implement({
         + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all',''])}]"
       + "],arguments[0])};return false;\"";
     }
-    return "<a target='docs' href='docs"+this.path+fname+"'"+m+">"+fname+"</a>";
+    return "<a target='docs' href='"+this.relpath+fname+"'"+m+">"+fname+"</a>";
   },
 // ------------------------------------------------------- LabelDrop.DOM_addFile
 // přidá řádek pro informaci o vkládaném souboru
@@ -964,7 +964,7 @@ Ezer.LabelDrop.implement({
     xhr.setRequestHeader("EZER-FILE-NAME", encodeURIComponent(f.name));
     xhr.setRequestHeader("EZER-FILE-CHUNK", n);
     xhr.setRequestHeader("EZER-FILE-CHUNKS", max);
-    xhr.setRequestHeader("EZER-FILE-PATH", Ezer.options.path_docs+this.path);
+    xhr.setRequestHeader("EZER-FILE-RELPATH", this.relpath);
     xhr.onload = function(e) {
       if (e.target.status == 200) {
         // vraci pole:name|chunk/chunks|path|strlen
@@ -987,7 +987,7 @@ Ezer.LabelDrop.implement({
           }
           else if ( this.part && (obj= this.part['onload']) ) {
             // zavolání funkce onload ex-li s kopií f
-            var ff= {name:resp[0], size:f.size, status:f.status};
+            var ff= {name:resp[0], relpath:this.relpath, size:f.size, status:f.status};
             new Ezer.Eval(obj.code,this,[ff],'onload',null,false,obj,obj.desc.nvar);
           }
         }

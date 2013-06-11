@@ -2579,11 +2579,11 @@ Ezer.LabelDrop= new Class({
   path: '/',
 //-
 // ------------------------------------------------------------------------------- LabelDrop.init
-// inicializace oblasti pro drop souborů, definice cesty
-// (začínající a končící lomítkem a relativní k root/docs) pro soubory
-//fm: LabelDrop.init (path)
-  init: function (path) {
-    this.path= path;
+// inicializace oblasti pro drop souborů, definice cesty pro soubory
+// (začínající jménem a končící lomítkem a relativní k $ezer_root)
+//fm: LabelDrop.init (relpath)
+  init: function (relpath) {
+    this.relpath= relpath;
     this.DOM_init();
     return 1;
   },

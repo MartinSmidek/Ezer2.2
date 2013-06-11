@@ -6,7 +6,9 @@
   $name=   utf2ascii(urldecode($name));
   $chunk=  $_SERVER['HTTP_EZER_FILE_CHUNK'];
   $chunks= $_SERVER['HTTP_EZER_FILE_CHUNKS'];
-  $path=   $_SERVER['HTTP_EZER_FILE_PATH'];
+  $relpath=$_SERVER['HTTP_EZER_FILE_RELPATH'];
+  $path=   $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$relpath;
+
   $data= file_get_contents("php://input");
   $end= "";
   // nastavení začátku
@@ -56,7 +58,7 @@ end:
 function utf2ascii($val) {
   $txt= preg_replace('~&(.)(?:acute|caron);~u', '\1', $val);
   $txt= preg_replace('~&(?:nbsp|amp);~u', '_', $txt);
-  $ref= preg_replace('~[^\\pL0-9_\.]+~u', '_', $txt);
+  $ref= preg_replace('~[^\\pL0-9_\-\.]+~u', '_', $txt);
   $ref= trim($ref, "_");
 //     setLocale(LC_CTYPE, "cs_CZ.utf-8");                      bohužel nebývá nainstalováno
 //     $url= iconv("utf-8", "us-ascii//TRANSLIT", $url);
