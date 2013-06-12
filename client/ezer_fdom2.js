@@ -128,18 +128,24 @@ Ezer.MenuMain.implement({
       $each(this.part,function(desc,id) {
         var href= make_url_menu([id]); // 'ezer://'+id;
         if ( desc.type=='tabs' ) {
-          new Element('a',{href:href,html:desc.options.title||id}).inject(new Element('div').inject(
+          var a= new Element('a',{href:href,html:desc.options.title||id}).inject(new Element('div').inject(
           desc.DOM_li= new Element('li',{
   //           'class': id==active ? 'Active' : '',
             events:{
               click: function(event) {
                 Ezer.pushState(href);
                 Ezer.fce.touch('block',this,'click');     // informace do _touch a trail na server
+                Ezer.fce.DOM.help_hide();
                 this._focus();
                 return false;
               }.bind(desc)
             }
           }).inject(this._menuDom)));
+          // zvýraznění nadpisu, pokud právě k němu existuje _help - help pro tabs nelze vynutit
+          var key= desc.self_sys().sys;
+          if ( key && desc.options._sys && Ezer.sys.ezer.help_keys.contains(key,',') ) {
+            a.innerHTML+= "<sub>&hearts;</sub>";
+          }
         }
         // odhlášení (i když není požadováno přihlášení)
         else if ( desc.type=='tabs.logoff' ) {
@@ -614,22 +620,36 @@ Ezer.PanelMain.implement({
 });
 // ================================================================================================= Panel pod Tabs
 // --------------------------------------------------------------------------- fce pro panely v Tabs
+// zobrazí záložku panelu a podle stavu helpu ji označí, pokud je help pro tuto záložku
+// a přihlášeného uživatele vynucený, naplní panel.force_help
 Ezer.PanelInTabs_add= function(panel) {
-    var href= make_url_menu([panel.owner.id,panel.id]); // 'ezer://'+panel.owner.id+'.'+panel.id;
-    new Element('a',{href:href,html:panel.options.title||panel.id}).inject(new Element('div').inject(
-    panel._tabDom= new Element('li',{styles:{display:'none'},
-    events:{
-      click: function(event) {
-        if ( !this.owner.activePanel
-          || (this.owner.activePanel && !this.owner.activePanel.is_fixed) ) {
-          // pokud panel není blokován proti ztrátě focusu
-          Ezer.pushState(href);
-          this._focus();
-        }
-        return false;
-      }.bind(panel)
+  var href= make_url_menu([panel.owner.id,panel.id]); // 'ezer://'+panel.owner.id+'.'+panel.id;
+  var a= new Element('a',{href:href,html:panel.options.title||panel.id}).inject(
+    new Element('div').inject(
+      panel._tabDom= new Element('li',{styles:{display:'none'},events:{
+        click: function(event) {
+          if ( !this.owner.activePanel
+            || (this.owner.activePanel && !this.owner.activePanel.is_fixed) ) {
+            // pokud panel není blokován proti ztrátě focusu
+            Ezer.pushState(href);
+            Ezer.fce.DOM.help_hide();
+            this._focus();
+          }
+          return false;
+        }.bind(panel)
+      }
+    }).inject(panel.owner._tabsDom)
+  ));
+  // zvýraznění nadpisu, pokud právě k němu existuje _help
+  var key= panel.self_sys().sys;
+  if ( panel.options._sys && Ezer.sys.ezer.help_keys.contains(key,',') ) {
+    a.innerHTML+= "<sub>&hearts;</sub>";
+    // posouzení, zda má být help navíc vnucen při firstfocus
+    if ( Ezer.sys.ezer.help_keys.contains('*'+key,',') ) {
+      a.innerHTML+= "<sub>!</sub>";
+      panel.force_help= true;
     }
-  }).inject(panel.owner._tabsDom)));
+  }
 }
 // ---------------------------------------------------------------------------------- PanelPlain-DOM
 // panel vnořený do Tabs
@@ -3005,13 +3025,12 @@ Ezer.fce.DOM.alert= function (str,continuation) {
 // -------------------------------------------------------------------------------------- help
 // zobrazení helpu v popup okně s možností editace
 Ezer.obj.DOM.help= null;                                // popup StickyWin
-Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
+Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
   // konstrukce elementů pro Help při prvním volání
   if ( !Ezer.obj.DOM.help ) {
     Ezer.obj.DOM.help= {};
-    var _w= 500, _h= 300, dotaz= null, options= {draggable:true,
-      closeOnClickOut:!Ezer.sys.user.skills.contains('ah',' '), // způsobí hide při editaci
-      relativeTo: document.id('work'),position:'upperLeft',
+    var _w= 500, _h= 300, dotaz= null, options= {draggable:true, closeOnClickOut:true,
+      relativeTo:document.id('work'), position:'upperLeft',
       content:StickyWin.ui('HELP: informace, otázky a odpovědi k této kartě','',{
         cornerHandle:true, width:_w+55,
         cssClassName:'PanelPopup',closeButton:true
@@ -3086,6 +3105,9 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
               Ezer.App.help_save(Ezer.obj.DOM.help.xkey.sys,data);
               Ezer.obj.DOM.help.sticky.hide();
             }],
+            ["vynutit zobrazení",function(el) {
+              Ezer.App.help_force(Ezer.obj.DOM.help.ykey.sys);
+            }],
             ["-neukládat změny",function(el) {
               Ezer.obj.DOM.help.txt.innerHTML= html;
               Ezer.obj.DOM.help.sticky.hide();
@@ -3100,7 +3122,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
   Ezer.obj.DOM.help.xkey= xkey;
   Ezer.obj.DOM.help.ykey= ykey;
   Ezer.obj.DOM.help.cap.setProperty('text',title);
-  Ezer.obj.DOM.help.cap.title= xkey.sys==ykey.sys ? ykey.sys : xkey.sys+"=>"+ykey.sys;
+  Ezer.obj.DOM.help.cap.title= (xkey.sys==ykey.sys ? ykey.sys : xkey.sys+"=>"+ykey.sys)+' '+seen;
   Ezer.obj.DOM.help.txt.innerHTML= html; // načtení HTML helpu
   Ezer.obj.DOM.help.dotaz_butt.setStyles({display:'block'});
   // přidá obsluhu vnořeným elementům <a href='help://....'>
@@ -3115,7 +3137,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey) {
     }
   });
   Ezer.obj.DOM.help.sticky.show();
-};
+}
 Ezer.fce.DOM.help_= function (y) {
   Ezer.obj.DOM.help.txt.innerHTML= y.text;
   if ( y.mail!='ok' ) {
@@ -3123,6 +3145,11 @@ Ezer.fce.DOM.help_= function (y) {
   }
   Ezer.obj.DOM.help.dotaz.getElement('textarea').value= '';
   Ezer.obj.DOM.help.dotaz.setStyles({display:'none'});
+}
+Ezer.fce.DOM.help_hide= function () {
+  if ( Ezer.obj.DOM.help ) {
+    Ezer.obj.DOM.help.sticky.hide();
+  }
 };
 // -------------------------------------------------------------------------------------- trace
 // b označuje (nepovinný) blok, který je ukázán při kliknutí na trasovací řádek

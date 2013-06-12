@@ -376,7 +376,7 @@ $html_header
     </div>
     <ul id="menu" class="MainMenu"></ul>
     <ul id="submenu" class="MainTabs">
-      <li id="_help" style="display:block;float:right"><a>HELP</a></li>
+      <li id="_help" style="display:block;float:right"><a>HELP<sub>&hearts;</sub></a></li>
     </ul>
   </div>
   <div id='ajax_bar'></div>

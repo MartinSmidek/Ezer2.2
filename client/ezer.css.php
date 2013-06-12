@@ -352,6 +352,8 @@ div.PanelPopup div.dragHandle {
 
 .disabled {
   color:#ccc !important; }
+.changed:focus {
+  outline:#f88 dotted 2px !important; }
 .changed {
   outline:#f88 solid 2px !important; }
 .changed_ok {

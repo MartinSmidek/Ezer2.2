@@ -461,6 +461,9 @@ Ezer.Application.implement({
 // je voláno v případě prvního focus panelu - obdoba události domready
   onfirstfocus: function(panel) {
     Ezer.app.DOM_layout();  // přepočet layoutu
+    if ( panel.force_help ) {
+      this.help_text(panel.self_sys());
+    }
   },
 // -------------------------------------------------------------------------------------- block_info
 // vrátí informaci o místě ve zdrojovém textu bloku
@@ -512,7 +515,7 @@ Ezer.Application.implement({
     this.ask({cmd:'help_text',key:k},'help_text_',{key:k});
   },
   help_text_: function(y,parm) {
-    Ezer.fce.help(y.text,'HELP: '+y.key.title,y.key,parm.key);
+    Ezer.fce.help(y.text,'HELP: '+y.key.title,y.key,parm.key,y.seen);
   },
 // --------------------------------------------------------------------------------------- help_save
 // zapíše helptext s daným klíčem
@@ -526,6 +529,11 @@ Ezer.Application.implement({
   },
   help_ask_: function(y,parm) {
     parm.continuation(y);
+  },
+// -------------------------------------------------------------------------------------- help_force
+// zařídí vynucené zobrazení helpu
+  help_force: function(k) {
+    this.ask({cmd:'help_force',key:k});
   },
 // --------------------------------------------------------------------------------------- save_drag
 // po skončené inicializaci z include a load_$

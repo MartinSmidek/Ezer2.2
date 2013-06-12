@@ -1068,7 +1068,7 @@
     break; /* map_load */
   # ================================================================================================ VOLÁNÍ z APP
   # ------------------------------------------------------------------------------------------------ user_login
-  # přihlášení uživatele, zápis do SESSION, zápis do historie
+  # přihlášení uživatele, zápis do SESSION, zápis do historie, zjištění klíčů _help
   # x: uname, pword      -- uname nesmí být prázdné
   # y: ok, user_id=id_user, user_abbr
   case 'user_login':
@@ -1125,6 +1125,9 @@
                                                 display("$res:$qry");
       }
     }
+    // zjištění klíčů _help
+    $EZER->help_keys= help_keys();
+    // vrácení hodnot
     if ( !$y->sys ) $y->sys= (object)array();
     $y->sys->user= $USER;              // přenos do klienta
     $y->sys->ezer= $EZER;
@@ -1163,6 +1166,8 @@
     else {
       $y->user_id= 0;
     }
+    // zjištění klíčů _help
+    $EZER->help_keys= help_keys();
     if ( !$y->sys ) $y->sys= (object)array();
     $y->sys->user= $USER;              // přenos do klienta
     $y->sys->ezer= $EZER;
@@ -1301,9 +1306,14 @@
     }
     break;
   # ------------------------------------------------------------------------------------------------ help_text
-  # vrátí text z tabulky _help podle klíče
+  # vrátí text z tabulky _help podle klíče a poznamená uživatele do seen
   case 'help_text':
-    $y->text= "K této kartě zatím nebyl položen dotaz, můžete být první :-)";
+    $abbr= $_SESSION[$ezer_root]['user_abbr'];
+    $y->text= "<center><big><br><br><br><br>K této kartě zatím není napsána nápověda,
+      avšak pomocí tlačítka <br><br><b>[Chci&nbsp;se&nbsp;zeptat&nbsp;k&nbsp;této&nbsp;kartě]</b>
+      můžete položit otázku,
+      <br><br>která se zde zobrazí a zároveň se odešle autorovi programu
+      <br><br>mail s žádostí o doplnění nápovědy.</big></center>";
     $y->key= $x->key;
     // postupné zkracování klíče
     $akey= explode('.',$x->key->sys);
@@ -1311,11 +1321,17 @@
     while (count($akey)) {
       $key= implode('.',$akey);
       $tit= implode('|',$atit);
-      $qh= "SELECT help FROM _help WHERE topic='{$key}'";
+      $qh= "SELECT help,seen FROM _help WHERE topic='$key'";
       $rh= @mysql_query($qh);
       if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
         $y->text= $h->help;
+        $y->seen= $h->seen;
         $y->key= (object)array('sys'=>$key,'title'=>$tit);
+        // poznamená uživatele do seen, pokud tam není
+        if ( $abbr && strpos($h->seen,$abbr)===false ) {
+          $qs= "UPDATE _help SET seen='{$h->seen},$abbr' WHERE topic='$key' ";
+          $rs= mysql_qry($qs);
+        }
         break;
       }
       array_pop($akey);
@@ -1327,6 +1343,14 @@
   case 'help_save':
     $text= mysql_real_escape_string($x->text);
     $qh= "REPLACE INTO _help (topic,help) VALUES ('{$x->key}','$text') ";
+    $rh= mysql_qry($qh);
+    $y->ok= $rh ? 1 : 0;
+    break;
+  # ------------------------------------------------------------------------------------------------ help_force
+  # zapíše do tabulky _help značku vynucující alepoň jedno zobrazení
+  case 'help_force':
+    $text= mysql_real_escape_string($x->text);
+    $qh= "UPDATE _help SET seen='*' WHERE topic='{$x->key}' ";
     $rh= mysql_qry($qh);
     $y->ok= $rh ? 1 : 0;
     break;
@@ -1544,6 +1568,27 @@
   exit;
 
 # ================================================================================================== servis
+# -------------------------------------------------------------------------------------------------- help_keys
+# přečte seznam klíčů tabulky _help, pokud existuje
+function help_keys() {
+  $keys= '';
+  ezer_connect();
+  // zjištění seznamu všech klíčů
+  $qh= "SELECT GROUP_CONCAT(topic) AS _k FROM _help ";
+  $rh= @mysql_query($qh);
+  if ( $rh && $h= mysql_fetch_object($rh) ) {
+    $keys.= $h->_k;
+  }
+  // zjištění seznamu klíčů s vynuceným zobrazením helpu pro přihlášeného uživatele
+  $qh= "SELECT COUNT(*) AS _pocet,GROUP_CONCAT(topic SEPARATOR ',*') AS _k FROM _help
+        WHERE LEFT(seen,1)='*' AND NOT FIND_IN_SET('GAN',seen) ";
+  $rh= @mysql_query($qh);
+  if ( $rh && $h= mysql_fetch_object($rh) ) {
+    if ( $h->_pocet ) $keys.= ",*{$h->_k}";
+  }
+  return $keys;
+}
+# -------------------------------------------------------------------------------------------------- json_encode_short
 function json_encode_short($data) {
   switch ($type = gettype($data)) {
   case 'NULL':
