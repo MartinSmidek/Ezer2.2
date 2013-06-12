@@ -425,11 +425,12 @@ Ezer.Item.implement({
         // pokud je definováno
         a.set('id','clipboard');
         clipboard_init();
-        a.addEvents({
-          mouseover: function(el) {
+        a.addEvent(Ezer.browser=='CH' ? 'mouseover' : 'mousedown',
+          function(el) {
             this.fire('onclick',[],el);
+            return false;
           }.bind(this)
-        });
+        );
       }
       else {
         a.addEvents({
@@ -3111,6 +3112,10 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
             ["-neukládat změny",function(el) {
               Ezer.obj.DOM.help.txt.innerHTML= html;
               Ezer.obj.DOM.help.sticky.hide();
+            }],
+            ["alert(odkaz na tento help)",function(el) {
+              Ezer.fce.alert("  <a href='help://"+Ezer.obj.DOM.help.xkey.sys+"'>"
+                +Ezer.obj.DOM.help.xkey.title+"</a> ");
             }]
           ],arguments[0]);
           return false;
