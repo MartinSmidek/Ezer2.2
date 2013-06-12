@@ -144,7 +144,8 @@ Ezer.MenuMain.implement({
           // zvýraznění nadpisu, pokud právě k němu existuje _help - help pro tabs nelze vynutit
           var key= desc.self_sys().sys;
           if ( key && desc.options._sys && Ezer.sys.ezer.help_keys.contains(key,',') ) {
-            a.innerHTML+= "<sub>&hearts;</sub>";
+//             a.innerHTML+= "<sub>&hearts;</sub>";
+            a.innerHTML+= "<sub> ?</sub>";
           }
         }
         // odhlášení (i když není požadováno přihlášení)
@@ -644,7 +645,8 @@ Ezer.PanelInTabs_add= function(panel) {
   // zvýraznění nadpisu, pokud právě k němu existuje _help
   var key= panel.self_sys().sys;
   if ( panel.options._sys && Ezer.sys.ezer.help_keys.contains(key,',') ) {
-    a.innerHTML+= "<sub>&hearts;</sub>";
+//     a.innerHTML+= "<sub>&hearts;</sub>";
+    a.innerHTML+= "<sub> ?</sub>";
     // posouzení, zda má být help navíc vnucen při firstfocus
     if ( Ezer.sys.ezer.help_keys.contains('*'+key,',') ) {
       a.innerHTML+= "<sub>!</sub>";
