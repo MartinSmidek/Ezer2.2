@@ -3036,7 +3036,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
         cornerHandle:true, width:_w+55,
         cssClassName:'PanelPopup',closeButton:true
     })};
-    Ezer.obj.DOM.help.sticky= $(new StickyWin(options));
+    Ezer.obj.DOM.help.sticky= $(Ezer.obj.DOM.help.stickywin= new StickyWin(options));
     Ezer.obj.DOM.help.cap= Ezer.obj.DOM.help.sticky.getElement('.caption');
     Ezer.obj.DOM.help.sticky.getElement('.body').setStyles({width:_w,height:_h}).adopt(
         // formulář dotazu
@@ -3081,8 +3081,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
               Ezer.obj.DOM.help.txt.innerHTML=
                 "<div id='editable' contenteditable='true'>"+Ezer.obj.DOM.help.txt.innerHTML+"</div>";
               CKEDITOR.disableAutoInline= true;
-              CKEDITOR.inline('editable',{
-                resize_enabled:false, //skin:'Kama',
+              CKEDITOR.inline('editable',{ startupFocus:true, resize_enabled:false, //skin:'Kama',
                 entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
                 toolbar:Ezer.options.CKEditor['EzerHelp']
                   ? Ezer.options.CKEditor['EzerHelp'].toolbar
@@ -3092,26 +3091,27 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
                     '-','NumberedList','BulletedList','-','Outdent','Indent',
                     '-','Source','ShowBlocks','RemoveFormat']]
               });
+              Ezer.obj.DOM.help.stickywin.attach(true);
             }],
             ["uložit pod '"+Ezer.obj.DOM.help.ykey.title+"'",function(el) {
               var data= CKEDITOR.instances.editable.getData();
               Ezer.obj.DOM.help.txt.innerHTML= data;
               Ezer.App.help_save(Ezer.obj.DOM.help.ykey.sys,data);
-              Ezer.obj.DOM.help.sticky.hide();
+              Ezer.obj.DOM.help.stickywin.hide();
             }],
             Ezer.obj.DOM.help.ykey.sys==Ezer.obj.DOM.help.xkey.sys ? null :
             ["uložit pod '"+Ezer.obj.DOM.help.xkey.title+"'",function(el) {
               var data= window.CKEDITOR.instances.editable.getData();
               Ezer.obj.DOM.help.txt.innerHTML= data;
               Ezer.App.help_save(Ezer.obj.DOM.help.xkey.sys,data);
-              Ezer.obj.DOM.help.sticky.hide();
+              Ezer.obj.DOM.help.stickywin.hide();
             }],
             ["vynutit zobrazení",function(el) {
               Ezer.App.help_force(Ezer.obj.DOM.help.ykey.sys);
             }],
             ["-neukládat změny",function(el) {
               Ezer.obj.DOM.help.txt.innerHTML= html;
-              Ezer.obj.DOM.help.sticky.hide();
+              Ezer.obj.DOM.help.stickywin.hide();
             }],
             ["alert(odkaz na tento help)",function(el) {
               Ezer.fce.alert("  <a href='help://"+Ezer.obj.DOM.help.xkey.sys+"'>"
@@ -3124,6 +3124,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
     }
   }
   // zobrazení Helpu podle zadaných parametrů
+  Ezer.obj.DOM.help.stickywin.attach(false);
   Ezer.obj.DOM.help.xkey= xkey;
   Ezer.obj.DOM.help.ykey= ykey;
   Ezer.obj.DOM.help.cap.setProperty('text',title);
@@ -3153,7 +3154,7 @@ Ezer.fce.DOM.help_= function (y) {
 }
 Ezer.fce.DOM.help_hide= function () {
   if ( Ezer.obj.DOM.help ) {
-    Ezer.obj.DOM.help.sticky.hide();
+    Ezer.obj.DOM.help.stickywin.hide();
   }
 };
 // -------------------------------------------------------------------------------------- trace
