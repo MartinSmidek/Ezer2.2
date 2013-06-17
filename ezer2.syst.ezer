@@ -268,7 +268,9 @@ panel users [,,,543] {type:'plain', title:'Uživatelé', _sys:'uzi', skill:'a|a'
       show dsc [,,345,] { data:_skill.skill_desc, title:'popis oprávnění', format:'uts+q$', skill:'a|m'
         proc onsubmit() { this.save } }
       menu { type:'context'
-        item { title:'přidat nový řádek', skill:'m|m'
+        item { title:'odeberat všechna oprávnění'
+          proc onclick() { seznam.selected("clear") } }
+        item { title:'-přidat nový řádek', skill:'m|m'
           proc onclick() {
             eq(sel.get,'ignore');
             seznam.browse_seek(conc('id_skill=',
@@ -281,16 +283,19 @@ panel users [,,,543] {type:'plain', title:'Uživatelé', _sys:'uzi', skill:'a|a'
           proc onclick() { confirm('opravdu odebrat oprávnění ',abb.get,':',dsc.get,'?');
             _skill.delete_record(conc('id_skill=',id.get));
             seznam.browse_load } }
-        item { title:'zobrazit vybrané'
+        item { title:'-zobrazit vybrané'
           proc onclick() { seznam.selected("use"); sel.set('use'); seznam.browse_load } }
         item { title:'zobrazit vše'
           proc onclick() { seznam.selected("ignore"); sel.set('ignore'); seznam.browse_load } }
-        item { title:'odeberat všechna oprávnění'
-          proc onclick() { seznam.selected("clear") } }
-        item { title:'zkontrolovat konzistentnost'
+        item { title:'-zkontrolovat konzistentnost'
           proc onclick() { alert(ask('sys_user_skills')) } }
         item { title:'exportovat přehledovou tabulku'
           proc onclick() { ask('sys_user_skills','skills'); download('docs/skills.xls') } }
+        item { title:'nositelé nastaveného oprávnění'
+          proc onclick() {
+            uzivatele.list.selected('clear');
+            uzivatele.list.selected('set',ask('sys_user_skilled',abb.get))
+          } }
       }
       proc onchoice() {
         // pokud je přihlášený administrátor, zablokujeme mu možnost změnit si oprávnění

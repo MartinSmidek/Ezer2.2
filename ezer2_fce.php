@@ -143,6 +143,19 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
     $err.= "Během práce došlo zřejmě k automatickému odhlášení, přihlašte se prosím znovu a opravu opakujte.";
   return "$html<br><br>$err";
 }
+# -------------------------------------------------------------------------------------------------- sys_user_skilled
+# vrátí seznam id_user nositelů daného skill
+function sys_user_skilled($skill) {
+  global $ezer_system;
+  $ids= '';
+  $qu= "SELECT GROUP_CONCAT(id_user ORDER BY id_user) AS _ids FROM $ezer_system._user
+        WHERE skills RLIKE '^{$skill}[ ]|[ ]{$skill}[ ]|[ ]{$skill}\$|^{$skill}\$' ";
+  $ru= mysql_qry($qu,0,0,0,'ezer_system');
+  if ( $ru && $u= mysql_fetch_object($ru) ) {
+    $ids= $u->_ids;
+  }
+  return $ids;
+}
 # -------------------------------------------------------------------------------------------------- sys_user_skills
 # proveden kontrolu konzistence oprávnění, pokud je zadáno jméno souboru
 # vygeneruje přehlednou tabulku oprávnění pro Excel

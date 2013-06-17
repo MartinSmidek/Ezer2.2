@@ -1842,9 +1842,9 @@ Ezer.Select.implement({
     if ( img ) {
       // varianta s obrázkem šipky
       var src= this.type=='select.auto' ? 'select_auto.gif' : 'select.gif';
-        new Element('img',{align:'right',src:Ezer.version+'/client/img/'+src,events:{
+        new Element('img',{align:'right',src:Ezer.version+'/client/img/'+src,events:this.skill==2? {
           click: function() {this.DOM_Input.focus();}.bind(this)
-        }}).inject(this.DOM_Closure);
+        }:{}}).inject(this.DOM_Closure);
     }
     this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
         width:this._w-(img ? 20 : 0),height:this._h-4}
