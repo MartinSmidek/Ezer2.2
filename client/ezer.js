@@ -3241,6 +3241,9 @@ Ezer.EditHtml= new Class({
 //      jeho hodnota přesto odevzdána k uložení na disk. Důvodem k tomuto chování je asynchronní
 //      časování události blur v CKeditoru.
   changed: function() {
+    if ( this.ckeditor && Ezer.options.CKEditor.version=='4' ) {
+      return this.ckeditor.checkDirty();
+    }
     if ( !this._changed && this.ckeditor ) {
       this._changed= this.original.value!=this.ckeditor.getData();
     }
