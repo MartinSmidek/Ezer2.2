@@ -1098,7 +1098,7 @@ function rc2man($rc) {
 function rc2roky($rc,$now=0) {
 //   return $rc;
   if ( !$now ) $now= time();
-  $roky= $rc && $rc!="0000000000" ? floor(($now-rc2time($rc))/(60*60*24*365.24)) : 0;
+  $roky= $rc && $rc!="0000000000" ? floor(($now-rc2time($rc))/(60*60*24*365.2425)) : 0;
   return $roky;
 }
 # -------------------------------------------------------------------------------------------------- narozeni2roky
