@@ -143,7 +143,8 @@ Ezer.MenuMain.implement({
           }).inject(this._menuDom)));
           // zvýraznění nadpisu, pokud právě k němu existuje _help - help pro tabs nelze vynutit
           var key= desc.self_sys().sys;
-          if ( key && desc.options._sys && Ezer.sys.ezer.help_keys.contains(key,',') ) {
+          if ( key && desc.options._sys && Ezer.sys.ezer.help_keys
+            && Ezer.sys.ezer.help_keys.contains(key,',') ) {
 //             a.innerHTML+= "<sub>&hearts;</sub>";
             a.innerHTML+= "<sub> ?</sub>";
           }

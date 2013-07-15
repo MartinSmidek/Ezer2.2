@@ -1355,7 +1355,7 @@
     $y->ok= $rh ? 1 : 0;
     break;
   # ------------------------------------------------------------------------------------------------ help_ask
-  # připíše text dotazu do tabulky _help
+  # připíše text dotazu do tabulky _help a pošle mail
   case 'help_ask':
     $help= "";
     $qh= "SELECT help FROM _help WHERE topic='{$x->key->sys}'";
@@ -1373,7 +1373,14 @@
     // pošli mail
     if ( $EZER->options->mail ) {
       $subject= "Ezer/$ezer_root HELP: {$x->key->title}";
-      $sent= send_mail($subject,$text);
+      $from= '';
+      $fromname= '';
+      $to= $EZER->options->mail;
+      if ( $USER->options && $USER->options->email ) {
+        $from= $USER->options->email;
+        $fromname= "{$USER->forename} {$USER->surname}";
+      }
+      $sent= send_mail($subject,$text,$from,$to,$fromname);
       $y->mail= $sent ? 'ok' : 'fail';
     }
     break;
