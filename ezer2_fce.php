@@ -1,4 +1,36 @@
 <?php # (c) 2007-2009 Martin Smidek <martin@smidek.eu>
+/** ================================================================================================ SVN */
+# --------------------------------------------------------------------------------------- sys_svn_cmd
+# provedení SVN příkazu na serveru, par.cmd je nepovinná relativní složka, par.cmd příkaz
+function sys_svn_cmd($par) {
+  global $ezer_path_root;
+  function do_cmd($cmd) {
+    // provedení příkazu
+    $html= $cmd;
+    $last_line= exec($cmd,$output,$retval);
+                                                          debug($output,"do_cmd=$retval");
+    $lines= implode('<br>',$output);
+    $html.= "<br>return:'$retval'<br>output:'$lines'<hr>";
+    return $html;
+  }
+  $html= '';
+  // přepnutí na složku
+  if ($par->dir) {
+    $html.= do_cmd("cd $ezer_path_root/{$par->dir}");
+    $html.= do_cmd("pwd");
+  }
+  // provedení příkazu
+  if ($par->cmd) {
+    $html.= do_cmd("{$par->cmd} --non-interactive --username gandi --password gn");
+  }
+  // testovací příkaz
+  if ($par->test) {
+    $html.= do_cmd("cd $ezer_path_root/test pwd");
+    $html.= do_cmd("pwd");
+    $html.= do_cmd("svn log -v -r 0:N --limit 100 /home/www/ezer/www-fis/2/test");
+  }
+  return $html;
+}
 /** ================================================================================================ POŽADAVKY */
 # -------------------------------------------------------------------------------------------------- abbr2user
 # zjištění uživatele podle jeho zkratky

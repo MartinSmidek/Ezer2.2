@@ -2637,7 +2637,10 @@ Ezer.LabelMap= new Class({
   init: function (type) {
     var stredCR= new google.maps.LatLng(49.8, 15.6);
     var map_id= google.maps.MapTypeId[type||'TERRAIN'];
-    var g_options= {zoom:7, center:stredCR, mapTypeId:map_id};
+    var g_options= {zoom:7, center:stredCR, mapTypeId:map_id,
+      mapTypeControlOptions:{position: google.maps.ControlPosition.RIGHT_BOTTOM},
+      zoomControlOptions:{position: google.maps.ControlPosition.LEFT_BOTTOM}
+    };
     this.map= new google.maps.Map(this.DOM_Block,g_options);
     this.poly= null;
     this.rect= null;
