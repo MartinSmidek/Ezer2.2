@@ -3099,18 +3099,18 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
             ["uložit pod '"+Ezer.obj.DOM.help.ykey.title+"'",function(el) {
               var data= CKEDITOR.instances.editable.getData();
               Ezer.obj.DOM.help.txt.innerHTML= data;
-              Ezer.App.help_save(Ezer.obj.DOM.help.ykey.sys,data);
+              Ezer.App.help_save(Ezer.obj.DOM.help.ykey,data);
               Ezer.obj.DOM.help.stickywin.hide();
             }],
             Ezer.obj.DOM.help.ykey.sys==Ezer.obj.DOM.help.xkey.sys ? null :
             ["uložit pod '"+Ezer.obj.DOM.help.xkey.title+"'",function(el) {
               var data= window.CKEDITOR.instances.editable.getData();
               Ezer.obj.DOM.help.txt.innerHTML= data;
-              Ezer.App.help_save(Ezer.obj.DOM.help.xkey.sys,data);
+              Ezer.App.help_save(Ezer.obj.DOM.help.xkey,data);
               Ezer.obj.DOM.help.stickywin.hide();
             }],
             ["vynutit zobrazení",function(el) {
-              Ezer.App.help_force(Ezer.obj.DOM.help.ykey.sys);
+              Ezer.App.help_force(Ezer.obj.DOM.help.ykey);
             }],
             ["-neukládat změny",function(el) {
               Ezer.obj.DOM.help.txt.innerHTML= html;

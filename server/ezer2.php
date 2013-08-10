@@ -1305,6 +1305,10 @@
 //       if ( "{$x->app}/{$x->file}"==$path ) $y->text= $text;
     }
     break;
+  # ================================================================================================ help
+  # x->key->sys =   _help.topic, zřetězení atributů _sys - systémové jméno helpu
+  # x->key->title = _help.name, zřetězení atributů title - uživatelské jméno helpu
+  # x->text =       _help.help, text helpu v html
   # ------------------------------------------------------------------------------------------------ help_text
   # vrátí text z tabulky _help podle klíče a poznamená uživatele do seen
   case 'help_text':
@@ -1313,20 +1317,18 @@
       avšak pomocí tlačítka <br><br><b>[Chci&nbsp;se&nbsp;zeptat&nbsp;k&nbsp;této&nbsp;kartě]</b>
       můžete položit otázku,
       <br><br>která se zde zobrazí a zároveň se odešle autorovi programu
-      <br><br>mail s žádostí o doplnění nápovědy.</big></center>";
+      <br><br>mail s žádostí o odpověď resp. o doplnění nápovědy.</big></center>";
     $y->key= $x->key;
     // postupné zkracování klíče
     $akey= explode('.',$x->key->sys);
-    $atit= explode('|',$x->key->title);
     while (count($akey)) {
       $key= implode('.',$akey);
-      $tit= implode('|',$atit);
-      $qh= "SELECT help,seen FROM _help WHERE topic='$key'";
+      $qh= "SELECT help,seen,name FROM _help WHERE topic='$key'";
       $rh= @mysql_query($qh);
       if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
         $y->text= $h->help;
         $y->seen= $h->seen;
-        $y->key= (object)array('sys'=>$key,'title'=>$tit);
+        $y->key= (object)array('sys'=>$key,'title'=>$h->name);
         // poznamená uživatele do seen, pokud tam není
         if ( $abbr && strpos($h->seen,$abbr)===false ) {
           $qs= "UPDATE _help SET seen='{$h->seen},$abbr' WHERE topic='$key' ";
@@ -1335,26 +1337,48 @@
         break;
       }
       array_pop($akey);
-      array_pop($atit);
+    }
+    // sestavení seznamu odkazů na nadřízené a podřízené položky helpu
+    $qh= "SELECT topic,name FROM _help WHERE topic LIKE '$key.%' OR topic='ezer' ";
+    $ul= '';
+    $rh= @mysql_query($qh);
+    while ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
+      $ul.= "<li><a href='help://{$h->topic}'>{$h->name}</a></li>";
+    }
+    if ( $ul ) {
+      $y->text= "<div class='HelpList'>viz též ...<ul>$ul</ul></div>{$y->text}";
     }
     break;
-  # ------------------------------------------------------------------------------------------------ help_save
+  # -------------------------------------------------------------------------------------- help_save
   # zapíše text do tabulky _help
   case 'help_save':
+    $y->ok= 0;
     $text= mysql_real_escape_string($x->text);
-    $qh= "REPLACE INTO _help (topic,help) VALUES ('{$x->key}','$text') ";
-    $rh= mysql_qry($qh);
-    $y->ok= $rh ? 1 : 0;
+    $qh= "SELECT topic FROM _help WHERE topic='{$x->key->sys}'";
+    $rh= @mysql_query($qh);
+    if ( $rh && mysql_num_rows($rh) ) {
+      // help pro topic existuje - vyměň text a title
+      $h= mysql_fetch_object($rh);
+      $qu= "UPDATE _help SET name='{$x->key->title}',help='$text' WHERE topic='{$h->topic}'";
+      $ru= mysql_qry($qu);
+      $y->ok= $ru ? 1 : 0;
+    }
+    elseif ( $rh && mysql_num_rows($rh)==0 ) {
+      // help pro topic neexistuje - založ jej
+      $qi= "INSERT INTO _help (topic,name,help) VALUES ('{$x->key->sys}','{$x->key->title}','$text') ";
+      $ri= mysql_qry($qi);
+      $y->ok= $ri ? 1 : 0;
+    }
     break;
-  # ------------------------------------------------------------------------------------------------ help_force
+  # ------------------------------------------------------------------------------------- help_force
   # zapíše do tabulky _help značku vynucující alepoň jedno zobrazení
   case 'help_force':
     $text= mysql_real_escape_string($x->text);
-    $qh= "UPDATE _help SET seen='*' WHERE topic='{$x->key}' ";
+    $qh= "UPDATE _help SET seen='*' WHERE topic='{$x->key->sys}' ";
     $rh= mysql_qry($qh);
     $y->ok= $rh ? 1 : 0;
     break;
-  # ------------------------------------------------------------------------------------------------ help_ask
+  # --------------------------------------------------------------------------------------- help_ask
   # připíše text dotazu do tabulky _help a pošle mail
   case 'help_ask':
     $help= "";
@@ -1365,7 +1389,7 @@
     }
     $abbr= $_SESSION[$ezer_root]['user_abbr'];
     $text= mysql_real_escape_string("[$abbr ".date('j/n/Y H:i')."] {$x->text}");
-    $qh= "REPLACE INTO _help (topic,help) VALUES ('{$x->key->sys}','$text$help') ";
+    $qh= "REPLACE INTO _help (topic,name,help) VALUES ('{$x->key->sys}','{$x->key->title}','$text$help') ";
     $rh= mysql_qry($qh);
     $y->ok= $rh ? 1 : 0;
     $y->mail= '?';
@@ -1384,7 +1408,8 @@
       $y->mail= $sent ? 'ok' : 'fail';
     }
     break;
-  # ------------------------------------------------------------------------------------------------ load_code2
+  # ================================================================================================ CODE
+  # ------------------------------------------------------------------------------------- load_code2
   # zavede modul včetně modulů vnořených pomocí options.include:onload[,fname]
   # pokud je zdrojový text modulu novější než přeložený json-text, pak jej napřed přeloží.
   #
@@ -1541,7 +1566,7 @@
 //     file_put_contents("snap.json",$y->error);
 //     file_put_contents("snap.json",$json->encode($y->app));
     break;
-  # ------------------------------------------------------------------------------------------------ code
+  # ------------------------------------------------------------------------------------------- code
   case 'code': // (files)
     global $code;
     $code= (object)array();

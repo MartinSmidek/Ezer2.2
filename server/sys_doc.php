@@ -605,4 +605,12 @@ function doc_todo_show1($ods,$dos,$odt=0,$dot=99999,$path,$nic='') { trace();
   $html= $tab ? "<dl class='todo'>$tab</dl>" : $nic;
   return $html;
 }
+/** ================================================================================================ HELP */
+# zobrazování položek kontextového helpu _HELP
+# -------------------------------------------------------------------------------------------------- doc_todo
+# vygeneruje přehled _help
+function doc_help($cond='all') {
+  $html.= "";
+  return $html;
+}
 ?>

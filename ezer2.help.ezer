@@ -1,4 +1,10 @@
 #pragma library
+proc the_formsave (f,b) {
+  f.same
+| f.key; f.save; { b.browse_seek(conc(f.id_key,'=',f.key)); f.load | f.init }
+| f.insert; f.load;
+  b.raise('onrowclick',b.browse_seek(conc(f.id_key,'=',f.key)))
+}
 # -------------------------------------------------------------------------------------- Dokumentace
 panel apl [,,770,] {type:'right', title:'Dokumentace', _sys:'dok'
   menu m {type:'left'                   // nesmí mít active
@@ -111,6 +117,77 @@ panel nov [,,770,] {type:'right', title:'Novinky', _sys:'new'
   }
   use u: form f [0,0,,]
 }
+# ---------------------------------------------------------------------------------- kontextový help
+panel faq [,,770,] {type:'right', title:'Kontextový help', _sys:'faq'
+  use hlp: form _hlp [12,4,,]
+  menu {type:'left', active:*
+    menu {title:'Přehledy', type:'group'
+      item {title:'Seznam všech' }
+      proc onclick(i) {
+        hlp.fill(conc(i.owner.title,' - ',i.title));
+        hlp.s.browse_load
+      }
+    }
+  }
+  form _hlp [,,*,500] {
+    // seznam témat
+    browse s [0,35,150,100] { rows:20, qry_rows:1
+      show id_help { data:_help.id_help }
+      show [,,100,] { title:'název', data:_help.name, format:'s+q*t' }
+      show [,,50,] { title:'zkratka', data:_help.topic, format:'sq*t' }
+      show [,,40,] { title:'stav', data:_help.seen, format:'sq*t' }
+      proc onrowclick() {
+        form.key(id_help.get); form.load;
+        hlp.set(f_hlp.get)
+      }
+    }
+    // pole
+    field f_hlp { data:_help.help }
+    label head [0,0,*,31] { title:'' }
+    label [230,41,0,] { title:'název:' }
+    field name [267,37,119,] { data:_help.name }
+    label [403,41,31,] { title:'zkratka:' }
+    field topic [448,37,80,] { data:_help.topic }
+    label [542,41,27,] { title:'stav:' }
+    field seen [571,37,40,] { data:_help.seen }
+    // příkazy
+    button [647,36,,] { title:"Ulož"
+      proc onclick() {
+        the_formsave(form,s)
+      }
+    }
+    button [693,36,,] { title:"Uprav text"
+      proc onclick() {
+        help_edit.h.txt.set(f_hlp.get);
+        help_edit.modal(50,50);
+        f_hlp.set(help_edit.h.txt.get);
+        f_hlp.change;
+        form.save; form.load; hlp.set(f_hlp.get)
+      }
+    }
+    // plocha pro zobrazení téma
+    label hlp [230,66,,] { title:'',
+      style:"width:auto;margin-right:20px;font-size:11px;color:0;background-color:#C9D5E5;padding:10px" }
+    // procedury
+    proc fill(h) {
+      [ h; head.set(conc("<div class='karta'>",h,"</div>")) ];
+    }
+  }
+  # ================================================================================= help_edit
+  panel help_edit [0,0,645,520] { title:' Úprava textu nápovědy', type:'popup', css:'dialog'
+    use h: form _hlp [0,0,,],
+    # ------------------------------------------------------------------------ _hlp
+    form _hlp [10,10,600,460] {
+      button  [540,9,45,20] { title:'Uložit', help:'ukončit editor a uložit změny'
+        proc onclick() {panel.hide(1); }
+      }
+      button  [600,9,45,20] { title:'Zpět', help:'ukončit editor bez uložení změn'
+        proc onclick() { panel.hide(0); }
+      }
+      edit txt [0,40,655,480] {type:'html', par:°{toolbar:'EzerMail'} },
+    }
+  }
+}
 # ------------------------------------------------------------------------------------------------ f
 # formulář pro levostranné menu
 form f {
@@ -121,4 +198,12 @@ form f {
     hresult.set(conc(hresult.get,"<div id='Content'>",txt,"</div>"));
   }
   label hresult [0,0,*,] { title:'--' }
+}
+
+table _help {  key_id:'id_help'
+  number id_help { key:'primary' }
+  text topic
+  text name
+  text seen
+  text help
 }
