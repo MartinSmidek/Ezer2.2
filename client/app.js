@@ -515,7 +515,7 @@ Ezer.Application.implement({
     this.ask({cmd:'help_text',key:k},'help_text_',{key:k});
   },
   help_text_: function(y,parm) {
-    Ezer.fce.help(y.text,'HELP: '+y.key.title,y.key,parm.key,y.seen);
+    Ezer.fce.help(y.text,'HELP: '+y.key.title,y.key,parm.key,y.seen,y.refs);
   },
 // --------------------------------------------------------------------------------------- help_save
 // zapíše helptext s daným klíčem

@@ -3029,7 +3029,7 @@ Ezer.fce.DOM.alert= function (str,continuation) {
 // -------------------------------------------------------------------------------------- help
 // zobrazení helpu v popup okně s možností editace
 Ezer.obj.DOM.help= null;                                // popup StickyWin
-Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
+Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
   // konstrukce elementů pro Help při prvním volání
   if ( !Ezer.obj.DOM.help ) {
     Ezer.obj.DOM.help= {};
@@ -3082,9 +3082,10 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
             ['editovat obsah',function(el) {
               Ezer.obj.DOM.help.dotaz_butt.setStyles({display:'none'});
               Ezer.obj.DOM.help.txt.innerHTML=
-                "<div id='editable' contenteditable='true'>"+Ezer.obj.DOM.help.txt.innerHTML+"</div>";
+                "<div id='editable' contenteditable='true'>"+html+"</div>";
+//                 "<div id='editable' contenteditable='true'>"+Ezer.obj.DOM.help.txt.innerHTML+"</div>";
               CKEDITOR.disableAutoInline= true;
-              CKEDITOR.inline('editable',{ startupFocus:true, resize_enabled:false, //skin:'Kama',
+              var e1= CKEDITOR.inline('editable',{ startupFocus:true, resize_enabled:false, //skin:'Kama',
                 entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
                 toolbar:Ezer.options.CKEditor['EzerHelp']
                   ? Ezer.options.CKEditor['EzerHelp'].toolbar
@@ -3095,6 +3096,12 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
                     '-','Source','ShowBlocks','RemoveFormat']]
               });
               Ezer.obj.DOM.help.stickywin.attach(true);
+              e1.on("instanceReady", function(event) {
+                var bar= $('cke_editable');
+                if ( bar ) {
+                  bar.setStyle('top',Ezer.obj.DOM.help.sticky.getStyle('top').toInt()-30);
+                }
+              });
             }],
             ["uložit pod '"+Ezer.obj.DOM.help.ykey.title+"'",function(el) {
               var data= CKEDITOR.instances.editable.getData();
@@ -3132,7 +3139,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen) {
   Ezer.obj.DOM.help.ykey= ykey;
   Ezer.obj.DOM.help.cap.setProperty('text',title);
   Ezer.obj.DOM.help.cap.title= (xkey.sys==ykey.sys ? ykey.sys : xkey.sys+"=>"+ykey.sys)+' '+seen;
-  Ezer.obj.DOM.help.txt.innerHTML= html; // načtení HTML helpu
+  Ezer.obj.DOM.help.txt.innerHTML= refs+html; // načtení HTML helpu
   Ezer.obj.DOM.help.dotaz_butt.setStyles({display:'block'});
   // přidá obsluhu vnořeným elementům <a href='help://....'>
   Ezer.obj.DOM.help.txt.getElements('a').each(function(el) {

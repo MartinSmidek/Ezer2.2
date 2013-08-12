@@ -1310,7 +1310,8 @@
   # x->key->title = _help.name, zřetězení atributů title - uživatelské jméno helpu
   # x->text =       _help.help, text helpu v html
   # ------------------------------------------------------------------------------------------------ help_text
-  # vrátí text z tabulky _help podle klíče a poznamená uživatele do seen
+  # vrátí y->text z tabulky _help podle klíče a poznamená uživatele do seen
+  # vrátí y->refs = html obsahující další odkazy
   case 'help_text':
     $abbr= $_SESSION[$ezer_root]['user_abbr'];
     $y->text= "<center><big><br><br><br><br>K této kartě zatím není napsána nápověda,
@@ -1321,14 +1322,16 @@
     $y->key= $x->key;
     // postupné zkracování klíče
     $akey= explode('.',$x->key->sys);
+    $atit= explode('|',$x->key->title);
     while (count($akey)) {
       $key= implode('.',$akey);
+      $tit= implode('|',$atit);
       $qh= "SELECT help,seen,name FROM _help WHERE topic='$key'";
       $rh= @mysql_query($qh);
       if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
         $y->text= $h->help;
         $y->seen= $h->seen;
-        $y->key= (object)array('sys'=>$key,'title'=>$h->name);
+        $y->key= (object)array('sys'=>$key,'title'=>$h->name?$h->name:$tit);
         // poznamená uživatele do seen, pokud tam není
         if ( $abbr && strpos($h->seen,$abbr)===false ) {
           $qs= "UPDATE _help SET seen='{$h->seen},$abbr' WHERE topic='$key' ";
@@ -1337,6 +1340,7 @@
         break;
       }
       array_pop($akey);
+      array_pop($atit);
     }
     // sestavení seznamu odkazů na nadřízené a podřízené položky helpu
     $qh= "SELECT topic,name FROM _help WHERE topic LIKE '$key.%' OR topic='ezer' ";
@@ -1345,9 +1349,7 @@
     while ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
       $ul.= "<li><a href='help://{$h->topic}'>{$h->name}</a></li>";
     }
-    if ( $ul ) {
-      $y->text= "<div class='HelpList'>viz též ...<ul>$ul</ul></div>{$y->text}";
-    }
+    $y->refs= $ul ? "<div class='HelpList'>viz též ...<ul>$ul</ul></div>" : '';
     break;
   # -------------------------------------------------------------------------------------- help_save
   # zapíše text do tabulky _help

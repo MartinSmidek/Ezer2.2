@@ -7671,8 +7671,8 @@ Ezer.fce.warning= function () {
 //   kde klíč je hodnota získaná funkcí self_sys. Poslední parametr se zobrazuje jako title
 //   v nadpisu (ve standardním helpu obsahuje zkratky uživatelů, kteří viděli help)
 //s: funkce
-Ezer.fce.help= function (html,title,ykey,xkey,seen) {
-  Ezer.fce.DOM.help(html,title,ykey,xkey,seen);
+Ezer.fce.help= function (html,title,ykey,xkey,seen,refs) {
+  Ezer.fce.DOM.help(html,title,ykey,xkey,seen,refs);
   return 1;
 };
 // -------------------------------------------------------------------------------------- set_trace
