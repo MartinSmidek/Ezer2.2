@@ -1355,7 +1355,8 @@
     $qh= "SELECT topic,name FROM _help WHERE topic LIKE '$key.%' OR topic IN ($refs) ";
     $rh= @mysql_query($qh);
     while ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
-      $ul.= "<li><a href='help://{$h->topic}'>{$h->name}</a></li>";
+      $ref= $h->name ? $h->name : $h->topic;
+      $ul.= "<li><a href='help://{$h->topic}'>$ref</a></li>";
     }
     $y->refs= $ul ? "<div class='HelpList'>viz též ...<ul>$ul</ul></div>" : '';
     break;
@@ -1369,7 +1370,8 @@
     if ( $rh && mysql_num_rows($rh) ) {
       // help pro topic existuje - vyměň text a title
       $h= mysql_fetch_object($rh);
-      $qu= "UPDATE _help SET name='{$x->key->title}',help='$text' WHERE topic='{$h->topic}'";
+      $topic= $h->topic; // ? $h->topic : $x->key->title;
+      $qu= "UPDATE _help SET name='{$x->key->title}',help='$text' WHERE topic='$topic'";
       $ru= mysql_qry($qu);
       $y->ok= $ru ? 1 : 0;
     }

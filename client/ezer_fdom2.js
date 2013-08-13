@@ -3051,7 +3051,8 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
             }
           }}),
           new Element('input',{type:'button',value:'Uložit',events:{
-            click: function(el) { // uložení dotazu na server, skrytí formuláře a obnovení helpu
+            // uložení dotazu na server, skrytí formuláře a obnovení helpu
+            click: function(el) {
               Ezer.App.help_ask(Ezer.obj.DOM.help.xkey,
                 Ezer.obj.DOM.help.dotaz.getElement('textarea').value,Ezer.fce.DOM.help_);
             }
