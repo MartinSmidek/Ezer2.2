@@ -1343,8 +1343,16 @@
       array_pop($atit);
     }
     // sestavení seznamu odkazů na nadřízené a podřízené položky helpu
-    $qh= "SELECT topic,name FROM _help WHERE topic LIKE '$key.%' OR topic='ezer' ";
+    $refs= "'ezer'";
+    $key= $x->key->sys;
+    $akey= explode('.',$x->key->sys);
+    while ( count($akey) ) {
+      array_pop($akey);
+      $k= implode('.',$akey);
+      $refs.= ",'$k'";
+    }
     $ul= '';
+    $qh= "SELECT topic,name FROM _help WHERE topic LIKE '$key.%' OR topic IN ($refs) ";
     $rh= @mysql_query($qh);
     while ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
       $ul.= "<li><a href='help://{$h->topic}'>{$h->name}</a></li>";
