@@ -142,21 +142,22 @@ Ezer.Application= new Class({
   },
   // ----------------------------------------------------------------------------- _mini_debug
   // ikona má název *logo.gif kde * je '+' nebo '-'
+  _mini_debug_virgin: true,
   _mini_debug: function (on) {
     var timer;
     this.domIcon_idle= $('StatusIcon_idle');
     this.domIcon_server= $('StatusIcon_server');
     this.idle= true;                            // není běžící požadavek na server
     // kontextový help
-    if ( $('submenu') ) {
-      $('submenu').addEvents({
+    if ( $('_help') && this._mini_debug_virgin ) {
+      $('_help').addEvents({
         // vyvolání kontextového helpu
         click: function(e) {
           this._help(true);
         }.bind(this),
       });
     }
-    // kontextové men loga pro ladění
+    // kontextové menu loga pro ladění
     this.logo= $('logo');
     if ( this.logo ) {
       if ( on && Ezer.sys.user.skills && Ezer.sys.user.skills.contains('m',' ') ) {
@@ -181,6 +182,7 @@ Ezer.Application= new Class({
         });
       }
     }
+    this._mini_debug_virgin= false;
   },
   // ----------------------------------------------------------------------------- putFootDom
   // patička

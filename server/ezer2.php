@@ -1349,16 +1349,21 @@
     while ( count($akey) ) {
       array_pop($akey);
       $k= implode('.',$akey);
-      $refs.= ",'$k'";
+      if ( $k ) $refs.= ",'$k'";
     }
     $ul= '';
+    $nh= 0;
     $qh= "SELECT topic,name FROM _help WHERE topic LIKE '$key.%' OR topic IN ($refs) ";
     $rh= @mysql_query($qh);
     while ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
       $ref= $h->name ? $h->name : $h->topic;
       $ul.= "<li><a href='help://{$h->topic}'>$ref</a></li>";
+      $nh++;
     }
     $y->refs= $ul ? "<div class='HelpList'>viz též ...<ul>$ul</ul></div>" : '';
+                                                        $x->totrace= 'u';
+                                                        debug($x);
+                                                        display("$key =&gt; $qh =&gt; $nh");
     break;
   # -------------------------------------------------------------------------------------- help_save
   # zapíše text do tabulky _help
