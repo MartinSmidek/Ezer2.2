@@ -3033,7 +3033,9 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
   // konstrukce elementů pro Help při prvním volání
   if ( !Ezer.obj.DOM.help ) {
     Ezer.obj.DOM.help= {};
-    var _w= 500, _h= 300, dotaz= null, options= {draggable:true, closeOnClickOut:true,
+    var _w= Ezer.options.help && Ezer.options.help.width || 500;
+    var _h= Ezer.options.help && Ezer.options.help.height || 300;
+    var dotaz= null, options= {draggable:true, closeOnClickOut:true,
       relativeTo:document.id('work'), position:'upperLeft',
       content:StickyWin.ui('HELP: informace, otázky a odpovědi k této kartě','',{
         cornerHandle:true, width:_w+55,
@@ -3083,7 +3085,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
             ['editovat obsah',function(el) {
               Ezer.obj.DOM.help.dotaz_butt.setStyles({display:'none'});
               Ezer.obj.DOM.help.txt.innerHTML=
-                "<div id='editable' contenteditable='true'>"+html+"</div>";
+                "<div id='editable' contenteditable='true'>"+Ezer.obj.DOM.help.html+"</div>";
 //                 "<div id='editable' contenteditable='true'>"+Ezer.obj.DOM.help.txt.innerHTML+"</div>";
               CKEDITOR.disableAutoInline= true;
               var e1= CKEDITOR.inline('editable',{ startupFocus:true, resize_enabled:false, //skin:'Kama',
@@ -3121,7 +3123,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
               Ezer.App.help_force(Ezer.obj.DOM.help.ykey);
             }],
             ["-neukládat změny",function(el) {
-              Ezer.obj.DOM.help.txt.innerHTML= html;
+              Ezer.obj.DOM.help.txt.innerHTML= Ezer.obj.DOM.help.html;
               Ezer.obj.DOM.help.stickywin.hide();
             }],
             ["alert(odkaz na tento help)",function(el) {
@@ -3136,6 +3138,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
   }
   // zobrazení Helpu podle zadaných parametrů
   Ezer.obj.DOM.help.stickywin.attach(false);
+  Ezer.obj.DOM.help.html= html;
   Ezer.obj.DOM.help.xkey= xkey;
   Ezer.obj.DOM.help.ykey= ykey;
   Ezer.obj.DOM.help.cap.setProperty('text',title);
