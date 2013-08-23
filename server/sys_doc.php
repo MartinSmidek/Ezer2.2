@@ -224,25 +224,28 @@ function doc_ezer_state ($fname,&$files) { trace();
     $files[$name]->info= $code->info;
   }
 }
-# -------------------------------------------------------------------------------------------------- doc_php_cg
+# --------------------------------------------------------------------------------------- doc_php_cg
 # test CG
-function doc_php_cg ($fnames) {
-  global $ezer_path_root, $ezer_php_libr;
-  // seznam funkcí vynechaných ze seznamu volaných - odvozený z $ezer_php_libr
-  $omi= array();
-  foreach($ezer_php_libr as $fname) {
-    $ts= token_get_all(file_get_contents("$ezer_path_root/ezer2.2/$fname"));
-    for ($i= 0; $i<count($ts); $i++) {
-      // vynechání mezer
-      if ( is_array($ts[$i]) && $ts[$i][0]==T_WHITESPACE ) continue;
-      // seznam funkcí
-      else if ( is_array($ts[$i]) && $ts[$i][0]==T_FUNCTION ) {
-        $i+= 2;
-        $omi[]= $ts[$i][1];
+function doc_php_cg ($fnames) {  trace();
+  # výstup tokenů
+  function token_debug($xs) {
+    $y= array();
+    foreach ($xs as $i=>$x) {
+      if ( is_array($x) ) {
+        if (in_array($x[0],array(T_WHITESPACE,T_COMMENT,T_VARIABLE))) continue;
+        $y[$i]= token_name($x[0])."   $x[1]";
+      }
+      else {
+        if (!in_array($x[0],array('{','}','('))) continue;
+        $y[$i]= $x;
       }
     }
+    debug($y);
   }
-//                                                         debug($omi,'omitted');
+  global $ezer_path_appl;
+  $html= "";
+  // seznam funkcí vynechaných ze seznamu volaných
+  $omi= array('debug','display','fce_error','trace');
   // seznam dostupných funkcí
   $fce_lst= get_defined_functions();
   $usr= $fce_lst['user'];
@@ -255,21 +258,34 @@ function doc_php_cg ($fnames) {
   $phps= array();
   // phps :: [file=>fce, ... ]          -- seznam funkcí
   //  fce :: id=>[id,...]               -- seznam volaných
+  // 1.průchod - deklarace funkcí
   foreach(explode(',',$fnames) as $fname) {
-    $phps[$fname]= array('?'=>array());
+    $phps[$fname]= array(); //array('?'=>array());
     $last= "?";
-    $ts= token_get_all(file_get_contents("$ezer_path_root/$fname"));
+    $ts= token_get_all(file_get_contents("$ezer_path_appl/$fname"));
+//                                                 token_debug($ts);
     for ($i= 0; $i<count($ts); $i++) {
       // vynechání mezer
-      if ( is_array($ts[$i]) && $ts[$i][0]==T_WHITESPACE ) continue;
-      // seznam funkcí
-      else if ( is_array($ts[$i]) && $ts[$i][0]==T_FUNCTION ) {
+      if ( is_array($ts[$i]) && in_array($ts[$i][0],array(T_WHITESPACE,T_COMMENT,T_VARIABLE)) )
+        continue;
+      // definice funkce
+      if ( is_array($ts[$i]) && $ts[$i][0]==T_FUNCTION ) {
         $i+= 2;
         $last= $ts[$i][1];
         $phps[$fname][$last]= array();
       }
+    }
+    for ($i= 0; $i<count($ts); $i++) {
+      // vynechání mezer
+      if ( is_array($ts[$i]) && in_array($ts[$i][0],array(T_WHITESPACE,T_COMMENT,T_VARIABLE)) )
+        continue;
+      // definice funkce
+      if ( is_array($ts[$i]) && $ts[$i][0]==T_FUNCTION ) {
+        $i+= 2;
+        $last= $ts[$i][1];
+      }
       // volání funkce
-      else if ( is_array($ts[$i]) && $ts[$i][0]==T_STRING && in_array($u= $ts[$i][1],$usr) ) {
+      if ( is_array($ts[$i]) && $ts[$i][0]==T_STRING && in_array($u= $ts[$i][1],$usr) ) {
         if ( isset($fce[$u]) ) {
           // pokud není mezi vynechávanými
           if ( !in_array($u,$phps[$fname][$last]) ) {
@@ -282,7 +298,8 @@ function doc_php_cg ($fnames) {
   }
 //                                                 debug($phps,'CG');
 //                                                 debug($fce,'fce');
-  return (object)array('calls'=>$phps,'called'=>$fce);
+  $html.= "<div class='dbg'>".debugx($phps,'CG')."</div>";
+  return (object)array('calls'=>$phps,'called'=>$fce,'html'=>$html);
 }
 /** ================================================================================================ PSPAD */
 # -------------------------------------------------------------------------------------------------- pspad_gen
