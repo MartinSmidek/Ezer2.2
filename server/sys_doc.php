@@ -93,7 +93,7 @@ function doc_php() {
   $ezers= doc_ezer_list();
   $cg= doc_php_cg(implode(',',$ezer_php));
 //                                                 debug($cg,'CG');
-                                                debug($cg->calls['ck/ck.dop.jed.php'],'CG ck.dop.jed.php');
+//                                                 debug($cg->calls['ck/ck.dop.jed.php'],'CG ck.dop.jed.php');
   // $used obsahuje volané funkce: $fce => $n kde $n je vzdálenost od ezer-skriptu
   // 1 znamená přímo volané z ezer-skriptu
   $used= array();
@@ -565,7 +565,7 @@ function doc_todo_show1($ods,$dos,$odt=0,$dot=99999,$path,$nic='') { trace();
   // rozklad na řádky
   $text= substr($file,$f1,$f2-$f1);
   $line= explode("\n",$text);
-                                                debug($line,'todo.wiki');
+//                                                 debug($line,'todo.wiki');
   $tab= '';
   for ($i= 1; $i<=count($line); $i++) {
     $j= 1;
