@@ -5990,7 +5990,7 @@ Ezer.Eval= new Class({
               this.stack[++this.top]= val;
               break;
             // L - test pro foreach: na zásobníku je pole p, pokud je prázdné sníží zásobník a skočí,
-            //     pokud je p neprázdné dá na vrchol p.pop
+            //     pokud je p neprázdné dá na vrchol p.shift
             case 'L':
               obj= this.stack[this.top];                // pole
               if ( $type(obj)!='array' )
@@ -7039,6 +7039,13 @@ Ezer.fce.cset= function () {
     oa.set(t>=0?1:0);
   }
   return x;
+}
+// -------------------------------------------------------------------------------------- cset
+//ff: fce.chr (ascii)
+//      vrátí jednoznakový řetězec se znakem odpovídajícím předanému ASCII kódu
+//s: funkce
+Ezer.fce.chr= function (ascii) {
+  return String.fromCharCode(ascii);
 }
 // ================================================================================================= fce date+time
 // -------------------------------------------------------------------------------------- date2sql
