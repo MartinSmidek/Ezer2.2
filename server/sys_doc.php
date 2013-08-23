@@ -4,7 +4,7 @@
 # seznam Ezer modulů
 function doc_ezer() {
   global $ezer_root, $ezer_php;
-  $html= "<div id='Content'><div class='CSection CMenu'>";
+  $html= "<div class='CSection CMenu'>";
   $html.= "<h3 class='CTitle'>Komentovaný seznam Ezer modulů aplikace '$ezer_root'</h3>";
   $html.= "
     <i>Seznam <b style='color:blue'>Ezer-modulů</b> aplikace se seznamem PHP-funkcí, volaných
@@ -73,26 +73,27 @@ function doc_ezer() {
     }
   }
   $html.= "</dl>";
-  $html.= "</div></div>";
+  $html.= "</div>";
   return $html;
 }
 # -------------------------------------------------------------------------------------------------- doc_php
 # seznam PHP modulů s označením nepoužitých
 function doc_php() {
   global $ezer_root, $ezer_php;
-  $html= "<div id='Content'><div class='CSection CMenu'>";
+  $html= "<div class='CSection CMenu'>";
   $html.= "<h3 class='CTitle'>Komentovaný seznam PHP modulů aplikace '$ezer_root'</h3>";
   $html.= "
     <i>Seznam ezer-modulů aplikace se seznamem php-funkcí.
     Číslo před jménem funkce označuje hloubku volání vzhledem k Ezerskriptu.
     Jména funkcí jsou označena jako <b style='color:red'>nepoužitá</b> resp. jako
-    volaná <b style='color:green'>přímo </b> z Ezerscriptu.
+    volaná <b style='color:limegreen'>přímo </b> z Ezerscriptu.
     Jméno funkce je následováno seznamem volaných funkcí
     (standardní funkce obsažené v seznamu \$ezer_php_libr v $ezer_root.inc jsou vynechány).
     </i>";
   $ezers= doc_ezer_list();
   $cg= doc_php_cg(implode(',',$ezer_php));
 //                                                 debug($cg,'CG');
+                                                debug($cg->calls['ck/ck.dop.jed.php'],'CG ck.dop.jed.php');
   // $used obsahuje volané funkce: $fce => $n kde $n je vzdálenost od ezer-skriptu
   // 1 znamená přímo volané z ezer-skriptu
   $used= array();
@@ -132,20 +133,20 @@ function doc_php() {
     foreach($desc as $fce=>$calls) {
       if ( $fce=='?' ? count($calls) : true ) {
         $u= $used[$fce];
-        $clr= $u==0 ? "style='color:red'" : ($u==1 ? "style='color:green'" : '');
+        $clr= $u==0 ? "style='color:red'" : ($u==1 ? "style='color:limegreen'" : '');
         $html.= "<dd style='text-indent:-10px'>$u <b $clr>$fce</b>: ".implode(', ',$calls)."</dd>";
       }
     }
   }
   $html.= "</dl>";
-  $html.= "</div></div>";
+  $html.= "</div>";
   return $html;
 }
 # -------------------------------------------------------------------------------------------------- doc_called
 # called graph PHP modulů
 function doc_called() {
   global $ezer_root, $ezer_php;
-  $html= "<div id='Content'><div class='CSection CMenu'>";
+  $html= "<div class='CSection CMenu'>";
   $html.= "<h3 class='CTitle'>Seznam PHP funkcí aplikace '$ezer_root'</h3>";
   $html.= "<i>Abecední seznam PHP funkcí se seznamem funkcí, ze kterých jsou volány.<br>
     Volání z modulů Ezer jsou uvedena <b style='color:blue'>tučně</b>.</i>";
@@ -169,7 +170,7 @@ function doc_called() {
     $html.= "</dd>";
   }
   $html.= "</dl>";
-  $html.= "</div></div>";
+  $html.= "</div>";
   return $html;
 }
 # -------------------------------------------------------------------------------------------------- doc_ezer_list
@@ -228,13 +229,30 @@ function doc_ezer_state ($fname,&$files) { trace();
 # test CG
 function doc_php_cg ($fnames) {
   global $ezer_path_root, $ezer_php_libr;
+  # výstup tokenů
+  function token_debug($xs,$fname) {
+    $y= array();
+    foreach ($xs as $i=>$x) {
+      if ( is_array($x) ) {
+        if (in_array($x[0],array(T_WHITESPACE,T_COMMENT,T_VARIABLE))) continue;
+        $y[$i]= token_name($x[0])."   $x[1]";
+      }
+      else {
+        if (!in_array($x[0],array('{','}','('))) continue;
+        $y[$i]= $x;
+      }
+    }
+    debug($y,$fname);
+  }
   // seznam funkcí vynechaných ze seznamu volaných - odvozený z $ezer_php_libr
   $omi= array();
   foreach($ezer_php_libr as $fname) {
     $ts= token_get_all(file_get_contents("$ezer_path_root/ezer2.2/$fname"));
+//                                                         token_debug($ts,$fname);
     for ($i= 0; $i<count($ts); $i++) {
       // vynechání mezer
-      if ( is_array($ts[$i]) && $ts[$i][0]==T_WHITESPACE ) continue;
+      if ( is_array($ts[$i]) && in_array($ts[$i][0],array(T_WHITESPACE,T_COMMENT,T_VARIABLE)) )
+        continue;
       // seznam funkcí
       else if ( is_array($ts[$i]) && $ts[$i][0]==T_FUNCTION ) {
         $i+= 2;
@@ -244,7 +262,7 @@ function doc_php_cg ($fnames) {
   }
 //                                                         debug($omi,'omitted');
   // seznam dostupných funkcí
-  $fce_lst= get_defined_functions();
+  $fce_lst= get_defined_functions();   // pozor! převádí jména na lowercase
   $usr= $fce_lst['user'];
   $fce= array();
   foreach($usr as $u) {
@@ -256,7 +274,7 @@ function doc_php_cg ($fnames) {
   // phps :: [file=>fce, ... ]          -- seznam funkcí
   //  fce :: id=>[id,...]               -- seznam volaných
   foreach(explode(',',$fnames) as $fname) {
-    $phps[$fname]= array(/*'?'=>array()*/);
+    $phps[$fname]= array('?'=>array());
     $last= "?";
     $ts= token_get_all(file_get_contents("$ezer_path_root/$fname"));
     for ($i= 0; $i<count($ts); $i++) {
@@ -265,7 +283,7 @@ function doc_php_cg ($fnames) {
       // seznam funkcí
       else if ( is_array($ts[$i]) && $ts[$i][0]==T_FUNCTION ) {
         $i+= 2;
-        $last= $ts[$i][1];
+        $last= strtolower($ts[$i][1]);
         $phps[$fname][$last]= array();
       }
       // volání funkce
@@ -282,7 +300,7 @@ function doc_php_cg ($fnames) {
     }
   }
 //                                                 debug($phps,'CG');
-                                                debug($fce,'fce');
+//                                                 debug($fce,'fce');
   $html.= "<div class='dbg'>".debugx($phps,'CG')."</div>";
   return (object)array('calls'=>$phps,'called'=>$fce,'html'=>$html);
 }
@@ -291,7 +309,7 @@ function doc_php_cg ($fnames) {
 # vygeneruje definici syntaxe pro Ezer pro PSPad
 function pspad_gen() {
   global $ezer_path_pspad;
-  $html= "<div id='Content'><div class='CSection CMenu'>";
+  $html= "<div class='CSection CMenu'>";
   $html.= "<h3 class='CTitle'>Barvení syntaxe EzerScript pro PSPad</h3>";
   $fname= "$ezer_path_pspad/Ezer.ini";
   $now= date('d.m.Y');
@@ -351,7 +369,7 @@ onsubmit=
 ask=";
   $n= @file_put_contents($fname,$ini);
   if ( $n===false ) fce_error("LIBR: nelze zapsat $fname pro PSPad");
-  $html.= nl2br($ini)."</div></div>";
+  $html.= nl2br($ini)."</div>";
   return $html;
 }
 # -------------------------------------------------------------------------------------------------- pspad_keys
@@ -397,7 +415,7 @@ function pspad_keys(&$res,&$key1,&$key2,&$key3) {
 function doc_todo($item,$source='app',$nic="<dl class='todo'><dt>V tomto období nebyly změny</dt></dl>") {
   global $ezer_path_todo, $ezer_path_root;
   $nove= 30;
-  $html= "<div id='Content'><div class='CSection CMenu'>";
+  $html= "<div class='CSection CMenu'>";
   $cond= $source=='app' ? "cast!=1 " : "cast=1 ";
   $order= "kdy_skoncil DESC";
   switch ( $item ) {
@@ -419,7 +437,7 @@ function doc_todo($item,$source='app',$nic="<dl class='todo'><dt>V tomto období
     break;
   }
   $html.= doc_todo_show($cond,$order);
-  $html.= "</div></div>";
+  $html.= "</div>";
   return $html;
 }
 # -------------------------------------------------------------------------------------------------- doc_todo_show
@@ -505,7 +523,7 @@ function map_user() {
 # vygeneruje přehled aktivit podle menu
 function doc_todo1($item,$source='app',$nic="<dl class='todo'><dt>V tomto období nebyly změny</dt></dl>") {
   global $ezer_path_todo, $ezer_path_root;
-  $html= "<div id='Content'><div class='CSection CMenu'>";
+  $html= "<div class='CSection CMenu'>";
   $path= $source=='app' ? $ezer_path_todo : "$ezer_path_root/ezer2.2/wiki/";
   $nove= 12;
   switch ( $item ) {
@@ -534,7 +552,7 @@ function doc_todo1($item,$source='app',$nic="<dl class='todo'><dt>V tomto obdob�
     $html.= doc_todo_show1('++todo','++done',0,99999,$path,$nic);
     break;
   }
-  $html.= "</div></div>";
+  $html.= "</div>";
   return $html;
 }
 # -------------------------------------------------------------------------------------------------- doc_todo_show1
