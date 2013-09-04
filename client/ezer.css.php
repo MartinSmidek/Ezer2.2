@@ -756,7 +756,8 @@ div.Help   	{ position: absolute; z-index:2; width:300px; height:150px; right:30
                   border: 3px solid silver; height: 17px; padding-top: 3px; }
 .Help textarea  { position:absolute; width:294px; height:120px; top:23px;
                   font-family:Arial,Helvetica,sans-serif; font-size:9pt }
-div.HelpList    { float:right; background-color:$b2_brow; padding:10px; }
+div.HelpList    { float:right; background-color:$b2_brow; padding:10px;
+                  max-width: 230px; word-wrap:break-word; }
 .HelpList ul    { margin:0; padding:0 10px; }
 
 __EOD;
