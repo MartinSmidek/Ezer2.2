@@ -1327,7 +1327,7 @@
       $key= implode('.',$akey);
       $tit= implode('|',$atit);
       $qh= "SELECT help,seen,name FROM _help WHERE topic='$key'";
-                                                        display("qh=$qh");
+//                                                         display("qh=$qh");
       $rh= @mysql_query($qh);
       if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
         $y->text= $h->help;
@@ -1362,9 +1362,9 @@
       $nh++;
     }
     $y->refs= $ul ? "<div class='HelpList'>viz též ...<ul>$ul</ul></div>" : '';
-                                                        $x->totrace= 'u';
-                                                        debug($x);
-                                                        display("$key =&gt; $qh =&gt; $nh");
+//                                                         $x->totrace= 'u';
+//                                                         debug($x);
+//                                                         display("$key =&gt; $qh =&gt; $nh");
     break;
   # -------------------------------------------------------------------------------------- help_save
   # zapíše text do tabulky _help

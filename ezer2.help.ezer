@@ -146,17 +146,19 @@ panel faq [,,770,] {type:'right', title:'Kontextový help', _sys:'faq'
     label head [0,0,*,31] { title:'' }
     label [230,41,0,] { title:'název:' }
     field name [267,37,119,] { data:_help.name }
-    label [403,41,31,] { title:'zkratka:' }
-    field topic [448,37,80,] { data:_help.topic }
-    label [542,41,27,] { title:'stav:' }
-    field seen [571,37,40,] { data:_help.seen }
+    label [395,41,31,] { title:'zkratka:' }
+    field topic [440,37,80,] { data:_help.topic,
+      help:"zřetězení atributů _sys pro kontext nebo 'ezer.cokoliv' pro obecný text" }
+    label [529,41,27,] { title:'stav:' }
+    field seen [558,37,40,] { data:_help.seen }
     // příkazy
-    button [647,36,,] { title:"Ulož"
-      proc onclick() {
-        the_formsave(form,s)
-      }
+    button [609,36,,] { title:"Nový"
+      proc onclick() { form.init(1) }
     }
-    button [693,36,,] { title:"Uprav text"
+    button [648,36,,] { title:"Ulož"
+      proc onclick() { the_formsave(form,s) }
+    }
+    button [686,36,,] { title:"Uprav text"
       proc onclick() {
         help_edit.h.txt.set(f_hlp.get);
         help_edit.modal(50,50);
@@ -166,7 +168,7 @@ panel faq [,,770,] {type:'right', title:'Kontextový help', _sys:'faq'
       }
     }
     // plocha pro zobrazení téma
-    label hlp [230,66,,] { title:'',
+    label hlp [230,66,,] { title:'', css:'ContextHelp'
       style:"width:auto;margin-right:20px;font-size:11px;color:0;background-color:#C9D5E5;padding:10px" }
     // procedury
     proc fill(h) {

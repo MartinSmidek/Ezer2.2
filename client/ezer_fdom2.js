@@ -3039,7 +3039,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
       relativeTo:document.id('work'), position:'upperLeft',
       content:StickyWin.ui('HELP: informace, otázky a odpovědi k této kartě','',{
         cornerHandle:true, width:_w+55,
-        cssClassName:'PanelPopup',closeButton:true
+        cssClassName:'PanelPopup ContextHelp',closeButton:true
     })};
     Ezer.obj.DOM.help.sticky= $(Ezer.obj.DOM.help.stickywin= new StickyWin(options));
     Ezer.obj.DOM.help.cap= Ezer.obj.DOM.help.sticky.getElement('.caption');
