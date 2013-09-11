@@ -7860,35 +7860,24 @@ Ezer.fce.touch= function (type,block,args) {
       var r= new Request({method:'post', url:Ezer.App.options.server_url, onComplete:null}).post(x);
       break;
     case 'block':
-      // nejprve najdeme první nadřazený blok s _sys
+      // pokud k bloku jdeme přes focus|click pak aktualizujeme block_sys
       var block_sys= null;
-      if ( block ) {
+      if ( block && (args=='focus' || args=='click') ) {
+        // nejprve najdeme první nadřazený blok s _sys
         for (var b= block; b.owner; b= b.owner) {
           if ( b.options && b.options._sys ) {
             block_sys= b;
-                                                Ezer.trace('*','touch block '+b.id);
+//                                                 Ezer.trace('*','touch block '+b.id+' '+(args||''));
             break;
           }
         }
-        if ( args ) {
-          // pokud je definována metoda, zapíšeme do trail
-          Ezer.fce.trail('add',block,args);
-        }
+        // a zapíšeme do trail
+        Ezer.fce.trail('add',block,args);
       }
-      else {
-//                                                 Ezer.trace('*','touch block null');
-      }
-      // vlastní zápis se provede při odchodu na jiný nadřazený blok
-      if ( Ezer.App.hits_block && Ezer.App.hits_block!=block_sys ) {
+      // vlastní zápis se provede při odchodu na jiný blok
+      if ( block_sys && Ezer.App.hits_block && Ezer.App.hits_block!=block_sys ) {
         // čitelná cesta ke kořenu zapamatovaného bloku
         var id= Ezer.App.hits_block.self_sys().sys;
-//         var id= '';                                                                              SMAZAT
-//         for (var o= Ezer.App.hits_block; o.owner; o= o.owner) {
-//           if ( o.options._sys ) {
-//             id= (o.options._sys=='*'?o.id:o.options._sys)+(id ? '.'+id : '');
-//           }
-//         }
-//         if ( !id ) id= '@';
         Ezer.App.hits_block= block_sys;
         Ezer.App.hits_block_id= id;
         to_send= true;
@@ -7897,7 +7886,8 @@ Ezer.fce.touch= function (type,block,args) {
       else if ( Ezer.App.hits > Ezer.sys.ezer.activity.touch_limit ) {
         to_send= true;
       }
-      if ( !Ezer.App.hits_block ) Ezer.App.hits_block= block_sys;
+      if ( !Ezer.App.hits_block )
+        Ezer.App.hits_block= block_sys;
       x.module= type;
       x.menu= Ezer.App.hits_block_id;
       break;

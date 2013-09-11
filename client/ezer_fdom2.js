@@ -3150,6 +3150,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
     if ( el.href && el.href.substr(0,7)=='help://' ) {
       el.addEvents({
         click: function(ev) {
+//                                                 Ezer.trace('*','trace/a/href='+el.href);
           Ezer.app.help_text({sys:ev.target.href.substr(7)});
           return false;
         }

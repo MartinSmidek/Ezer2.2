@@ -309,7 +309,8 @@ Ezer.Application= new Class({
   _help: function(on) {
     if ( on && Ezer.App.hits_block ) {
       var key= Ezer.App.hits_block.self_sys();
-      Ezer.trace('*',"FAQ "+key.sys+'  '+key.title);
+//                                                 Ezer.trace('*',"FAQ "+key.sys+'  '+key.title);
+//                                                 Ezer.debug(key,'trace/key');
       Ezer.App.help_text(key);
     }
     else if ( !on && Ezer.obj.DOM.help.sticky ) {

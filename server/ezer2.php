@@ -1305,11 +1305,11 @@
 //       if ( "{$x->app}/{$x->file}"==$path ) $y->text= $text;
     }
     break;
-  # ================================================================================================ help
+  # ================================================================================================ HELP
   # x->key->sys =   _help.topic, zřetězení atributů _sys - systémové jméno helpu
   # x->key->title = _help.name, zřetězení atributů title - uživatelské jméno helpu
   # x->text =       _help.help, text helpu v html
-  # ------------------------------------------------------------------------------------------------ help_text
+  # -------------------------------------------------------------------------------------- help_text
   # vrátí y->text z tabulky _help podle klíče a poznamená uživatele do seen
   # vrátí y->refs = html obsahující další odkazy
   case 'help_text':
@@ -1327,6 +1327,7 @@
       $key= implode('.',$akey);
       $tit= implode('|',$atit);
       $qh= "SELECT help,seen,name FROM _help WHERE topic='$key'";
+                                                        display("qh=$qh");
       $rh= @mysql_query($qh);
       if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
         $y->text= $h->help;
