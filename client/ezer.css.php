@@ -749,6 +749,10 @@ h4.CHeading, .STitle
 
 /*help*/
 
+div.Form>div.ContextHelp {
+                  background:url($path/clientcide/stickyWinHTML/body.png) scroll center bottom repeat-y;
+                  padding:10px 0 10px 10px; color:black; overflow:auto }
+.ContextHelp img{ padding:5px; overflow: auto; }
 .ContextHelp hr { clear:both; color:transparent }
 div.Help   	{ position: absolute; z-index:2; width:300px; height:150px; right:30px; top:15px;
                   background-color:silver; box-shadow:5px 5px 10px #567; }

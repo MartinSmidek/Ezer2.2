@@ -152,6 +152,7 @@ panel faq [,,770,] {type:'right', title:'Kontextový help', _sys:'faq'
     label [529,41,27,] { title:'stav:' }
     field seen [558,37,40,] { data:_help.seen }
     // příkazy
+    label  [605,31,149,30] { css:'ae_parm'}
     button [609,36,,] { title:"Nový"
       proc onclick() { form.init(1) }
     }
@@ -168,8 +169,8 @@ panel faq [,,770,] {type:'right', title:'Kontextový help', _sys:'faq'
       }
     }
     // plocha pro zobrazení téma
-    label hlp [230,66,,] { title:'', css:'ContextHelp'
-      style:"width:auto;margin-right:20px;font-size:11px;color:0;background-color:#C9D5E5;padding:10px" }
+    label [230,66,,] { title:"Poznámka: prvek &lt;hr> je vkládán jako průhledný s clear=both"  }
+    label hlp [230,86,500,290] { css:'PanelPopup ContextHelp' }
     // procedury
     proc fill(h) {
       [ h; head.set(conc("<div class='karta'>",h,"</div>")) ];
