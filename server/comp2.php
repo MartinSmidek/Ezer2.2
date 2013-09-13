@@ -1552,7 +1552,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
         $code_top= 0;
         $code[]= (object)array('o'=>'y','c'=>gen($pars,$vars,$c->par[$i],0,$struct1),
           'str_c'=>$c->par[$i],'str_s'=>$struct1);
-        $struct->arr[]= $struct1;
+//         $struct->arr[]= $struct1;     // revize 3175 - viz test.stx.ezer 130913
       }
       $code_top= $code_top0;
       $call= (object)array('o'=>'s','i'=>$c->op,'a'=>$npar);
