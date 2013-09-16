@@ -3911,6 +3911,8 @@ Ezer.Browse= new Class({
   Extends: Ezer.Block,
 //on: Browse.rows   - počet datových řádků načtených do paměti
 //-
+//os: Browse.format  - úprava zobrazení browse ('n': nezobrazovat)
+//-
 //on: Browse.qry_rows   - počet dotazových řádků
 //-
 //on: Browse.buf_rows   - počet řádků načítaných do bufferu (má-li být větší než rows)

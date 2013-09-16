@@ -2472,6 +2472,10 @@ Ezer.Browse.implement({
         this._css_def(clmn,this,'css_cell');
       }
     }
+    // pokud je format:'n' potlač zobrazení
+    if ( this._fc('n') ) {
+      this.DOM_Block.setStyles({display:'none'})
+    }
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_slider
   DOM_slider: function () {
