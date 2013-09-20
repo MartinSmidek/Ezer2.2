@@ -97,6 +97,7 @@ echo <<<__EOD
 .blue   { background-color:#abf !important; }
 .yellow { background-color:#ffa !important; }
 .yellow2{ background-color:#ff0 !important; }
+.orange { background-color:#fa0 !important; }
 .white  { background-color:#fff !important; }
 .grey   { background-color:#aaa !important; }
 

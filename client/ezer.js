@@ -3198,6 +3198,10 @@ Ezer.Field= new Class({
 //      vstupní část formuláře
 //t: Block,Elem,Field
 //s: Block
+//-
+//os: FieldDate.format - poloha dialogu data
+//  ; 'R' : 'right' zobrazit zarovnaný na pravou hranu
+//  ; 'U' : 'upper' zobrazit nad hodnotou
 Ezer.FieldDate= new Class({
   Extends: Ezer.Field,
   options: {}
