@@ -7439,7 +7439,7 @@ Ezer.fce.clipboard= function () {
 }
 // ================================================================================================= fce system
 // ------------------------------------------------------------------------------------ href
-//ff: fce.href (path,...)
+//ff: fce.href (path)
 //      přepne aplikaci podle path=m[.s[.l.g.i]][.p]  -- tabs, panel, menu.left, menu.group, menu.item
 //      poslední může být jméno procedury, následovat mohou parametry oddělené /
 //      další parametry mohou být dány jako druhý a další parametry href

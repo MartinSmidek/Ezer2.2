@@ -387,8 +387,10 @@ table.focus {
   font-size:12pt; margin:0; padding:0 }
 .Label a {
   color:$c_kuk /*!important;*/ }
-.Label a:hover {
+.Label a:hover, .href:hover {
   background-color:$b_kuk !important; }
+.href {
+  text-decoration:underline; color:$c_kuk; cursor:pointer; }
 
 div.LabelDrop {
   position:absolute; z-index:1; border:1px dashed #fff;
