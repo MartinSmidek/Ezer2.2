@@ -4447,7 +4447,7 @@ Ezer.Browse= new Class({
   },
   // x - {table:..,cond:...,order:...}
   // y - {values:[[id1:val1,...]...],rows:...}
-  // rec - záznam, který má být aktivní (default=1)
+  // rec = -1 pokud nemá být změněn form.key
   browse_load_: function(y,rec) {
 //                                                         Ezer.debug(y,'browse_load_');
     // načtení výsledku dotazu do buferu v Browse.buf
@@ -4461,15 +4461,19 @@ Ezer.Browse= new Class({
     this.b= this.blen>0 ? from : -1;
     if ( this.blen>0 ) {
       // naplň buf a keys daty
-      this.owner._key= null;                    // klíč prvního řádku
+      if ( rec!=-1 )                            // pokud není blokováno
+        this.owner._key= null;                  // nastav klíč prvního řádku
       for (var bi= 0; bi<this.blen; bi++) {     // bi ukazuje do buf a keys
         this.buf[bi]= {};
         for (var vi in y.values[bi+1]) {        // vi je identifikátor show
           // hodnota bude do buf transformována show._load
           this.buf[bi][vi]= this.part[vi]._load(y.values[bi+1][vi]);
-          if ( this.keys[bi]===undefined && this.part[vi].data && this.part[vi].data.id==y.key_id ) {
+          if ( this.keys[bi]===undefined
+            && this.part[vi].data && this.part[vi].data.id==y.key_id ) {
             // klíč je zapsán jen podle první položky, která jej má v data.id
-            this.owner._key= this.keys[bi]= this.buf[bi][vi];
+            this.keys[bi]= this.buf[bi][vi];
+            if ( rec!=-1 )                      // pokud není blokováno
+              this.owner._key= this.keys[bi];   // změň běžný klíč
           }
         }
       }
@@ -7457,9 +7461,9 @@ Ezer.fce.href= function (path) {
     if ( part && part._focus ) {
       part._focus();
       for (var i=1; i<xs.length; i++) {
-        if ( (part.options.include===undefined || part.options.include=='onload'
+        if ( /*(part.options.include===undefined || part.options.include=='onload'
            || part.options.include=='loaded')
-          && part.part && (part= part.part[xs[i]]) ) {
+          && */ part.part && (part= part.part[xs[i]]) ) {
           switch (part.type) {
           case 'panel':
           case 'panel.plain':

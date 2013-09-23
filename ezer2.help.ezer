@@ -1,7 +1,7 @@
 #pragma library
 proc the_formsave (f,b) {
   f.same
-| f.key; f.save; { b.browse_seek(conc(f.id_key,'=',f.key)); f.load | f.init }
+| f.key; f.save; { b.browse_seek; f.load | f.init }
 | f.insert; f.load;
   b.raise('onrowclick',b.browse_seek(conc(f.id_key,'=',f.key)))
 }
