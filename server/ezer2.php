@@ -1399,6 +1399,7 @@
   # --------------------------------------------------------------------------------------- help_ask
   # připíše text dotazu do tabulky _help a pošle mail
   case 'help_ask':
+    global $path_url;
     $help= "";
     $qh= "SELECT help FROM _help WHERE topic='{$x->key->sys}'";
     $rh= @mysql_query($qh);
@@ -1406,12 +1407,14 @@
       $help= "<hr>{$h->help}";
     }
     $abbr= $_SESSION[$ezer_root]['user_abbr'];
+    $href= "<a href=\"$path_url?menu={$x->key->sys}\">$abbr</a>";
     $text= mysql_real_escape_string("[$abbr ".date('j/n/Y H:i')."] {$x->text}");
+    $msg= "[$href ".date('j/n/Y H:i')."] {$x->text}";
     $qh= "REPLACE INTO _help (topic,name,help) VALUES ('{$x->key->sys}','{$x->key->title}','$text$help') ";
     $rh= mysql_qry($qh);
     $y->ok= $rh ? 1 : 0;
     $y->mail= '?';
-    $y->text= "$text$help";
+    $y->text= "<div title='{$y->ok}'>$text</div>$help";
     // pošli mail
     if ( $EZER->options->mail ) {
       $subject= "Ezer/$ezer_root HELP: {$x->key->title}";
@@ -1422,7 +1425,7 @@
         $from= $USER->options->email;
         $fromname= "{$USER->forename} {$USER->surname}";
       }
-      $sent= send_mail($subject,$text,$from,$to,$fromname);
+      $sent= send_mail($subject,$msg,$from,$to,$fromname);
       $y->mail= $sent ? 'ok' : 'fail';
     }
     break;
