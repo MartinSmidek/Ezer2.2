@@ -4019,6 +4019,7 @@ Ezer.Browse= new Class({
 //   set_page   - zruší výběr a nastaví jako vybrané ty viditelné
 //   add_page   - přidá k výběru ty viditelné
 //   refresh    - obnoví zobrazení výběru
+//   toggle     - změní stav aktivního řádku, pokud je param=1 nebude vyvoláno onrowclick
 //   use        - operace browse_load, browse_seek budou vracet jen vybrané řádky
 //   ignore     - operace browse_load, browse_seek se budou chovat jakoby nic
 //   set        - nastaví klíče podle daného seznamu (string s klíči oddělenými čárkou)
@@ -4042,7 +4043,7 @@ Ezer.Browse= new Class({
       else
         this.keys_sel.push(key);
       this._css_row(this.tact);
-      this.DOM_hi_row(this.t+this.tact-1);
+      this.DOM_hi_row(this.t+this.tact-1,param||0);
       break;
     case 'set': // nastaví klíče podle daného seznamu (string s klíči oddělenými čárkou)
       if ( param )

@@ -1208,6 +1208,14 @@ Ezer.Elem.implement({
         }
         else  {
           this.fire('onchange',[]);
+          if ( !this._fc('t') ) {
+            if ( this.original.value==this.DOM_Input.value ) {
+              this.DOM_Input.removeClass('changed');
+            }
+            else {
+              this.DOM_Input.addClass('changed');
+            }
+          }
         }
       }.bind(this)
     });

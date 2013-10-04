@@ -353,8 +353,6 @@ div.PanelPopup div.dragHandle {
 
 .disabled {
   color:#ccc !important; }
-.changed:focus {
-  outline:#f88 dotted 2px !important; }
 .changed {
   outline:#f88 solid 2px !important; }
 .changed_ok {
@@ -374,8 +372,9 @@ div.PanelPopup div.dragHandle {
 .Chat .focus {
   outline-color:#f88 !important;; }
 table.focus {
-  outline:#ff0 dotted 2px !important;
-}
+  outline:#ff0 dotted 2px !important; }
+input.changed:focus {
+  outline:#f88 dotted 2px !important; }
 
 /* form, elem */
 
