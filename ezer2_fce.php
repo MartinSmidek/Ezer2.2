@@ -1,6 +1,6 @@
 <?php # (c) 2007-2009 Martin Smidek <martin@smidek.eu>
 /** ================================================================================================ SVN */
-# --------------------------------------------------------------------------------------- sys_svn_cmd
+# -------------------------------------------------------------------------------------- sys_svn_cmd
 # provedení SVN příkazu na serveru, par.cmd je nepovinná relativní složka, par.cmd příkaz
 function sys_svn_cmd($par) {
   global $ezer_path_root;
@@ -32,14 +32,14 @@ function sys_svn_cmd($par) {
   return $html;
 }
 /** ================================================================================================ POŽADAVKY */
-# -------------------------------------------------------------------------------------------------- abbr2user
+# ---------------------------------------------------------------------------------------- abbr2user
 # zjištění uživatele podle jeho zkratky
 function abbr2user($abbr) {
   $id= select("id_user","_user","abbr='$abbr'",'ezer_system');
   return $id ? $id : 0;
 }
 /** ================================================================================================ NASTAVENÍ */
-# -------------------------------------------------------------------------------------------------- sys_user_record
+# ---------------------------------------------------------------------------------- sys_user_record
 # přehled osobních údajů
 function sys_user_record($id_user=0) {  trace();
   global $json, $ezer_root, $ezer_system;
@@ -80,7 +80,7 @@ function sys_user_record($id_user=0) {  trace();
   $html.= "</table>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- sys_user_get
+# ------------------------------------------------------------------------------------- sys_user_get
 # čtení osobních údajů
 # $typ='fld' -- _user.fld
 # $typ='opt' -- _user.options.fld
@@ -108,7 +108,7 @@ function sys_user_get ($id_user,$typ,$fld) {  trace();
   }
   return $val;
 }
-# -------------------------------------------------------------------------------------------------- sys_user_change_me
+# ------------------------------------------------------------------------------- sys_user_change_me
 # změna osobních údajů pro přihlášeného uživatele
 # $typ='fld' -- _user->$fld=$val
 # $typ='pas' -- _user->password=$val pokud stávající _user->password==$p1 a $val==$p2
@@ -117,7 +117,7 @@ function sys_user_change_me($typ,$fld,$val,$p1='',$p2='') {  trace();
   $id_user= $_SESSION[$ezer_root]['user_id'];
   sys_user_change($id_user,$typ,$fld,$val,$p1,$p2);
 }
-# -------------------------------------------------------------------------------------------------- sys_user_change
+# ---------------------------------------------------------------------------------- sys_user_change
 # změna osobních údajů pro libovolného uživatele
 # $typ='fld' -- _user->$fld=$val
 # $typ='pas' -- _user->password=$val pokud stávající _user->password==$p1 a $val==$p2
@@ -175,7 +175,7 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
     $err.= "Během práce došlo zřejmě k automatickému odhlášení, přihlašte se prosím znovu a opravu opakujte.";
   return "$html<br><br>$err";
 }
-# -------------------------------------------------------------------------------------------------- sys_user_skilled
+# --------------------------------------------------------------------------------- sys_user_skilled
 # vrátí seznam id_user nositelů daného skill
 function sys_user_skilled($skill) {
   global $ezer_system;
@@ -188,7 +188,7 @@ function sys_user_skilled($skill) {
   }
   return $ids;
 }
-# -------------------------------------------------------------------------------------------------- sys_user_skills
+# ---------------------------------------------------------------------------------- sys_user_skills
 # proveden kontrolu konzistence oprávnění, pokud je zadáno jméno souboru
 # vygeneruje přehlednou tabulku oprávnění pro Excel
 function sys_user_skills($file='') {
@@ -285,7 +285,7 @@ function sys_user_skills($file='') {
 # v globálním nastavení musí být definováno
 #   $path_backup     -- složka záloh databází
 #   $ezer_mysql_path -- cesta k utilitě mysql
-# -------------------------------------------------------------------------------------------------- sys_backup_make
+# ---------------------------------------------------------------------------------- sys_backup_make
 # BACKUP: uloží obrazy databází do příslušných složek, pro lokální systém připojí postfix -local
 # parametry
 #   listing  - přehled existujících záloh
@@ -511,27 +511,27 @@ function sys_backup_delete($dir) { trace();
   if ( !$ok ) fce_warning("sys_backup_delete: nelze smazat starou zálohu v $dir");
 }
 /** ================================================================================================ UŽIVATELÉ */
-# -------------------------------------------------------------------------------------------------- sys_session
+# -------------------------------------------------------------------------------------- sys_session
 # vygeneruje tabulku běžného $_SESSION
 function sys_session() {
   $html= "<div class='dbg'>".debugx($_SESSION,'$_SESSION')."</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- sys_user
+# ------------------------------------------------------------------------------------------ sys_user
 # vygeneruje tabulku běžného $USER
 function sys_user() {
   global $USER;
   $html= "<div class='dbg'>".debugx($USER,'$USER')."</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- sys_ezer
+# ------------------------------------------------------------------------------------------ sys_ezer
 # vygeneruje tabulku běžného $EZER
 function sys_ezer() {
   global $EZER;
   $html= "<div class='dbg'>".debugx($EZER,'$EZER')."</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- sys_skills_test
+# ---------------------------------------------------------------------------------- sys_skills_test
 # vrátí seznam zkratek oprávnění, které nejsou popsány v tabulce _skill
 function sys_skills_test($skills) {
   global $ezer_system;
@@ -544,7 +544,7 @@ function sys_skills_test($skills) {
   $missed= implode(' ',array_diff(explode(' ',$skills),$dskills));
   return $missed ? "<span class='selected'>$missed</span> není definováno" : '';
 }
-# -------------------------------------------------------------------------------------------------- sys_skills2ids
+# ----------------------------------------------------------------------------------- sys_skills2ids
 # vrátí seznam klíčů tabulky _skill odpovídajících seznamu v parametru
 function sys_skills2ids($skills) {
   global $ezer_system;
@@ -560,7 +560,7 @@ function sys_skills2ids($skills) {
   }
   return $ids;
 }
-# -------------------------------------------------------------------------------------------------- sys_ids2skills
+# ----------------------------------------------------------------------------------- sys_ids2skills
 # vrátí uspořádaný seznam zkratek tabulky _skill odpovídajících seznamu v parametru
 function sys_ids2skills($ids) {
   global $ezer_system;
@@ -577,7 +577,7 @@ function sys_ids2skills($ids) {
   sort($askills);
   return implode(' ',$askills);
 }
-# -------------------------------------------------------------------------------------------------- sys_watch_key
+# ------------------------------------------------------------------------------------ sys_watch_key
 # vygeneruje přístupový klíč k aplikaci a vrátí odkaz na download
 function sys_watch_key() {
   global $ezer_root;
@@ -592,7 +592,7 @@ function sys_watch_key() {
   return $html;
 }
 /** ================================================================================================ AKTIVITY */
-# -------------------------------------------------------------------------------------------------- sys_activity
+# ------------------------------------------------------------------------------------- sys_activity
 # vygeneruje přehled aktivit podle menu
 # pokud ... tak vynechá uživatele, jejichž zkratky jsou v seznamu $EZER->activity->skip
 function sys_activity($k,$to_skip=0,$den=0) {
@@ -744,7 +744,7 @@ function sys_activity($k,$to_skip=0,$den=0) {
   $html.= "</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- sys_day_modules
+# ---------------------------------------------------------------------------------- sys_day_modules
 # vygeneruje podrobný přehled aktivity modulů pro daný den
 function sys_day_modules($skip,$day,$short=false) {
   global $user_options, $USER;
@@ -774,7 +774,7 @@ function sys_day_modules($skip,$day,$short=false) {
   $html= sys_table($touch,$hours,'module','#dce7f4');
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- sys_days_modules
+# --------------------------------------------------------------------------------- sys_days_modules
 # vygeneruje podrobný přehled aktivity modulů pro dané období (počátek a délka)
 function sys_days_modules($skip,$day,$ndays,$short=false) {
   global $user_options, $USER;
@@ -806,7 +806,7 @@ function sys_days_modules($skip,$day,$ndays,$short=false) {
   $html= sys_days_table($touch,$days,'module','#dce7f4');
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- sys_day_users
+# ------------------------------------------------------------------------------------ sys_day_users
 # vygeneruje přehled aktivit uživatelů pro daný den
 function sys_day_users($skip,$day,$short=false) {  trace();
   global $user_options, $USER;
@@ -844,7 +844,7 @@ function sys_day_users($skip,$day,$short=false) {  trace();
   $html= sys_table($touch,$hours,$short==2?'speed':'user','#e7e7e7',true);
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- sys_days_users
+# ----------------------------------------------------------------------------------- sys_days_users
 # vygeneruje přehled aktivit uživatelů pro dané období (počátek a délka)
 function sys_days_users($skip,$day,$ndays,$short=false) {
   global $user_options, $USER;
@@ -900,7 +900,7 @@ function sys_days_users($skip,$day,$ndays,$short=false) {
   $html= sys_days_table($touch,$days,$short==2?'speed':'user','#e7e7e7',true);
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- sys_bugs
+# ----------------------------------------------------------------------------------------- sys_bugs
 # vygeneruje přehled BUGs
 #   _touch.level == 1 BUG čekající na vyřešení
 #   _touch.level == 2 BUG opravená
@@ -942,7 +942,7 @@ __JS
   $result= $n ? "celkem $n" : "nic";
   return $result.$html;
 }
-# -------------------------------------------------------------------------------------------------- sys_day_logins
+# ----------------------------------------------------------------------------------- sys_day_logins
 # vygeneruje přehled přihlášení pro daný den
 #   $sign= 'all' => všechno
 function sys_day_logins($skip,$day,$sign='=') {
@@ -970,7 +970,7 @@ function sys_day_logins($skip,$day,$sign='=') {
   $result= $n ? "$n přihlášení" : "bez přihlášení";
   return $result.$html;
 }
-# -------------------------------------------------------------------------------------------------- sys_day_errors
+# ----------------------------------------------------------------------------------- sys_day_errors
 # vygeneruje přehled chyb pro dané období
 #   $sign= 'all' => všechno
 function sys_day_errors($skip,$day,$sign='=') {
@@ -1022,7 +1022,7 @@ __JS
   $result= $n ? "hlášení $n chyb" : "bez hlášení chyby";
   return $result.$html;
 }
-# -------------------------------------------------------------------------------------------------- sys_day_error
+# ------------------------------------------------------------------------------------ sys_day_error
 # callback funkce ze sys_day_errors
 function sys_day_error($id,$akce) {
 //                                                 display("sys_day_error($id,$akce)");
@@ -1056,7 +1056,7 @@ function sys_day_error($id,$akce) {
   }
   return '';
 }
-# -------------------------------------------------------------------------------------------------- sys_table
+# ---------------------------------------------------------------------------------------- sys_table
 # zobrazí přehled aktivit pro daný den, pokud není uvedeno $color, použije se definice barev
 # z $ezer_root.php $EZER->activity->colors= "80:#f0d7e4,40:#e0d7e4,20:#dce7f4,0:#e7e7e7"; (sestupně)
 # (pokud je h>hi použije se jako podklad colori)
@@ -1130,7 +1130,7 @@ function sys_table($touch,$hours,$type,$color,$config_colors=false) { #trace();
   $tab= "<div class='systable'>$tab</div>";
   return $tab;
 }
-# -------------------------------------------------------------------------------------------------- sys_days_table
+# ----------------------------------------------------------------------------------- sys_days_table
 # zobrazí přehled aktivit pro období, pokud není uvedeno $color, použije se definice barev
 # z $ezer_root.php $EZER->activity->colors= "80:#f0d7e4,40:#e0d7e4,20:#dce7f4,0:#e7e7e7"; (sestupně)
 # (pokud je h>hi použije se jako podklad colori)
@@ -1211,7 +1211,7 @@ function sys_days_table($touch,$days,$type,$color,$config_colors=false) { #trace
   return $tab;
 }
 /** ================================================================================================ POŽADAVKY */
-# -------------------------------------------------------------------------------------------------- sys_todo_notify
+# ---------------------------------------------------------------------------------- sys_todo_notify
 # pošle mail na adresu
 #  $type= new|upd|att
 # změna stavu = změna pole stav nebo změna některého z polí kdy_...
@@ -1243,7 +1243,7 @@ function sys_todo_notify($type,$id_todo,$chng) { trace();
   }
   return 1;
 }
-# -------------------------------------------------------------------------------------------------- sys_todo_attach
+# ---------------------------------------------------------------------------------- sys_todo_attach
 # přidá přílohu k požadavku jako odkaz, soubor bude v docs/todo
 function sys_todo_attach($id_todo,$fileinfo) {
   global $ezer_path_root;
@@ -1262,7 +1262,7 @@ function sys_todo_attach($id_todo,$fileinfo) {
   $refs= sys_todo_refs($names);
   return $refs;
 }
-# -------------------------------------------------------------------------------------------------- sys_todo_refs
+# ------------------------------------------------------------------------------------ sys_todo_refs
 # převede seznam jmen na odkazy
 function sys_todo_refs($names) {
   $refs= array();
@@ -1276,7 +1276,7 @@ function sys_todo_refs($names) {
   }
   return implode('<br>',$refs);
 }
-# -------------------------------------------------------------------------------------------------- sys_todo_conds
+# ----------------------------------------------------------------------------------- sys_todo_conds
 # vrátí první podmínky vyhovující skill uživatele z polí $EZER->todo->select,$EZER->todo->browse
 # pro zobrazení požadavků ve tvaru {cond_select:cond,cond_browse:cond}
 function sys_todo_conds() {
@@ -1292,7 +1292,7 @@ function sys_todo_conds() {
       }
     }
   }
-                                                        debug($obj,"sys_todo_conds");
+//                                                         debug($obj,"sys_todo_conds");
   return $obj;
 }
 ?>
