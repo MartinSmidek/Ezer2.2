@@ -374,7 +374,7 @@ div.PanelPopup div.dragHandle {
 table.focus {
   outline:#ff0 dotted 2px !important; }
 input.changed:focus {
-  outline:#f88 dotted 2px !important; }
+  outline:#ff3333 dotted 2px !important; }
 
 /* form, elem */
 
