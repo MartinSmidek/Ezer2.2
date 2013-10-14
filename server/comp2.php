@@ -1739,7 +1739,7 @@ function get_if_block ($root,&$block,&$id) {
       if ( in_array('coor+',$specs[$key]) && get_if_coorp($block) )  ;
       if ( in_array('const',$specs[$key]) && get_def($id,$value) ) {
         $block->options->value= $value;
-        $ok= get_if_delimiter(';');
+        $ok= get_if_delimiter(';') || get_if_delimiter(',');
         // další konstanty
         while ( $ok ) {
           get_id($cid);
@@ -1919,7 +1919,7 @@ function get_if_args (&$args) {
 }
 # -------------------------------------------------------------------------------------------------- const
 # (a) const :: 'const' id '=' value         -- začátek
-# (b) const :: ';' id '=' value             -- pokračování
+# (b) const :: (';'|',') id '=' value       -- pokračování
 function get_def ($id,&$value) {
   global $tree, $const_list;
   $value= null; $type= 'global';
@@ -1931,7 +1931,7 @@ function get_def ($id,&$value) {
   if ( !isset($const_list[$id]) )
     $const_list[$id]= array('value'=>$value,'type'=>$type);
   else
-    comp_error("SYNTAX: konstanta $id má duplicitní definici ($id=$value)");
+    comp_error("SYNTAX: konstanta $id má duplicitní definici ($id={$const_list[$id]['value']})");
   $tree.= ' k';
   return true;
 }
@@ -2176,6 +2176,7 @@ function get_id_or_key (&$id) {
 # vrací 1.písmeno typu
 function get_value (&$val,&$type) {
   global $head, $lex, $typ, $tree, $const_list;
+  $ok= false;
   $val= $lex[$head];
   if ( $typ[$head]=='del' && $val=='-' ) {
     $head++;

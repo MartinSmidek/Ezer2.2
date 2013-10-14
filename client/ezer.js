@@ -75,19 +75,32 @@ Ezer.Block= new Class({
 // test integrity bloku po jeho dokončení
   _check: function () {
   },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _const
+// zjistí hodnotu konstanty
+  _const: function (id) {
+    // zkusíme najít konstantu v nadblocích
+    var val= 0;
+    for (var o= this; o.owner; o= o.owner) {
+      if ( o.part && o.part[id] && o.part[id].type=='const' ) {
+        val= o.part[id].value;
+        break;
+      }
+    }
+    return val;
+  },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _coord
 // přepočítá symbolicky zadané souřadnice bloku na čísla
   _coord: function () {
     var b, s;
     for (var x in {_l:0,_t:1,_w:2,_h:3}) {
       if ( typeof(this.options[x])=='object' ) {
-//                                                 Ezer.debug(this.options[x],x);
+                                                Ezer.debug(this.options[x],x);
         this[x]= 0;
         for (var i in this.options[x]) {
           switch (s= this.options[x][i][0]) {
           case 'k':
             var id= this.options[x][i][2];              // jméno konstanty
-            this[x]= Ezer.const_value(id,this.options[x][i][1]);
+            this[x]= this._const(id);
             break;
           case 'n':
             this[x]+= this.options[x][i][1];
@@ -3978,7 +3991,7 @@ Ezer.Browse= new Class({
       // rows je zadáno konstantou
       var m= [], x= Ezer.code_name(this.options.rows,m,this.owner);
       if ( x && x[0] && x[0].type=='const' ) {
-        this.options.rows= Ezer.const_value(m[m.length-1],x[0].options.value);
+        this.options.rows= this._const(m[m.length-1]);
       }
       else Ezer.error("ERROR RUN pro atribut rows nelze určit konstantu "+this.options.rows);
     }
