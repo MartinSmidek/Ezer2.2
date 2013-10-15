@@ -1948,12 +1948,12 @@ function get_numvalue (&$val,&$id) {
   }
   else if ( $typ[$head]=='id' ) {     // jméno konstanty
     $id= $val;
-    if ( !isset($const_list[$id]) )
-      comp_error("SYNTAX: sčítanec musí být jménem dříve definované konstanty");
+    // if ( !isset($const_list[$id]) )
+    //   comp_error("SYNTAX: sčítanec musí být jménem dříve definované konstanty");
     $ok= true;
     $head++;
     $val= $const_list[$id]['value'];
-    if ( $const_list[$id]['type']!='n' ) comp_error("SYNTAX: po + byla očekávána numerická konstanta");
+    // if ( $const_list[$id]['type']!='n' ) comp_error("SYNTAX: po + byla očekávána numerická konstanta");
   }
   if ( !$ok ) comp_error("SYNTAX: bylo očekávána číslo nebo konstanta místo {$typ[$head]} $val");
   return true;
@@ -1962,7 +1962,7 @@ function get_numvalue (&$val,&$id) {
 # (a) const :: 'const' id '=' cvalue            -- začátek
 # (b) const :: (';'|',') id '=' cvalue          -- pokračování
 #     cvalue :: const | nvalue
-#     nvalue :: number | nid | nvalue [ '+' nvalue ] -- kde nid je numerická konstanta
+#     nvalue :: number | nid | nvalue [ '+' nvalue ] -- kde nid je konstanta kontrolovaná v runtime
 function get_def ($id,&$value,&$is_expr) {
   global $tree, $const_list;
   $value= null; $type= 'global';
@@ -1983,7 +1983,7 @@ function get_def ($id,&$value,&$is_expr) {
   $ok= get_if_delimiter('+');
   if ( $ok ) {
     $is_expr= true;
-    if ( $type!='n' ) comp_error("SYNTAX: konstantní výraz smí být jen číselný");
+    //if ( $type!='n' ) comp_error("SYNTAX: konstantní výraz smí být jen číselný"); -- zrušeno
     $value= array($id1 ? array('k',$value,$id1) : array('n',$value));
     while ( $ok ) {
       // další sčítanec

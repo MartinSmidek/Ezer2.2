@@ -79,13 +79,15 @@ Ezer.Block= new Class({
 // zjistí hodnotu konstanty
   _const: function (id) {
     // zkusíme najít konstantu v nadblocích
-    var val= 0;
+    var val= undefined;
     for (var o= this; o.owner; o= o.owner) {
       if ( o.part && o.part[id] && o.part[id].type=='const' ) {
         val= o.part[id].value;
         break;
       }
     }
+    if ( val==undefined )
+      Ezer.error("konstanta '"+id+"' nebyla nalezena",'S',this);
     return val;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _coord
