@@ -1969,7 +1969,7 @@ function get_def ($id,&$value,&$is_expr) {
   $id1= null;
   $ok= get_if_delimiter('=');
   if ( $ok ) {
-    $ok= get_if_id_not_keyword(&$id1);
+    $ok= get_if_id_not_keyword($id1);
     if ( $ok ) {
       $value= $const_list[$id1]['value'];
       $type= $const_list[$id1]['type'];
@@ -1987,7 +1987,7 @@ function get_def ($id,&$value,&$is_expr) {
     $value= array($id1 ? array('k',$value,$id1) : array('n',$value));
     while ( $ok ) {
       // další sčítanec
-      get_numvalue (&$value2,&$id2);
+      get_numvalue ($value2,$id2);
       if ( $id2 ) {
         $value[]= array('k',$value2,$id2);
       }
