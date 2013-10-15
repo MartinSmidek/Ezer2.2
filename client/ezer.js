@@ -1940,7 +1940,24 @@ Ezer.Const= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  initialize
   initialize: function(owner,desc,DOM,id,skill) {
     this.parent(owner,desc,DOM,id,skill);
-    this.value= Ezer.const_value(id,this.options.value);
+    if ( this.options.expr ) {
+      // výpočet konstanty dané výrazem
+      this.value= 0;
+      for (var i in this.options.expr) {
+        var x= this.options.expr[i];
+        switch (x[0]) {
+        case 'k':                               // jméno konstanty
+          this.value+= this._const(x[2]);
+          break;
+        case 'n':                               // číselný literál
+          this.value+= x[1];
+          break;
+        }
+      }
+    }
+    else {
+      this.value= Ezer.const_value(id,this.options.value);
+    }
   },
 // ------------------------------------------------------------------------------------ get
 //fm: Const.get ()

@@ -1737,16 +1737,23 @@ function get_if_block ($root,&$block,&$id) {
       if ( in_array('arg'  ,$specs[$key]) && get_if_args($args)  ) $block->arg= $args;
       if ( in_array('coord',$specs[$key]) && get_if_coord($block) )  ;
       if ( in_array('coor+',$specs[$key]) && get_if_coorp($block) )  ;
-      if ( in_array('const',$specs[$key]) && get_def($id,$value) ) {
-        $block->options->value= $value;
-        $ok= get_if_delimiter(';') || get_if_delimiter(',');
+      if ( in_array('const',$specs[$key]) && get_def($id,$value,$is_expr) ) {
+        if ( $is_expr )
+          $block->options->expr= $value;
+        else
+          $block->options->value= $value;
+        $root->part->$id= $block;
+        $ok= get_if_delimiter(';');
         // další konstanty
         while ( $ok ) {
           get_id($cid);
-          get_def($cid,$value);
+          get_def($cid,$value,$is_expr);
           $cblock= new stdClass;
           $cblock->type= 'const';
-          $cblock->options->value= $value;
+          if ( $is_expr )
+            $cblock->options->expr= $value;
+          else
+            $cblock->options->value= $value;
           $cblock->_lc= $last_lc;
           $cblock->id= $id;
           $root->part->$cid= $cblock;
@@ -1917,19 +1924,85 @@ function get_if_args (&$args) {
   }
   return $ok;
 }
+# ----------------------------------------------------------------------------------------- numvalue
+# numvalue :: [-]num | constant_name   --> $value
+# vrací 1.písmeno typu
+function get_numvalue (&$val,&$id) {
+  global $head, $lex, $typ, $tree, $const_list;
+  $ok= false;
+  $val= $lex[$head];
+  if ( $typ[$head]=='del' && $val=='-' ) {
+    $head++;
+    $val.= $lex[$head];
+    $ok= $typ[$head]=='num';
+  }
+  else {
+    $ok= $typ[$head]=='num';
+  }
+  if ( $ok ) {
+    if ( $typ[$head]!='num' ) comp_error("SYNTAX: po + byla očekávána numerická hodnota");
+    $id= null;
+    $type= 'n';
+    $val= 0+$val;
+    $head++; $tree.= " v";
+  }
+  else if ( $typ[$head]=='id' ) {     // jméno konstanty
+    $id= $val;
+    if ( !isset($const_list[$id]) )
+      comp_error("SYNTAX: sčítanec musí být jménem dříve definované konstanty");
+    $ok= true;
+    $head++;
+    $val= $const_list[$id]['value'];
+    if ( $const_list[$id]['type']!='n' ) comp_error("SYNTAX: po + byla očekávána numerická konstanta");
+  }
+  if ( !$ok ) comp_error("SYNTAX: bylo očekávána číslo nebo konstanta místo {$typ[$head]} $val");
+  return true;
+}
 # -------------------------------------------------------------------------------------------------- const
-# (a) const :: 'const' id '=' value         -- začátek
-# (b) const :: (';'|',') id '=' value       -- pokračování
-function get_def ($id,&$value) {
+# (a) const :: 'const' id '=' cvalue            -- začátek
+# (b) const :: (';'|',') id '=' cvalue          -- pokračování
+#     cvalue :: const | nvalue
+#     nvalue :: number | nid | nvalue [ '+' nvalue ] -- kde nid je numerická konstanta
+function get_def ($id,&$value,&$is_expr) {
   global $tree, $const_list;
   $value= null; $type= 'global';
+  $id1= null;
   $ok= get_if_delimiter('=');
   if ( $ok ) {
-    get_value($value,$type);
+    $ok= get_if_id_not_keyword(&$id1);
+    if ( $ok ) {
+      $value= $const_list[$id1]['value'];
+      $type= $const_list[$id1]['type'];
+    }
+    else {
+      get_value($value,$type);
+      $ok= true;
+    }
+  }
+  // případné rozšíření?
+  $ok= get_if_delimiter('+');
+  if ( $ok ) {
+    $is_expr= true;
+    if ( $type!='n' ) comp_error("SYNTAX: konstantní výraz smí být jen číselný");
+    $value= array($id1 ? array('k',$value,$id1) : array('n',$value));
+    while ( $ok ) {
+      // další sčítanec
+      get_numvalue (&$value2,&$id2);
+      if ( $id2 ) {
+        $value[]= array('k',$value2,$id2);
+      }
+      else {
+        $value[]= array('n',$value2);
+      }
+      $const_list[$id]= array('expr'=>$value,'type'=>$type);
+      $ok= get_if_delimiter('+');
+    }
   }
   // přidání do seznamu konstant
-  if ( !isset($const_list[$id]) )
+  elseif ( !isset($const_list[$id]) ) {
     $const_list[$id]= array('value'=>$value,'type'=>$type);
+    $is_expr= false;
+  }
   else
     comp_error("SYNTAX: konstanta $id má duplicitní definici ($id={$const_list[$id]['value']})");
   $tree.= ' k';
@@ -2559,13 +2632,13 @@ function get_source($start,$stop) {
 }
 # ================================================================================================== ERROR
 # -------------------------------------------------------------------------------------------------- comp_error
-function comp_error ($msg,$situace=1) {
+function comp_error ($msg,$offset=0) {
   global $lex, $pos, $head, $errors, $err, $error_code_context, $error_code_lc, $ezer,
     $ezer_name, $ezer_app;
   $errors++;
   // zobraz řádek $line s okolím
   $in_code= preg_match("/CODE/",$msg);
-  list($line,$clmn)= explode(',',$in_code ? $error_code_lc : $pos[$head]);
+  list($line,$clmn)= explode(',',$in_code ? $error_code_lc : $pos[$head]+$offset);
   $msg2= "<b>".($in_code ? "SYNTAX " : '')."$msg</b> in $ezer_name;$line,$clmn<br>";
   $msg2.= source_line($ezer_name,$ezer_app,$line,$clmn);
   $err.= $msg2;
