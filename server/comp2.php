@@ -1742,6 +1742,7 @@ function get_if_block ($root,&$block,&$id) {
           $block->options->expr= $value;
         else
           $block->options->value= $value;
+        if ( !isset($root->part) ) $root->part= (object)array();
         $root->part->$id= $block;
         $ok= get_if_delimiter(';');
         // další konstanty
@@ -1750,6 +1751,7 @@ function get_if_block ($root,&$block,&$id) {
           get_def($cid,$value,$is_expr);
           $cblock= new stdClass;
           $cblock->type= 'const';
+          if ( !isset($cblock->options) ) $cblock->options= (object)array();
           if ( $is_expr )
             $cblock->options->expr= $value;
           else
