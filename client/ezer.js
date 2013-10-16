@@ -96,7 +96,7 @@ Ezer.Block= new Class({
     var b, s, xi, id;
     for (var x in {_l:0,_t:1,_w:2,_h:3}) {
       if ( typeof(this.options[x])=='object' ) {
-                                                Ezer.debug(this.options[x],x);
+//                                                 Ezer.debug(this.options[x],x);
         this[x]= 0;
         for (var i in this.options[x]) {
           xi= this.options[x][i];
