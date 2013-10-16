@@ -470,7 +470,7 @@ function link_code(&$c,$name,$isroot,$block) { #trace("{$c->type}");
       if ( $table && $table->type=='table' ) {
         $c->_init= $fullname;
       }
-      else comp_error("CODE: '{$c->_init}' není jménem {$c->_of}",0);
+      else comp_error("CODE: '{$c->_init}' není jménem {$c->_of} (1)",0);
     }
   }
   else if ( $c->type=='var' && $c->_of=='form' && $c->_init) {
@@ -481,7 +481,7 @@ function link_code(&$c,$name,$isroot,$block) { #trace("{$c->type}");
       $c->_init= $fullname;
     }
     else {
-      comp_error("CODE: '{$c->_init}' není jménem {$c->_of}",0);
+      comp_error("CODE: '{$c->_init}' není jménem {$c->_of} (2)",0);
     }
   }
   else if ( $c->type=='var' && $c->_of=='area' && $c->_init) {
@@ -490,7 +490,7 @@ function link_code(&$c,$name,$isroot,$block) { #trace("{$c->type}");
       $c->_init= $fullname;
     }
     else {
-      comp_error("CODE: '{$c->_init}' není jménem {$c->_of}",0);
+      comp_error("CODE: '{$c->_init}' není jménem {$c->_of}  (3)",0);
     }
   }
   else if ( $c->type=='proc' ) {
@@ -506,7 +506,7 @@ function link_code(&$c,$name,$isroot,$block) { #trace("{$c->type}");
     $c->_init= $fullname;
     if ( !$table ) {
       $error_code_lc= $c->_lc;
-      comp_error("CODE: '{$c->_init}' není jménem {$c->_of}",0);
+      comp_error("CODE: '{$c->_init}' není jménem {$c->_of}  (4)",0);
     }
     unset($c->table);
   }
