@@ -101,11 +101,11 @@ Ezer.Block= new Class({
         for (var i in this.options[x]) {
           xi= this.options[x][i];
           switch (s= xi[0]) {
-          case 'k':                               // jméno konstanty [k,value,id,-]
+          case 'k':                               // jméno konstanty [k,value,id[,-]]
             this[x]+= (xi[3] && xi[3]=='-') ? -this._const(xi[2]) : this._const(xi[2]);
             break;
-          case 'n':                               // číselný literál [n,value,-]
-            this[x]+= (xi[2] && xi[2]=='-') ? -xi[1] : xi[1];
+          case 'n':                               // číselný literál [n,value]
+            this[x]+= xi[1];
             break;
           case 'l': case 't': case 'w': case 'h':
             Ezer.assert(b= this.owner.part[xi[1]],'chybný odkaz '+s,this);

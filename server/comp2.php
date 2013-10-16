@@ -1987,8 +1987,9 @@ function get_def ($id,&$value,&$is_expr) {
     while ( $op ) {
       // další sčítanec
       get_numvalue ($value2,$id2);
-      $expr= $id2 ? array('k',$value2,$id2) : array('n',$value2);
-      if ( $op=='-' ) $expr[]= '-';
+      $expr= $id2
+        ? ($op==='-' ? array('k',$value2,$id2,'-') : array('k',$value2,$id2))
+        : ($op==='-' ? array('n',-$value2) : array('n',$value2));
       $value[]= $expr;
       $const_list[$id]= array('expr'=>$value,'type'=>$type);
       $op= get_if_delimiter('+') ? '+' : (get_if_delimiter('-') ? '-' : false);
@@ -2030,9 +2031,11 @@ function get_if_coorp ($block) {
 }
 function get_cexpr (&$cexpr,$rel1,$rel2='',$rel3='') {
   $cexpr= array();
+  $op= true;
   $op= get_if_delimiter('+') ? '+' : (get_if_delimiter('-') ? '-' : true);
   while ( $op ) {
     if ( get_if_number($num) ) {         // číslo
+      if ( $op==='-' ) $num= -$num;
       $x= array('n',$num);
     }
     else if ( get_if_delimiter($rel1) )
@@ -2045,7 +2048,7 @@ function get_cexpr (&$cexpr,$rel1,$rel2='',$rel3='') {
       $ids= explode('.',$id);
       switch ( count($ids) ) {
       case 1:
-        $x= array('k',$id);
+        $x= $op==='-' ? array('k',$id,'-') : array('k',$id);
         break;
       case 2:
         $x= array_reverse($ids);
@@ -2055,11 +2058,12 @@ function get_cexpr (&$cexpr,$rel1,$rel2='',$rel3='') {
       }
     }
 //     $ok= get_if_delimiter('+');
-    if ( $op=='-' ) $x[]= '-';
-    $cexpr[]= $x;
+    if ( $x ) {
+      $cexpr[]= $x;
+    }
     $op= get_if_delimiter('+') ? '+' : (get_if_delimiter('-') ? '-' : false);
   }
-//                                                 debug($cexpr,'cexpr');
+                                                debug($cexpr,'cexpr');
   return count($cexpr);
 }
 # -------------------------------------------------------------------------------------------------- coord
