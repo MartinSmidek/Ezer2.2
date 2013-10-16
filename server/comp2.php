@@ -530,6 +530,7 @@ function link_code(&$c,$name,$isroot,$block) { #trace("{$c->type}");
                 $c->options->{$id}[$p][0]= 'k';
                 $c->options->{$id}[$p][1]= $const->options->value;
                 $c->options->{$id}[$p][2]= $part[1];
+                if ( isset($part[2]) && $part[2]=='-' ) $c->options->{$id}[$p][3]= '-';
               }
               else comp_error("CODE: '{$part[1]}' není jménem konstanty",0);
             }
@@ -1950,12 +1951,9 @@ function get_numvalue (&$val,&$id) {
   }
   else if ( $typ[$head]=='id' ) {     // jméno konstanty
     $id= $val;
-    // if ( !isset($const_list[$id]) )
-    //   comp_error("SYNTAX: sčítanec musí být jménem dříve definované konstanty");
     $ok= true;
     $head++;
     $val= $const_list[$id]['value'];
-    // if ( $const_list[$id]['type']!='n' ) comp_error("SYNTAX: po + byla očekávána numerická konstanta");
   }
   if ( !$ok ) comp_error("SYNTAX: bylo očekávána číslo nebo konstanta místo {$typ[$head]} $val");
   return true;
@@ -1964,7 +1962,7 @@ function get_numvalue (&$val,&$id) {
 # (a) const :: 'const' id '=' cvalue            -- začátek
 # (b) const :: (';'|',') id '=' cvalue          -- pokračování
 #     cvalue :: const | nvalue
-#     nvalue :: number | nid | nvalue [ '+' nvalue ] -- kde nid je konstanta kontrolovaná v runtime
+#     nvalue :: number | nid | nvalue [ ('+'|'-') nvalue ] -- kde nid je jméno kontrolované za běhu
 function get_def ($id,&$value,&$is_expr) {
   global $tree, $const_list;
   $value= null; $type= 'global';
@@ -1982,22 +1980,18 @@ function get_def ($id,&$value,&$is_expr) {
     }
   }
   // případné rozšíření?
-  $ok= get_if_delimiter('+');
-  if ( $ok ) {
+  $op= get_if_delimiter('+') ? '+' : (get_if_delimiter('-') ? '-' : false);
+  if ( $op ) {
     $is_expr= true;
-    //if ( $type!='n' ) comp_error("SYNTAX: konstantní výraz smí být jen číselný"); -- zrušeno
     $value= array($id1 ? array('k',$value,$id1) : array('n',$value));
-    while ( $ok ) {
+    while ( $op ) {
       // další sčítanec
       get_numvalue ($value2,$id2);
-      if ( $id2 ) {
-        $value[]= array('k',$value2,$id2);
-      }
-      else {
-        $value[]= array('n',$value2);
-      }
+      $expr= $id2 ? array('k',$value2,$id2) : array('n',$value2);
+      if ( $op=='-' ) $expr[]= '-';
+      $value[]= $expr;
       $const_list[$id]= array('expr'=>$value,'type'=>$type);
-      $ok= get_if_delimiter('+');
+      $op= get_if_delimiter('+') ? '+' : (get_if_delimiter('-') ? '-' : false);
     }
   }
   // přidání do seznamu konstant
@@ -2012,7 +2006,8 @@ function get_def ($id,&$value,&$is_expr) {
 }
 # -------------------------------------------------------------------------------------------------- coord+
 # coord_plus+ :: '[' cexpr ',' cexpr ',' cexpr ',' cexpr ']'
-# cexpr       :: ( '^' | '$' | '$v' | '*' | '~' | const_id | id '.' ('l'|'r'|'t'|'b'|'w'|'h') | num ) [ '+' cexpr ]
+# cexpr       :: ( '^' | '$' | '$v' | '*' | '~' | const_id | id '.' ('l'|'r'|'t'|'b'|'w'|'h') | num )
+#                [ ('+'|'-') cexpr ]
 function get_if_coorp ($block) {
   global $tree, $pos, $head;
   $coord= null;
@@ -2035,25 +2030,36 @@ function get_if_coorp ($block) {
 }
 function get_cexpr (&$cexpr,$rel1,$rel2='',$rel3='') {
   $cexpr= array();
-  $ok= true;
-  while ( $ok ) {
-    if ( get_if_number($num) )          $cexpr[]= array('n',$num);
-    else if ( get_if_delimiter($rel1) ) $cexpr[]= array($rel1);
-    else if ( $rel2 && get_if_delimiter($rel2) ) $cexpr[]= array($rel2);
-    else if ( $rel3 && get_if_delimiter($rel3) ) $cexpr[]= array($rel3);
+  $op= get_if_delimiter('+') ? '+' : (get_if_delimiter('-') ? '-' : true);
+  while ( $op ) {
+    if ( get_if_number($num) ) {         // číslo
+      $x= array('n',$num);
+    }
+    else if ( get_if_delimiter($rel1) )
+      $x= array($rel1);
+    else if ( $rel2 && get_if_delimiter($rel2) )
+      $x= array($rel2);
+    else if ( $rel3 && get_if_delimiter($rel3) )
+      $x= array($rel3);
     else if ( get_if_id($id) )  {
       $ids= explode('.',$id);
       switch ( count($ids) ) {
-      case 1:                           $cexpr[]= array('k',$id);  break;
+      case 1:
+        $x= array('k',$id);
+        break;
       case 2:
-        $cexpr[]= array_reverse($ids);
+        $x= array_reverse($ids);
         break;
       default:
         comp_error("SYNTAX: lze jen jméno konstaty nebo jméno boxu následované l,r,t,b,w,h");
       }
     }
-    $ok= get_if_delimiter('+');
+//     $ok= get_if_delimiter('+');
+    if ( $op=='-' ) $x[]= '-';
+    $cexpr[]= $x;
+    $op= get_if_delimiter('+') ? '+' : (get_if_delimiter('-') ? '-' : false);
   }
+//                                                 debug($cexpr,'cexpr');
   return count($cexpr);
 }
 # -------------------------------------------------------------------------------------------------- coord

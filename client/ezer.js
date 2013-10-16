@@ -93,30 +93,30 @@ Ezer.Block= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _coord
 // přepočítá symbolicky zadané souřadnice bloku na čísla
   _coord: function () {
-    var b, s;
+    var b, s, xi, id;
     for (var x in {_l:0,_t:1,_w:2,_h:3}) {
       if ( typeof(this.options[x])=='object' ) {
                                                 Ezer.debug(this.options[x],x);
         this[x]= 0;
         for (var i in this.options[x]) {
-          switch (s= this.options[x][i][0]) {
-          case 'k':
-            var id= this.options[x][i][2];              // jméno konstanty
-            this[x]= this._const(id);
+          xi= this.options[x][i];
+          switch (s= xi[0]) {
+          case 'k':                               // jméno konstanty [k,value,id,-]
+            this[x]+= (xi[3] && xi[3]=='-') ? -this._const(xi[2]) : this._const(xi[2]);
             break;
-          case 'n':
-            this[x]+= this.options[x][i][1];
+          case 'n':                               // číselný literál [n,value,-]
+            this[x]+= (xi[2] && xi[2]=='-') ? -xi[1] : xi[1];
             break;
           case 'l': case 't': case 'w': case 'h':
-            Ezer.assert(b= this.owner.part[this.options[x][i][1]],'chybný odkaz '+s,this);
+            Ezer.assert(b= this.owner.part[xi[1]],'chybný odkaz '+s,this);
             this[x]+= b['_'+s];
             break;
           case 'r':
-            Ezer.assert(b= this.owner.part[this.options[x][i][1]],'chybný odkaz '+s,this);
+            Ezer.assert(b= this.owner.part[xi[1]],'chybný odkaz '+s,this);
             this[x]+= b._l+b._w;
             break;
           case 'b':
-            Ezer.assert(b= this.owner.part[this.options[x][i][1]],'chybný odkaz '+s,this);
+            Ezer.assert(b= this.owner.part[xi[1]],'chybný odkaz '+s,this);
             this[x]+= b._t+b._h;
             break;
           case '*':
@@ -1948,11 +1948,11 @@ Ezer.Const= new Class({
       for (var i in this.options.expr) {
         var x= this.options.expr[i];
         switch (x[0]) {
-        case 'k':                               // jméno konstanty
-          this.value+= this._const(x[2]);
+        case 'k':                               // jméno konstanty [k,value,id,-]
+          this.value+= (x[3] && x[3]=='-') ? -this._const(x[2]) : this._const(x[2]);
           break;
-        case 'n':                               // číselný literál
-          this.value+= x[1];
+        case 'n':                               // číselný literál [n,value,-]
+          this.value+= (x[2] && x[2]=='-') ? -x[1] : x[1];
           break;
         }
       }
