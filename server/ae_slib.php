@@ -1404,7 +1404,7 @@ function win2utf($val,$always=false) { #trace();
 function utf2win($val,$always=false) {
   global $ezer_mysql_cp;
   if ( $always || !$ezer_mysql_cp || $ezer_mysql_cp=='cp1250' ) {
-    $val= iconv("utf-8", "windows-1250", urldecode(mysql_escape_string($val)));
+    $val= iconv("utf-8", "windows-1250", urldecode(mysql_real_escape_string($val)));
   }
   return $val;
 }

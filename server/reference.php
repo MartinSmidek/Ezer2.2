@@ -375,7 +375,7 @@ function i_doc_app($fnameslist,$chapter,$to_save=true) {
         $txt= strtr($txt,$css);
         if ( $to_save ) {
           // zápis do tabulky
-          $esc_text= mysql_escape_string($txt);
+          $esc_text= mysql_real_escape_string($txt);
           $class= "{$fname}_".str_pad((($i-1)/2),2,'0',STR_PAD_LEFT);
           $set= "elem='modul',class='$class',part='',file='$fname',chapter='$chapter',"
             . "section='$modul',title='$title',sorting=$sort,text=\"$esc_text\"";
@@ -584,7 +584,7 @@ function i_doc_final($class,$id,$info,$t) { #if ($t=='i') trace();
     // definice záznamu v doc_elem
     if ( $sect ) $set.= "section='$sect',";
     if ( $hist ) $set.= "history='$hist',";
-    $html= mysql_escape_string($html);
+    $html= mysql_real_escape_string($html);
     $set.= "text=\"$html\",";
     break;
   case 'Fire':         // fire (události) :: abstract (; x : y)*
@@ -594,7 +594,7 @@ function i_doc_final($class,$id,$info,$t) { #if ($t=='i') trace();
     // definice záznamu v doc_elem
     $set.= "comp=\"$t\",";
     $set.= "abstract= \"$abstract\",";
-    $html= mysql_escape_string($html);
+    $html= mysql_real_escape_string($html);
     $set.= "text=\"$html\",";
 //                                                         debug($x,$name);
 //                                                         display("$set");
@@ -608,7 +608,7 @@ function i_doc_final($class,$id,$info,$t) { #if ($t=='i') trace();
     // definice záznamu v doc_elem
     $set.= "comp=\"$t\",";
     $set.= "abstract= \"$abstract\",";
-    $html= mysql_escape_string($html);
+    $html= mysql_real_escape_string($html);
     $set.= "text=\"$html\",";
 //     if ( $id=='skill' ) { debug($x,$name); display("SKILL**$set");}
     break;
@@ -636,11 +636,11 @@ function i_doc_final($class,$id,$info,$t) { #if ($t=='i') trace();
     if ( $sect ) $set.= "section='$sect',";
     if ( $hist ) $set.= "history='$hist',";
     $set.= "comp=\"$t\",";
-    $html= mysql_escape_string($html);
+    $html= mysql_real_escape_string($html);
     $set.= "text=\"$html\",";
     break;
   }
-  $extd= mysql_escape_string($extd);
+  $extd= mysql_real_escape_string($extd);
   $set.= "class='$class',extends='$extd',part='$id',file='$i_doc_file',chapter='reference',sorting=99";
   $qry= "REPLACE $db.ezer_doc2 SET $set ";
   $res= mysql_qry($qry);
@@ -744,7 +744,7 @@ function i_doc_lang() { //trace();
     $text.= i_doc_subs_attribs($blok);
     $text.= "</div>";
   }
-  $esc_text= mysql_escape_string($text);
+  $esc_text= mysql_real_escape_string($text);
   $qry= "REPLACE $db.ezer_doc2 (chapter,section,elem,class,sorting,title,text)
          VALUES ('reference','ezerscript','text','language',1,'popis jazyka',\"$esc_text\") ";
   $res= mysql_qry($qry);
