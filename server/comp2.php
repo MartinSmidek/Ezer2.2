@@ -1740,7 +1740,7 @@ function get_if_block ($root,&$block,&$id) {
       if ( in_array('coor+',$specs[$key]) && get_if_coorp($block) )  ;
       if ( in_array('const',$specs[$key]) && get_def($id,$value,$is_expr) ) {
         if ( $is_expr )
-          $block->options->expr= $value;
+          $block->options->_expr= $value;
         else
           $block->options->value= $value;
         if ( !isset($root->part) ) $root->part= (object)array();
@@ -1754,7 +1754,7 @@ function get_if_block ($root,&$block,&$id) {
           $cblock->type= 'const';
           if ( !isset($cblock->options) ) $cblock->options= (object)array();
           if ( $is_expr )
-            $cblock->options->expr= $value;
+            $cblock->options->_expr= $value;
           else
             $cblock->options->value= $value;
           $cblock->_lc= $last_lc;
@@ -1991,7 +1991,7 @@ function get_def ($id,&$value,&$is_expr) {
         ? ($op==='-' ? array('k',$value2,$id2,'-') : array('k',$value2,$id2))
         : ($op==='-' ? array('n',-$value2) : array('n',$value2));
       $value[]= $expr;
-      $const_list[$id]= array('expr'=>$value,'type'=>$type);
+      $const_list[$id]= array('_expr'=>$value,'type'=>$type);
       $op= get_if_delimiter('+') ? '+' : (get_if_delimiter('-') ? '-' : false);
     }
   }
@@ -2063,7 +2063,7 @@ function get_cexpr (&$cexpr,$rel1,$rel2='',$rel3='') {
     }
     $op= get_if_delimiter('+') ? '+' : (get_if_delimiter('-') ? '-' : false);
   }
-                                                debug($cexpr,'cexpr');
+//                                                 debug($cexpr,'cexpr');
   return count($cexpr);
 }
 # -------------------------------------------------------------------------------------------------- coord

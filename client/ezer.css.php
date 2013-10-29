@@ -373,7 +373,7 @@ div.PanelPopup div.dragHandle {
   outline-color:#f88 !important;; }
 table.focus {
   outline:#ff0 dotted 2px !important; }
-input.changed:focus {
+input.changed:focus, textarea.changed:focus {
   outline:#ff3333 dotted 2px !important; }
 
 /* form, elem */

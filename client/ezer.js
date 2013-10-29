@@ -1942,11 +1942,11 @@ Ezer.Const= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  initialize
   initialize: function(owner,desc,DOM,id,skill) {
     this.parent(owner,desc,DOM,id,skill);
-    if ( this.options.expr ) {
+    if ( this.options._expr ) {
       // výpočet konstanty dané výrazem
       this.value= 0;
-      for (var i in this.options.expr) {
-        var x= this.options.expr[i];
+      for (var i in this.options._expr) {
+        var x= this.options._expr[i];
         switch (x[0]) {
         case 'k':                               // jméno konstanty [k,value,id,-]
           this.value+= (x[3] && x[3]=='-') ? -this._const(x[2]) : this._const(x[2]);
