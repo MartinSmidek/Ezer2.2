@@ -457,7 +457,7 @@ function pragma_attrs($c) {
 # doplní _abs (absolutní jména)
 # $context= [id=>objekt,...]
 # a naváže includované části
-function link_code(&$c,$name,$isroot,$block) { #trace("{$c->type}");
+function link_code(&$c,$name,$isroot,$block) { //trace("{$c->type}");
   global $context, $code, $module, $procs, $plain_code, $error_code_context, $error_code_lc
     , $names, $full, $includes, $call_php;
 //                                                 debug($c,"LINK $name");
@@ -510,7 +510,8 @@ function link_code(&$c,$name,$isroot,$block) { #trace("{$c->type}");
     }
     unset($c->table);
   }
-  else if ( $c->part ) {
+//   else
+  if ( $c->part ) {
     array_push($context,(object)array('id'=>$c->id,'ctx'=>$c));
     foreach ($c->part as $id=>$cpart) {
       link_code($cpart,"$name.$id",$isroot,"$block.$id");
@@ -526,6 +527,7 @@ function link_code(&$c,$name,$isroot,$block) { #trace("{$c->type}");
           foreach($desc as $p=>$part) {
             if ( $part[0]=='k' ) {
               $const= find_part_rel($part[1],$fullname);
+//                                                                 debug($const,$fullname);
               if ( $const && $const->type=='const' ) {
                 $c->options->{$id}[$p][0]= 'k';
                 $c->options->{$id}[$p][1]= $const->options->value;
