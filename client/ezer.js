@@ -1686,17 +1686,18 @@ Ezer.View= new Class({
     return 1;
   },
 // ------------------------------------------------------------------------------------ load
-//fx: View.load ([key_val=view.key])
+//fx: View.load ([key_val=view.key,[cond]])
 //      přečte položky formuláře, které mají v atributu data použito toto view
 //      ostatní položky formuláře zůstanou nezměněné (položky s expr jsou vynechány
 //      i když používají pouze toto view).
 //      Pokud je není key_val definováno, použije aktuální hodnotu klíče
+//      nebo vyhledá záznam podle nepovinné podmínky (key_val v tom případě ignoruje)
 //      (metoda nevyvolává onload)
-  load: function(key_val) {
+  load: function(key_val,cond) {
     Ezer.assert(this.value.options.key_id,'table referované přes view chybí definice key_id',this);
     // vytvoř parametry dotazu
     var key= key_val||this._key;
-    Ezer.assert(!isNaN(key),'view.load nemá číselný klíč věty',this);
+    Ezer.assert(cond || !isNaN(key),'view.load nemá číselný klíč věty',this);
     var table= this.value;
     var x= {cmd:'form_load', key:key, key_id:table.options.key_id,
       db:table.options.db||'', table:table.id, fields:[], joins:{}};
@@ -1712,6 +1713,7 @@ Ezer.View= new Class({
     },this);
     if ( !x.fields.length )
       Ezer.error('chybný kontext pro view_load');
+    if ( cond ) x.cond= cond;
     return x;
   },
   load_: function(y) {
@@ -2217,13 +2219,13 @@ Ezer.Form= new Class({
 // ------------------------------------------------------------------------------------ load
 //fx: Form.load ([key_val=form.key,[cond]])
 //      načtení dat do skalárních polí formuláře podle hodnoty primárního klíče tabulky
-//      nebo podle nepovinné podmínky
+//      nebo podle nepovinné podmínky (key_val v tom případě ignoruje)
 //a: key_val - hodnota primárního klíče
 //   cond - mysql podminka
   load: function(key_val,cond) {
     // vytvoř parametry dotazu
     var key= key_val||this._key;
-    Ezer.assert(!isNaN(key),'form.load nemá číselný klíč věty',this);
+    Ezer.assert(cond || !isNaN(key),'form.load nemá číselný klíč věty',this);
     var x= {cmd:'form_load', key:key_val||this._key, fields:[], joins:{}};
     this._changed= false;                 // bude true po změně nějaké položky
     $each(this.part,function(field,id) {
