@@ -108,7 +108,7 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
 
 # ================================================================================================== AKTIVITY
 panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a'
-  menu left { type:'left'
+  menu left { type:'left', format:'f'
     menu a { title:'Aktivní uživatelé',type:'group'
       item d { title:'dnes'               par:°{s:'uzivatele',c:'dnes',short:'1'}}
       item { title:'... podrobně'       par:°{s:'uzivatele',c:'dnes',short:'0'}}

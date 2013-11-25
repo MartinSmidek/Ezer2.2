@@ -7615,13 +7615,14 @@ Ezer.fce.prints= function (width,height,css_file) {
 // -------------------------------------------------------------------------------------- javascript
 //ff: fce.javascript (code[,value])
 //      pokud je specifikované value, stane se návratovou hodnotou, jinak se použije výsledek kódu
-//      pokud je specifikované value, pak je v 'code' lze referovat přes this
 //s: funkce
 Ezer.fce.javascript= function(code,value) {
   var x= 0;
   try {
-    // x= eval(code);
-    x= new Function(code).bind(value)();
+    x= eval(code);
+    // asi lepší ale nekompatibilní varianta:
+    //      pokud je specifikované value, pak je v 'code' lze referovat přes this
+    // x= new Function(code).bind(value)();
   }
   catch (e) {
     var msg= e.message||'?';
