@@ -34,10 +34,24 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- DOM_layout
   DOM_layout: function() {
     // změna šířky změní width ve stylu PanelRight
+    const pruh= 16;
     var leftMenu= document.getElement('.Accordion');
     var leftMenuWidth= leftMenu ? leftMenu.getStyle('width').toInt() : 210;
-    var w= window.getSize().x - leftMenuWidth;
-    $$('.PanelRight').setStyle('width',w);
+    var w= window.getSize().x;
+    $$('.PanelRight').each(function(dom_panel){
+      var panel= dom_panel.retrieve('Ezer');
+      var menu_left= panel.menuleft;
+      if ( panel._folded ) {
+        dom_panel.setStyles({width:w-pruh,left:pruh});
+        menu_left.DOM_Block.setStyle('width',pruh);
+      }
+      else {
+        dom_panel.setStyles({width:w-leftMenuWidth,left:leftMenuWidth});
+        if ( menu_left ) {
+          menu_left.DOM_Block.setStyle('width',leftMenuWidth);
+        }
+      }
+    });
 //                                         Ezer.fce.echo(window.getSize().x,'-',leftMenuWidth,'=',w);
     // změna výšky definuje velikost pracovní plochy
     Ezer.Shield.top= $('work').getCoordinates().top;

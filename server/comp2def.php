@@ -228,7 +228,7 @@ $attribs = array (
 #  tabs
   'tabs'   =>  explode(",",'type:s,skill:s,title:s,active:i,include:s,where:s'),
 #  menu
-  'menu'   =>  explode(",",'type:s,skill:s,title:s,par:o,active:i'),
+  'menu'   =>  explode(",",'type:s,skill:s,title:s,par:o,active:i,format:s'),
   'item'   =>  explode(",",'type:s,title:s,skill:s,par:o,format:s'),
 #  browse
   'browse' =>  explode(",",'key_id:s,type:s,buf_rows:n,qry_rows:n,wheel:n,css_rows:s,rows:nc,group_by:s,optimize:o,format:s'),

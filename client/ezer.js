@@ -1157,6 +1157,8 @@ Ezer.MenuMain= new Class({
 //s: Block
 Ezer.MenuLeft= new Class({
 //oi: MenuLeft.active - vnořený Item, který má být aktivní hned po startu, hvězdička aktivuje první item
+//os: MenuLeft.format - vzhled
+//  ; 'f' : 'foldable' umožní skrývat menu a rozšiřovat pravý panel
   Extends: Ezer.Menu,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start
 //f: MenuLeft.start (code,oneval)
@@ -1681,6 +1683,19 @@ Ezer.View= new Class({
       var elem= this.owner.part[ie];
       if ( elem.view==this && elem.skill && elem.init ) {
         elem.init(init_values);
+      }
+    }
+    return 1;
+  },
+// ------------------------------------------------------------------------------------ plain
+//fm: View.plain ()
+//      odstraní příznak změny ze všech přístupných elementů view
+  plain: function() {
+    this._changed= false;                 // bude true po změně nějaké položky
+    for (var ie in this.owner.part) {           // projdi elementy
+      var elem= this.owner.part[ie];
+      if ( elem.view==this && elem.skill && elem.plain ) {
+        elem.plain();
       }
     }
     return 1;
@@ -7613,6 +7628,22 @@ Ezer.fce.javascript= function(code,value) {
     Ezer.error('chyba '+msg+' ve funkci javascript pro "'+code+'"');
   }
   return value?value:x;
+}
+// ---------------------------------------------------------------------------------------- function
+//ff: fce.function (par,code,arg)                                                       EXPERIMENTAL
+//      provede Function(par,code)(arg)
+//      Příklad: echo(function('a','a+1',2) zobrazí 3
+//s: funkce
+Ezer.fce['function']= function(par,code,arg) {
+  var x= 0;
+  try {
+    x= new Function(par,code)(arg);
+  }
+  catch (e) {
+    var msg= e.message||'?';
+    Ezer.error('chyba '+msg+' ve funkci function pro "'+code+'('+arg+')"');
+  }
+  return x;
 }
 // -------------------------------------------------------------------------------------- source
 //ff: fce.source (msg)

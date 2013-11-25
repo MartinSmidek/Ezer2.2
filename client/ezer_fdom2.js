@@ -198,9 +198,18 @@ Ezer.MenuLeft.implement({
     Ezer.assert(this.owner.type=='panel.right',"menu typu 'left' může být pouze v panelu typu 'right'");
     // vložení accordionu do panelu na připravené místo
     this.DOM_Block= new Element('div',{'class':'Accordion',styles:{display:'none'}}).inject($('work'));
-//     this.owner.DOM_Block=
-//        new Element('div',{'class':'Panel inAccordion'}).inject(this.owner.DOM_Block);
-//     this.owner._tabDom.setStyles({display:'none'});
+    // přidání smršťovacího tlačítka pro format:'f' (foldable)
+    if ( this._f('f')>=0 ) {
+      this.owner._folded= false; // panel si pamatuje, zda je levé menu zúžené (viz Ezez.app.DOM_layout)
+      new Element('img',{src:Ezer.paths.images_cc+'/left_fold.png',styles:{
+        position:'absolute',right:0,opacity:0.5},events:{
+          click: function(event) {
+            event.target.src= Ezer.paths.images_cc+(this._folded?'/left_fold.png':'/left_unfold.png');
+            this._folded= !this._folded;
+            Ezer.app.DOM_layout();
+          }.bind(this.owner)
+      }}).inject(this.DOM_Block);
+    }
     this.owner.sel_group= null;
   },
 // ------------------------------------------------------------------------------------ DOM_re1
@@ -699,6 +708,7 @@ Ezer.PanelRight.implement({
 //     this.owner._tabDom.setStyles({display:'none'});
       new Element('div',{'class':'PanelRight',styles:{display:'none'}}).inject($('work'));
     this.DOM_Block.setStyles({width:this._w,height:this._h});
+    this.DOM_Block.store('Ezer',this); // kvůli Ezer.app.DOM_layout
   },
   DOM_add2: function() {
   },
