@@ -495,20 +495,12 @@ Ezer.Block= new Class({
 //      tag vyhovujícím regulárnímu dotazu v tags
 //      v tom případě lze nastavením on=2 zobrazit vybrané a skrýt ty jejichž tag nevyhovuje;
 //      v bezparametrické podobě vrací 1, pokud je blok viditelný
-//a: on - 0 | 1
+//a: on - 0 | 1 | 2
 //   tags - regulární výraz popisující vyhovující tagy (např. 'f.|g')
   display: function (on,tags) {
-    var ok= 1;
-    on= on=="0"||on===null ? 0 : on;
-    if ( on===undefined ) {
-      var block= this instanceof Ezer.Var && this.value ? this.value.DOM_Block : this.DOM_Block;
-      ok= block && block.getStyle('display')=='block' ? 1 : 0;
-    }
-    else if ( tags ) {
-      var re= new RegExp(tags);
-      // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
-      for(var i in this.part) {
-        var part= this.part[i];
+    function displ(parts) {
+      for (var i in parts) {
+        var part= parts[i];
         var block= part instanceof Ezer.Var && part.value ? part.value.DOM_Block : part.DOM_Block;
         if ( block && part.options.tag ) {
           if ( re.test(part.options.tag) ) {
@@ -519,6 +511,19 @@ Ezer.Block= new Class({
           }
         }
       }
+    }
+    var ok= 1;
+    on= on=="0"||on===null ? 0 : on;
+    if ( on===undefined ) {
+      var block= this instanceof Ezer.Var && this.value ? this.value.DOM_Block : this.DOM_Block;
+      ok= block && block.getStyle('display')=='block' ? 1 : 0;
+    }
+    else if ( tags ) {
+      var re= new RegExp(tags);
+      // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
+      displ(this.part);
+      if ( this instanceof Ezer.Var && this.value && this.value.part )
+        displ(this.value.part);
     }
     else if ( this instanceof Ezer.Var ) {
       if ( this.value && this.value.DOM_Block ) {
