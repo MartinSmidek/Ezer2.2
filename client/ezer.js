@@ -491,10 +491,13 @@ Ezer.Block= new Class({
 //fm: Block.display ([on[,tags]])
 //      zobrazí pokud on=1 resp. skryje blok pokud on=0;
 //      na skryté bloky (např. kvůli skill) nemá vliv;
-//      pokud je uveden seznam tags, provede se pro přímé podbloky s atributem
-//      tag vyhovujícím regulárnímu dotazu v tags
-//      v tom případě lze nastavením on=2 zobrazit vybrané a skrýt ty jejichž tag nevyhovuje;
-//      v bezparametrické podobě vrací 1, pokud je blok viditelný
+//      pokud je uveden regulární výraz tags, provede se pro přímé podbloky (a hodnoty use)
+//      s atributem tag vyhovujícím dotazu.
+//      V tom případě lze nastavením on=2 zobrazit vybrané a skrýt ty jejichž tag nevyhovuje;
+//      v bezparametrické podobě vrací 1, pokud je blok viditelný.
+//      Pokud je atribut tag ve formě seznamu (čárkou oddělené hodnoty) metoda se uplatní pokud
+//      alespoň jedna hodnota vyhoví regulárnímu výrazu.
+//      Je-li on=2 uplatní se, pokud nevyhovuje ani jedna hodnota.
 //a: on - 0 | 1 | 2
 //   tags - regulární výraz popisující vyhovující tagy (např. 'f.|g')
   display: function (on,tags) {
@@ -503,12 +506,14 @@ Ezer.Block= new Class({
         var part= parts[i];
         var block= part instanceof Ezer.Var && part.value ? part.value.DOM_Block : part.DOM_Block;
         if ( block && part.options.tag ) {
-          if ( re.test(part.options.tag) ) {
+          var tag_list= part.options.tag.split(',');
+          var some= tag_list.some(function(tag){
+            return re.test(tag);
+          });
+          if ( some )
             block.setStyles({display:on ? 'block' : 'none'});
-          }
-          else if ( on==2 ) {
+          else if ( on==2 )
             block.setStyles({display:'none'});
-          }
         }
       }
     }
