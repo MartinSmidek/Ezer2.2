@@ -1883,6 +1883,20 @@ Ezer.Table= new Class({
   },
   insert_record_: function (y) {
     return y.ok;
+  },
+// ------------------------------------------------------------------------------------ update_record
+//fx: Table.update_record (cond,set)
+// update 1 záznamu z tabulky podle hodnot předaných v objektu set
+// (hlásí chybu pokud podmínka cond specifikuje více záznamů - a nesmaže)
+//a: cond - podmínka
+//   set - {field:value,..}
+//r: y - ok
+  update_record: function (cond,set) {
+    var x= {cmd:'update_record', db:this.options.db||'', table:this.id, cond:cond, set:set};
+    return x;
+  },
+  update_record_: function (y) {
+    return y.ok;
   }
 });
 // ================================================================================================= map

@@ -319,6 +319,34 @@
       $y->ok= $res ? ($n ? $n : 1) : 0;
     }
     break;
+  # ------------------------------------------------------------------------------------------------ update_record
+  # provede UPDATE pro záznam vyhovující podmínce, není-li právě jeden takový, ohlásí chybu
+  // x: table, cond, set
+  // y: ok
+  case 'update_record':
+    if ( $x->db ) ezer_connect($x->db);
+    // zjištění správného počtu před smazáním
+    $y->ok= 0;
+    $db= $x->db ? $x->db : $mysql_db; $table= ($ezer_db[$db][5] ? $ezer_db[$db][5] : $db).'.'.$x->table;
+    $set= ''; $del= '';
+    foreach ($x->set as $fld=>$val) {
+      $set= "$fld='".mysql_real_escape_string($val)."'";
+      $del= ',';
+    }
+    if ( $set ) {
+      $qry= "SELECT count(*) AS _pocet FROM $table WHERE {$x->cond} ";
+      $res= mysql_qry($qry);
+      if ( $res ) {
+        $obj= mysql_fetch_assoc($res);
+        if ( $obj->_pocet<=$x->count ) {
+          $qryu= "UPDATE $table SET $set WHERE {$x->cond} ";
+          $resu= mysql_qry($qryu);
+          $y->ok= $resu ? 1 : 0;
+        }
+        else fce_error("update_record: pokus o úpravu {$obj->_pocet} záznamů");
+      }
+    }
+    break;
   # ------------------------------------------------------------------------------------------------ form_insert
   # úschova nových hodnot do existujícího záznamu (mode=a vyvolá připojení hodnoty ke stávající)
   // x: db,table, fields ; fields=[...{id:field,val[,pipe]...]

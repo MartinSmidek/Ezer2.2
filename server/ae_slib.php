@@ -817,23 +817,34 @@ function select($expr,$table,$cond=1,$db='.main.') {
     $result= array();
     $qry= "SELECT $expr FROM $table WHERE $cond";
     $res= mysql_qry($qry,0,0,0,$db);
-    if ( !$res ) fce_error(wu("chyba funkce select:$qry"));
+    if ( !$res ) fce_error(wu("chyba funkce select:$qry/".mysql_error()));
     $result= mysql_fetch_row($res);
   }
   elseif ( $expr=='*' ) {
     $qry= "SELECT * FROM $table WHERE $cond";
     $res= mysql_qry($qry,0,0,0,$db);
-    if ( !$res ) fce_error(wu("chyba funkce select:$qry"));
+    if ( !$res ) fce_error(wu("chyba funkce select:$qry/".mysql_error()));
     $result= mysql_fetch_object($res);
   }
   else {
     $result= '';
     $qry= "SELECT $expr AS _result_ FROM $table WHERE $cond";
     $res= mysql_qry($qry,0,0,0,$db);
-    if ( !$res ) fce_error(wu("chyba funkce select:$qry"));
+    if ( !$res ) fce_error(wu("chyba funkce select:$qry/".mysql_error()));
     $o= mysql_fetch_object($res);
     $result= $o->_result_;
   }
+  return $result;
+}
+# -------------------------------------------------------------------------------------------------- select1
+# navrácení hodnoty jednoduchého dotazu - $expr musí vracet jednu hodnotu
+function select1($expr,$table,$cond=1,$db='.main.') {
+  $result= '';
+  $qry= "SELECT $expr AS _result_ FROM $table WHERE $cond";
+  $res= mysql_qry($qry,0,0,0,$db);
+  if ( !$res ) fce_error(wu("chyba funkce select1:$qry/".mysql_error()));
+  $o= mysql_fetch_object($res);
+  $result= $o->_result_;
   return $result;
 }
 # -------------------------------------------------------------------------------------------------- query
