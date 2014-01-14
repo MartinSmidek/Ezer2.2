@@ -6786,7 +6786,7 @@ Ezer.fce.array= function () {
 // Pozn.: implementovány jsou tyto kombinace parametrů: fb, bf, of, fo, sf.
 //s: funkce
 Ezer.fce.copy_by_name= function (x,y,delimiters) {
-  var key= y instanceof Ezer.Form ? y._key : 0;
+  var x0= x, y0= y, key= y instanceof Ezer.Form ? y._key : 0;
   if ( x.type=='var' ) x= x.value;
   if ( y.type=='var' ) y= y.value;
   var typ_x= x instanceof Ezer.Browse ? 'b' : x instanceof Ezer.Form ? 'f' :
@@ -6828,6 +6828,14 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
   }
   else if ( typ_x=='o' && typ_y=='f' ) {        // object --> form
     $each(y.part,function(field,id) {
+      if ( field.key && x[id]!==undefined ) {
+        field.key(x[id],key);
+      }
+      else if ( field.set && x[id]!==undefined ) {
+        field.set(x[id],key);
+      }
+    });
+    $each(y0.part,function(field,id) {          // pro rozšířené use
       if ( field.key && x[id]!==undefined ) {
         field.key(x[id],key);
       }

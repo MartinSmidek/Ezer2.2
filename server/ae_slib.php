@@ -851,7 +851,6 @@ function select1($expr,$table,$cond=1,$db='.main.') {
 # -------------------------------------------------------------------------------------------------- query
 # provedení MySQL dotazu
 function query($qry,$db='.main.') {
-  $result= '';
   $res= mysql_qry($qry,0,0,0,$db);
   return $res;
 }
