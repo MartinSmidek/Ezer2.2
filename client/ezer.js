@@ -577,14 +577,14 @@ Ezer.Block= new Class({
     this.DOM_set_properties(prop);
     return 1;
   },
-// ------------------------------------------------------------------------------------ raise
+// -------------------------------------------------------------------------------------- raise
 //fm: Block.raise (event_name[,arg])
   raise: function(event_name,arg) {
     this.fire(event_name,[arg]);
     return 1;
   },
-// ------------------------------------------------------------------------------------ subBlocks
-//f: Block.subBlocks (desc,DOM,wrap_fce,extend)
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  subBlocks
+//Block.subBlocks (desc,DOM,wrap_fce,extend)
 //      zapojí části bloku do bloku
 //   extend=='rewrite' pro přepsání bloků
 //   extend=='include' pro přidání vnitřních bloků
@@ -871,6 +871,41 @@ Ezer.Block= new Class({
     });
     ajax.send();
     Ezer.App._ajax(1);
+  },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  runScript
+//fm: Block.runScript (ezercsript)
+//                                                                              EXPERIMENTÁLNÍ
+// kompilace Ezerscriptu zadaného řetězcem a jeho zahájení v kontextu this.
+// Metoda je určena především pro ladění programu z trasovacího okna,
+// pokud je voláno z programu, vrací hodnotu 1 - nečeká na ukončení ezescriptu.
+  runScript: function(script) {
+    var s= this.app_file();     // zjistí {app:app,file:file,root:root}
+    var self= '';
+    for (var o= this; o.owner; o= o.owner) {
+      if ( o.type!='var' )
+        self= o._id+(self ? '.'+self : '');
+    }
+    self= self ? '$.'+self : '$';
+                                                Ezer.trace('*','self='+self);
+    var x= {cmd:'dbg_compile',context:{self:self,app:s.app,file:s.file},script:script};
+    this.ask(x,'runScript_');
+    return 1;
+  },
+  runScript_: function(y) {
+    var val= '';
+//                                                         Ezer.debug(y.ret);
+    if ( y.ret.code ) {
+      var self= this.type=='var' && this.value ? this.value : this;
+      var v= new Ezer.Eval(y.ret.code,self,[],'dbg');
+      val= v.simple ? v.value : '';
+    }
+    if ( y.ret.err ) {
+      Ezer.fce.warning(y.ret.err);
+    }
+    if ( y.ret.trace ) {
+      Ezer.trace('C',y.ret.trace);
+    }
+    return val;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start
 //f: Block.start (code,oneval)
@@ -2642,7 +2677,7 @@ Ezer.Label= new Class({
 //      prvek pro kontrolovaný upload souborů na server, kliknutí přeruší přenos
 //t: Block,Label
 //s: Block
- //i: LabelDrop.ondrop - funkce zavolaná po dokončení vložení souboru
+//i: LabelDrop.ondrop - funkce zavolaná po dokončení vložení souboru
 //i: LabelDrop.onload - funkce zavolaná po dokončení přenosu na server
 Ezer.LabelDrop= new Class({
   Extends:Ezer.Label,
@@ -2650,19 +2685,18 @@ Ezer.LabelDrop= new Class({
   options: {
   },
   path: '/',
-//-
 // ------------------------------------------------------------------------------- LabelDrop.init
+//fm: LabelDrop.init (relpath)
 // inicializace oblasti pro drop souborů, definice cesty pro soubory
 // (začínající jménem a končící lomítkem a relativní k $ezer_root)
-//fm: LabelDrop.init (relpath)
   init: function (relpath) {
     this.relpath= relpath;
     this.DOM_init();
     return 1;
   },
 // -------------------------------------------------------------------------------- LabelDrop.set
-// do oblasti zapíše jména souborů podle parametru
 //fm: LabelDrop.set (lst)
+// do oblasti zapíše jména souborů podle parametru
 //a: lst - seznam jmen souborů (ve složce docs) oddělených čárkou, za jménem souboru může
 // následovat po dvojtečce status (např. délka)
   set: function (lst) {
@@ -2675,8 +2709,8 @@ Ezer.LabelDrop= new Class({
     return 1;
   },
 // -------------------------------------------------------------------------------- LabelDrop.get
-// vrátí seznam souborů oddělených čárkou
 //fm: LabelDrop.get ()
+// vrátí seznam souborů oddělených čárkou
   get: function () {
     var lst= '', del= '';
     this.DOM_files.each(function(f){
@@ -2705,8 +2739,8 @@ Ezer.LabelMap= new Class({
   zoom: null,           // aktivní výřez mapy (LatLngBounds)
   rect: null,           // zobrazený obdélník (Polygon)
 // ------------------------------------------------------------------------------- LabelMap.init
-// inicializace oblasti se zobrazením mapy ČR
 //fm: LabelMap.init ([TERRAIN|ROADMAP])
+// inicializace oblasti se zobrazením mapy ČR
   init: function (type) {
     var stredCR= new google.maps.LatLng(49.8, 15.6);
     var map_id= google.maps.MapTypeId[type||'TERRAIN'];
@@ -2721,8 +2755,8 @@ Ezer.LabelMap= new Class({
     return 1;
   },
 // ------------------------------------------------------------------------------- LabelMap.dump
-// vytvoří objekt obsahující informaci o počtu značek, polygonů, ...
 //fm: LabelMap.dump ()
+// vytvoří objekt obsahující informaci o počtu značek, polygonů, ...
   dump: function () {
     var visible= 0;
     var viewPort= this.map ? this.map.getBounds() : null;
@@ -2742,8 +2776,8 @@ Ezer.LabelMap= new Class({
     }
   },
 // -------------------------------------------------------------------------------- LabelMap.get
-// get('ids') vrátí seznam zobrazených značek
 //fm: LabelMap.get (op)
+// get('ids') vrátí seznam zobrazených značek
   get: function (op) {
     var ret= del= '';
     switch (op) {
@@ -2759,6 +2793,7 @@ Ezer.LabelMap= new Class({
     return ret;
   },
 // -------------------------------------------------------------------------------- LabelMap.set
+//fm: LabelMap.set (gobject)
 // zobrazí v mapě informace předané objektem geo
 //   set({mark:'mark*'[,ezer]...) - doplní do mapy značky s informacemi podle popisu
 //                                  k vytvořeným značkám přidá případně objekt ezer
@@ -2770,7 +2805,6 @@ Ezer.LabelMap= new Class({
 // id   = nenulový klíč
 // bod  = lat,ltd
 // icon = CIRCLE[,scale:1-10][,ontop:1]|cesta k bitmapě
-//fm: LabelMap.set (gobject)
   set: function (geo) {
     var ret= 1;
     // -------------------------------------------- MARK
@@ -2872,8 +2906,8 @@ Ezer.LabelMap= new Class({
     return ret;
   },
 // --------------------------------------------------------------------------- LabelMap.set_mark
-// zpřístupní vlastnosti dané značky
 //fm: LabelMap.set_mark (mark,option)
+// zpřístupní vlastnosti dané značky
   set_mark: function (mark,ids,value) {
   var res= 1;
     var id= ids.split('.');
@@ -2902,8 +2936,8 @@ Ezer.LabelMap= new Class({
     return res;
   },
 // --------------------------------------------------------------------------- LabelMap.get_bounds
-// vrátí souřadnice severovýchodního a jihozápadního rohu mapy spojené středníkem
 //fm: LabelMap.get_bounds ()
+// vrátí souřadnice severovýchodního a jihozápadního rohu mapy spojené středníkem
   get_bounds: function () {
     var rect= "";
     var bounds= this.map.getBounds();
@@ -2916,8 +2950,8 @@ Ezer.LabelMap= new Class({
     return rect;
   },
 // --------------------------------------------------------------------------- LabelMap.fit_Bounds
-// zvolí měřítko a polohu mapy tak, aby byly vidět všechny nastavené značky
 //fm: LabelMap.fit_bounds ()
+// zvolí měřítko a polohu mapy tak, aby byly vidět všechny nastavené značky
   fit_bounds: function () {
     if ( Object.getLength(this.mark) ) {
       var box= new google.maps.LatLngBounds();
@@ -2928,12 +2962,11 @@ Ezer.LabelMap= new Class({
     }
     return 1;
   },
-// (setBounds,panToBounds, getZoom, setZoom)
 // --------------------------------------------------------------------------- LabelMap.geocode
+//fi: LabelMap.geocode (gobject)
 // doplní do gobjektu souřadnice obsažené adresy nebo je vymaže,
 // pokud adresa nebyla poznána
 //   geocode({id,address:x,...}) => {mark:'id,lat,ltd',...}
-//fi: LabelMap.geocode (gobject)
   geocode_counter:1,
   geocode: function (geo) {
     if ( !this.geocoder ) this.geocoder= new google.maps.Geocoder();

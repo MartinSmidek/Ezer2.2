@@ -1458,6 +1458,29 @@
     }
     break;
   # ================================================================================================ CODE
+  # ------------------------------------------------------------------------------------ dbg_compile
+  case 'dbg_compile':
+    require_once("$ezer_path_serv/comp2.php");
+    require_once("$ezer_path_serv/comp2def.php");
+    $log= $code= "";
+    $log.= dbg_context_load($x->context);
+    try {
+      $ezer= $x->script;
+      $ok= get_ezer($top,true);
+      $c= $top->part->dbg;
+      proc($c,'dbg');
+    }
+    catch (Exception $e) {
+      goto end_dbg;
+    }
+    $code= $top->part->dbg->code;
+    if ( $code ) $log.= "přeložený kód:".xcode($code,0,'');
+  end_dbg:
+    $y->ret->code= $code;
+    $y->ret->err= $err;
+    $y->ret->errors= $errors;
+    $y->ret->trace= $log.$trace;
+    break;
   # ------------------------------------------------------------------------------------- load_code2
   # zavede modul včetně modulů vnořených pomocí options.include:onload[,fname]
   # pokud je zdrojový text modulu novější než přeložený json-text, pak jej napřed přeloží.

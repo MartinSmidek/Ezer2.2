@@ -632,9 +632,13 @@ hr.cleaner {
 
 /* echo, error, dbg */
 
-#kuk, #kuk_err, #error {
-  z-index:2; display:none; height:{$h_kuk}px; margin:0;
+#kuk, #kuk_err, #error, #dbg {
+  position:relative; z-index:2; display:none; height:{$h_kuk}px; margin:0;
   background-color:#eee; overflow-y:scroll; font-size:8pt; line-height:13px; }
+#dbg {
+  float:right; background-color:#ffa; width:400px; border:0; padding:0 5px; }
+.dbg_context {
+  outline:2px dotted #ff00ff; }
 .dbg {
   margin:0; overflow-y:auto; font-size:8pt; line-height:13px; }
 #warning {

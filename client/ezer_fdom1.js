@@ -56,8 +56,10 @@ Ezer.Application= new Class({
     // změna výšky definuje velikost pracovní plochy
     Ezer.Shield.top= $('work').getCoordinates().top;
     if ( this.options.to_trace ) {
+      $('dbg').setStyle('height',0);
       var h= $('dolni').getCoordinates().top - $('work').getCoordinates().top;
       $('work').setStyle('height',h);
+      $('dbg').setStyle('height',$('kuk').getStyle('height'));
     }
     else {
       var h= $('dolni').getCoordinates().top - $('horni').getCoordinates().bottom;
@@ -219,6 +221,12 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- _setTrace
   // vytvoření ovládání trasování, hlášení chyb, FAQ
   _setTrace: function() {
+    function __run() {
+      if ( Ezer.help.block )
+        Ezer.help.block.runScript($('dbg').value);
+      else
+        Ezer.run.$.runScript($('dbg').value);
+    }
     this._barRightDom= $('status_right');
     this._bar= {};
     this._barRightDom.getChildren().destroy();
@@ -250,6 +258,47 @@ Ezer.Application= new Class({
       this._barSwitch('q','kód interpreta');
       this._barSwitch('Q','kód interpreta (jen s ift,iff,is)');
       this._barSwitch('C','trasování kompilátoru');
+      // debug - zobrazení debuggeru - zachází se s ním jako s trasováním '$'
+      Ezer.is_trace['$']= this.options.ae_trace.indexOf('$')>=0;
+      new Element('span', {id:'dbg_switch', text:'debug!', title:'zobrazí debugger',
+         'class':Ezer.is_trace['$']?'ae_switch_on':'', events:{
+        click: function(event) {
+          if ( Ezer.to_trace ) {
+            event.target.toggleClass('ae_switch_on');
+            if ( this.options.ae_trace.indexOf('$')>=0 ) {
+              this.options.ae_trace= this.options.ae_trace.replace('$','');
+              Ezer.is_trace['$']= false;
+            }
+            else {
+              this.options.ae_trace+= '$';
+              Ezer.is_trace['$']= true;
+            }
+            $('dbg').setStyles({display:event.target.hasClass('ae_switch_on') ? 'block' : 'none'});
+          }
+        }.bind(this),
+        contextmenu: function(e) {
+          Ezer.fce.contextmenu([
+            ['run (ctrl-Enter)',        function(el) { __run() }],
+            ['clear & run (alt-Enter)', function(el) { Ezer.fce.clear(); __run() }],
+            ['-výběr kontextu',         function(el) { Ezer.run.$.helpBlock(1) }],
+            ['zrušení kontextu', function(el) {
+              var dom= Ezer.help.dom(Ezer.help.block);
+              if ( dom )
+                dom.removeClass('dbg_context');
+            }]
+          ],arguments[0]);
+          return false;
+        }.bind(this)
+      }}).inject(this._barRightDom);
+      $('dbg').addEvents({
+        keydown: function (event) {
+          if (event.key=='enter' && (event.control || event.alt) ) {
+            if ( event.alt ) Ezer.fce.clear();
+            __run();
+          }
+        }.bind(this),
+      })
+      $('dbg').setStyles({display:Ezer.is_trace['$'] ? 'block' : 'none'});
       // dump
       new Element('span', {text:'dump:',title:'vypíše proměnné zobrazeného panelu', events:{
         click: function(event) {
@@ -268,8 +317,6 @@ Ezer.Application= new Class({
           Ezer.trace(null,Ezer.fce.trail('show'));
         }.bind(this)
       }}).inject(this._barRightDom);
-//       // informace na konci
-//       new Element('span', {text:'| '+MooTools.lang.getCurrentLanguage()}).inject(this._barRightDom);
       // obsluha okna s chybami a trasováním
       $('kuk').addEvent('dblclick',this._clearTrace.bind(this))
               .setStyles({display:Ezer.to_trace ? 'block' : 'none'});
@@ -281,7 +328,7 @@ Ezer.Application= new Class({
         }.bind(this)
       });
     }
-    // pro všechny okno pro zobrazení měření výkonu - zachází se s ním jako s trasováním 'S'
+    // speed - pro všechny okno pro zobrazení měření výkonu - zachází se s ním jako s trasováním 'S'
     Ezer.is_trace['S']= this.options.ae_trace.indexOf('S')>=0;
     var speed= new Element('span', {text:'speed:','class':Ezer.is_trace['S']?'ae_switch_on':'',
         title:'zobrazí okno s měřením výkonu', events:{
@@ -357,10 +404,12 @@ Ezer.Application= new Class({
     if ( Ezer.to_trace ) {
       $('kuk').setStyle('display','block');
       $('status_bar').setStyles({cursor:'ns-resize'});
+      $('dbg').setStyles({display:$('dbg_switch').hasClass('ae_switch_on') ? 'block' : 'none'});
     }
     else {
       $('status_bar').setStyles({cursor:'default'});
       $('kuk').setStyle('display','none');
+      $('dbg').setStyle('display','none');
     }
   },
   // ----------------------------------------------------------------------------- _setTraceOnOff
@@ -689,6 +738,7 @@ Ezer.Block= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  Ezer.help
 // programátorské informace
 Ezer.help= {
+  block: null,                  // poslední blok, na který bylo kliknuto
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  dom
 // získání zobrazeného bloku
   dom: function (the) {
@@ -938,6 +988,7 @@ Ezer.Help= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _helpThis
   _helpSave: {},                        // úschova vlastností
   _helpIn: false,
+  _helpBlock: null,                     // zvolený blok - je definován událostí click
 // počne resp. skončí design-mode pro blok
   _helpThis: function(on) {
     // vlastní funkce
@@ -969,13 +1020,25 @@ Ezer.Help= new Class({
                  opacity:this._helpSave.opacity});
             }
             return false;
+          }.bind(this),
+          click:  function() {
+            if ( this._helpIn ) {
+              Ezer.help.block= this;
+                                                    Ezer.trace('*','context: '+this.self()+'/'+this._helpIn);
+              Ezer.run.$.helpBlock(0);
+              var dom= Ezer.help.dom(this);
+              if ( dom ) {
+                dom.addClass('dbg_context');
+              }
+            }
+            return false;
           }.bind(this)
         });
       }
       else {
         dom.title= this._helpSave.title;
         this.enable(this._helpSave.enabled);
-        dom.removeEvents('mouseover','mouseout');
+        dom.removeEvents('mouseover','mouseout','click');
       }
     }
   }

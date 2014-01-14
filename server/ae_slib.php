@@ -413,6 +413,7 @@ $html_header
       <div id='status_center' style="float:left;">zpráva</div>
       <div id='status_right' style="float:right;"></div>
     </div>
+    <textarea id="dbg"></textarea>
     <pre id="kuk"></pre>
   </div>
   <div id="report" class="report"></div>

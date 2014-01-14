@@ -112,7 +112,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
           $cntx= file_get_contents($cname);
           $load= json_decode($cntx);
 //                                                         debug($load,$cname);
-//                                                         display($cntx);
+//                                                         display($cname);
           $code= $load->code;
           if ( $code->library )
             $is_library= true;
@@ -231,6 +231,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
           link_code($spart,"$top.$id",false,$id);
         }
         foreach ($start->part as $id=>$spart) {
+//                                                 if ( "$top.$id"=='$.test.fce.dbg._d' ) debug($context,"call proc($top.$id)",(object)array('depth'=>3));
           proc($spart,"$top.$id");
 //                                                         debug($spart,'po proc (2)');
         }
@@ -300,6 +301,101 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
   unset($loads->code);
 //                                                         debug($loads,"ENVIRONMENT $myname");
   return "$ok = kompilace a link $ename => $cname";
+}
+# --------------------------------------------------------------------------------- dbg_context_load
+# pro natažení kontextu překladu pro debugger
+function dbg_context_load ($ctx) {  #trace();
+  $log= "";
+  // části funkce comp2:comp_file
+  require_once("ezer2.2/server/comp2.php");
+  global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
+    $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes, $onloads;
+  global $call_php;
+  $errors= 0;
+  try {
+    // definice kompilačního prostředí
+    $name= substr($ctx->self,2);
+    $root= $ctx->app;
+    // natažení kontextu
+    $context= array();
+    $ids= explode('.',$name);
+    $n= count($ids);
+    $k= $kend= $n-1;
+    $prefix= "$ezer_path_root/$root/code";
+    while ( $k>=0 ) {
+      // postupně zkracujeme složené jméno
+      $try= $k>0 ? implode('.',array_slice($ids,0,$k)) : '$';
+      $cname= "$prefix/$try.json";
+      if ( file_exists($cname) ) {
+        // pokud je jménem přeloženého modulu, vložíme do $includes
+        $cntx= file_get_contents($cname);
+        $load= json_decode($cntx);
+        $code= $load->code;
+        if ( $code->library )
+          $is_library= true;
+        $includes[$try]= $code;
+        $level= array();
+        if ( $try=='$' ) {
+          $level[]= (object)array(id=>'$','ctx'=>$code);
+          $id= '$';
+        }
+        elseif ( $code->library ) {
+          $level[]= (object)array(id=>'#','ctx'=>$code);
+          $id= '#';
+        }
+        elseif ( $k>0 ) {
+          $id= $ids[$k-1];
+        }
+        else $log.= "LINK: chyba pro $name";
+        // test na přítomnost $ids[$k...$kend] v $cntx
+        $goal_obj= null;
+        for ($i= $k, $ci= $code, $idi= $ids[$k]; $i<=$kend; $i++, $ci= $cid, $idi= $ids[$i]) {
+          if ( !isset($ci->part) || !$idi ) continue;
+          $cid= $ci->part->$idi;
+          if ( $cid ) $level[]= (object)array('id'=>$idi,'ctx'=>$cid);
+          $goal_obj= $cid;
+          $goal_id= $idi;
+          if ( $i==$n-1 ) {
+            $start= $cid;
+            $sid= $idi;
+          }
+        }
+        $including[]= (object)array('in'=>$try,'obj'=>$goal_obj);
+        for($i= count($level)-1; $i>=0; $i--) {
+          array_unshift($context,$level[$i]);
+        }
+        // pokud jsme narazili na knihovnu, další moduly nejsou potřeba
+        if ( $code->library ) {
+          $top= "#.$sid";
+          break;
+        }
+        $k--;
+        $kend= $k;
+      }
+      else {
+        $k--;
+      }
+      for ($i= 1; $i<count($including); $i++) {
+        $including[$i]->includes= $including[$i-1]->in;
+      }
+      for ($i= 1; $i<count($including); $i++) {
+        $including[$i]->obj->part= $includes[$including[$i]->includes]->part;
+      }
+      for ($i= 0; $i<count($including); $i++) {
+        if ( isset($including[$i]->obj->options->include) )
+          unset($including[$i]->obj->options->include);
+      }
+    }
+    // označkuj zděděné
+    if ( $start->part ) foreach ($start->part as $id=>$spart) {
+      $start->part->$id->_old= true;
+    }
+  }
+  catch (Exception $e) {
+    $log= "ERROR";
+  }
+end:
+  return $log;
 }
 # -------------------------------------------------------------------------------------------------- xlist
 # listing modulu
@@ -576,6 +672,7 @@ function proc(&$c,$name) { #trace();
   global $trace_me;
   global $context, $code, $module, $procs, $plain_code, $error_code_context, $error_code_lc
     , $names, $full;
+//                                                 if ( $name='dbg' || $name=='$.test.fce.dbg._d.test' ) debug($context,"proc($name)",(object)array('depth'=>3));
   if ( $c->type=='proc' ) {
     $trace_me= $_GET['trace']==1; //&& $c->id=='xonclick';
     if ($trace_me) $before= debugx($c);
@@ -1633,12 +1730,12 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
 # ================================================================================================== SYNTAX
 # lexikální a syntaktická analýza
 # -------------------------------------------------------------------------------------------------- ezer
-function get_ezer (&$top) {
+function get_ezer (&$top,$dbg=false) {
   global $tree, $lex, $head, $attribs1, $attribs2, $keywords, $errors, $const_list;
   $const_list= array();
   get_ezer_keys($keywords,$attribs1,$attribs2);
   note_time('tables');
-  $ok= lex_analysis2();
+  $ok= lex_analysis2($dbg);
   note_time('lexical');
   if ( $ok ) {
     $head= 0; $tree= '';
@@ -2535,11 +2632,13 @@ function get_expr($context,&$expr) {
 }
 # ================================================================================================== LEXICAL
 # -------------------------------------------------------------------------------------------------- lex_analysis2
-function lex_analysis2 () {
+function lex_analysis2 ($dbg=false) {
   global $tok2lex, $ezer, $keywords, $specs, $lex, $typ, $pos, $not, $gen_source;
 
   // rozbor na tokeny podle PHP
-  $tok= token_get_all("<"."?php\n $ezer ?".">");
+  $tok= token_get_all( $dbg
+    ? ("<"."?php\n proc dbg() ".'{'."$ezer} ?".">")
+    : ("<"."?php\n $ezer ?".">"));
 //                                                             debug($tok,'tok');
   note_time('lexical1');
   tok_positions($tok);
