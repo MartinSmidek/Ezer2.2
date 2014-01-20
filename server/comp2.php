@@ -320,7 +320,7 @@ function dbg_context_load ($ctx) {  #trace();
     $context= array();
     $ids= explode('.',$name);
     $n= count($ids);
-    $k= $kend= $n-1;
+    $k= $kend= $n;
     $prefix= "$ezer_path_root/$root/code";
     while ( $k>=0 ) {
       // postupně zkracujeme složené jméno
@@ -395,6 +395,7 @@ function dbg_context_load ($ctx) {  #trace();
     $log= "ERROR";
   }
 end:
+//                                                 debug($context,"kontext kompilace",(object)array('depth'=>3));
   return $log;
 }
 # -------------------------------------------------------------------------------------------------- xlist
@@ -2637,7 +2638,7 @@ function lex_analysis2 ($dbg=false) {
 
   // rozbor na tokeny podle PHP
   $tok= token_get_all( $dbg
-    ? ("<"."?php\n proc dbg() ".'{'."$ezer} ?".">")
+    ? ("<"."?php\n proc dbg() ".'{'."$ezer \n} ?".">")
     : ("<"."?php\n $ezer ?".">"));
 //                                                             debug($tok,'tok');
   note_time('lexical1');

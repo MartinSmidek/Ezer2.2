@@ -1458,6 +1458,7 @@
     }
     break;
   # ================================================================================================ CODE
+  # překlad předaného ezercriptu a jeho zapamatování v SESSION
   # ------------------------------------------------------------------------------------ dbg_compile
   case 'dbg_compile':
     require_once("$ezer_path_serv/comp2.php");
@@ -1466,6 +1467,7 @@
     $log.= dbg_context_load($x->context);
     try {
       $ezer= $x->script;
+      $_SESSION[$ezer_root]['dbg_script']= $ezer;
       $ok= get_ezer($top,true);
       $c= $top->part->dbg;
       proc($c,'dbg');

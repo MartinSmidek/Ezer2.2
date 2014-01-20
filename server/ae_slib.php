@@ -108,11 +108,13 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     'status_bar'        => $ezer_template=='menu' ? 'true' : 'false',
     'to_speed'          => 1,
     'to_trace'          => $ezer_template=='menu' ? 'true' : 'false',
-    'path_docs'         => "'$ezer_path_docs'"  // složka pro upload skrze LabelDrop
+    'path_docs'         => "'$ezer_path_docs'",  // složka pro upload skrze LabelDrop
+    'theight'           => $theight
   );
   $js_options->watch_ip= $EZER->options->watch_ip= $pars->watch_ip ? '1' : '0';
   $js_options->watch_key= $EZER->options->watch_key= $pars->watch_key ? '1' : '0';
   $js_options->CKEditor= $pars->CKEditor ? $pars->CKEditor : '{}';
+  $js_options->dbg=      $pars->dbg ? $pars->dbg : '0';
   if ( $menu )      $js_options->start= "'$menu'";
   if ( $xtrace ) {
     $js_options->to_trace= 1;
@@ -137,6 +139,19 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
       $del= ',';
     }
   }
+  // klíčová slova pro debugger
+  $head_jush= '';
+  if ( $pars->dbg ) {
+    require_once("$ezer_path_serv/sys_doc.php");
+    pspad_keys($res,$key1,$key2,$key3);
+    $k= strtr(substr($key2,0,-1),array("="=>'|',"\n"=>''));
+    $head_jush= <<<__EOD
+  <script type="text/javascript">
+    jush.links2.sql=/(\b)(($k))\b(\s*)/g;
+  </script>
+__EOD;
+  }
+
   // SLEDOVÁNÍ IP ADRESY
   $ip_ok= true;
   $ip_msg= '';
@@ -306,6 +321,7 @@ __EOD;
     }
   </script>
   $head
+$head_jush
 </head>
 __EOD;
   $html_footer.= <<<__EOD
@@ -364,6 +380,16 @@ __EOD;
   case 'menu':
 # ------------------------------------------------------------------------------- HTML menu
 # template pro zobrazení Ezer.MenuMain jako hlavního objektu aplikace
+$dolni= $xtrace ? '' : " style='height:0'";
+$dbg_script= trim($_SESSION[$ezer_root]['dbg_script']) ?: "echo(fdate('j.n.Y')) // příkazy + ctrl-Enter";
+$debugger= $js_options->dbg ? <<<__EOD
+    <form action="" method="post" enctype="multipart/form-data" id="form">
+      <textarea id="dbg" name='query' class='sqlarea jush-sql' spellcheck='false' wrap='off'
+      >$dbg_script</textarea>
+      <script type='text/javascript'>focus(document.getElementsByTagName('textarea')[0]);</script>
+    </form>
+__EOD
+ : '';
 $template= <<<__EOD
 $html_header
 <body id="body" class='nogrid'>
@@ -402,19 +428,21 @@ $html_header
   </div>
   <div id="uzivatel"></div>
 <!-- paticka -->
-  <div id="dolni">
+  <div id="paticka">
     <div id="warning"></div>
     <div id="kuk_err"></div>
-    <div id="paticka">
-      <div id="error"></div>
-    </div>
-    <div id="status_bar" style="width:100%;height:16px;padding: 1px 0pt 0pt;">
+    <div id="error"></div>
+  </div>
+  <div id="dolni"$dolni>
+    <div id="status_bar">
       <div id='status_left' style="float:left;"></div>
       <div id='status_center' style="float:left;">zpráva</div>
       <div id='status_right' style="float:right;"></div>
     </div>
-    <textarea id="dbg"></textarea>
-    <pre id="kuk"></pre>
+    <div id="trace">
+      $debugger
+      <pre id="kuk"></pre>
+    </div>
   </div>
   <div id="report" class="report"></div>
   <form><input id="drag" type="button" /></form>

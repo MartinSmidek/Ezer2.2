@@ -51,6 +51,13 @@ window.addEvent('load', function() {
 //   if ( Ezer.app.options.debug ) window.top.dbg.init();
   Ezer.app._mini_debug(Ezer.app.options.mini_debug);
   if ( Ezer.app.options.ondomready ) ondomready();
+//   if ( Ezer.options.dbg ) {
+//     $('body').addEvents({
+//       onkeydown: function(event){bodyKeydown(event)},
+//       onclick:   function(event){bodyClick(event)}
+//     })
+//     bodyLoad('5.1');
+//   }
 });
 // ----------------------------------------------------------------------------- ON popstate
 if ( Ezer.browser!='IE' )                               // IE nepodporuje HTML5

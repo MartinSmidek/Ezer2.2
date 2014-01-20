@@ -130,8 +130,8 @@ textarea { resize: none; }
   /*overflow:auto;*/ position:relative; }
 #dolni {
   bottom:0; margin-top:2px; color:$c3_kuk; font-size:8pt;
-  width:100%; z-index:6000; border-top:1px solid $c_kuk;
-  position:fixed; _position:absolute; }
+  width:100%; height:{$h_kuk}px; z-index:6000; border-top:1px solid $c_kuk;
+  position:absolute; }
 .nogrid {
   background: $b url($path/body_bg.png) repeat-x; }
 .karta {
@@ -593,6 +593,7 @@ __EOD
 
 /* patička */
 
+#paticka { width:100%; position:absolute; z-index: 999; }
 #status, #status_left, #status_right {
   cursor:default; }
 #status_right {
@@ -601,15 +602,16 @@ __EOD
   position:absolute; top:-15px; right:0;
   background-color:$b_kuk; color:$c2_kuk;  }
 #status_bar {
-  background:#eee url($path/foot_bg.png) repeat-x; color:$c2_kuk; }
-#dolni span {
+  background:#eee url($path/foot_bg.png) repeat-x; color:$c2_kuk; position:absolute;
+  height:15px; top:-16px; width:100%; padding:1px 0 0; }
+#status_bar span {
   padding:1px 4px; margin:0 2px; }
 hr.cleaner {
   clear:both; display:none; }
 #dolni a {
   text-decoration:none; color:$c_kuk; }
 #dolni pre {
-  font-family:Consolas;  }
+  font-family:Consolas; }
 #dolni .line {
   color:grey;  }
 #dolni a:hover {
@@ -630,11 +632,20 @@ hr.cleaner {
 #bar_perc {
   background:#ffb454; height:4px; -moz-box-shadow:2px 2px 7px #a60; }
 
-/* echo, error, dbg */
+/* debugger */
+#form {
+  float:right; background-color:#ffa; width:400px; height:100%; margin:0; border:0; display:none; }
+#form pre {
+  overflow:auto; height:100%; margin:0; padding:2px 5px; }
 
+/* echo, error, dbg */
+#trace {
+  height:100%; width:100%; }
 #kuk, #kuk_err, #error, #dbg {
-  position:relative; z-index:2; display:none; height:{$h_kuk}px; margin:0;
+  position:relative; z-index:2; height:100%; margin:0;
   background-color:#eee; overflow-y:scroll; font-size:8pt; line-height:13px; }
+#kuk_err, #error {
+  display:none; }
 #dbg {
   float:right; background-color:#ffa; width:400px; border:0; padding:0 5px; }
 .dbg_context {
