@@ -1463,22 +1463,30 @@
   case 'dbg_compile':
     require_once("$ezer_path_serv/comp2.php");
     require_once("$ezer_path_serv/comp2def.php");
-    $log= $code= "";
+    $log= $cd= "";
     $log.= dbg_context_load($x->context);
     try {
       $ezer= $x->script;
       $_SESSION[$ezer_root]['dbg_script']= $ezer;
+//                                                 debug($context,"dbg_compile",(object)array('depth'=>3));
+//                                                 $top= $context[2]->ctx->part->pot;
+//                                                 debug($top,"dbg_compile",(object)array('depth'=>3));
       $ok= get_ezer($top,true);
-      $c= $top->part->dbg;
-      proc($c,'dbg');
+      if ( $ok ) {
+        $c= $top->part->dbg;
+        proc($c,'dbg');
+      }
     }
     catch (Exception $e) {
       goto end_dbg;
     }
-    $code= $top->part->dbg->code;
-    if ( $code ) $log.= "přeložený kód:".xcode($code,0,'');
+    if ( !$errors ) {
+      $cd= $top->part->dbg->code;
+      if ( $cd ) $log.= "přeložený kód:".xcode($cd,0,'');
+    }
   end_dbg:
-    $y->ret->code= $code;
+    $y->ret= (object)array();
+    $y->ret->code= $cd;
     $y->ret->err= $err;
     $y->ret->errors= $errors;
     $y->ret->trace= $log.$trace;

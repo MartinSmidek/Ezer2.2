@@ -288,9 +288,9 @@ Ezer.Application= new Class({
           }.bind(this),
           contextmenu: function(e) {
             Ezer.fce.contextmenu([
-              ['run (ctrl-Enter)',        function(el) { __run() }],
-              ['clear & run (alt-Enter)', function(el) { Ezer.fce.clear(); __run() }],
-              ['-výběr kontextu',         function(el) {
+              ['run (ctrl-Enter)',              function(el) { __run() }],
+              ['clear & run (shift-ctrl-Enter)',function(el) { Ezer.fce.clear(); __run() }],
+              ['-výběr kontextu',               function(el) {
                 Ezer.help.dbg= true;
                 Ezer.run.$.helpBlock(1)
               }],
@@ -306,8 +306,8 @@ Ezer.Application= new Class({
         }}).inject(this._barRightDom);
         $('form').addEvents({
           keydown: function (event) {
-            if (event.key=='enter' && (event.control || event.alt) ) {
-              if ( event.alt ) Ezer.fce.clear();
+            if (event.key=='enter' && event.control ) {
+              if ( event.shift ) Ezer.fce.clear();
               __run();
             }
           }.bind(this),

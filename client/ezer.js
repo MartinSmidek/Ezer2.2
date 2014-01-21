@@ -882,10 +882,12 @@ Ezer.Block= new Class({
     var s= this.app_file();     // zjistí {app:app,file:file,root:root}
     var self= '';
     for (var o= this; o.owner; o= o.owner) {
+      if ( o._library )
+        break;
       if ( o.type!='var' )
         self= o._id+(self ? '.'+self : '');
     }
-    self= self ? '$.'+self : '$';
+    self= self ? (o._library ? '#.' : '$.')+self : '$';
                                                 Ezer.trace('*','self='+self);
     var x= {cmd:'dbg_compile',context:{self:self,app:s.app,file:s.file},script:script};
     this.ask(x,'runScript_');

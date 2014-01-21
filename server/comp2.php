@@ -1,6 +1,7 @@
 <?php # (c) 2007-2009 Martin Smidek <martin@smidek.eu>
 
-global $x, $y, $trace, $err,$ezer_path_code;
+global $x, $y, $trace, $err,$ezer_path_code, $debugger;
+$debugger= false; // true => kompilátor spuštěn v okně debug
 # zaslepení funkcí
 function note_time() {};
 # ================================================================================================== COMPILER
@@ -306,18 +307,25 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
 # pro natažení kontextu překladu pro debugger
 function dbg_context_load ($ctx) {  #trace();
   $log= "";
+  $debugger= true;
   // části funkce comp2:comp_file
   require_once("ezer2.2/server/comp2.php");
-  global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
+  global $debugger, $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
     $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes, $onloads;
   global $call_php;
+  $call_php= array();
   $errors= 0;
   try {
     // definice kompilačního prostředí
-    $name= substr($ctx->self,2);
+//     $name= $ctx->self;
+//     $name= substr($name,0,2)=='$.' ? substr($name,2) : $name;
+//     $name= substr(strstr($name,'.'),1);
+                                                        debug($ctx);
+    $name= $ctx->file;
     $root= $ctx->app;
     // natažení kontextu
     $context= array();
+    $context_id= array();
     $ids= explode('.',$name);
     $n= count($ids);
     $k= $kend= $n;
@@ -327,6 +335,7 @@ function dbg_context_load ($ctx) {  #trace();
       $try= $k>0 ? implode('.',array_slice($ids,0,$k)) : '$';
       $cname= "$prefix/$try.json";
       if ( file_exists($cname) ) {
+                                                        display("$cname:");
         // pokud je jménem přeloženého modulu, vložíme do $includes
         $cntx= file_get_contents($cname);
         $load= json_decode($cntx);
@@ -345,6 +354,7 @@ function dbg_context_load ($ctx) {  #trace();
         }
         elseif ( $k>0 ) {
           $id= $ids[$k-1];
+          $level[]= (object)array(id=>$id,'ctx'=>$code);
         }
         else $log.= "LINK: chyba pro $name";
         // test na přítomnost $ids[$k...$kend] v $cntx
@@ -362,7 +372,11 @@ function dbg_context_load ($ctx) {  #trace();
         }
         $including[]= (object)array('in'=>$try,'obj'=>$goal_obj);
         for($i= count($level)-1; $i>=0; $i--) {
-          array_unshift($context,$level[$i]);
+                                                display("add context {$level[$i]->id} $cname");
+          if ( !isset($context_id[$level[$i]->id]) ) {
+            $context_id[$level[$i]->id]= true;
+            array_unshift($context,$level[$i]);
+          }
         }
         // pokud jsme narazili na knihovnu, další moduly nejsou potřeba
         if ( $code->library ) {
@@ -395,6 +409,7 @@ function dbg_context_load ($ctx) {  #trace();
     $log= "ERROR";
   }
 end:
+//                                                 debug($context_id,"kontext kompilace");
 //                                                 debug($context,"kontext kompilace",(object)array('depth'=>3));
   return $log;
 }
@@ -1794,6 +1809,7 @@ function get_ezer_keys (&$keywords,&$attribs1,&$attribs2) {
 # struct :: '{' part (',' part)* '}' ]
 # part   :: block | attr
 function get_if_block ($root,&$block,&$id) {
+//                                                 debug($root,"get_if_block",(object)array('depth'=>2));
   global $blocs, $blocs2, $blocs3, $specs, $attribs1, $attribs2, $tree, $last_lc;
   global $pragma_syntax, $pragma_group, $pragma_box;
   global $errors; if ( $errors ) return false;
