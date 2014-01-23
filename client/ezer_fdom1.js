@@ -227,6 +227,7 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- _setTrace
   // vytvoření ovládání trasování, hlášení chyb, FAQ
   _setTrace: function() {
+    // provedení skriptu
     function __run() {
       if ( Ezer.help.block )
         Ezer.help.block.runScript($('dbg').value);
@@ -235,6 +236,14 @@ Ezer.Application= new Class({
       }
       else
         Ezer.run.$.runScript($('dbg').value);
+    }
+    // odstranění nastaveného kontextu pro skript
+    function __clear() {
+      if ( Ezer.help.block ) {
+        var dom= Ezer.help.dom(Ezer.help.block);
+        if ( dom ) dom.removeClass('dbg_context');
+        Ezer.help.block= null;
+      }
     }
     this._barRightDom= $('status_right');
     this._bar= {};
@@ -291,15 +300,11 @@ Ezer.Application= new Class({
               ['run (ctrl-Enter)',              function(el) { __run() }],
               ['clear & run (shift-ctrl-Enter)',function(el) { Ezer.fce.clear(); __run() }],
               ['-výběr kontextu',               function(el) {
+                __clear();
                 Ezer.help.dbg= true;
                 Ezer.run.$.helpBlock(1)
               }],
-              ['zrušení kontextu', function(el) {
-                var dom= Ezer.help.dom(Ezer.help.block);
-                if ( dom )
-                  dom.removeClass('dbg_context');
-                Ezer.help.block= null;
-              }]
+              ['zrušení kontextu',              function(el) { __clear() }]
             ],arguments[0]);
             return false;
           }.bind(this)

@@ -51,13 +51,6 @@ window.addEvent('load', function() {
 //   if ( Ezer.app.options.debug ) window.top.dbg.init();
   Ezer.app._mini_debug(Ezer.app.options.mini_debug);
   if ( Ezer.app.options.ondomready ) ondomready();
-//   if ( Ezer.options.dbg ) {
-//     $('body').addEvents({
-//       onkeydown: function(event){bodyKeydown(event)},
-//       onclick:   function(event){bodyClick(event)}
-//     })
-//     bodyLoad('5.1');
-//   }
 });
 // ----------------------------------------------------------------------------- ON popstate
 if ( Ezer.browser!='IE' )                               // IE nepodporuje HTML5
@@ -233,6 +226,9 @@ Ezer.Application.implement({
         this.loginDomMsg('nemáte dostatečné oprávnění');
       }
       else {
+        if ( Ezer.options.dbg && !y.sys.user.skills.contains('m',' ') ) {
+          Ezer.options.dbg= 0;                  // debugger je jen pro programátory
+        }
         Ezer.sys.user= y.sys.user;
         Ezer.sys.ezer= y.sys.ezer;
         this.loginDomClose();

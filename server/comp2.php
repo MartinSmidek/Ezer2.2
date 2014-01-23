@@ -1,7 +1,7 @@
 <?php # (c) 2007-2009 Martin Smidek <martin@smidek.eu>
 
 global $x, $y, $trace, $err,$ezer_path_code, $debugger;
-$debugger= false; // true => kompilátor spuštěn v okně debug
+// $debugger= false; // true => kompilátor spuštěn v okně debug
 # zaslepení funkcí
 function note_time() {};
 # ================================================================================================== COMPILER
@@ -24,7 +24,8 @@ function comp ($src) {
     $errors,$js1, $js2, $js3, $js3_ic, $err, $code;
   $ezer= $src;
   $yobj= (object)array();
-  $ycomp= get_ezer($yobj) ? 'ok' : 'ko';
+  $dbgobj= null;
+  $ycomp= get_ezer($yobj,$dbgobj) ? 'ok' : 'ko';
 //   $code= gen_code($yobj);
   if ( $errors ) display($tree);
   $code= $yobj;
@@ -195,7 +196,8 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
     }
     // vlastní překlad
                                                         if ($_GET['trace']==3) debug($start,'před get_ezer');
-    $ok= get_ezer($start) ? 'ok' : 'ko';
+    $dbgobj= null;
+    $ok= get_ezer($start,$dbgobj) ? 'ok' : 'ko';
                                                         if ($_GET['trace']==2) debug($start,"po get_ezer = $ok");
     // pokud je pragma.names, připrav doplnění jednoznačných jmen
     if ( $pragma_syntax ) $start= pragma_syntax($start);        // provedení pragma.syntax
@@ -307,7 +309,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
 # pro natažení kontextu překladu pro debugger
 function dbg_context_load ($ctx) {  #trace();
   $log= "";
-  $debugger= true;
+//   $debugger= true;
   // části funkce comp2:comp_file
   require_once("ezer2.2/server/comp2.php");
   global $debugger, $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
@@ -320,7 +322,7 @@ function dbg_context_load ($ctx) {  #trace();
 //     $name= $ctx->self;
 //     $name= substr($name,0,2)=='$.' ? substr($name,2) : $name;
 //     $name= substr(strstr($name,'.'),1);
-                                                        debug($ctx);
+//                                                         debug($ctx);
     $name= $ctx->file;
     $root= $ctx->app;
     // natažení kontextu
@@ -335,7 +337,7 @@ function dbg_context_load ($ctx) {  #trace();
       $try= $k>0 ? implode('.',array_slice($ids,0,$k)) : '$';
       $cname= "$prefix/$try.json";
       if ( file_exists($cname) ) {
-                                                        display("$cname:");
+//                                                         display("$cname:");
         // pokud je jménem přeloženého modulu, vložíme do $includes
         $cntx= file_get_contents($cname);
         $load= json_decode($cntx);
@@ -372,7 +374,7 @@ function dbg_context_load ($ctx) {  #trace();
         }
         $including[]= (object)array('in'=>$try,'obj'=>$goal_obj);
         for($i= count($level)-1; $i>=0; $i--) {
-                                                display("add context {$level[$i]->id} $cname");
+//                                                 display("add context {$level[$i]->id} $cname");
           if ( !isset($context_id[$level[$i]->id]) ) {
             $context_id[$level[$i]->id]= true;
             array_unshift($context,$level[$i]);
@@ -696,6 +698,7 @@ function proc(&$c,$name) { #trace();
     $procs[]= $desc;
 //                                                 display("proc $name");
     try {
+//                                                 debug($context,"proc($name)",(object)array('depth'=>3));
       gen_proc($c,$desc,$name);
       $c->par= $desc->par;
       $c->npar= count((array)$c->par);
@@ -1746,7 +1749,9 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
 # ================================================================================================== SYNTAX
 # lexikální a syntaktická analýza
 # -------------------------------------------------------------------------------------------------- ezer
-function get_ezer (&$top,$dbg=false) {
+# top  - prázdný objekt, pro library neprázdný ale označkovaný jako _old
+# top2 - pro běžný překlad null, pro debugger objekt pro vložení procedury dbg
+function get_ezer (&$top,&$top2,$dbg=false) {
   global $tree, $lex, $head, $attribs1, $attribs2, $keywords, $errors, $const_list;
   $const_list= array();
   get_ezer_keys($keywords,$attribs1,$attribs2);
@@ -1761,8 +1766,15 @@ function get_ezer (&$top,$dbg=false) {
     while ( $ok && !$errors ) {
       $ok= get_if_block($top,$block,$id);
       if ( $ok ) {
-        if ( !$top->part ) $top->part= (object)array();
-        $top->part->$id= $block;
+        if ( $top2 ) {
+          if ( !$top2->part ) $top2->part= (object)array();
+          $top2->part->$id= $block;
+          break;
+        }
+        else {
+          if ( !$top->part ) $top->part= (object)array();
+          $top->part->$id= $block;
+        }
       }
     }
     $nlex= count($lex);
@@ -2654,7 +2666,7 @@ function lex_analysis2 ($dbg=false) {
 
   // rozbor na tokeny podle PHP
   $tok= token_get_all( $dbg
-    ? ("<"."?php\n proc dbg() ".'{'."$ezer \n} ?".">")
+    ? ("<"."?php\n proc _dbg_() ".'{'."$ezer \n} ?".">")
     : ("<"."?php\n $ezer ?".">"));
 //                                                             debug($tok,'tok');
   note_time('lexical1');

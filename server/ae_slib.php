@@ -115,7 +115,7 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   $js_options->watch_key= $EZER->options->watch_key= $pars->watch_key ? '1' : '0';
   $js_options->CKEditor= $pars->CKEditor ? $pars->CKEditor : '{}';
   $js_options->dbg=      $pars->dbg ? $pars->dbg : '0';
-  if ( $menu )      $js_options->start= "'$menu'";
+  if ( $menu ) $js_options->start= "'$menu'";
   if ( $xtrace ) {
     $js_options->to_trace= 1;
     $js_options->show_trace= 1;

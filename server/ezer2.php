@@ -1463,26 +1463,56 @@
   case 'dbg_compile':
     require_once("$ezer_path_serv/comp2.php");
     require_once("$ezer_path_serv/comp2def.php");
+    function dbg_find_obj($full) {
+      # najde objekt pojmenovaný úplným jménem a přebuduje kontext překladu
+      global $context;
+      $obj= $context[0]->ctx;
+      $obj_id= $context[0]->id;
+      $context= array();
+      $ids= explode('.',$full);
+      $id0= array_shift($ids);
+      if ( $id0=='$' || $id0=='#' ) {
+        for ($i= 0; $i<count($ids); $i++) {
+          $id= $ids[$i];
+          if ( $id && $obj->part->$id ) {
+            array_push($context,(object)array('id'=>$obj_id,'ctx'=>$obj));
+            $obj_id= $id;
+            $obj= $obj->part->$id;
+          }
+          elseif ($obj->options->include) {
+            $obj= null; goto end;
+          }
+          else {
+            $obj= null; goto end;
+          }
+        }
+      }
+      else $obj= null;
+    end:
+      return $obj;
+    }
+    # překlad skriptu $x->script do procedury _dbg_ v zadaném kontextu $x->context->self
+                                                display("debugger context: {$x->context->self}");
+//                                                 debug($x->context,"dbg_compile");
     $log= $cd= "";
     $log.= dbg_context_load($x->context);
     try {
       $ezer= $x->script;
       $_SESSION[$ezer_root]['dbg_script']= $ezer;
-//                                                 debug($context,"dbg_compile",(object)array('depth'=>3));
-//                                                 $top= $context[2]->ctx->part->pot;
-//                                                 debug($top,"dbg_compile",(object)array('depth'=>3));
-      $ok= get_ezer($top,true);
+      $obj= dbg_find_obj($x->context->self);
+      if ( !$obj ) { $err= "nelze určit kontext překladu"; goto end_dbg; }
+      $ok= get_ezer($top,$obj,true);
       if ( $ok ) {
-        $c= $top->part->dbg;
-        proc($c,'dbg');
+        $block= $obj->part->_dbg_;
+        proc($block,'_dbg_');
       }
     }
     catch (Exception $e) {
       goto end_dbg;
     }
     if ( !$errors ) {
-      $cd= $top->part->dbg->code;
-      if ( $cd ) $log.= "přeložený kód:".xcode($cd,0,'');
+      $cd= $block->code;
+//       if ( $cd ) $log.= "přeložený kód:".xcode($cd,0,'');
     }
   end_dbg:
     $y->ret= (object)array();
