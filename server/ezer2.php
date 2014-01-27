@@ -1463,6 +1463,15 @@
   case 'dbg_compile':
     require_once("$ezer_path_serv/comp2.php");
     require_once("$ezer_path_serv/comp2def.php");
+    function dbg_includes() {
+      # doplní id do includes (korekce kvůli identifikaci jmen knihovních modulů)
+      global $includes;
+      foreach($includes as $ids=>$include) {
+        $id= strrpos($ids,'.') ? substr($ids,strrpos($ids,'.')+1) : $ids;
+        $includes[$ids]->id= $id;
+//                                                 display("$ids-$id-{$includes[$ids]->id}");
+      }
+    }
     function dbg_find_obj($full) {
       # najde objekt pojmenovaný úplným jménem a přebuduje kontext překladu
       global $context;
@@ -1471,35 +1480,67 @@
       $context= array();
       $ids= explode('.',$full);
       $id0= array_shift($ids);
+//                                                 display("$full");
+//       if ( $id0=='$' ) {
+//       }
+//       elseif ( $id0=='#' ) {
+//       }
+//                                                 display("$id0-".implode('!',$ids));
       if ( $id0=='$' || $id0=='#' ) {
         for ($i= 0; $i<count($ids); $i++) {
           $id= $ids[$i];
+//                                                 display("$i:$obj_id.$id");
           if ( $id && $obj->part->$id ) {
-            array_push($context,(object)array('id'=>$obj_id,'ctx'=>$obj));
-            $obj_id= $id;
-            $obj= $obj->part->$id;
           }
           elseif ($obj->options->include) {
-            $obj= null; goto end;
+//                                                 display("include:{$obj->options->include}");
+//             list($how,$file)= explode(',',$obj->options->include);
+//             if ( $file && isset($includes[$file]) ) {
+//               $obj->part= $includes[$file];
+//             }
+//             else {
+              $obj= null;
+              goto end;
+//             }
           }
           else {
             $obj= null; goto end;
           }
+          context_push($obj_id,$obj);
+          $obj_id= $id;
+          $obj= $obj->part->$id;
         }
       }
       else $obj= null;
+      context_push($id,$obj);
     end:
       return $obj;
+    }
+    function context_push($id,$obj) {
+      # obohatí kontext
+      global $context, $includes;
+      foreach($includes as $include) {
+        if ( $id == $include->id) {
+          array_push($context,(object)array('id'=>$id,'ctx'=>$include));
+          return;
+        }
+      }
+      array_push($context,(object)array('id'=>$id,'ctx'=>$obj));
     }
     # překlad skriptu $x->script do procedury _dbg_ v zadaném kontextu $x->context->self
                                                 display("debugger context: {$x->context->self}");
 //                                                 debug($x->context,"dbg_compile");
     $log= $cd= "";
     $log.= dbg_context_load($x->context);
+    dbg_includes();
+//                                                 debug($includes,"includes",(object)array('depth'=>2));
     try {
       $ezer= $x->script;
       $_SESSION[$ezer_root]['dbg_script']= $ezer;
+//                                                 debug($context,"context",(object)array('depth'=>4));
       $obj= dbg_find_obj($x->context->self);
+//                                                 debug($context,"context",(object)array('depth'=>4));
+//                                                 debug($obj,"obj",(object)array('depth'=>3));
       if ( !$obj ) { $err= "nelze určit kontext překladu"; goto end_dbg; }
       $ok= get_ezer($top,$obj,true);
       if ( $ok ) {
@@ -1512,6 +1553,7 @@
     }
     if ( !$errors ) {
       $cd= $block->code;
+      $log.= "compilation ok, ";
 //       if ( $cd ) $log.= "přeložený kód:".xcode($cd,0,'');
     }
   end_dbg:

@@ -299,12 +299,12 @@ Ezer.Application= new Class({
             Ezer.fce.contextmenu([
               ['run (ctrl-Enter)',              function(el) { __run() }],
               ['clear & run (shift-ctrl-Enter)',function(el) { Ezer.fce.clear(); __run() }],
-              ['-výběr kontextu',               function(el) {
+              ['-výběr kontextu myší',          function(el) {
                 __clear();
                 Ezer.help.dbg= true;
                 Ezer.run.$.helpBlock(1)
               }],
-              ['zrušení kontextu',              function(el) { __clear() }]
+              ['kontextem je běžný panel',      function(el) { __clear() }]
             ],arguments[0]);
             return false;
           }.bind(this)

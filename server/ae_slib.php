@@ -381,7 +381,7 @@ __EOD;
 # ------------------------------------------------------------------------------- HTML menu
 # template pro zobrazení Ezer.MenuMain jako hlavního objektu aplikace
 $dolni= $xtrace ? '' : " style='height:0'";
-$dbg_script= trim($_SESSION[$ezer_root]['dbg_script']) ?: "echo(fdate('j.n.Y')) // příkazy + ctrl-Enter";
+$dbg_script= trim($_SESSION[$ezer_root]['dbg_script']) ?: "echo(debug(sys('ezer'))) // příkazy + ctrl-Enter";
 $debugger= $js_options->dbg ? <<<__EOD
     <form action="" method="post" enctype="multipart/form-data" id="form">
       <textarea id="dbg" name='query' class='sqlarea jush-sql' spellcheck='false' wrap='off'
