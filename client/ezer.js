@@ -5502,7 +5502,7 @@ Ezer.Show= new Class({
   }
 });
 // ================================================================================================= Eval
-//c: Eval (code,context,args,id,continuation,no_trow)
+//c: Eval (code,context,args,id,continuation,no_trow,proc,nvars)
 //      interpret vnitřního kódu
 //a: code - přeložený kód
 //   context -  objekt, ke kterému se vztahují relativní odkazy (např. vlastník procedury) a který je potenciálním nositelem procedur onready|onbusy
@@ -5571,7 +5571,7 @@ Ezer.Eval= new Class({
       else
         t= "'"+t+"'";
       break;
-   case 'number':
+    case 'number':
       t= x;
       break;
     case 'object':
@@ -5581,7 +5581,7 @@ Ezer.Eval= new Class({
       t= x ? '<b>true</b>' : '<b>false</b>';
       break;
     case 'array':
-      t= '<b>array</b>';
+      t= '<b>array</b> '+x.length;
       break;
     case 'element':    case 'event':  case 'textnode':  case 'whitespace':  case 'arguments':
     case 'date':   case 'function':  case 'regexp':      case 'class':
@@ -5772,6 +5772,7 @@ Ezer.Eval= new Class({
             case 'v':
               this.stack[++this.top]= cc.v;
               break;
+            //   z i   - sníží zásobník o i, pokud je i==0 pak jej vyprázdní
             case 'z':
               if ( cc.i>0 )
                 this.top-= cc.i;
@@ -6108,19 +6109,45 @@ Ezer.Eval= new Class({
                 val= obj[cc.i];
               this.stack[++this.top]= val;
               break;
-            // L - test pro foreach: na zásobníku je pole p, pokud je prázdné sníží zásobník a skočí,
-            //     pokud je p neprázdné dá na vrchol p.shift
+            // K - inicializace pro foreach iterující objekt, na zásobník přidá pole klíčů objektu
+            case 'K':
+              obj= this.stack[this.top];                // objekt
+              this.stack[++this.top]= Object.keys(obj); // pole klíčů
+              break;
+            // L 1 - test pro foreach: na zásobníku je pole p, pokud je prázdné sníží zásobník a skočí,
+            //       pokud je p neprázdné dá na vrchol p.shift
+            // L 2 - test pro foreach: na zásobníku je objekt a pole pk klíčů iterovaného objektu
+            //       pokud je pole klíčů prázdné sníží zásobník o 2 a skočí,
+            //       pokud je p neprázdné dá na vrchol klíč (pk.shift) a hodnotu
             case 'L':
-              obj= this.stack[this.top];                // pole
-              if ( $type(obj)!='array' )
-                Ezer.error('EVAL: '+cc.i+' nemá definované pole','S',this.proc,last_lc);
-              if ( !obj.length ) {                      // pokud je prázdné
-                this.top--;                             // tak je odstraň ze zásobníku
-                Ezer.eval_jump= '*';                    // bude ukončeno skokem za foreach
+              if ( cc.i==1 ) {
+                obj= this.stack[this.top];              // pole
+                if ( $type(obj)!='array' )
+                  Ezer.error('EVAL: 1. parametr foreach není pole','S',this.proc,last_lc);
+                if ( !obj.length ) {                      // pokud je prázdné
+                  this.top--;                             // tak je odstraň ze zásobníku
+                  Ezer.eval_jump= '*';                    // bude ukončeno skokem za foreach
+                }
+                else {                                    // jinak na vrchol dej
+                  this.stack[++this.top]= obj.shift();    // element pole a zkrať pole
+                  c-= cc.go-1;                            // a eliminuj příkaz skoku
+                }
               }
-              else {                                    // jinak na vrchol dej
-                this.stack[++this.top]= obj.shift();    // element pole a zkrať pole
-                c-= cc.go-1;                            // a eliminuj příkaz skoku
+              else {                                    // objekt
+                keys= this.stack[this.top];               // pole klíčů
+                obj= this.stack[this.top-1];              // objekt
+                if ( $type(obj)!='object' )
+                  Ezer.error('EVAL: 1. parametr foreach není objekt','S',this.proc,last_lc);
+                if ( !keys.length ) {                     // pokud je pole klíčů prázdné
+                  this.top-= 2;                           // tak je i objekt odstraň ze zásobníku
+                  Ezer.eval_jump= '*';                    // bude ukončeno skokem za foreach
+                }
+                else {                                    // jinak na vrchol dej
+                  val= keys.shift();                      // klíč z pole a zkrať pole
+                  this.stack[++this.top]= obj[val];       // přidej hodnotu
+                  this.stack[++this.top]= val;
+                  c-= cc.go-1;                            // a eliminuj příkaz skoku
+                }
               }
               break;
             default:

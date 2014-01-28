@@ -1557,23 +1557,33 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       else comp_error("CODE: while musí mít 2 parametry");
     }
     // -------------------------------------- foreach x fce
+    // foreach(pole,procedura s jedním parametrem: hodnota)
+    // foreach(objekt,procedura s dvěma parametry: hodnota,klíč)
     elseif ( $c->op=='foreach' ) {
       // {expr:'call',op:'foreach',par:[x,{expr:'name',name:fce}]}
       if ( count($c->par)==2 ) {
         $x= gen($pars,$vars,$c->par[0],0,$struct1);
         if ( $c->par[1]->expr=='name' ) {
           $fce= find_part_abs($c->par[1]->name,$fullname,'proc');
-          if ( $fce && $fce->type=='proc' && 1==count((array)$fce->par) ) {
-            $x= gen($pars,$vars,$c->par[0],0,$struct1);
-            $test= (object)array('o'=>'L','go'=>count($f)+3);
-            $f= gen_name($c->par[1]->name,$pars,$vars,true,$c->par[1]);
-            $f[count($f)-1]->a= 1;
-            $f[count($f)-1]->ift= -count($f);
-            $popx= (object)array('o'=>'z','i'=>1,'nojmp'=>1);
-            $code[]= array($x,$test,$f,$popx);
-            $struct->arr[]= $struct1;
+          if ( $fce && $fce->type=='proc' ) {
+            $nfpar= count((array)$fce->par);
+            if ( $nfpar==1 || $nfpar==2 ) {
+              $x= gen($pars,$vars,$c->par[0],0,$struct1);
+              $inic= (object)array('o'=>'K');
+              $test= (object)array('o'=>'L','i'=>$nfpar,'go'=>count($f)+3);
+              $f= gen_name($c->par[1]->name,$pars,$vars,true,$c->par[1]);
+              $f[count($f)-1]->a= $nfpar;
+              $f[count($f)-1]->ift= -count($f);
+              $popx= (object)array('o'=>'z','i'=>1,'nojmp'=>1);
+              if ( $nfpar==1 )
+                $code[]= array($x,$test,$f,$popx);      // pro pole
+              else
+                $code[]= array($x,$inic,$test,$f,$popx);      // pro objekty
+              $struct->arr[]= $struct1;
+            }
+            else comp_error("CODE: procedura použitá ve foreach musí mít jeden nebo dva parametry");
           }
-          else comp_error("CODE: procedura použitá ve foreach musí mít jeden parametr");
+          else comp_error("CODE: druhý parametr ve foreach musí být procedura");
         }
         else comp_error("CODE: foreach musí mít 2 parametry: seznam a jméno procedury");
       }
