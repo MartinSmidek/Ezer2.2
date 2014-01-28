@@ -60,7 +60,7 @@ $blocs2 = array (                                    // překládají se na AE_<
                                .'select.map,select.map0,field,field.date,field.list,menu,chat,check,list'
                                .($pragma_attrs?',select':'')),
   'view'        =>  explode(",",''),
-  'var'         =>  explode(",",'button,select,select.map,label,label.drop,label.map,edit,field,browse'), //??????????
+  'var'         =>  explode(",",'button,select,select.map,label,label.drop,label.map,edit,field,field.date,browse'), //??????????
   'field'       =>  explode(",",'proc,menu'),
   'field.date'  =>  explode(",",'proc,menu'),
   'field.list'  =>  explode(",",'proc,menu'),

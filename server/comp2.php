@@ -1575,10 +1575,10 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
               $f[count($f)-1]->a= $nfpar;
               $f[count($f)-1]->ift= -count($f);
               $popx= (object)array('o'=>'z','i'=>1,'nojmp'=>1);
-              if ( $nfpar==1 )
-                $code[]= array($x,$test,$f,$popx);      // pro pole
-              else
-                $code[]= array($x,$inic,$test,$f,$popx);      // pro objekty
+//               if ( $nfpar==1 )
+//                 $code[]= array($x,$test,$f,$popx);      // pro pole
+//               else
+                $code[]= array($x,$inic,$test,$f,$popx);      // pro pole i objekty
               $struct->arr[]= $struct1;
             }
             else comp_error("CODE: procedura použitá ve foreach musí mít jeden nebo dva parametry");
