@@ -179,85 +179,6 @@ var MooTreeControl = new Class({
 	},
 	
 	/*
-	Property: adopt
-		Adopts a structure of nested ul/li/a elements as tree nodes, then removes the original elements.
-	
-	Parameters:
-		id - a string representing the ul element to be adopted, or an element reference.
-		parentNode - optional, a <MooTreeNode> object under which to import the specified ul element. Defaults to the root node of the parent control.
-	
-	Note:
-		The ul/li structure must be properly nested, and each li-element must contain one a-element, e.g.:
-		
-		><ul id="mytree">
-		>  <li><a href="test.html">Item One</a></li>
-		>  <li><a href="test.html">Item Two</a>
-		>    <ul>
-		>      <li><a href="test.html">Item Two Point One</a></li>
-		>      <li><a href="test.html">Item Two Point Two</a></li>
-		>    </ul>
-		>  </li>
-		>  <li><a href="test.html"><!-- icon:_doc; color:#ff0000 -->Item Three</a></li>
-		></ul>
-		
-		The "href", "target", "title" and "name" attributes of the a-tags are picked up and stored in the
-		data property of the node.
-		
-		CSS-style comments inside a-tags are parsed, and treated as arguments for <MooTreeNode> constructor,
-		e.g. "icon", "openicon", "color", etc.
-	*/
-/*
-	adopt: function(id, parentNode) {
-		if (parentNode === undefined) parentNode = this.root;
-		this.disable();
-		this._adopt(id, parentNode);
-		parentNode.update(true);
-		$(id).destroy();
-		this.enable();
-	},
-	
-	_adopt: function(id, parentNode) {
-		// adopts a structure of ul/li elements into this tree
-		e = $(id);
-		var i=0, c = e.getChildren();
-		for (i=0; i<c.length; i++) {
-			if (c[i].nodeName == 'LI') {
-				var con={text:''}, comment='', node=null, subul=null;
-				var n=0, z=0, se=null, s = c[i].getChildren();
-				for (n=0; n<s.length; n++) {
-					switch (s[n].nodeName) {
-						case 'A':
-							for (z=0; z<s[n].childNodes.length; z++) {
-								se = s[n].childNodes[z];
-								switch (se.nodeName) {
-									case '#text': con.text += se.nodeValue; break;
-									case '#comment': comment += se.nodeValue; break;
-								}
-							}
-							con.data = s[n].getProperties('href','target','title','name');
-						break;
-						case 'UL':
-							subul = s[n];
-						break;
-					}
-				}
-				if (con.label != '') {
-					con.data.url = con.data['href']; // (for backwards compatibility)
-					if (comment != '') {
-						var bits = comment.split(';');
-						for (z=0; z<bits.length; z++) {
-							var pcs = bits[z].trim().split(':');
-							if (pcs.length == 2) con[pcs[0].trim()] = pcs[1].trim();
-						}
-					}
-					node = parentNode.insert(con);
-					if (subul) this._adopt(subul, node);
-				}
-			}
-		}
-	},
-*/
-	/*
 	Property: disable
 		Call this to temporarily disable visual updates -- if you need to insert/remove many nodes
 		at a time, many visual updates would normally occur. By temporarily disabling the control,
@@ -587,18 +508,20 @@ var MooTreeNode = new Class({
 	Parameters:
 		recursive - boolean, defaults to false. With recursive set to true, all child nodes are recursively toggle to this node's new state.
 		state - boolean. If undefined, the node's state is toggled. If true or false, the node can be explicitly opened or closed.
+                depth - depth of recursion, if undefined then recursion is unlimited
 	*/
 	
-	toggle: function(recursive, state) {
+	toggle: function(recursive, state, depth) {
 		
+                depth = depth === undefined ? 999 : depth;
 		this.open = (state === undefined ? !this.open : state);
 		this.update();
 
 		this.onExpand(this.open);
 		this.control.onExpand(this, this.open);
 
-		if (recursive) this.nodes.forEach( function(node) {
-			node.toggle(true, this.open);
+		if (recursive && depth > 0 ) this.nodes.forEach( function(node) {
+			node.toggle(true, this.open, depth-1);
 		}, this);
 		
 	},
@@ -615,84 +538,4 @@ var MooTreeNode = new Class({
 		this.onSelect(state);
 	},
 	
-	/*
-	Property: load
-		Asynchronously load an XML structure into a node of this tree.
-	
-	Parameters:
-		url - string, required, specifies the URL from which to load the XML document.
-		vars - query string, optional.
-	*/
-/*
-	load: function(url, vars) {
-	
-		if (this.loading) return; // if this node is already loading, return
-		this.loading = true;      // flag this node as loading
-		
-		this.toggle(false, true); // expand the node to make the loader visible
-		
-		this.clear();
-
-		this.insert(this.control.loader);
-		
-		var f = function() {
-			new Request({
-				method: 'GET',
-				url: url,
-				onSuccess: this._loaded.bind(this),
-				onFailure: this._load_err.bind(this)
-			}).send(url, vars || '');
-		}.bind(this).delay(20);
-		
-		//window.setTimeout(f.bind(this), 20); // allowing a small delay for the browser to draw the loader-icon.
-		
-	},
-	
-	_loaded: function(text, xml) {
-		// called on success - import nodes from the root element:
-		this.control.disable();
-		this.clear();
-		this._import(xml.documentElement);
-		this.control.enable();
-		this.loading = false;
-	},
-	
-	_import: function(e) {
-		// import childnodes from an xml element:
-		var n = e.childNodes;
-		for (var i=0; i<n.length; i++) if (n[i].tagName == 'node') {
-			var opt = {data:{}};
-			var a = n[i].attributes;
-			for (var t=0; t<a.length; t++) {
-				switch (a[t].name) {
-					case 'text':
-					case 'id':
-					case 'icon':
-					case 'openicon':
-					case 'color':
-					case 'open':
-						opt[a[t].name] = a[t].value;
-						break;
-					default:
-						opt.data[a[t].name] = a[t].value;
-				}
-			}
-			var node = this.insert(opt);
-			if (node.data.load) {
-				node.open = false; // can't have a dynamically loading node that's already open!
-				node.insert(this.control.loader);
-				node.onExpand = function(state) {
-					this.load(this.data.load);
-					this.onExpand = new Function();
-				}
-			}
-			// recursively import subnodes of this node:
-			if (n[i].childNodes.length) node._import(n[i]);
-		}
-	},
-	
-	_load_err: function(req) {
-		window.alert('Error loading: ' + this.text);
-	}
-*/
 });
