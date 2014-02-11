@@ -192,7 +192,7 @@ function debugx (gt,label,depth) {
     x= "<table class='dbg' style='background-color:"+c+"'>";
     x+= label!==undefined ? "<tr><td valign='top' colspan='2' class='title'>"+label+"</td></tr>" : '';
     Object.each(gt,function(t,g){
-      x+= "<tr><td valign='top' color='label'>"+g+"</td><td>"+debugx(t,null,depth-1)+"</td></tr>";
+      x+= "<tr><td valign='top' color='label'>"+g+"</td><td>"+debugx(t,undefined,depth-1)+"</td></tr>";
     });
     x+= "</table>";
   }
@@ -223,6 +223,7 @@ var ContextMenu = new Class({
     onClick: function(){},
     fadeSpeed: 200,
     focus_css: 'ContextFocus',
+    focus_mask: true,                          //140202gn nenulové znamená označení target maskou
     event: null                                // show imediately when started by event
   },
   // initialization
@@ -316,6 +317,15 @@ var ContextMenu = new Class({
     this.menu.setStyle('display','block');
     this.shown= true;
     if ( this.options.focus_css ) this.target.addClass(this.options.focus_css);
+    if ( this.options.focus_mask ) {
+      // pokud existuje element s id=mask pak jeho zobrazení a pozvednutí elementu nad masku
+      var mask= $('mask');
+      if ( mask ) {
+        this.saved_style= this.target.getStyles("position,z-index");
+        mask.setStyles({display:'block'});
+        this.target.setStyles({position:'relative',zIndex:999});
+      }
+    }
     return this;
   },
   // hide the menu
@@ -324,6 +334,14 @@ var ContextMenu = new Class({
       this.menu.setStyle('display','none');
       this.shown= false;
       if ( this.options.focus_css ) this.target.removeClass(this.options.focus_css);
+      if ( this.options.focus_mask ) {
+        // případné odstranění masky
+        var mask= $('mask');
+        if ( mask ) {
+          mask.setStyles({display:'none'});
+          this.target.setStyles(this.saved_style);
+        }
+      }
     }
     return this;
   },

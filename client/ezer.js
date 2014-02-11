@@ -1282,7 +1282,17 @@ Ezer.MenuGroup= new Class({
 //t: Menu,Block
 //s: Block
 Ezer.MenuContext= new Class({
-  Extends: Ezer.Menu
+  Extends: Ezer.Menu,
+// ------------------------------------------------------------------------------------ enable
+//fm: MenuContext.enable (enabled)
+//      parametr enabled=0 potlačí vyvolání kontextového menu, enabled=1 je opět povolí
+  enable: function (enabled) {
+    if ( enabled )
+      this.ContextMenu.enable();
+    else
+      this.ContextMenu.disable();
+    return true;
+  }
 });
 // ================================================================================================= Tabs
 //c: Tabs ([options])
@@ -3356,7 +3366,7 @@ Ezer.EditHtml= new Class({
 //      jeho hodnota přesto odevzdána k uložení na disk. Důvodem k tomuto chování je asynchronní
 //      časování události blur v CKeditoru.
   changed: function() {
-    if ( this.ckeditor && Ezer.options.CKEditor.version=='4' ) {
+    if ( this.ckeditor && Ezer.options.CKEditor.version[0]=='4' ) {
       return this.ckeditor.checkDirty();
     }
     if ( !this._changed && this.ckeditor ) {

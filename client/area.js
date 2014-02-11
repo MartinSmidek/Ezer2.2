@@ -55,17 +55,24 @@ Ezer.Area= new Class({
       this.fire('area_onstart',[this]);
   },
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_attach
-  // DOM - DOM_Block - DOM_Area
+  // DOM - DOM_Block - DOM_Area - id je hledáno v rámci panel.DOM
   DOM_attach: function(id) {
-    // nalezení DOM elementu a připojení událostí
-    this.DOM_Block= this.DOM_Block= $(id);
-    // obsluha podporovaných událostí
-    var fce= this.desc.part ? this.desc.part.onclick : null;
-    if ( fce ) {
-      this.DOM_Block.addEvent('click', function(ev) {
-        new Ezer.Eval(fce.code,this,[],'onclick',false,false,fce,0);
-        return false;
-      }.bind(this))
+    // nalezneme panel
+    var panel= null;
+    for (var o= this.owner; o; o= o.owner) {
+      if ( o.type.substr(0,5)=='panel' ) { panel= o; break; }
+    }
+    if ( panel && panel.DOM_Block ) {
+      // nalezení DOM elementu a připojení událostí
+      this.DOM_Block= this.DOM_Block= panel.getElement(id);
+      // obsluha podporovaných událostí
+      var fce= this.desc.part ? this.desc.part.onclick : null;
+      if ( fce ) {
+        this.DOM_Block.addEvent('click', function(ev) {
+          new Ezer.Eval(fce.code,this,[],'onclick',false,false,fce,0);
+          return false;
+        }.bind(this))
+      }
     }
   },
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_add
@@ -177,6 +184,15 @@ Ezer.Area= new Class({
     return 1;
   },
 // ================================================================================================= AREA TREE
+// ------------------------------------------------------------------------------------ tree_expand
+//fm: Area.tree_expand (n)
+//      zobrazí n úrovní stromu, tree_expand(0) jej svine
+  tree_expand: function (n) {
+    this.tree.collapse();
+    if ( n )
+      this.tree.root.toggle(true, true, n-1);
+    return 1;
+  },
 // ------------------------------------------------------------------------------------ tree_insert
 //fm: Area.tree_insert (id)
 //      vloží uzel pod daný uzel
@@ -392,7 +408,7 @@ Ezer.str.new_area= function() {
     }
     else {
       if ( typeof(parent.value)=='string' ) {
-        DOM= $(parent.value);
+        DOM= panel.DOM_Block.getElementById(parent.value);
         if ( !DOM ) Ezer.error(name.value+" nelze najít id='"+parent.value+"' ");
       }
       else if ( typeof(parent.value)=='object' ) {

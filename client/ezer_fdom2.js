@@ -296,7 +296,13 @@ Ezer.MenuGroup.implement({
 Ezer.MenuContext.implement({
   DOM_add1: function() {
     this.DOM= new Element('ul',{'class':'ContextMenu'}).inject($('body'));
-    this.ContextMenu= new ContextMenu({target:this.owner.DOM_Block,menu:this.DOM,ezer_owner:null});
+    var options= {target:this.owner.DOM_Block,menu:this.DOM,ezer_owner:null};
+    if ( this._f('m')>=0 ) {
+      // zvýraznit oblast kontextového menu pomocí masky - musí existovat element s id='mask'
+      options.focus_mask= true;
+      options.focus_css= '';
+    }
+    this.ContextMenu= new ContextMenu(options);
   },
   DOM_add2: function() {
     this.ContextMenu.ezer_owner= this;
@@ -448,6 +454,7 @@ Ezer.Item.implement({
           click: function(el) {
             if ( !el.target.hasClass('disabled') ) {
               Ezer.fce.touch('block',this,'click');       // informace do _touch na server
+              this.owner.ContextMenu.hide();
               this.fire('onclick',[],el);
             }
           }.bind(this)
@@ -1499,12 +1506,13 @@ Ezer.EditHtml.implement({
           this.DOM_Input= new Element('textarea')
         ).inject(this.owner.DOM_Block);
       // --------------------------------- ošetření rozdílu mezi verzemi před startem
-      if ( Ezer.options.CKEditor.version=='4' ) {
+      if ( Ezer.options.CKEditor.version[0]=='4' ) {
         // základní nastavení editoru verze 4.0.1
         var options= {
           width:this._w, height:this._h-60, resize_enabled:false,
           entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
-          skin:'version3'
+          skin:'kama'
+//           skin:'version3'
         };
       }
       else {
@@ -1528,7 +1536,7 @@ Ezer.EditHtml.implement({
             '-','Source','ShowBlocks','RemoveFormat' ]]});
       this.ckeditor= CKEDITOR.replace(this.DOM_Input,options);
       // ------------------------------------ ošetření rozdílu mezi verzemi po startu
-      if ( Ezer.options.CKEditor.version=='4' ) {
+      if ( Ezer.options.CKEditor.version[0]=='4' ) {
         // dokončení nastavení editoru verze 4.0.1
       }
       else {
@@ -1584,7 +1592,7 @@ Ezer.EditHtml.implement({
 //f: EditHtml-DOM.DOM_changed (on[,quiet=0))
 //      označení příznaku změny elementu formuláře, pokud je quiet=0
   DOM_changed: function(on,quiet) {
-    var div= Ezer.browser=='CH' && Ezer.options.CKEditor.version!='4'
+    var div= Ezer.browser=='CH' && Ezer.options.CKEditor.version[0]!='4'
       ? this.DOM_Block.getElement('table.cke_editor')
       : this.DOM_Block;
     // pokud má element zobrazení
@@ -3099,7 +3107,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
             Ezer.obj.DOM.help.dotaz.setStyles({display:'block'});
           }
         }}));
-    if ( Ezer.options.CKEditor.version=='4' && Ezer.sys.user.skills.contains('ah',' ') ) {
+    if ( Ezer.options.CKEditor.version[0]=='4' && Ezer.sys.user.skills.contains('ah',' ') ) {
       Ezer.obj.DOM.help.cap.addEvents({
         contextmenu: function(event) {
           // kontextové menu pro administraci helpu

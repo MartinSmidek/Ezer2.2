@@ -431,7 +431,7 @@ $html_header
   <div id="paticka">
     <div id="warning"></div>
     <div id="kuk_err"></div>
-    <div id="error"></div>
+    <div id="error" style="margin:-30px 0px 0px;"></div>
   </div>
   <div id="dolni"$dolni>
     <div id="status_bar">
@@ -789,7 +789,8 @@ function debugx(&$gt,$label=false,$html=0,$depth=64,$length=64,$win1250=0,$getty
   if ( is_array($gt) ) {
     $debug_level++;
     $x= "<table class='dbg_array'>";
-    $x.= $label!==false ? "<tr><td valign='top' colspan='".($gettype?3:2)."' class='title'>$label</td></tr>" : '';
+    $x.= $label!==false
+      ? "<tr><td valign='top' colspan='".($gettype?3:2)."' class='title'>$label</td></tr>" : '';
     foreach($gt as $g => $t) {
       $x.= "<tr><td valign='top' class='label'>$g</td><td>"
       . debugx($t,NULL,$html,$depth,$length,$win1250,$gettype) //TEST==1 ? $t : htmlspecialchars($t)
@@ -803,24 +804,27 @@ function debugx(&$gt,$label=false,$html=0,$depth=64,$length=64,$win1250=0,$getty
     $debug_level++;
     $x= "<table class='dbg_object'>";
     $x.= $label!==false ? "<tr><td valign='top' colspan='".($gettype?3:2)."' class='title'>$label</td></tr>" : '';
-    $obj= get_object_vars($gt);
+//     $obj= get_object_vars($gt);
     $len= 0;
-    foreach($obj as $g => $t) {
+    foreach($gt as $g => $t) {
       $len++;
       if ( $len>$length ) break;
-      if ( $g=='parent' ) {
-        $td= $t==null ? "<td class='label'>nil</td>" : (
-          is_object($t) && isset($t->id) ? "<td class='label'>{$t->id}</td>" : (
-          is_string($t) ? "<td>$t</td>" :
-          "<td class='label'>?</td>"));
-        $x.= "<tr><td class='dbg_over'>$g:</td>$td</tr>";
-      }
-      else {
+//       if ( is_string($t) ) {
+//         $x.= "<td>$g:$t</td>";
+//       }
+//       if ( $g=='parent' ) {
+//         $td= $t==null ? "<td class='label'>nil</td>" : (
+//           is_object($t) && isset($t->id) ? "<td class='label'>{$t->id}</td>" : (
+//           is_string($t) ? "<td>$t</td>" :
+//           "<td class='label'>?</td>"));
+//         $x.= "<tr><td class='dbg_over'>$g:</td>$td</tr>";
+//       }
+//       else {
         $x.= "<tr><td valign='top' class='label'>$g:</td><td>"
         . debugx($t,NULL,$html,$depth,$length,$win1250,$gettype) //TEST==1 ? $t : htmlspecialchars($t)
         .($gettype ? "</td><td>".gettype($t) : '')                      //+typ
         ."</td></tr>";
-      }
+//       }
     }
     $x.= "</table>";
     $debug_level--;
