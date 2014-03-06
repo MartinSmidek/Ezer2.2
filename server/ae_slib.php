@@ -265,9 +265,24 @@ __EOD
     if ( function_exists("ezer_login_notify") ) {
       $notify= ezer_login_notify();
       if ( $notify ) {
-        $info= "<div class='login_notify'>$notify</div>$info";
+        $info= "<div id='login_notify' class='login_notify'>$notify</div>$info";
       }
     }
+    $info.=  <<<__EOD
+      <script>
+        // přidá obsluhu vnořeným elementům <a href='help://....'>
+        $('login_2').getElements('a').each(function(el) {
+          if ( el.href && el.href.substr(0,7)=='help://' ) {
+            el.addEvents({
+              click: function(ev) {
+                Ezer.app.help_text({sys:ev.target.href.substr(7)});
+                return false;
+              }
+            })
+          }
+        });
+      </script>
+__EOD;
     break;
   }
   // spojení všech CSS a JS do jediného souboru pokud je $minify==true a $_GET['dbg'] je prázdné

@@ -3107,7 +3107,8 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
             Ezer.obj.DOM.help.dotaz.setStyles({display:'block'});
           }
         }}));
-    if ( Ezer.options.CKEditor.version[0]=='4' && Ezer.sys.user.skills.contains('ah',' ') ) {
+    if ( Ezer.options.CKEditor.version[0]=='4' && Ezer.sys.user.skills
+      && Ezer.sys.user.skills.contains('ah',' ') ) {
       Ezer.obj.DOM.help.cap.addEvents({
         contextmenu: function(event) {
           // kontextové menu pro administraci helpu
