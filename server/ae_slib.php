@@ -261,6 +261,13 @@ __EOD
         $kontakt</div>";
     else
       $info.= "<hr/>$kontakt";
+    // přidání NOTIFY informace dodané nepovinnou funkcí ezer_login_notify
+    if ( function_exists("ezer_login_notify") ) {
+      $notify= ezer_login_notify();
+      if ( $notify ) {
+        $info= "<div class='login_notify'>$notify</div>$info";
+      }
+    }
     break;
   }
   // spojení všech CSS a JS do jediného souboru pokud je $minify==true a $_GET['dbg'] je prázdné

@@ -147,6 +147,7 @@ textarea { resize: none; }
 #login_1 div.login_a { padding:20px; }
 #login_2 div.login_a { padding:5px; height:180px; overflow-y:auto; }
 #login_2 div.login_a_msg { padding:5px; }
+#login_2 div.login_notify { padding:5px; background-color:$b_kuk; color:$c2_kuk; }
 #login form { margin:0; padding:0;  }
 #login span { margin:0; padding:0;  }
 #login input { margin:2px 0 10px; padding:0 2px; width:auto; overflow:visible;}
