@@ -39,11 +39,11 @@
 function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$const=null) {
   global $EZER, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system, $gc_maxlifetime;
   // převzetí url-parametrů
-  $menu=    $_GET['menu'] ? $_GET['menu'] : '';
-  $xtrace=  $_GET['trace'];
-  $skin=    $_GET['skin'] ? $_GET['skin'] : $skin;
-  $theight= $_GET['theight'] ? $_GET['theight'] : 240;
-  $dbg=     $_GET['dbg'];
+  $menu=    isset($_GET['menu']) ? $_GET['menu'] : '';
+  $xtrace=  isset($_GET['trace']) ? $_GET['trace'] : '';
+  $skin=    isset($_GET['skin']) ? $_GET['skin'] : $skin;
+  $theight= isset($_GET['theight']) ? $_GET['theight'] : 240;
+  $dbg=     isset($_GET['dbg']) ? $_GET['dbg'] : '';
   // identifikace prohlížeče
   $browser=
     preg_match('/MSIE/',$_SERVER['HTTP_USER_AGENT'])?'IE':(
@@ -54,21 +54,21 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   // interpretace parametrů
   $minify= false;
   $ezer_root= $app;
-  $title= $pars->title ? $pars->title : '';
-  $title_right= $pars->title_right ? $pars->title_right : $app_name;
-  $ezer_template= $browser=='IE' ? 'IE' : ($pars->template ? $pars->template : 'menu');
-  $post_server= $pars->post_server ? $pars->post_server[$ezer_local] : null;
+  $title= isset($pars->title) ? $pars->title : '';
+  $title_right= isset($pars->title_right) ? $pars->title_right : $app_name;
+  $ezer_template= $browser=='IE' ? 'IE' : (isset($pars->template) ? $pars->template : 'menu');
+  $post_server= isset($pars->post_server) ? $pars->post_server[$ezer_local] : null;
   // ikona aplikace
   $favicon= $ezer_local ? "favicon_local.ico" : "favicon.ico";
   $favicon= file_exists("./{$ezer_root}/img/{$favicon}") ? $favicon
     : ($ezer_local ? "{$ezer_root}_local.png" : "{$ezer_root}.png");
   // promítnutí nastavení do SESSION
-  $gc_maxlifetime= $pars->gc_maxlifetime ? $pars->gc_maxlifetime : 12*60*60;
+  $gc_maxlifetime= isset($pars->gc_maxlifetime) ? $pars->gc_maxlifetime : 12*60*60;
   $session= "php";                      // standardní práce se SESSION
   ini_set('session.gc_maxlifetime',$gc_maxlifetime);
   session_start();                      // defaultní práce se session, $session=='php'
   $_SESSION['gc_maxlifetime']= $gc_maxlifetime;
-  if ( $_GET['session'] ) {             // zobraz stav session hned po startu
+  if ( isset($_GET['session']) ) {             // zobraz stav session hned po startu
     $info= $_SESSION;
   }
   // přenesení GET parametrů do SESSION aby byly přístupné i v root.ini volané z ezer2.php
@@ -84,8 +84,9 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   $_SESSION[$ezer_root]['skin']= $skin;
   $_SESSION[$ezer_root]['app_name']= $app_name;
   $_SESSION['skin']= $skin;
-  $refresh= $_SESSION[$ezer_root]['sess_state']=='on' ? 'true' : 'false';
-  if ( $ezer_local && $_GET['skin'] ) {
+  $refresh= isset($_SESSION[$ezer_root]['sess_state']) && $_SESSION[$ezer_root]['sess_state']=='on'
+    ? 'true' : 'false';
+  if ( $ezer_local && isset($_GET['skin']) ) {
     $_SESSION['skin']= $skin;
     $title.= "/$skin";
   }
@@ -111,10 +112,10 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     'path_docs'         => "'$ezer_path_docs'",  // složka pro upload skrze LabelDrop
     'theight'           => $theight
   );
-  $js_options->watch_ip= $EZER->options->watch_ip= $pars->watch_ip ? '1' : '0';
-  $js_options->watch_key= $EZER->options->watch_key= $pars->watch_key ? '1' : '0';
-  $js_options->CKEditor= $pars->CKEditor ? $pars->CKEditor : '{}';
-  $js_options->dbg=      $pars->dbg ? $pars->dbg : '0';
+  $js_options->watch_ip= $EZER->options->watch_ip= isset($pars->watch_ip) ? '1' : '0';
+  $js_options->watch_key= $EZER->options->watch_key= isset($pars->watch_key) ? '1' : '0';
+  $js_options->CKEditor= isset($pars->CKEditor) ? $pars->CKEditor : '{}';
+  $js_options->dbg=      isset($pars->dbg) ? $pars->dbg : '0';
   if ( $menu ) $js_options->start= "'$menu'";
   if ( $xtrace ) {
     $js_options->to_trace= 1;
@@ -156,7 +157,8 @@ __EOD;
   $ip_ok= true;
   $ip_msg= '';
   $key_msg= '';
-  if ( ($pars->watch_ip || $pars->watch_key) && ($pars->no_local || !$ezer_local ) ) {
+  if ( (isset($pars->watch_ip)
+     || isset($pars->watch_key)) && (isset($pars->no_local) || !$ezer_local ) ) {
     // ověření přístupu - externí přístup hlídat vždy, lokální jen je-li  no_local=true
     if ( $pars->watch_key && ($watch_key= $_POST['watch_try']) ) {
       $watch_lock= @file_get_contents("$ezer_root/code/$ezer_root.key");
@@ -251,9 +253,9 @@ __EOD
     require_once("$ezer_path_serv/sys_doc.php");
     $kontakt= is_array($welcome) ? $welcome[1] : $kontakt;
     ezer_connect();
-    $cond= $pars->news_cond ? $pars->news_cond : 'cast!=1';
+    $cond= isset($pars->news_cond) ? $pars->news_cond : 'cast!=1';
     $cond= $cond ? "$cond AND" : '';
-    $dnu= $pars->news_days ? $pars->news_days : 12;
+    $dnu= isset($pars->news_days) ? $pars->news_days : 12;
     $info= doc_todo_show("$cond SUBDATE(NOW(),$dnu)<=kdy_skoncil AND kdy_skoncil!='0000-00-00' ");
     if ( !$info )
       $info= "<div class='login_a_msg'>
@@ -404,7 +406,7 @@ __EOD;
 # template pro zobrazení Ezer.MenuMain jako hlavního objektu aplikace
 $dolni= $xtrace ? '' : " style='height:0'";
 $dbg_script= trim($_SESSION[$ezer_root]['dbg_script']) ?: "echo(debug(sys('ezer'))) // příkazy + ctrl-Enter";
-$debugger= $js_options->dbg ? <<<__EOD
+$debugger= isset($js_options->dbg) ? <<<__EOD
     <form action="" method="post" enctype="multipart/form-data" id="form">
       <textarea id="dbg" name='query' class='sqlarea jush-sql' spellcheck='false' wrap='off'
       >$dbg_script</textarea>
@@ -554,7 +556,7 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
   $ezer_db= $dbs[$sada];
   $ezer_sdb= $dbs[$sada];
   $ezer_system= $ezer_system ? $ezer_system : 'ezer_system';
-  $ezer_system= $dbs[$sada][$ezer_system][5] ? $dbs[$sada][$ezer_system][5] : $ezer_system;
+  $ezer_system= isset($dbs[$sada][$ezer_system][5]) ? $dbs[$sada][$ezer_system][5] : $ezer_system;
   $mysql_db_track= $tracking;
   $mysql_tracked= $tracked;  // seznam začíná a končí čárkou
   // nastavení kódování
@@ -573,12 +575,12 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
   $ezer_path_todo= "$ezer_path_root/wiki";
   $ezer_path_pspad= $path_pspad[$sada];
   // parametrizace standardních modulů
-  if ( !$EZER->options ) $EZER->options= (object)array();
+  if ( !isset($EZER->options) ) $EZER->options= (object)array();
   $EZER->options->root= $ezer_root;
   $EZER->options->app=  $ezer_root;
   $EZER->options->index= "$ezer_root.php";
   $EZER->options->docs_ref= "docs";
-  if ( !$EZER->activity ) $EZER->activity= (object)array();
+  if ( !isset($EZER->activity) ) $EZER->activity= (object)array();
   $EZER->activity->touch_limit= 50; // počet dotyků (ae_hits) po kterých je uskutečněn zápis do _touch
   $EZER->activity->colors= "80:#f0d7e4,40:#e0d7e4,20:#dce7f4,0:#e7e7e7";  // viz system.php::sys_table
   // knihovní moduly
@@ -655,8 +657,8 @@ function send_mail($subject,$html,$from='',$to='',$fromname='') { trace();
   $mail= new PHPMailer;
   $mail->SetLanguage('cz',"$phpmailer_path/language/");
   $mail->IsSMTP();
-  $mail->Host= $EZER->smtp->host ? $EZER->smtp->host : "192.168.1.1";
-  $mail->Port= $EZER->smtp->port ? $EZER->smtp->port : 25;
+  $mail->Host= isset($EZER->smtp->host) ? $EZER->smtp->host : "192.168.1.1";
+  $mail->Port= isset($EZER->smtp->port) ? $EZER->smtp->port : 25;
   $mail->CharSet = "utf-8";
   $mail->From= $from;
   $mail->FromName= $fromname;
@@ -2073,7 +2075,7 @@ function ezer_connect ($db='.main.',$even=false) {
   }
         $x= "db=$db";
   // vlastní připojení, pokud nebylo ustanoveno
-  $db_name= $ezer_db[$db][5] ? $ezer_db[$db][5] : $db;
+  $db_name= isset($ezer_db[$db][5]) ? $ezer_db[$db][5] : $db;
   if ( !$ezer_db[$db][0] || $even ) {
     $ezer_db[$db][0]= @mysql_pconnect($ezer_db[$db][1],$ezer_db[$db][2],$ezer_db[$db][3]);
     if ( !$ezer_db[$db][0] ) {
@@ -2200,7 +2202,7 @@ function mysql_qry($qry,$pocet=null,$err=null,$to_throw=false,$db='') {
   }
   if ( strpos($totrace,'M')!==false )
     $y->qry.= (isset($y->qry)?"\n":'')."$ok $time \"$myqry\" ";
-  $y->qry_ms+= $time;
+  $y->qry_ms= isset($y->qry_ms) ? $y->qry_ms+$time : $time;
   $qry_del= "\n: ";
   if ( $msg ) {
     if ( $to_throw ) throw new Exception($err ? "$err$abbr" : $msg);
