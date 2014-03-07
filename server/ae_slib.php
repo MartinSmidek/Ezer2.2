@@ -1587,19 +1587,21 @@ function source_line ($file,$app,$line,$clmn) {
 #   export_row
 #   export_tail
 # $export_par je kontext export obsahující na vstupu (+dočasné informace ve složkách začínajících _)
-#   file        -- jméno souboru ve složce docs
+#   dir         -- nepovinné jméno složky pod docs
+#   file        -- jméno souboru ve složce docs/dir
 #   type        -- 'csv'|'xls'
 #   title       -- pro 'xls': nadpis od A1, hlavička pak začne od A3
 #   color       -- pro 'xls': podložení hlavičky, default=aabbbbbb (4 barvy)
 # -------------------------------------------------------------------------------------------------- export_head
 # otevření exportovaného souboru, $clmns je seznam jmen sloupců
-function export_head($par,$clmns) { #trace();
+function export_head($par,$clmns,$fmt='') { #trace();
   global $export_par, $ezer_path_docs;
   $export_par= $par;
   $export_par->rows= 0;
+  $fpath= $ezer_path_docs.(isset($export_par->dir)?"/{$export_par->dir}":'');
   switch ($export_par->type) {
   case 'csv':
-    $export_par->_f= fopen("$ezer_path_docs/{$export_par->file}.{$export_par->type}",'w');
+    $export_par->_f= fopen("$fpath/{$export_par->file}.{$export_par->type}",'w');
     $export_par->ok= $export_par->_f ? true : false;
     fputcsv($export_par->_f,explode(',',uw($clmns)),";",'"');
     break;
@@ -1619,19 +1621,20 @@ function export_head($par,$clmns) { #trace();
     foreach(explode(',',$clmns) as $clmn) {
       $A= Excel5_n2col($c++);
       $export_par->_xls.= "$del{$A}=*";
-      $header.= "|$A$n $clmn";
+      $header.= "|$A$n $clmn $fmt";
       $del= ',';
     }
     if ( $export_par->title ) {
       $header.= "|A1:{$A}1 merge center";
     }
-    $export_par->_xls.= "\n$header\n|A$n:$A$n bcolor=$color";
+    $export_par->_xls.= "\n$header";
+    $export_par->_xls.= $fmt ? '' : "\n|A$n:$A$n bcolor=$color";
     break;
   }
 }
 # -------------------------------------------------------------------------------------------------- export_row
 # zápis řádku do exportovaného souboru
-function export_row($row) { #trace();
+function export_row($row,$fmt='') { #trace();
   global $export_par;
   $export_par->rows++;
   switch ($export_par->type) {
@@ -1647,7 +1650,7 @@ function export_row($row) { #trace();
     foreach($row as $val) {
       $A= Excel5_n2col($c++);
       $val= strtr($val,"\n\r","  ");
-      $export_par->_xls.= "|$A$n $val";
+      $export_par->_xls.= "|$A$n $val $fmt";
     }
     break;
   }
@@ -1668,7 +1671,7 @@ function export_tail($show_xls=0) { #trace();
     if ( $show_xls )
       $ret= $export_par->_xls;
     else {
-      $inf= Excel5($export_par->_xls,1);
+      $inf= Excel5($export_par->_xls,1,$wb,$export_par->dir);
       $export_par->ok= $inf ? 0 : 1;
 //                                                         debug($export_par,$inf);
       if ( $inf ) fce_warning($inf);
@@ -1710,6 +1713,7 @@ function Excel5_date($tm) {  #trace();
 # PARAMETRY
 #       pokud je $table==null je vytvořena tabulka příkazem 'BOOK table_name'
 #       pokud je $table= {wb:otevřená kniha,formats:formáty}
+#       dir je nepovinné jméno podsložky docs
 # příkazy jsou od sebe odděleny novým řádkem nebo |
 # příkazy začínající // jsou ignorovány (// musí být na začátku nepokračovacího řádku nebo po |)
 # řádek je možno ukončit ||, nový řádek pak tvoří pokračování stávajícího
@@ -1733,7 +1737,7 @@ function Excel5_date($tm) {  #trace();
 #       formát=(s|n|d)(r|b|i|t|d)   (string|number|date)(right|bold|italics|title|decimal)
 # CLOSE
 #       close name                              -- zapíše table do souboru
-function Excel5($desc,$gen=1,&$wb=null) {  #trace();
+function Excel5($desc,$gen=1,&$wb=null,$dir='') {  #trace();
   global $ezer_path_serv, $ezer_path_root;
   // pro testování a vývoj
   $list= false;
@@ -1937,7 +1941,7 @@ __XLS;
           require_once "$ezer_path_serv/licensed/xls2/Classes/PHPExcel/IOFactory.php";
           $objWriter= PHPExcel_IOFactory::createWriter($wb->wb, 'Excel5');
 //           $objWriter= PHPExcel_IOFactory::createWriter($wb->wb, 'Excel2007');
-          $fpath= "$ezer_path_root/docs/{$wb->name}.xls";
+          $fpath= "$ezer_path_root/docs/".($dir?"$dir/":'')."{$wb->name}.xls";
           $objWriter->save($fpath);
           if ( $list ) $html.= "CLOSE $fpath";
         }
