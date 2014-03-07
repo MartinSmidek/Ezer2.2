@@ -68,7 +68,7 @@ Ezer.Application= new Class({
     }
     else {
 //       var h= $('dolni').getCoordinates().top - $('horni').getCoordinates().bottom;
-      $('work').setStyle('height',ws.h);
+      $('work').setStyle('height',ws.y);
       $('dolni').setStyle('height',0);
     }
   },
