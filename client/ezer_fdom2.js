@@ -834,11 +834,15 @@ Ezer.Label.implement({
       }
     }).inject(owners_block);
     this.DOM_optStyle(this.DOM_Block);
-    if ( this.options.help )
+    if ( this._fc('t') )
+      this.DOM_Block.set('title',this.options.title||'');
+    else if ( this.options.help )
       this.DOM_Block.set('title',this.options.help);
   },
   DOM_set: function (str) {
     this.DOM_Block.set('html',str);
+    if ( this._fc('t') )
+      this.DOM_Block.set('title',str);
     // přidá obsluhu vnořeným elementům <a href='ezer://....'>
     // obdobný kód je v Ezer.App.start_href_modify
     this.DOM_Block.getElements('a').each(function(el) {
