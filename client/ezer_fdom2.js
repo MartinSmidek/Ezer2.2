@@ -2148,7 +2148,9 @@ Ezer.SelectAuto.implement({
   DOM_seekItem: function (sel) {
     this.value= !sel.value || sel.value>999990 ? '' : $(sel).get('text');
     this._key=  !sel.value || sel.value>999990 ? 0 : sel.value;
-    this.DOM_set();
+    if ( this.options.par && this.options.par.save!='key_only') {
+      this.DOM_set();
+    }
     this.DOM_DropList.setStyle('display','none');
     this.DOM_Block.setStyle('zIndex',2);
     this.change();

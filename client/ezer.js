@@ -3706,21 +3706,27 @@ Ezer.Select= new Class({
 // ================================================================================================= SelectAuto
 //c: SelectAuto
 //      Pozn. metoda form.save použije klíč zobrazené hodnoty nebo zobrazenou hodnotu
-//      v závislosti na hodnotě atributu par.save='key'|'value'. Defaultní je 'value'.
+//      v závislosti na hodnotě atributu par.save='value'|'key'|'key_only'. Defaultní je 'value'.
 //t: Block,Elem,Select
 //s: Block
 //i: SelectAuto.onfocus - položka má focus
 Ezer.SelectAuto= new Class({
   Extends: Ezer.Select,
   options: {
-//oo: SelectAuto.par - parametry pro autocompleter
+//oo: SelectAuto.par - parametry pro autocompleter,
+//      obsahující mj. složky (celý objekt je předán funkci par.fce):
+//      ; 'fce' : název PHP funkce plnící dynamicky nabídku
+//      ; 'save' : má hodnotu 'value' resp. 'key' resp. 'key_only' pokud má vracet hodnotu (default)
+//                 resp. klíč resp. klíč a ponechat text vyplněného vzoru
+//      ; 'subtype' : rezervované jméno
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _save
 // interní hodnota uschovávaná na serveru je klíč zobrazené hodnoty nebo zobrazená hodnota
 // v závislosti na hodnotě atributu par.save='key'|'value'. Defaultní je 'value'
   _save: function () {
     var vmo;
-    if ( this.options.par && this.options.par.save && this.options.par.save=='key' ) {
+    if ( this.options.par && this.options.par.save
+      && (this.options.par.save=='key' || this.options.par.save=='key_only') ) {
       vmo= {val:this._key}
       if ( this.original.key ) {
         vmo.old= this.original.value;
