@@ -1885,7 +1885,10 @@ Ezer.Select.implement({
     var dl_w= this.options.par && this.options.par.subtype=='keys' && this.options.par.width
       ? this.options.par.width : this._w-1;
     this.DOM_DropList= new Element('ul',{'class':'SelectDrop',styles:{
-        width:dl_w,display:'none'}}).inject(this.DOM_Block);
+        display:'none'}}).inject(this.DOM_Block);
+    if ( !this._fc('w') ) {        // pokud je format:'w' bude seznam v neomezené šířce
+      this.DOM_DropList.setStyle('width',dl_w);
+    }
     if ( this._fc('u') ) {         // pokud je format:'u' budout options nad select
       this.DOM_DropList.setStyle('bottom',this._h);
     }

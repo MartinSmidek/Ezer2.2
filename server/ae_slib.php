@@ -891,6 +891,7 @@ function select($expr,$table,$cond=1,$db='.main.') {
     $o= mysql_fetch_object($res);
     $result= $o->_result_;
   }
+//                                                 debug($result,"select");
   return $result;
 }
 # -------------------------------------------------------------------------------------------------- select1
@@ -902,6 +903,16 @@ function select1($expr,$table,$cond=1,$db='.main.') {
   if ( !$res ) fce_error(wu("chyba funkce select1:$qry/".mysql_error()));
   $o= mysql_fetch_object($res);
   $result= $o->_result_;
+//                                                 debug($result,"select1");
+  return $result;
+}
+# -------------------------------------------------------------------------------------------------- select_object
+# navrácení hodnot jednoduchého jednoznačného dotazu jako objektu (funkcí mysql_fetch_object)
+function select_object($expr,$table,$cond=1,$db='.main.') {
+  $qry= "SELECT $expr FROM $table WHERE $cond";
+  $res= mysql_qry($qry,0,0,0,$db);
+  if ( !$res ) fce_error(wu("chyba funkce select_object:$qry/".mysql_error()));
+  $result= mysql_fetch_object($res);
   return $result;
 }
 # -------------------------------------------------------------------------------------------------- query

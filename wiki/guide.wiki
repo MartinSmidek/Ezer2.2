@@ -1,5 +1,35 @@
 = Ezer2 =
 
+== Tipy pro programátora ==
+
+# ---------------------------------------------------------------------------------- vzdálené volání
+
+=== volání procedury z jiného zdrojového textu ===
+
+Rozsáhlejší aplikaci je třeba rozdělit do více zdrojových textů,
+zde ''$.ezer'', ''app.A.ezer'', ''app.B.ezer''.
+Aby bylo možné volat procedury z jednoho (nezávisle kompilovaného) modulu do druhého,
+je třeba je napřed deklarovat ve společně viditelném modulu.
+
+Deklarace procedury ap pro kompilátor. Panel A musí mít include 'onload', nelze 'onclick' -
+pro panel B toto omezení neplatí.
+
+  # soubor $.ezer
+ panel A { include:'onload'
+   proc ap() {}
+ }
+ panel B { include:'onclick' }
+Tělo procedury ap
+
+  #soubor app.A
+ proc ap() { echo("tělo ap") }
+Volání procedury z jiného zdrojového textu
+
+  #soubor app.B
+ proc bp() { A.ap() }
+
+
+
 == Verze 2.2 ==
 
 === Přidáno ===
@@ -86,10 +116,11 @@ Písmeno ''a'' zastupuje ve schématu název systému
 Složky Subversion pro aplikaci jsou označeny jako '''A''', pro jádro jako '''K''',
 neoznačené složky jsou z hlediska Subversion externí.
 
-== vývojové prostředí ==
+== Vývojové prostředí ==
 
 Pro editování EzerScriptu je používán freewarový editor '''PSPad'''
 do kterého je doplněn soubor Ezer.ini obsahující definici syntaktických kategorií jazyka.
 
 Projekt PSPadu je vhodné umístit do kořene aplikace.
+
 

@@ -3616,6 +3616,7 @@ Ezer.Chat= new Class({
 Ezer.Select= new Class({
 //os: Select.format - vzhled hodnotového prvku
 //  ; 'u' : 'up' seznam hodnot bude zobrazen nad select
+//  ; 'w' : 'wide' seznam hodnot bude zobrazen v plné šířce
   Extends: Ezer.Elem,
   Items: {},
 // ------------------------------------------------------------------------------------ selects
@@ -6938,8 +6939,8 @@ Ezer.fce.sys= function () {
 }
 // -------------------------------------------------------------------------------------- has_skill
 //ff: fce.has_skill (skills)
-//      zjistí zda přihlášený uživatel má aspoň jedno má z daných oprávnění
-//a: skills - hodnoty oddělené mezerou
+//      zjistí zda přihlášený uživatel má aspoň jedno z daných oprávnění
+//a: skills - hodnoty oddělené středníkem
 //r: 1 - ano
 //s: funkce
 Ezer.fce.has_skill= function (skills_query) {
