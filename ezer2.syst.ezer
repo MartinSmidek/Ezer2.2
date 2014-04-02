@@ -64,7 +64,8 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
     field zkratka [102,67,160,17] { data:k.zkratka },
     field poradi [294,67,40,17] { data:k.poradi, format:'r' },
     edit hodnota [4,106,392,95] { data:k.hodnota },
-    edit ikona [4,221,392,95] { data:k.ikona },
+    edit ikona [4,221,190,95] { data:k.ikona },
+    edit barva [205,221,190,95] { data:k.barva },
     edit popis [4,335,392,95] { data:k.popis },
     # popisky
     label [4,8,50,15] { title:'id_cis', help:'_cis.id_cis' },
@@ -73,6 +74,7 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
     label [102,50,50,15] { title:'zkratka', help:'_cis.zkratka' },
     label [4,90,65,15] { title:'hodnota 1', help:'_cis.hodnota' },
     label [4,205,62,15] { title:'hodnota 2', help:'_cis.ikona' },
+    label [207,205,62,15] { title:'hodnota 3', help:'_cis.barva' },
     label [294,50,50,15] { title:'pořadí', help:'_cis.poradi' },
     label [4,320,142,15] { title:'popis (do dokumentace)', help:'_cis.popis' },
     # procedury

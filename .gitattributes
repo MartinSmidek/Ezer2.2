@@ -121,6 +121,7 @@ code/comp2tab.php -text
 /ezer2.pers.ezer -text
 /ezer2.syst.ezer -text
 /ezer2_fce.php -text
+/help.php -text
 server/ae_slib.php -text
 server/comp2.php -text
 server/comp2def.php -text
