@@ -2193,7 +2193,7 @@ Ezer.SelectAuto.implement({
 //f: SelectAuto-DOM.DOM_newItems
 //      zobrazí hodnoty podle informace ze serveru
   DOM_newItems: function(y) {
-                                                        Ezer.debug(y.value,'ok');
+//                                                         Ezer.debug(y.value,'ok');
     this.Items= y.value;
     this.DOM_addItems();
   }
