@@ -241,6 +241,7 @@
   # ask(fce,args1, ...) -- zavolání funkce 'fce' na serveru
   # x: fce,args
   # y: value
+  case 'run':   // jako 'ask' ale bez návratu
   case 'ask':
     global $trace_parm;
     try {
@@ -269,6 +270,7 @@
     catch (Exception $e) {
       $y->error= $e->getMessage();
     }
+    if ( $x->cmd=='run') exit;
     break;
   # ------------------------------------------------------------------------------------------------ time
   case 'time':

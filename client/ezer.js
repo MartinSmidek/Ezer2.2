@@ -8009,16 +8009,29 @@ Ezer.fce.error= function (str,level,block,lc,calls) {
       Ezer.fce.DOM.error(estr+(inside?(" <b>in</b> "+inside):'')+" <b>after</b> "+trail);
       Ezer.fce.touch('error',str,[inside,trail]);
     }
+    else if ( level=='M') {
+      // chybová hláška způsobující zaslání mailu
+      Ezer.trace(0,str);
+      var msg= estr+(inside?(" <b>in</b> "+inside):'')+" <b>after</b> "+trail;
+      Ezer.fce.DOM.error(msg);
+      Ezer.fce.touch('error',str,[inside,trail]);
+      // provede volání funkce 'send_error' (nečeká na výsledek)
+      var x= {cmd:'run',fce:'send_error',args:[msg],nargs:1,
+              root:Ezer.root,session:Ezer.options.session};
+      var r= new Request({method:'post', url:Ezer.App.options.server_url, onComplete:null}).post(x);
+    }
     else {
       // jiná chyba (mimo Ezer.Eval.eval)
       Ezer.fce.DOM.error(estr+" <b>after</b> "+trail);
       if ( level!=='msg' ) throw {level:level,msg:str};
     }
   }
+  return 1;
 };
 // pokračování výpisu chyby, až se ze serveru vrátí žádost block_info o zdrojový text
 Ezer.fce.error_= function (info) {
   Ezer.fce.DOM.error(info);
+  return 1;
 }
 // -------------------------------------------------------------------------------------- touch
 //ff: fce.touch (type,block|msg|fce[,args])

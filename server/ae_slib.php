@@ -633,6 +633,15 @@ function fce_warning ($msg,$send_mail='') { trace();
   }
   return false;
 }
+# -------------------------------------------------------------------------------------------------- send_error
+# pošle chybovou hlášku správci aplikace mailem
+function send_error ($msg) { trace();
+  global $ezer_root, $USER;
+  $user= $USER->abbr;
+  $body= "Error message sent at ".date('j.n.Y H:i:s').", user=$user<hr>$msg";
+  send_mail("Ezer/$ezer_root ERROR",$body,"","",'error');
+  return false;
+}
 # -------------------------------------------------------------------------------------------------- set_limits
 # nastaví limity pro upload (MB,sec)
 function set_limits ($max_size=10,$max_time=300) { trace();
