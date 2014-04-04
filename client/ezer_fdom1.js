@@ -57,20 +57,12 @@ Ezer.Application= new Class({
         }
       }
     });
-//                                         Ezer.fce.echo(window.getSize().x,'-',leftMenuWidth,'=',ws.x);
     // změna výšky definuje velikost pracovní plochy
     Ezer.Shield.top= $('work').getCoordinates().top;
-    if ( this.options.to_trace ) {
-      var t= $('dolni').getCoordinates().top;
-      var h= t - $('work').getCoordinates().top;
-      $('work').setStyle('height',h);
-      $('paticka').setStyle('bottom',ws.y-t+pruh);
-    }
-    else {
-//       var h= $('dolni').getCoordinates().top - $('horni').getCoordinates().bottom;
-      $('work').setStyle('height',ws.y);
-      $('dolni').setStyle('height',0);
-    }
+    var t= $('dolni').getCoordinates().top;
+    var h= t - $('work').getCoordinates().top - 15;
+    $('work').setStyle('height',h);
+    $('paticka').setStyle('bottom',ws.y-t+pruh);
   },
   // ----------------------------------------------------------------------------- DOM_destroy
   DOM_destroy: function() {
