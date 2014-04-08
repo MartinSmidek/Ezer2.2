@@ -3053,7 +3053,8 @@ Ezer.fce.DOM.alert= function (str,continuation) {
   var win= null;
   if ( continuation ) {
     win= new StickyWin.Alert('Upozornění',str,{hideOnClick:false,closeOnEsc:true,
-      uiOptions:{closeButton:false,buttons:[{text:'Ok',onClick: function(){ continuation();}}]},
+      uiOptions:{closeButton:false,width:350,
+        buttons:[{text:'Ok',onClick: function(){ continuation();}}]},
       maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
     });
   }
