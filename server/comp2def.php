@@ -220,10 +220,10 @@ $attribs = array (
   'field'  =>  explode(",",'title:s,data:i,par:o,expr:s,map_pipe:m,sql_pipe:s,style:s,format:s,help:s,css:s,'
                           .'type:s,attribute:s,value:s,skill:s'),  // help_bg:s
   'button' =>  explode(",",'type:s,title:s,help:s,style:s,css:s,format:s,skill:s,par:o'),
-  'edit'   =>  explode(",",'type:s,data:i,value:s,expr:s,help:s,style:s,css:s,format:s,skill:s,par:o'),
+  'edit'   =>  explode(",",'title:s,type:s,data:i,value:s,expr:s,help:s,style:s,css:s,format:s,skill:s,par:o'),
   'select' =>  explode(",",'title:s,type:s,par:o,data:i,sql_pipe:s,options:m,labels:m,map_pipe:m,fkeys:i,fkey:i,expr:s,format:s,'
                           .'help:s,css:s,help_bg:s,auto:s,value:s,skill:s'),
-  'chat'   =>  explode(",",'data:i,divide:n,format:s,skill:s'),
+  'chat'   =>  explode(",",'title:s,data:i,divide:n,format:s,skill:s'),
   'check'  =>  explode(",",'data:i,style:s,css:s,help:s,title:s,format:s,skill:s,value:s'),
 #  tabs
   'tabs'   =>  explode(",",'type:s,skill:s,title:s,active:i,include:s,where:s'),

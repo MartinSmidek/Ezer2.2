@@ -36,7 +36,7 @@ Ezer.Block.implement({
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_optStyle
 // doplní případný styl, css-třídu a title
-  DOM_optStyle: function(dom,title_as_label) {
+  DOM_optStyle: function(dom,title_as_label,ignore_right) {
     // atribut style definuje styly pro parametr
     if ( this.options.style ) {
       var oss= this.options.style.split(';');
@@ -54,9 +54,9 @@ Ezer.Block.implement({
       // případný atribut title jako label
       var label= title_as_label[0]=='^' ? title_as_label.substr(1) : title_as_label;
       var up= title_as_label[0]=='^';
-      var left= !this._fc('r');
-      this.DOM_Label= new Element('div.ElemLabel',{text:label,
-        styles:up ? (left ? {top:-16,left:1} : {top:-16,right:1}) : {right:this._w+2}});
+      var left= ignore_right || !this._fc('r');
+      this.DOM_Label= new Element('div.Label',{text:label,
+        styles:up ? (left ? {top:-14,left:2} : {top:-14,right:2}) : {top:3,right:this._w+2}});
       this.DOM_Block.grab(this.DOM_Label,'top');
     }
     else if (this.DOM_Input ) {
@@ -1314,7 +1314,7 @@ Ezer.FieldDate.implement({
           width:(this._w||87)-18,height:this._h||16}})
     ).inject(this.owner.DOM_Block);
     this.DOM_ElemEvents();
-    this.DOM_optStyle(this.DOM_Block);
+    this.DOM_optStyle(this.DOM_Input,this.options.title,true); // u title ignorovat zarovnání
     if ( this.skill==2 && !this._fc('d') && !this._fc('o') ) {
       var ox= this._fc('R') ? -106 :  -7;                          // 44
       var oy= this._fc('U') ? -200 : -20;                          // 30
@@ -1379,7 +1379,7 @@ Ezer.FieldList.implement({
         width:this._w-(img ? 20 : 0),height:this._h-4}
     }).inject(this.DOM_Closure);
     this.DOM_ElemEvents(true);
-    this.DOM_optStyle(this.DOM_Block);
+    this.DOM_optStyle(this.DOM_Input,this.options.title,true); // u title ignorovat zarovnání
     // obal pro jednotlivé řádky
     var dl_w= this.options.par && this.options.par.width
       ? this.options.par.width : this._w-1;
@@ -1499,11 +1499,18 @@ Ezer.Edit.implement({
   DOM_add: function() {
     var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
     var corr= Ezer.browser=='CH' ? {height:this._h-4,width:this._w-2} : {height:this._h-2};
-    this.DOM_Block= this.DOM_Input= new Element('textarea',{'class':'Edit',
-      styles:this.coord(corr)
-    }).inject(owners_block);
+    this.DOM_Input= new Element('textarea.Edit');
+    if ( this.options.title ) {
+      // přidej div na obal input a návěští
+      this.DOM_Block= new Element('div.Element').inject(owners_block);
+      this.DOM_Input.inject(this.DOM_Block);
+    }
+    else {
+      this.DOM_Block= this.DOM_Input.inject(owners_block);
+    }
+    this.DOM_Block.setStyles(this.coord(corr));
     this.DOM_ElemEvents();
-    this.DOM_optStyle(this.DOM_Block);
+    this.DOM_optStyle(this.DOM_Input,this.options.title,true); // u title ignorovat zarovnání
   }
 });
 // ================================================================================================= EditHtml-DOM
@@ -1794,7 +1801,7 @@ Ezer.Chat.implement({
     this.append= this._f('r')>=0 ? 1 : 0;
     if ( this.skill==1 ) this.enable(0);
     this.DOM_ElemEvents();
-    this.DOM_optStyle(this.DOM_Block);
+    this.DOM_optStyle(this.DOM_Block,this.options.title);
   },
 // ------------------------------------------------------------------------------------ DOM_append
 //f: Chat-DOM.DOM_append (head,tail)
@@ -1895,7 +1902,7 @@ Ezer.Select.implement({
     this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
         width:this._w-(img ? 20 : 0),height:this._h-4}
     }).inject(this.DOM_Closure);
-    this.DOM_optStyle(this.DOM_Input,this.options.title);
+    this.DOM_optStyle(this.DOM_Input,this.options.title,true); // u title ignorovat zarovnání
 //o: Select-DOM.DOM_DropList - obal pro jednotlivé Items (options)
     var dl_w= this.options.par && this.options.par.subtype=='keys' && this.options.par.width
       ? this.options.par.width : this._w-1;
