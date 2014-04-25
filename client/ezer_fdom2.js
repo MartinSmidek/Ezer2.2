@@ -36,7 +36,7 @@ Ezer.Block.implement({
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_optStyle
 // doplní případný styl, css-třídu a title
-  DOM_optStyle: function(dom) {
+  DOM_optStyle: function(dom,title_as_label) {
     // atribut style definuje styly pro parametr
     if ( this.options.style ) {
       var oss= this.options.style.split(';');
@@ -50,7 +50,16 @@ Ezer.Block.implement({
     if ( this.options.css ) {
       this.DOM_Block.addClass(this.options.css);
     }
-    if (this.DOM_Input ) {
+    if ( title_as_label ) {
+      // případný atribut title jako label
+      var label= title_as_label[0]=='^' ? title_as_label.substr(1) : title_as_label;
+      var up= title_as_label[0]=='^';
+      var left= !this._fc('r');
+      this.DOM_Label= new Element('div.ElemLabel',{text:label,
+        styles:up ? (left ? {top:-16,left:1} : {top:-16,right:1}) : {right:this._w+2}});
+      this.DOM_Block.grab(this.DOM_Label,'top');
+    }
+    else if (this.DOM_Input ) {
       // nepovinná hodnota title
       if ( this.title )
         this.DOM_Input.set('title',this.title);
@@ -1275,12 +1284,18 @@ Ezer.Field.implement({
 //      zobrazí prvek field
   DOM_add: function() {
     var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
-    this.DOM_Block= this.DOM_Input= new Element('input',{'class':'Field',
-      styles:this.coord({height:this._h||15}),
-      type:this._f('p')==-1?'text':'password'
-    }).inject(owners_block);
+    this.DOM_Input= new Element('input.Field',{type:this._f('p')==-1?'text':'password'});
+    if ( this.options.title ) {
+      // přidej div na obal input a návěští
+      this.DOM_Block= new Element('div.Element').inject(owners_block);
+      this.DOM_Input.inject(this.DOM_Block);
+    }
+    else {
+      this.DOM_Block= this.DOM_Input.inject(owners_block);
+    }
+    this.DOM_Block.setStyles(this.coord({height:this._h||15}));
     this.DOM_ElemEvents();
-    this.DOM_optStyle(this.DOM_Block);
+    this.DOM_optStyle(this.DOM_Block,this.options.title);
   }
 });
 // ================================================================================================= FieldDate-DOM
@@ -1880,7 +1895,7 @@ Ezer.Select.implement({
     this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
         width:this._w-(img ? 20 : 0),height:this._h-4}
     }).inject(this.DOM_Closure);
-    this.DOM_optStyle(this.DOM_Input);
+    this.DOM_optStyle(this.DOM_Input,this.options.title);
 //o: Select-DOM.DOM_DropList - obal pro jednotlivé Items (options)
     var dl_w= this.options.par && this.options.par.subtype=='keys' && this.options.par.width
       ? this.options.par.width : this._w-1;

@@ -393,6 +393,11 @@ input.changed:focus, textarea.changed:focus {
 .href {
   text-decoration:underline; color:$c_kuk; cursor:pointer; }
 
+div.Element {
+  position:absolute; }
+div.ElemLabel {
+  text-align:right; position:absolute; top:3px; }
+
 div.LabelDrop {
   position:absolute; z-index:1; border:1px dashed #fff;
   outline:3px solid $b_doc_form; background-color:$b_doc_form; }
@@ -412,7 +417,7 @@ div.LabelDrop progress {
   color:$fc_item }
 
 .Field {
-  position:absolute; height:16px !important; border:1px solid #aaa; z-index:1; }
+  position:absolute; height:16px !important; width:100%; border:1px solid #aaa; z-index:1; }
 .FieldDate {
   position:absolute; z-index:1; }
 .FieldDate img {
