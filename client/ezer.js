@@ -5231,14 +5231,19 @@ Ezer.Show= new Class({
     return 1;
   },
 // ------------------------------------------------------------------------------------ get++
-//fm: Show.get ()
-//      vrátí hodnotu na aktivním řádku
-  get: function () {
-    Ezer.assert(this.owner.r>=0,
-      "get: dotaz na sloupec '"+this.id+"' neaktivního řádku browse '"+this.owner.id+"'");
-    var val= this.owner.buf[this.owner.r-this.owner.b][this.id];
-//     if ( typeof(val)=="string" && val==0 )   //110418g odstraněno
-//       val= 0;
+//fm: Show.get ([ti])
+//      vrátí hodnotu na aktivním řádku nebo
+//      EXPERIMENTÁLNÍ na zadaném ti-tém řádku (není-li obsazen, vrací prázdný řetězec)
+  get: function (ti) {
+    var val= '';
+    if ( arguments.length==1 ) {
+      val= this.owner.tlen>=ti ? this.owner.buf[this.owner.t+ti-1][this.id] : '';
+    }
+    else {
+      Ezer.assert(this.owner.r>=0,
+        "get: dotaz na sloupec '"+this.id+"' neaktivního řádku browse '"+this.owner.id+"'");
+      val= this.owner.buf[this.owner.r-this.owner.b][this.id];
+    }
     return val;
   },
 // ------------------------------------------------------------------------------------ save
@@ -6022,7 +6027,10 @@ Ezer.Eval= new Class({
                 if ( !(fce= obj[cc.i]) && obj.type=='var' && (obj= obj.value) )
                   fce= obj[cc.i]
                 if ( $type(fce)!='function' )
-                  Ezer.error('EVAL: '+cc.i+' není metoda '+obj.type,'S',this.proc,last_lc);
+                  if ( obj )
+                    Ezer.error('EVAL: '+cc.i+' není metoda '+obj.type,'S',this.proc,last_lc);
+                  else
+                    Ezer.error('EVAL: '+cc.i+' není metoda','S',this.proc,last_lc);
                 Ezer.calee= this.proc;
                 val= fce.apply(obj,args);
               }

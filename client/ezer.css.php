@@ -395,8 +395,8 @@ input.changed:focus, textarea.changed:focus {
 
 div.Element {
   position:absolute; }
-/*div.ElemLabel {
-  text-align:right; position:absolute; top:3px; }*/
+div.Element .Label {
+  white-space: pre; }
 
 div.LabelDrop {
   position:absolute; z-index:1; border:1px dashed #fff;
