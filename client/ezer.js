@@ -567,14 +567,17 @@ Ezer.Block= new Class({
     return 1;
   },
 // ------------------------------------------------------------------------------------ property
-//fm: Block.property (object)
-//      upraví vlastnosti bloku
+//fm: Block.property (object[,smooth])
+// změní styly bloku podle parametru
+// EXPERIMENTÁLNÍ: pokud je smooth=1 použije transition z mootools
+// EXPERIMENTÁLNÍ: pokud je smooth Ezer objekt s procedurou onproperty, bude zavolána po transition
+// pro šířku a výšku lze pro místo hodnoty dát *
 //a: height:*   - upraví výšku podle nejvyššího obsaženého elementu (s opravou u panelu na levé menu)
 //   min_height:n - minimální výška
 //   width:*    - upraví šířku podle nejširšího obsaženého elementu (s opravou u panelu na levé menu)
 //   min_width:n - minimální šířka
-  property: function(prop) {
-    this.DOM_set_properties(prop);
+  property: function(prop,smooth) {
+    this.DOM_set_properties(prop,smooth);
     return 1;
   },
 // -------------------------------------------------------------------------------------- raise

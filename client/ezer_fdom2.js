@@ -81,25 +81,48 @@ Ezer.Block.implement({
     return o;
   },
 // ------------------------------------------------------------------------------------ DOM_set_properties
-// nastaví panelu maximální rozumnou výšku
-  DOM_set_properties: function(prop) {
+// změní styly DOM_Block podle parametru, pokud je smooth=1 použije transition z mootools
+// pro šířku a výšku lze pro místo hodnoty dát * označující rozumné maximum
+  DOM_set_properties: function(prop,smooth) {
     var div= this.DOM_Block;
+    var style= {};
     if ( div ) {
-      if ( prop.height=='*' ) {
-        if ( this.type=='panel' )
-          div= div.getElement('.inAccordion') || div;                             // !!!!!!!!!!!!!!!!!
-        var hs= div.getElements('div').getCoordinates().map(function(o){return o.height});
-        var h= prop.min_height ? [hs.max(),prop.min_height].max() : hs.max();
-        div.setStyles({height:h+50});
+      if ( prop.left )                                  // left
+        style.left= prop.left;
+      if ( prop.top )                                   // top
+        style.top= prop.top;
+      if ( prop.width ) {                               // width
+        style.width= prop.width;
+        if ( prop.width=='*' ) {
+          var ws= div.getElements('div,table').getCoordinates().map(function(o){return o.width});
+          style.width= prop.min_width ? [ws.max(),prop.min_width].max() : ws.max();
+        }
       }
-      if ( prop.width=='*' ) {
-        var ws= div.getElements('div,table').getCoordinates().map(function(o){return o.width});
-        var w= prop.min_width ? [ws.max(),prop.min_width].max() : ws.max();
-        div.setStyles({width:w});
+      if ( prop.height ) {                              // height
+        style.height= prop.height;
+        if ( prop.height=='*' ) {
+          if ( this.type=='panel' )
+            div= div.getElement('.inAccordion') || div;                             // !!!!!!!!!!!!!!!!!
+          var hs= div.getElements('div').getCoordinates().map(function(o){return o.height});
+          style.height= (prop.min_height ? [hs.max(),prop.min_height].max() : hs.max())+50;
+        }
       }
-      else if ( prop.width ) {
-        div.setStyles({width:prop.width});
+      // vlastní změna
+      if ( smooth ) {
+        var options= {transition:'bounce:out'};
+        if ( smooth instanceof Ezer.Block ) {
+          // pokud je smooth ezer-objekt tak by měl obsahovat obsluhu onproperty
+          options.onComplete= function() {
+            smooth.callProc("onproperty");
+            div.get('morph').removeEvents('complete');
+            div.set('morph',{});
+          };
+        }
+        div.set('morph',options);
+        div.morph(style);
       }
+      else
+        div.setStyles(style);
     }
   },
 // ------------------------------------------------------------------------------------ coord
