@@ -567,18 +567,70 @@ Ezer.Block= new Class({
     return 1;
   },
 // ------------------------------------------------------------------------------------ property
-//fm: Block.property (object[,smooth])
-// změní styly bloku podle parametru
-// EXPERIMENTÁLNÍ: pokud je smooth=1 použije transition z mootools
-// EXPERIMENTÁLNÍ: pokud je smooth Ezer objekt s procedurou onproperty, bude zavolána po transition
-// pro šířku a výšku lze pro místo hodnoty dát *
+//fm: Block.property (props[,tags])
+// změní styly bloku podle parametru, pro šířku a výšku lze pro místo hodnoty dát *
+// EXPERIMENTÁLNÍ:
+// pokud je tags, pak se změna týká elementů v bloku, jejichž tag vyhovuje tags (jako pro display)
+// mohou být použity tyto pseudo-vlastnosti:
+//      down:n resp. aside:n posunou element proti originální poloze dolů resp. do strany
+//      smooth:1 transformaci provede funkce morph z mootools s defaultním options
+//      smooth:x funkci morph bude předáno x.transition, x.duration do options
+//               pokud bude definováno x.onproperty jako ezer-objekt bude v něm po skončení
+//               transition zavolána procedura onproperty
+//      return:'bounds' metoda vrátí rozměry ohraničujícího obdélníku (před případnou transformací)
 //a: height:*   - upraví výšku podle nejvyššího obsaženého elementu (s opravou u panelu na levé menu)
 //   min_height:n - minimální výška
 //   width:*    - upraví šířku podle nejširšího obsaženého elementu (s opravou u panelu na levé menu)
 //   min_width:n - minimální šířka
-  property: function(prop,smooth) {
-    this.DOM_set_properties(prop,smooth);
-    return 1;
+//r: object - pozice a velikost ohraničujícího obdélníku, pokud props.return='bounds'
+  property: function(props,tags) {
+    function bounds(el) {
+      var _l= el.getStyle('left').toInt(),
+          _t= el.getStyle('top').toInt();
+      rect._l= rect._l==undefined ? _l : Math.min(rect._l,_l);
+      rect._t= rect._t==undefined ? _t : Math.min(rect._t,_t);
+      var size= el.measure(function(){ return this.getSize(); });
+      rect._w= Math.max(rect._w,_l+size.x);
+      rect._h= Math.max(rect._h,_t+size.y);
+    }
+    var rect= {_l:undefined,_t:undefined,_w:0,_h:0};
+    if ( tags ) {
+      var re= new RegExp(tags);
+      var parts= this instanceof Ezer.Var && this.value ? this.value.part : this.part;
+      // proveď změnu pro podbloky s atributem tag vyhovujícím dotazu
+      for (var i in parts) {
+        var part= parts[i];
+        var block= part instanceof Ezer.Var && part.value ? part.value : part;
+        if ( block && block.DOM_Block && part.options.tag ) {
+          var tag_list= part.options.tag.split(',');
+          var some= tag_list.some(function(tag){
+            return re.test(tag);
+          });
+          if ( some ) {
+            if ( props.return=='bounds' ) bounds(block.DOM_Block);
+            block.DOM_set_properties(props);
+            // zabráníme vícenásobnému volání onproperty
+            if ( props.smooth && props.smooth.onproperty )
+              props.smooth.onproperty= undefined;
+          }
+        }
+      }
+    }
+    else if ( this instanceof Ezer.Var ) {
+      if ( this.value && this.value.DOM_Block ) {
+        if ( props.return=='bounds' ) bounds(this.value.DOM_Block);
+        this.value.DOM_set_properties(props);
+      }
+    }
+    else if ( this.DOM_Block ) {
+      if ( props.return=='bounds' ) bounds(this.DOM_Block);
+      this.DOM_set_properties(props);
+    }
+    if ( props.return=='bounds' ) {
+      rect._w-= rect._l;
+      rect._h-= rect._t;
+    }
+    return rect;
   },
 // -------------------------------------------------------------------------------------- raise
 //fm: Block.raise (event_name[,arg])

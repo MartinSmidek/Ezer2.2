@@ -81,24 +81,33 @@ Ezer.Block.implement({
     return o;
   },
 // ------------------------------------------------------------------------------------ DOM_set_properties
-// změní styly DOM_Block podle parametru, pokud je smooth=1 použije transition z mootools
+// změní styly DOM_Block podle parametru, pokud je prop.smooth=1 použije transition z mootools
 // pro šířku a výšku lze pro místo hodnoty dát * označující rozumné maximum
-  DOM_set_properties: function(prop,smooth) {
+// pseudo-vlastnosti down resp. aside posunou element proti originální poloze dolů resp. do strany
+// pseudo-vlastnosti smooth a onproperty využijí mootools
+  DOM_set_properties: function(prop) {
     var div= this.DOM_Block;
+    var smooth= prop.smooth;
     var style= {};
     if ( div ) {
-      if ( prop.left )                                  // left
+      if ( prop.left!==undefined )                                  // left
         style.left= prop.left;
-      if ( prop.top )                                   // top
+      else if ( prop.aside!==undefined ) {                          // nebo aside
+        style.top= this.desc.options._l + prop.aside;
+      }
+      if ( prop.top!==undefined )                                   // top
         style.top= prop.top;
-      if ( prop.width ) {                               // width
+      else if ( prop.down!==undefined ) {                           // nebo down
+        style.top= this.desc.options._t + prop.down;
+      }
+      if ( prop.width!==undefined ) {                               // width
         style.width= prop.width;
         if ( prop.width=='*' ) {
           var ws= div.getElements('div,table').getCoordinates().map(function(o){return o.width});
           style.width= prop.min_width ? [ws.max(),prop.min_width].max() : ws.max();
         }
       }
-      if ( prop.height ) {                              // height
+      if ( prop.height!==undefined ) {                              // height
         style.height= prop.height;
         if ( prop.height=='*' ) {
           if ( this.type=='panel' )
@@ -108,15 +117,20 @@ Ezer.Block.implement({
         }
       }
       // vlastní změna
-      if ( smooth ) {
-        var options= {transition:'bounce:out'};
-        if ( smooth instanceof Ezer.Block ) {
-          // pokud je smooth ezer-objekt tak by měl obsahovat obsluhu onproperty
-          options.onComplete= function() {
-            smooth.callProc("onproperty");
-            div.get('morph').removeEvents('complete');
-            div.set('morph',{});
-          };
+      if ( smooth!==undefined ) {
+        var options= {transition:'',duration:'short'};   // jinak se zapamatuje předchozí
+        if ( typeof(smooth)=='object' ) {
+          if ( smooth.transition ) options.transition= smooth.transition;
+          if ( smooth.duration )   options.duration=   smooth.duration;
+          if ( smooth.onproperty && smooth.onproperty instanceof Ezer.Block ) {
+            // pokud je prop.onproperty ezer-objekt tak by měl obsahovat obsluhu onproperty
+            var block= smooth.onproperty;
+            options.onComplete= function() {
+              block.callProc("onproperty");
+              div.get('morph').removeEvents('complete');
+              div.set('morph',null);
+            };
+          }
         }
         div.set('morph',options);
         div.morph(style);
