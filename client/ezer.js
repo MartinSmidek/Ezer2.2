@@ -1676,17 +1676,25 @@ Ezer.Var= new Class({
 //      nastaví hodnotu proměnné, pokud je typu object pak part určuje podsložku
   set: function (val,part) {
     if ( part!==undefined ) {
-      Ezer.assert(this.value===null || $type(this.value)=='object',
-        'set s 2.parametrem lze použít jen na objekty',this);
-      var is= typeof(part)=='string' ? part.split('.') : [part], v;
-      v= this.value||{};
-      for (var i= 0; i<is.length-1; i++) {
-        if ( typeof(v[is[i]])!='object' )
-          v= v[is[i]]= {};
-        else
-          v= v[is[i]];
+      if ( $type(this.value)=='array' ) {
+        v= this.value;
+        var n= Number(part);
+        Ezer.assert(n!==NaN,'set: index pole musí být číslo',this);
+        v[n]= val;
       }
-      v[is[i]]= val;
+      else {
+        Ezer.assert(this.value===null || $type(this.value)=='object',
+          'set s 2.parametrem lze použít jen na objekty nebo pole',this);
+        var is= typeof(part)=='string' ? part.split('.') : [part], v;
+        v= this.value||{};
+        for (var i= 0; i<is.length-1; i++) {
+          if ( typeof(v[is[i]])!='object' )
+            v= v[is[i]]= {};
+          else
+            v= v[is[i]];
+        }
+        v[is[i]]= val;
+      }
     }
     else {
       this.value= val;
@@ -1702,15 +1710,24 @@ Ezer.Var= new Class({
     if ( this.value===null )
       v= 0;
     else if ( part ) {
-      Ezer.assert($type(this.value)=='object','get s parametrem lze použít jen na objekty',this);
-      v= this.value;
-      $each(part.split('.'),function(i) {
-//         Ezer.assert(v[i]!==undefined,'get s parametrem '+part+' nelze použít',this);
-        if ( v[i]=='' )
-          v= '';
-        else
-          v= v[i]===undefined ? '' : v[i];
-      },this)
+      if ( $type(this.value)=='array' ) {
+        v= this.value;
+        var n= Number(part);
+        Ezer.assert(n!==NaN,'get: index pole musí být číslo',this);
+        v= v[n];
+      }
+      else {
+        Ezer.assert($type(this.value)=='object',
+          'get s parametrem lze použít jen na objekty nebo pole',this);
+        v= this.value;
+        $each(part.split('.'),function(i) {
+//           Ezer.assert(v[i]!==undefined,'get s parametrem '+part+' nelze použít',this);
+          if ( v[i]=='' )
+            v= '';
+          else
+            v= v[i]===undefined ? '' : v[i];
+        },this)
+      }
     }
     else
       v= this.value;
