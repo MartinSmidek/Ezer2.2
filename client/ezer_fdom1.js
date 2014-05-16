@@ -63,6 +63,27 @@ Ezer.Application= new Class({
     var h= t - $('work').getCoordinates().top - 15;
     $('work').setStyle('height',h);
     $('paticka').setStyle('bottom',ws.y-t+pruh);
+    // definice sys.screen width a height
+    Ezer.sys.screen= {width:ws.x,height:ws.y};
+    // projití aplikace root-tabs-panel a provedení onresize u neaktivovaných panelů
+    function downto_panels(block) {
+      if ( block.part ) {
+        for (var name in block.part) {
+          var x= block.part[name];
+          if ( x.part && (x instanceof Ezer.PanelPlain || x instanceof Ezer.PanelRight) ) {
+            if ( x.part.onresize ) {
+                                                Ezer.trace('*','resize of '+name+'/'+x.type);
+              x.callProc('onresize',[ws.x,ws.y]);
+            }
+          }
+          else if ( x instanceof Ezer.Tabs || x instanceof Ezer.MenuMain ) {
+            downto_panels(x);
+          }
+        }
+      }
+    }
+    if ( Ezer.run && Ezer.run.$ )
+      downto_panels(Ezer.run.$);
   },
   // ----------------------------------------------------------------------------- DOM_destroy
   DOM_destroy: function() {

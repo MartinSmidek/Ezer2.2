@@ -91,30 +91,36 @@ Ezer.Block.implement({
     var style= {};
     if ( div ) {
       if ( prop.left!==undefined )                                  // left
-        style.left= prop.left;
+        style.left= Number(prop.left);
       else if ( prop.aside!==undefined ) {                          // nebo aside
-        style.top= this.desc.options._l + prop.aside;
+        style.top= this._l + Number(prop.aside);
       }
       if ( prop.top!==undefined )                                   // top
-        style.top= prop.top;
+        style.top= Number(prop.top);
       else if ( prop.down!==undefined ) {                           // nebo down
-        style.top= this.desc.options._t + prop.down;
+        style.top= this._t + Number(prop.down);
       }
       if ( prop.width!==undefined ) {                               // width
-        style.width= prop.width;
+        style.width= Number(prop.width);
         if ( prop.width=='*' ) {
           var ws= div.getElements('div,table').getCoordinates().map(function(o){return o.width});
-          style.width= prop.min_width ? [ws.max(),prop.min_width].max() : ws.max();
+          style.width= prop.min_width ? [ws.max(),Number(prop.min_width)].max() : ws.max();
         }
       }
+      if ( prop.widen!==undefined ) {                               // nebo widen
+        style.width= this._w + Number(prop.widen);
+      }
       if ( prop.height!==undefined ) {                              // height
-        style.height= prop.height;
+        style.height= Number(prop.height);
         if ( prop.height=='*' ) {
           if ( this.type=='panel' )
             div= div.getElement('.inAccordion') || div;                             // !!!!!!!!!!!!!!!!!
           var hs= div.getElements('div').getCoordinates().map(function(o){return o.height});
-          style.height= (prop.min_height ? [hs.max(),prop.min_height].max() : hs.max())+50;
+          style.height= (prop.min_height ? [hs.max(),Number(prop.min_height)].max() : hs.max())+50;
         }
+      }
+      else if ( prop.stretch!==undefined ) {                       // nebo stretch
+        style.height= this._h + Number(prop.stretch);
       }
       // vlastní změna
       if ( smooth!==undefined ) {

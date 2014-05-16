@@ -359,6 +359,7 @@ onchoice=
 onload=
 onready=
 onbusy=
+onresize=
 onmarkclick=
 onrowclick=
 onsave=

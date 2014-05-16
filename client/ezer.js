@@ -506,7 +506,7 @@ Ezer.Block= new Class({
         var part= parts[i];
         var block= part instanceof Ezer.Var && part.value ? part.value.DOM_Block : part.DOM_Block;
         if ( block && part.options.tag ) {
-          var tag_list= part.options.tag.split(',');
+          var tag_list= part.options.tag.toString().split(',');
           var some= tag_list.some(function(tag){
             return re.test(tag);
           });
@@ -552,8 +552,9 @@ Ezer.Block= new Class({
     if ( tags ) {
       var re= new RegExp(tags);
       // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
-      for(var i in this.part) {
-        var part= this.part[i];
+      var parts= this instanceof Ezer.Var && this.value ? this.value.part : this.part;
+      for(var i in parts) {
+        var part= parts[i];
         if ( part.DOM_Block && part.options.tag && re.test(part.options.tag) ) {
           if ( id1 ) id1.split(' ').each(function(id){part.DOM_Block.addClass(id)});
           if ( id2 ) id2.split(' ').each(function(id){part.DOM_Block.removeClass(id)});
@@ -584,16 +585,38 @@ Ezer.Block= new Class({
 //   min_width:n - minimální šířka
 //r: object - pozice a velikost ohraničujícího obdélníku, pokud props.return='bounds'
   property: function(props,tags) {
-    function bounds(el) {
-      var _l= el.getStyle('left').toInt(),
-          _t= el.getStyle('top').toInt();
-      rect._l= rect._l==undefined ? _l : Math.min(rect._l,_l);
-      rect._t= rect._t==undefined ? _t : Math.min(rect._t,_t);
-      var size= el.measure(function(){ return this.getSize(); });
-      rect._w= Math.max(rect._w,_l+size.x);
-      rect._h= Math.max(rect._h,_t+size.y);
+    var rect= {_l:undefined,_t:undefined,_r:undefined,_b:undefined};
+    function mmax(a,b) { return (a==undefined || a<b) ? b : a; }
+    function mmin(a,b) { return (a==undefined || a>b) ? b : a; }
+    function bounds(block) {
+      var dom= block.DOM_Block;
+      var _l= dom.getStyle('left').toInt(),
+          _t= dom.getStyle('top').toInt();
+      var size= dom.measure(function(){
+        var rsiz= this.getSize();               // x, y
+        var label= this.getElement('div.Label');
+        if ( label ) {
+          // pokud je u elementů použito ^title, je třeba opravit hranice rect
+          var lpos= label.getPosition(dom);     // x, y
+          var lsiz= label.getSize();            // x, y
+//           var clab= label.getCoordinates();     // left, right, top, bottom
+          // opravy rect (_l, _r, _t, _b)
+//           rect._l= mmin(rect._l,clab.left);
+//           rect._r= mmax(rect._r,clab.right);
+//           rect._t= mmin(rect._t,clab.top);
+//           rect._b= mmax(rect._b,clab.bottom);
+          rect._l= mmin(rect._l,_l+lpos.x);
+          rect._r= mmax(rect._r,_l+lpos.x+lsiz.x);
+          rect._t= mmin(rect._t,_t+lpos.y);
+          rect._b= mmax(rect._b,_t+lpos.y+lsiz.y);
+        }
+        return rsiz;
+      });
+      rect._l= mmin(rect._l,_l);
+      rect._t= mmin(rect._t,_t);
+      rect._r= mmax(rect._r,_l+size.x); // = right
+      rect._b= mmax(rect._b,_t+size.y);
     }
-    var rect= {_l:undefined,_t:undefined,_w:0,_h:0};
     if ( tags ) {
       var re= new RegExp(tags);
       var parts= this instanceof Ezer.Var && this.value ? this.value.part : this.part;
@@ -607,7 +630,7 @@ Ezer.Block= new Class({
             return re.test(tag);
           });
           if ( some ) {
-            if ( props.return=='bounds' ) bounds(block.DOM_Block);
+            if ( props.return=='bounds' ) bounds(block);
             block.DOM_set_properties(props);
             // zabráníme vícenásobnému volání onproperty
             if ( props.smooth && props.smooth.onproperty )
@@ -618,18 +641,19 @@ Ezer.Block= new Class({
     }
     else if ( this instanceof Ezer.Var ) {
       if ( this.value && this.value.DOM_Block ) {
-        if ( props.return=='bounds' ) bounds(this.value.DOM_Block);
+        if ( props.return=='bounds' ) bounds(this.value);
         this.value.DOM_set_properties(props);
       }
     }
     else if ( this.DOM_Block ) {
-      if ( props.return=='bounds' ) bounds(this.DOM_Block);
+      if ( props.return=='bounds' ) bounds(this);
       this.DOM_set_properties(props);
     }
     if ( props.return=='bounds' ) {
-      rect._w-= rect._l;
-      rect._h-= rect._t;
+      rect._w= rect._l==undefined ? 0 : rect._r - rect._l;
+      rect._h= rect._t==undefined ? 0 : rect._b - rect._t;
     }
+    else rect= 1;
     return rect;
   },
 // -------------------------------------------------------------------------------------- raise
@@ -1709,7 +1733,7 @@ Ezer.Var= new Class({
     var v;
     if ( this.value===null )
       v= 0;
-    else if ( part ) {
+    else if ( part!==undefined ) {
       if ( $type(this.value)=='array' ) {
         v= this.value;
         var n= Number(part);
@@ -2122,10 +2146,11 @@ Ezer.Const= new Class({
     }
   },
 // ------------------------------------------------------------------------------------ get
-//fm: Const.get ()
+//fm: Const.get ([part])
 //      navrací hodnotu konstanty
-  get: function () {
-    return this.value;
+  get: function (part) {
+    // zavolej Var.get
+    return Ezer.Var.prototype.get.apply(this,[part]);
   }
 });
 // ================================================================================================= Form
@@ -6913,6 +6938,13 @@ Ezer.fce.array= function () {
   }
   return o;
 }
+// ----------------------------------------------------------------------------- array_length
+//ff: fce.array_length (pole)
+//      vrátí délku pole
+//s: funkce
+Ezer.fce.array_length= function (a) {
+  return a.length;
+}
 // ================================================================================================= fce objektové
 // ------------------------------------------------------------------------------------ copy_by_name
 //ff: fce.copy_by_name (form|browse|object|string,form|browse|object[,delimiters='|:'])
@@ -7473,6 +7505,25 @@ Ezer.fce.sum= function () {
   }
   return String(sum);
 }
+// -------------------------------------------------------------------------------------- minus
+//ff: fce.minus (x,s1,s2,...)
+//   minus(x)=-x; minus(x,s1,s2,...)=x-s1-s2...
+//s: funkce
+//a: x,s1,s2,...
+//r: -x nebo x-s1-s2...
+Ezer.fce.minus= function (x) {
+  var y;
+  if ( arguments.length==1 ) {
+    y= -x;
+  }
+  else {
+    y= x;
+    for (var i= 1; i<arguments.length; i++) {
+      y-= Number(arguments[i]);
+    }
+  }
+  return String(y);
+}
 // -------------------------------------------------------------------------------------- min
 //ff: fce.min (x1,x2,...)
 //   minimum hodnot x1, x2, ...
@@ -7531,17 +7582,6 @@ Ezer.fce.modulo= function (x,y) {
   var z= Number(x);
   z= z % Number(y);
   return String(z);
-}
-// -------------------------------------------------------------------------------------- minus
-//ff: fce.minus (x)
-//   záporná hodnota x
-//s: funkce
-//a: x
-//r: -x
-Ezer.fce.minus= function (x) {
-  var num= Number(x);
-  num= -num;
-  return String(num);
 }
 // -------------------------------------------------------------------------------------- castka_slovy
 //ff: fce.castka_slovy (castka [,platidlo,platidla,platidel,drobnych])

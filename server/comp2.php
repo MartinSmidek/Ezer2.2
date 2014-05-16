@@ -1471,6 +1471,7 @@ function gen_name($name,$pars,$vars,$first,$c=null,$nargs=null) {  #trace();
           $code[]= (object)array('o'=>'r','i'=>$id);
         }
         else {
+//                                                 debug($context,"'$id' v řetězení '$name'",(object)array('depth'=>3));
           comp_error("CODE: chybné jméno '$id' v řetězení '$name', i=$i");
         }
       }
