@@ -563,6 +563,10 @@ __EOD
 .BrowseSmart input.td_input {
   height:15px; position:relative; margin:-1px 2px -1px -3px; padding-left:2px;
   outline:2px dotted yellow; border:0px; font:inherit; background-color:#ffffaa}
+/* reload */
+.BrowseSmart td.BrowseReload {
+  background:url($path/browse_reload.png) no-repeat !important; cursor:pointer !important;
+  padding:0; width:8px; }
 /* posuvník */
 .BrowseSmart td.BrowseSet {
   background:url($path/browse_set.png) no-repeat !important; cursor:pointer !important;

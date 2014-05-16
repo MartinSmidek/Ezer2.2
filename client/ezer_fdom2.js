@@ -2326,47 +2326,76 @@ Ezer.Browse.implement({
   _clmns: 0,
   _opened: null,                        // buňka otevřená k editaci po Show.DblClk
   _opened_value: null,                  // původní hodnota této buňky
+// ------------------------------------------------------------------------------------ DOM_remove
+//f: Browse-DOM.DOM_remove ()
+//      odstraní obraz tabulky
+  DOM_remove: function(data_only) {
+    if ( data_only ) {
+      // odstranění pouze datové části browse
+      for (var i= 1; i<=this.tmax; i++) {
+          this.DOM_row[i].destroy();
+      }
+      this.DOM_row= [];
+      this.DOM_tag= [];
+    }
+    else {
+      // celkové odstranění obrazu browse
+      this.DOM.destroy();
+      this.DOM_Block= DOM_table= this.DOM_head= this.DOM_foot= this.DOM_status= null;
+      this.DOM_tbody= this.DOM_input= this.DOM_th_posun= null;
+      this.DOM_qry_row= this.DOM_row= this.DOM_tag= [];
+      this.DOM_Input_state= 0;
+    }
+  },
 // ------------------------------------------------------------------------------------ DOM_add1+
 //f: Browse-DOM.DOM_add1 ()
 //      zobrazí tabulku
-  DOM_add1: function() {
-    // základní struktura zobrazení browse
-    this.DOM= this.DOM_Block= new Element('div',{'class':'BrowseSmart',styles:this.coord()
-    }).inject(this.owner.DOM_Block);
-    this.DOM.adopt(
-      this.DOM_table= new Element('table',{cellspacing:1}).adopt(
-        // tady budou hlavičky sloupců
-        new Element('thead').adopt(
-          this.DOM_head= new Element('tr').adopt(new Element('td',{'class':'th',styles:{width:8}}))),
-        // patička s přehledem stavu
-        new Element('tfoot').adopt(
-          new Element('tr').adopt(
-            this.DOM_foot= new Element('th',{colSpan:1}).adopt(
-              new Element('div',{styles:{display:'block', textAlign:'center'}}).adopt(
-                this.DOM_status= new Element('span',{text:'-'})
-        ) ) ) ),
-        // tady budou sloupce
-        this.DOM_tbody= new Element('tbody')
-      ),
-      this.DOM_input= new Element('input',{'class':'BrowseFocus',type:'text'})
-    );
-    // doplnění začátku řádků s dotazy
-    this.DOM_qry_row= [];
-    for (var i= 1; i<=this.options.qry_rows; i++) {
-      this.DOM_tbody.adopt(
-        this.DOM_qry_row[i]= new Element('tr',{events:{
-          dblclick: function(event) {
-            event.stop();
-            this.init_queries();
-          }.bind(this)
-        }}).adopt(
-          new Element('td',{'class':'tag0'})
-        )
+  DOM_add1: function(data_only) {
+    if ( !data_only ) {
+      // základní struktura zobrazení browse - úplné vybudování
+      this.DOM= this.DOM_Block= new Element('div',{'class':'BrowseSmart',styles:this.coord()
+      }).inject(this.owner.DOM_Block);
+      this.DOM.adopt(
+        this.DOM_table= new Element('table',{cellspacing:1}).adopt(
+          // tady budou hlavičky sloupců
+          new Element('thead').adopt(
+            this.DOM_head= new Element('tr').adopt(
+              new Element('td',{'class':'BrowseReload',styles:{width:8}, events:{
+                click: function(el) {
+                  // znovu načti obsah
+                  this._ask_queries(true);
+                }.bind(this)
+          }}))),
+          // patička s přehledem stavu
+          new Element('tfoot').adopt(
+            new Element('tr').adopt(
+              this.DOM_foot= new Element('th',{colSpan:1}).adopt(
+                new Element('div',{styles:{display:'block', textAlign:'center'}}).adopt(
+                  this.DOM_status= new Element('span',{text:'-'})
+          ) ) ) ),
+          // tady budou sloupce
+          this.DOM_tbody= new Element('tbody')
+        ),
+        this.DOM_input= new Element('input',{'class':'BrowseFocus',type:'text'})
       );
+      // doplnění začátku řádků s dotazy
+      this.DOM_qry_row= [];
+      for (var i= 1; i<=this.options.qry_rows; i++) {
+        this.DOM_tbody.adopt(
+          this.DOM_qry_row[i]= new Element('tr',{events:{
+            dblclick: function(event) {
+              event.stop();
+              this.init_queries();
+            }.bind(this)
+          }}).adopt(
+            new Element('td',{'class':'tag0'})
+          )
+        );
+      }
+      // scroll bar začíná pod hlavičkou
+      if ( this.options.qry_rows>0 )
+        this.DOM_th_posun= this.DOM_qry_row[1];     // scrollbar již na úrovni dotazu
     }
-    // scroll bar začíná pod hlavičkou
-    if ( this.options.qry_rows>0 )
-      this.DOM_th_posun= this.DOM_qry_row[1];     // scrollbar již na úrovni dotazu
     // doplnění začátku datových řádků a přidání události pro mouse.click
     this.DOM_row= [];
     this.DOM_tag= [];
@@ -2496,71 +2525,80 @@ Ezer.Browse.implement({
 // ------------------------------------------------------------------------------------ DOM_add2+
 //f: Browse-DOM.DOM_add2 ()
 //      zobrazí sloupce tabulky, pokud je tabulka dostatečně definována
-  DOM_add2: function() {
+  DOM_add2: function(data_only) {
     // získání rozměrů
     Ezer.assert(this.DOM_th_posun,'browse nemá korektní vlastnosti',this);
     this._rows= (this.options.qry_rows||0)+this.tmax;
     this._posuv_height= this._rows*17-32;
     // vložení přepínače sloupců
     var browse= this, clicked;
-    this.DOM_head.adopt(clicked= new Element('td',{'class':'th',styles:{width:16}}));
-    if ( this.findProc('onclick') ) {
-      clicked.addClass('BrowseSet');
-      clicked.addEvents({
-        click: function(el) {
-          browse.fire('onclick',[browse],el);
+    if ( !data_only ) {
+      this.DOM_head.adopt(clicked= new Element('td',{'class':'th',styles:{width:16}}));
+      if ( this.findProc('onclick') ) {
+        clicked.addClass('BrowseSet');
+        clicked.addEvents({
+          click: function(el) {
+            browse.fire('onclick',[browse],el);
+          }.bind(this)
+        });
+      }
+      // vložení sloupce s posuvníkem -----------------------------------------------
+      this.DOM_th_posun.adopt(
+        new Element('td',{'class':'BrowsePosuv',rowspan:this._rows,events:{
+          mouseover: function(ev) {
+            if ( this.slen ) {
+              this.DOM_posuv_up.addClass('act');
+              this.DOM_posuv_dn.addClass('act');
+            }
+          }.bind(this),
+          mouseout: function(ev) {
+            this.DOM_posuv_up.removeClass('act');
+            this.DOM_posuv_dn.removeClass('act');
+          }.bind(this)
+        }}).adopt(
+          this.DOM_posuv_up= new Element('div',{'class':'BrowseUp',events:{
+            click: function(el) {
+              this._row_move(this.r-this.tmax+1);
+            }.bind(this)
+          }}),
+          new Element('div',{'class':'BrowsePosuv',styles:{height:this._posuv_height}}).adopt(
+            this.DOM_posuv= new Element('div',{styles:{height:this._posuv_height-12}}).adopt(
+              this.DOM_handle= new Element('div').adopt(
+                new Element('div',{'class':'BrowseHandleUp'}),
+                new Element('div',{'class':'BrowseHandleMi'}),
+                new Element('div',{'class':'BrowseHandleDn'})
+          ))),
+          this.DOM_posuv_dn= new Element('div',{'class':'BrowseDn',events:{
+            click: function(el) {
+              this._row_move(this.r+this.tmax-1);
+            }.bind(this)
+          }})
+        )
+      );
+      this.DOM_slider();
+      this.slider.knob.fade('hide');
+      $$(this.DOM_tbody, this.DOM_posuv).addEvents({
+        mousewheel: function(e) {
+          e= new Event(e).stop();
+          var ewh= e.wheel>0 ? this.options.wheel : -this.options.wheel;
+          this._row_move(this.r-ewh);
+          this.focus();
+          return false;
         }.bind(this)
       });
+//       $(document.body).addEvents({
+//         mouseleave: function () {
+//           browse.slider.drag.stop()
+//         }
+//       });
     }
-    // vložení sloupce s posuvníkem -----------------------------------------------
-    this.DOM_th_posun.adopt(
-      new Element('td',{'class':'BrowsePosuv',rowspan:this._rows,events:{
-        mouseover: function(ev) {
-          if ( this.slen ) {
-            this.DOM_posuv_up.addClass('act');
-            this.DOM_posuv_dn.addClass('act');
-          }
-        }.bind(this),
-        mouseout: function(ev) {
-          this.DOM_posuv_up.removeClass('act');
-          this.DOM_posuv_dn.removeClass('act');
-        }.bind(this)
-      }}).adopt(
-        this.DOM_posuv_up= new Element('div',{'class':'BrowseUp',events:{
-          click: function(el) {
-            this._row_move(this.r-this.tmax+1);
-          }.bind(this)
-        }}),
-        new Element('div',{'class':'BrowsePosuv',styles:{height:this._posuv_height}}).adopt(
-          this.DOM_posuv= new Element('div',{styles:{height:this._posuv_height-12}}).adopt(
-            this.DOM_handle= new Element('div').adopt(
-              new Element('div',{'class':'BrowseHandleUp'}),
-              new Element('div',{'class':'BrowseHandleMi'}),
-              new Element('div',{'class':'BrowseHandleDn'})
-        ))),
-        this.DOM_posuv_dn= new Element('div',{'class':'BrowseDn',events:{
-          click: function(el) {
-            this._row_move(this.r+this.tmax-1);
-          }.bind(this)
-        }})
-      )
-    );
-    this.DOM_slider();
-    this.slider.knob.fade('hide');
-    $$(this.DOM_tbody, this.DOM_posuv).addEvents({
-      mousewheel: function(e) {
-        e= new Event(e).stop();
-        var ewh= e.wheel>0 ? this.options.wheel : -this.options.wheel;
-        this._row_move(this.r-ewh);
-        this.focus();
-        return false;
-      }.bind(this)
-    });
-//     $(document.body).addEvents({
-//       mouseleave: function () {
-//         browse.slider.drag.stop()
-//       }
-//     });
+    else {
+      // pouze úprava pro data_only => úprava délky posuvníku
+      this.DOM_th_posun.getElement('td.BrowsePosuv').set('rowspan',this._rows);
+      this.DOM_th_posun.getElement('div.BrowsePosuv').setStyles({height:this._posuv_height});
+      this.DOM_posuv.setStyles({height:this._posuv_height-12});
+      this.slider.reset(0);
+    }
     // úprava patičky
     this.DOM_foot.setProperty('colSpan',this._clmns+2);
     // dynamické styly pro řádek
@@ -2759,159 +2797,162 @@ Ezer.Show.implement({
 // ------------------------------------------------------------------------------------ DOM_add+
 // f: Show-DOM.DOM_add ()
 //      zobrazení sloupce tabulky, pokud má šířku>0
-  DOM_add: function() {
-    this.owner._clmns++;
-    // přidání záhlaví sloupce
-    var w= this._w;
-    var title= this.options.title||'';
-    this.owner.DOM_head.adopt(
-      this.DOM_th= new Element('td',{'class':'th',title:this.help,styles:{width:w}}).adopt(
-        new Element('span',{text:title})
-      )
-    );
-    // změny šířky sloupců
-    this.DOM_th.grab(
-      this.DOM_resize= new Element('img',{'class':'resize',
-        src:Ezer.version+'/client/img/browse_resize.png'}),'top');
-    var s, w0, ws0;
-    this.DOM_th.makeResizable({
-      handle: this.DOM_th.getChildren('.resize'),
-      modifiers: {x:'width',y:false},
-      onStart:function(el){
-        this._resizing= true;
-        w0= this.DOM_th.getStyle('width').toInt();
-        this.DOM_resize.setProperty('title',w0);
-        s= this.DOM_th.getNext('td');
-        ws0= s.getStyle('width').toInt();
-      }.bind(this),
-      onDrag: function(el) {
-        if ( s ) {
-          var w1= this.DOM_th.getStyle('width').toInt();
-          this.DOM_resize.setProperty('title',w1);
-          if ( w1 < w0+ws0 ) {
-            var w2= ws0-(w1-w0);
-            s.setStyle('width',w2);
-            this.width(w1);
+  DOM_add: function(data_only) {
+    if ( !data_only ) {
+      // kompletní přidání záhlaví, dotazů, ...
+      this.owner._clmns++;
+      // přidání záhlaví sloupce
+      var w= this._w;
+      var title= this.options.title||'';
+      this.owner.DOM_head.adopt(
+        this.DOM_th= new Element('td',{'class':'th',title:this.help,styles:{width:w}}).adopt(
+          new Element('span',{text:title})
+        )
+      );
+      // změny šířky sloupců
+      this.DOM_th.grab(
+        this.DOM_resize= new Element('img',{'class':'resize',
+          src:Ezer.version+'/client/img/browse_resize.png'}),'top');
+      var s, w0, ws0;
+      this.DOM_th.makeResizable({
+        handle: this.DOM_th.getChildren('.resize'),
+        modifiers: {x:'width',y:false},
+        onStart:function(el){
+          this._resizing= true;
+          w0= this.DOM_th.getStyle('width').toInt();
+          this.DOM_resize.setProperty('title',w0);
+          s= this.DOM_th.getNext('td');
+          ws0= s.getStyle('width').toInt();
+        }.bind(this),
+        onDrag: function(el) {
+          if ( s ) {
+            var w1= this.DOM_th.getStyle('width').toInt();
+            this.DOM_resize.setProperty('title',w1);
+            if ( w1 < w0+ws0 ) {
+              var w2= ws0-(w1-w0);
+              s.setStyle('width',w2);
+              this.width(w1);
+            }
+            else {
+              this.width(w0+ws0-1);
+              s.setStyle('width',1);
+            }
+          }
+        }.bind(this),
+        onComplete: function() {
+          this._resizing= false;
+        }
+      });
+      if ( !this._w )
+        this.DOM_th.addClass('BrowseNoClmn');
+      var sort= this._f('s');
+      if ( sort>=0 ) {
+        var fs= this.options.format.substr(sort+1,1);
+        // požadavek na řazení: format: s s+ s-
+        // (lze dynamicky ovlivnit funkcí set_sort(x) kde x=a|d|n pro ASC, DESC a vynechat
+        // pokud po s následuje modifikátor + nebo - požaduje se počáteční seřazení
+        this.sorting= fs=='+' ? 'a' : (fs=='-' ? 'd' : 'n');
+        if ( this.sorting!='n' ) {
+          if ( this.data ) {
+            this.owner.order= this.view ? this.view.id+'.' : '';
+            this.owner.order+= this.data.id + (this.sorting=='a' ? ' ASC' : ' DESC');
+            this.owner.order_by= this;
+          }
+          else if ( this.options.expr ) {
+            this.owner.order= this.options.expr + (this.sorting=='a' ? ' ASC' : ' DESC');
+            this.owner.order_by= this;
+          }
+        }
+        this.DOM_th.grab(
+          this.DOM_img= new Element('img',{'class':'sort'}),'top');
+        this.DOM_sort();
+        this.DOM_th.addClass('ShowSort');
+        this.DOM_th.addEvents({
+          click: function() {
+            if ( !this._resizing ) {
+              this.sorting= this.sorting=='n' ? 'a' : (this.sorting=='a' ? 'd' : 'n');
+              this._sort();
+              this.owner.DOM_focus();
+            }
+          }.bind(this)
+        });
+      }
+      // přidání dotazových řádků sloupce
+      var qry= this._f('q'), fq= 0;
+      if ( qry>=0 ) {
+        var fq= this.options.format.substr(qry+1,1);
+        if ( !fq || '/=#$%@*.'.indexOf(fq)<0 )
+          fq= '*';
+      }
+      this.qry_type= fq;
+      for (var i= 1; i<=this.owner.options.qry_rows||0; i++) {
+        if ( qry<0 )
+          // bez výběrového pole
+          this.owner.DOM_qry_row[i].adopt(new Element('td',{'class':'BrowseNoQry'}));
+        else {
+          if ( fq=='#' ) {
+            // výběr z číselníkových hodnot - musí být definován atribut map_pipe
+            Ezer.assert(this.options.map_pipe,"formát 'q#' předpokládá atribut 'map_pipe'",this);
+            var td= new Element('td',{'class':'BrowseQry'});
+            this.owner.DOM_qry_row[i].adopt(td);
+            // vytvoření procedury onchange
+            var code= [{o:'t'},{o:'m',i:'_owner'},{o:'m',i:'_owner'},{o:'x',i:'browse_load'}];
+            var sel_desc= {type:'select.map0',options:{_w:this._w,par:{noimg:1,subtype:'browse'},
+                format:'t',map_pipe:this.options.map_pipe,options:this.options.map_pipe,
+                help:'výběr z číselníkových hodnot'},
+              part:{onchange:{type:'proc',par:{},code:code}}};
+            var sel_owner= {DOM_Block:td,_option:{}};
+            var sel= new Ezer.SelectMap0(sel_owner,sel_desc,td,'','');
+            sel.Items[0]= '?';
+            sel.owner= this;
+            sel.DOM_Block.setStyles({marginTop:1});
+            td.adopt(sel.DOM_Block);
+            this.DOM_qry[i]= sel.DOM_Input;
+            this.DOM_qry_select[i]= sel;
           }
           else {
-            this.width(w0+ws0-1);
-            s.setStyle('width',1);
+            // ostatní výběrová pole
+            this.DOM_qry_select[i]= null;
+            this.owner.DOM_qry_row[i].adopt(
+              new Element('td',{'class':'BrowseQry'}).adopt(
+                this.DOM_qry[i]= new Element('input',{
+                  title:
+                    fq=='=' ? 'výběr zadaných hodnot' :
+                    fq=='@' ? 'výběr podle vzorů s ?*' :
+                    fq=='*' ? 'výběr podle vzorů včetně diakritiky s ?*-$' :
+                    fq=='$' ? 'výběr podle vzorů bez diakritiky s ?*-$' :
+                    fq=='%' ? 'výběr podle vzorů bez diakritiky s ?*-$ s počáteční *' :
+                    fq=='/' ? 'výběr všeho od-do' : 'výběrové pole',
+                  styles:{textAlign:this._f('r')>=0 ? 'right' : this._f('c')>=0 ? 'center' : 'left'}
+                })
+            ) );
           }
+          if ( !this.owner.first_query )
+            this.owner.first_query= this.DOM_qry[i];
+          this.DOM_qry[i].addEvents({
+            focus: function(event) {
+                this.owner.DOM_table.addClass('changed');
+              }.bind(this),
+            blur:  function(event) {
+                this.owner.DOM_table.removeClass('changed');
+              }.bind(this),
+            // ovládání pásu dotaz; klávesnicí
+            keypress: function(event) {
+                switch (event.key) {
+                case 'esc':   // zrušit hledací vzory
+                  event.stop();
+                  this.owner.init_queries();
+                  break;
+                case 'enter': // provést hledání
+                  event.stop();
+                  event.stopPropagation();
+                  this.owner._ask_queries();
+                  break;
+                }
+  //               return false;
+              }.bind(this)
+          });
         }
-      }.bind(this),
-      onComplete: function() {
-        this._resizing= false;
-      }
-    });
-    if ( !this._w )
-      this.DOM_th.addClass('BrowseNoClmn');
-    var sort= this._f('s');
-    if ( sort>=0 ) {
-      var fs= this.options.format.substr(sort+1,1);
-      // požadavek na řazení: format: s s+ s-
-      // (lze dynamicky ovlivnit funkcí set_sort(x) kde x=a|d|n pro ASC, DESC a vynechat
-      // pokud po s následuje modifikátor + nebo - požaduje se počáteční seřazení
-      this.sorting= fs=='+' ? 'a' : (fs=='-' ? 'd' : 'n');
-      if ( this.sorting!='n' ) {
-        if ( this.data ) {
-          this.owner.order= this.view ? this.view.id+'.' : '';
-          this.owner.order+= this.data.id + (this.sorting=='a' ? ' ASC' : ' DESC');
-          this.owner.order_by= this;
-        }
-        else if ( this.options.expr ) {
-          this.owner.order= this.options.expr + (this.sorting=='a' ? ' ASC' : ' DESC');
-          this.owner.order_by= this;
-        }
-      }
-      this.DOM_th.grab(
-        this.DOM_img= new Element('img',{'class':'sort'}),'top');
-      this.DOM_sort();
-      this.DOM_th.addClass('ShowSort');
-      this.DOM_th.addEvents({
-        click: function() {
-          if ( !this._resizing ) {
-            this.sorting= this.sorting=='n' ? 'a' : (this.sorting=='a' ? 'd' : 'n');
-            this._sort();
-            this.owner.DOM_focus();
-          }
-        }.bind(this)
-      });
-    }
-    // přidání dotazových řádků sloupce
-    var qry= this._f('q'), fq= 0;
-    if ( qry>=0 ) {
-      var fq= this.options.format.substr(qry+1,1);
-      if ( !fq || '/=#$%@*.'.indexOf(fq)<0 )
-        fq= '*';
-    }
-    this.qry_type= fq;
-    for (var i= 1; i<=this.owner.options.qry_rows||0; i++) {
-      if ( qry<0 )
-        // bez výběrového pole
-        this.owner.DOM_qry_row[i].adopt(new Element('td',{'class':'BrowseNoQry'}));
-      else {
-        if ( fq=='#' ) {
-          // výběr z číselníkových hodnot - musí být definován atribut map_pipe
-          Ezer.assert(this.options.map_pipe,"formát 'q#' předpokládá atribut 'map_pipe'",this);
-          var td= new Element('td',{'class':'BrowseQry'});
-          this.owner.DOM_qry_row[i].adopt(td);
-          // vytvoření procedury onchange
-          var code= [{o:'t'},{o:'m',i:'_owner'},{o:'m',i:'_owner'},{o:'x',i:'browse_load'}];
-          var sel_desc= {type:'select.map0',options:{_w:this._w,par:{noimg:1,subtype:'browse'},
-              format:'t',map_pipe:this.options.map_pipe,options:this.options.map_pipe,
-              help:'výběr z číselníkových hodnot'},
-            part:{onchange:{type:'proc',par:{},code:code}}};
-          var sel_owner= {DOM_Block:td,_option:{}};
-          var sel= new Ezer.SelectMap0(sel_owner,sel_desc,td,'','');
-          sel.Items[0]= '?';
-          sel.owner= this;
-          sel.DOM_Block.setStyles({marginTop:1});
-          td.adopt(sel.DOM_Block);
-          this.DOM_qry[i]= sel.DOM_Input;
-          this.DOM_qry_select[i]= sel;
-        }
-        else {
-          // ostatní výběrová pole
-          this.DOM_qry_select[i]= null;
-          this.owner.DOM_qry_row[i].adopt(
-            new Element('td',{'class':'BrowseQry'}).adopt(
-              this.DOM_qry[i]= new Element('input',{
-                title:
-                  fq=='=' ? 'výběr zadaných hodnot' :
-                  fq=='@' ? 'výběr podle vzorů s ?*' :
-                  fq=='*' ? 'výběr podle vzorů včetně diakritiky s ?*-$' :
-                  fq=='$' ? 'výběr podle vzorů bez diakritiky s ?*-$' :
-                  fq=='%' ? 'výběr podle vzorů bez diakritiky s ?*-$ s počáteční *' :
-                  fq=='/' ? 'výběr všeho od-do' : 'výběrové pole',
-                styles:{textAlign:this._f('r')>=0 ? 'right' : this._f('c')>=0 ? 'center' : 'left'}
-              })
-          ) );
-        }
-        if ( !this.owner.first_query )
-          this.owner.first_query= this.DOM_qry[i];
-        this.DOM_qry[i].addEvents({
-          focus: function(event) {
-              this.owner.DOM_table.addClass('changed');
-            }.bind(this),
-          blur:  function(event) {
-              this.owner.DOM_table.removeClass('changed');
-            }.bind(this),
-          // ovládání pásu dotaz; klávesnicí
-          keypress: function(event) {
-              switch (event.key) {
-              case 'esc':   // zrušit hledací vzory
-                event.stop();
-                this.owner.init_queries();
-                break;
-              case 'enter': // provést hledání
-                event.stop();
-                event.stopPropagation();
-                this.owner._ask_queries();
-                break;
-              }
-//               return false;
-            }.bind(this)
-        });
       }
     }
     // přidání datových řádků sloupce

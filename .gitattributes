@@ -70,6 +70,8 @@ client/skins/default/browse_pgdn_act.png -text
 client/skins/default/browse_pgup.png -text
 client/skins/default/browse_pgup0.png -text
 client/skins/default/browse_pgup_act.png -text
+client/skins/default/browse_reload.pdn -text
+client/skins/default/browse_reload.png -text
 client/skins/default/browse_resize.png -text
 client/skins/default/browse_row2.gif -text
 client/skins/default/browse_set.png -text
