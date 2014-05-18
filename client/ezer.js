@@ -5280,6 +5280,8 @@ Ezer.Show= new Class({
 // doplní obrazy datových řádků
   reinitialize: function() {
 //                                                         Ezer.trace('*','reshow');
+  // zobrazení pokud je definován rozměr (šířka)
+  if ( this.options._w!==undefined )
     this.DOM_add(true);
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start
