@@ -342,7 +342,8 @@ desc=
 foreach=
 object=
 return=
-this=$key1
+this=
+while=$key1
 [ReservedWords]$res
 type=
 _sys=

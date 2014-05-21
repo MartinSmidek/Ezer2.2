@@ -29,8 +29,9 @@ Ezer.Application= new Class({
 //       this._setTrace();
     window.addEvent('resize',function(e){ this.DOM_layout(); }.bind(this));
     // úprava výšky trasovací oblasti
-    if ( this.options.show_trace )
-      $('dolni').setStyle('height',this.theight);
+//     if ( this.options.show_trace )
+//       $('dolni').setStyle('height',this.theight);
+      $('dolni').setStyle('height',0);
     this.DOM_layout();
     // V template stránky musí být div-element s id='drag' pro design-subsystém
     if ( $('drag') ) Ezer.drag.init($('drag'));
@@ -64,7 +65,7 @@ Ezer.Application= new Class({
     $('work').setStyle('height',h);
     $('paticka').setStyle('bottom',ws.y-t+pruh);
     // definice sys.screen width a height
-    Ezer.sys.screen= {width:ws.x,height:ws.y};
+    Ezer.sys.screen= {width:ws.x,height:t};
     // projití aplikace root-tabs-panel a provedení onresize u neaktivovaných panelů
     function downto_panels(block) {
       if ( block.part ) {
@@ -73,7 +74,7 @@ Ezer.Application= new Class({
           if ( x.part && (x instanceof Ezer.PanelPlain || x instanceof Ezer.PanelRight) ) {
             if ( x.part.onresize ) {
                                                 Ezer.trace('*','resize of '+name+'/'+x.type);
-              x.callProc('onresize',[ws.x,ws.y]);
+              x.callProc('onresize',[ws.x,t]);
             }
           }
           else if ( x instanceof Ezer.Tabs || x instanceof Ezer.MenuMain ) {
@@ -372,6 +373,7 @@ Ezer.Application= new Class({
       if ( !Ezer.to_trace )
         this.resize.detach();
     }
+    this._showTrace(Ezer.to_trace);
     // speed - pro všechny okno pro zobrazení měření výkonu - zachází se s ním jako s trasováním 'S'
     Ezer.is_trace['S']= this.options.ae_trace.indexOf('S')>=0;
     var speed= new Element('span', {text:'speed:','class':Ezer.is_trace['S']?'ae_switch_on':'',

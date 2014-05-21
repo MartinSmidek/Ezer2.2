@@ -4248,6 +4248,7 @@ Ezer.Browse= new Class({
   set_attrib: function(name,val,desc) {
     if ( name=='rows' ) {                                     //Ezer.trace('*','browse.set_attrib');
       if ( val>0 ) {    // počet řádků musí být kladný
+        var old_key= this.browse_key();
         // změň atribut
         this.parent(name,val,desc);
         // odstraň starý obraz
@@ -4267,7 +4268,7 @@ Ezer.Browse= new Class({
         this.DOM_add2(true);
         this.DOM_addEvents();
         // znovu načti obsah
-        this._ask_queries(true);
+        this._ask_queries(true,old_key);
       }
     }
     else
@@ -4518,14 +4519,26 @@ Ezer.Browse= new Class({
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _ask_queries+
 // proveď výběr
-  _ask_queries: function (no_focus) {
-    if ( !no_focus )
+// pokud je no_focus , jde o volání kvůli refresh a oldkey může obsahovat žádaný browse_key
+  _ask_queries: function (no_focus,oldkey) {
+    if ( no_focus ) {  // voláno kvůli refresh
+      var continuation=  this.findProc('onrefreshed')
+        ? {fce:this._ask_queries_,args:[],stack:true,obj:this} : null;
+      var code= [{o:'x',i:'browse_refresh',a:1}];
+//c: Eval (code,context,args,id,continuation,no_trow,proc,nvars)
+      new Ezer.Eval(code,this,[this,oldkey],'refresh',continuation);
+    }
+    else {
       this.DOM_focus();
-//     timer_init();
-    var code= [{o:'x',i:'browse_load',a:5}];
-    if ( this.findProc('onchange') ) code.push({o:'c',i:'onchange'});
-    new Ezer.Eval(code,this,[this,null,null,null,null,-1],'query');
+      var code= [{o:'x',i:'browse_load',a:5}];
+      if ( this.findProc('onchange') ) code.push({o:'c',i:'onchange'});
+//       browse_load: function(cond,order,having,from,len,quiet,sql) {
+      new Ezer.Eval(code,this,[this,null,null,null,null,-1],'query');
+    }
     return true;
+  },
+  _ask_queries_: function() {
+    new Ezer.Eval([{o:'c',i:'onrefreshed'}],this,[],'refreshed');
   },
 // ------------------------------------------------------------------------------------ get_query+
 //fm: Browse.get_query ([having=false])
@@ -4813,6 +4826,25 @@ Ezer.Browse= new Class({
       this.DOM_show();
     }
     return seek;      // vrací 0 a nemění zobrazení, pokud záznam nebyl nalezen
+  },
+// ---------------------------------------------------------------------------------- browse_refresh
+//fx: Browse.browse_refresh ([key])
+//  zopakuje předchozí browse_load včetně nastavení záznamu s klíčem key
+//a: key   - klíč
+  browse_refresh: function(oldkey) {
+    x= this._params({cmd:'browse_load'},null,null,null,this.b,-1,0,null);
+    x.oldkey= oldkey;
+    return x;
+  },
+  browse_refresh_: function (y) {
+    this.browse_load_(y,-1);  // nebude provedeno _row_move
+    var indx= this.keys.indexOf(y.oldkey);
+    if ( indx!=-1 ) {
+      // obsluha funkce browse_seek bez parametrů => nastavíme původní tab_act
+      this._row_move(this.b+indx,true);
+    }
+    this.DOM_show();
+    return 1;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _row_submit+
 // vrácení klíče aktivního řádku po Enter a DblClick

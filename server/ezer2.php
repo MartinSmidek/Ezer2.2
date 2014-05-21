@@ -527,6 +527,7 @@
       $y->cursor= 0+$x->cursor;
       $y->key_id= $x->key_id;
       $y->quiet= $x->quiet;
+      $y->oldkey= $x->oldkey;
       if ( isset($x->options) ) $y->options= $x->options;
       $db= $x->db ? $x->db : $mysql_db; $table= ($ezer_db[$db][5] ? $ezer_db[$db][5] : $db).'.'.$x->table;
       $atable= explode(' AS ',$table);
@@ -828,7 +829,7 @@
       }
     }
     if ( $x->db ) ezer_connect($x->db);
-    $qry1= "SELECT $ids,$fields FROM $table $joins WHERE $cond AND {$x->seek} $group $order LIMIT 1";
+    $qry1= "SELECT $ids,$fields FROM $table $joins WHERE ($cond) AND {$x->seek} $group $order LIMIT 1";
     $res1= mysql_qry($qry1);
     if ( $res1 && $row1= mysql_fetch_assoc($res1) ) {
       $key_val= $row1[$x->key_id];

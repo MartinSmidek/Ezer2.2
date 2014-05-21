@@ -404,7 +404,7 @@ __EOD;
   case 'menu':
 # ------------------------------------------------------------------------------- HTML menu
 # template pro zobrazení Ezer.MenuMain jako hlavního objektu aplikace
-$dolni= $xtrace ? '' : " style='height:0'";
+$dolni= /*$xtrace ? '' :*/ " style='height:0'";
 $dbg_script= trim($_SESSION[$ezer_root]['dbg_script']) ?: "echo(debug(sys('ezer'))) // příkazy + ctrl-Enter";
 $debugger= isset($js_options->dbg) ? <<<__EOD
     <form action="" method="post" enctype="multipart/form-data" id="form">
