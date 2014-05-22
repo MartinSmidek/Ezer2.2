@@ -504,7 +504,8 @@ Ezer.Block= new Class({
     function displ(parts) {
       for (var i in parts) {
         var part= parts[i];
-        var block= part instanceof Ezer.Var && part.value ? part.value.DOM_Block : part.DOM_Block;
+        var block= part instanceof Ezer.Var && part.value ? part.value.DOM_Block : (
+                   part instanceof Ezer.MenuGroup ? part.DOM : part.DOM_Block);
         if ( block && part.options.tag ) {
           var tag_list= part.options.tag.toString().split(',');
           var some= tag_list.some(function(tag){
@@ -534,6 +535,9 @@ Ezer.Block= new Class({
       if ( this.value && this.value.DOM_Block ) {
         this.value.DOM_Block.setStyles({display:on ? 'block' : 'none'});
       }
+    }
+    else if ( this instanceof Ezer.MenuGroup ) {
+      this.DOM.setStyles({display:on ? 'block' : 'none'});
     }
     else if ( this.DOM_Block ) {
       this.DOM_Block.setStyles({display:on ? 'block' : 'none'});

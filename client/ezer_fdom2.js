@@ -306,7 +306,8 @@ Ezer.MenuLeft.implement({
         group.DOM_fx.show();
       link.addEvents({
         click: function() {
-          group.DOM_fx.toggle();
+          if ( group._enabled )
+            group.DOM_fx.toggle();
           return false;
         }
       });
@@ -320,6 +321,7 @@ Ezer.MenuLeft.implement({
 // ================================================================================================= MenuGroup
 Ezer.MenuGroup.implement({
   Implements: [Ezer.Help],
+  _enabled: 1,
   DOM_add1: function() {
     Ezer.assert(this.owner.type=='menu.left','chybné menu - group mimo accordion');
     this.DOM= new Element('div',{'class':'MGroup MEntry'}).inject(this.owner.DOM_Block);
@@ -342,6 +344,15 @@ Ezer.MenuGroup.implement({
     this.DOM_fx.show();
 //     var a= this.DOM_Block.getElement('a');
 //     a.fireEvent('click',{target:a});
+  },
+// ------------------------------------------------------------------------------------ DOM_enabled
+//f: MenuGroup-DOM.DOM_enabled (on)
+//      změní vzhled na enabled/disabled podle parametru nebo this.options.enabled
+  DOM_enabled: function(on) {
+    this._enabled= on ? 1 : 0;
+    if ( !this._enabled ) {
+      this.DOM_fx.hide();
+    }
   }
 });
 // ================================================================================================= MenuContext
@@ -772,10 +783,10 @@ Ezer.PanelRight.implement({
   DOM_add2: function() {
   },
   _show: function(l,t) {
-    this.parent();
     if ( this.menuleft ) {
       this.menuleft.DOM_Block.setStyles({display:'block'});
     }
+    this.parent();
     return this;
   },
   _hide: function() {
