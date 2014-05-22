@@ -5415,6 +5415,7 @@ Ezer.Show= new Class({
   get: function (ti) {
     var val= '';
     if ( arguments.length==1 ) {
+      ti= Number(ti);
       val= this.owner.tlen>=ti ? this.owner.buf[this.owner.t+ti-1][this.id] : '';
     }
     else {
