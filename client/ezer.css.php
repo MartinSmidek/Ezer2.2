@@ -682,9 +682,9 @@ hr.cleaner {
 .ae_switch_on {
   background-color:$b_kuk; color:$c2_kuk;  }
 #kuk div.trace {
-  margin-left:70px; color:#000; padding:0; }
+  margin-left:70px; color:#000; padding:0; white-space:pre-line; }
 #kuk div.trace_hide {
-  margin-left:70px; color:#777; height:13px; overflow:hidden; }
+  margin-left:70px; color:#777; height:13px; overflow:hidden; white-space:pre; }
 #kuk span.trace_on {
   background:url($path/tree.png) no-repeat 55px -104px; color:#777;
   width:69px; margin:0; padding:0; float:left; left:0; }
