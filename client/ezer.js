@@ -223,6 +223,10 @@ Ezer.Block= new Class({
       o= o[ids[i]];
     }
     o[ids[i]]= val;
+    // promítni změnu do DOM pro: help
+    if ( name=='help' && this.DOM_Block ) {
+      this.DOM_Block.set('title',val);
+    }
     return 1;
   },
 // ------------------------------------------------------------------------------------ add_attrib
