@@ -4686,8 +4686,9 @@ Ezer.Browse= new Class({
   },
 // ------------------------------------------------------------------------------------ browse_export
 //fx: Browse.browse_export (par,[cond[,order[,having]]])
-//      export dat podle zadaných parametrů
-//a:    par - {file:jméno souboru v docs,type:'csv'|'xls'}
+//      export dat podle zadaných parametrů, pokud je v par.show obsažen seznam jmen,
+//      budou exportovány jen takto pojmenované sloupce
+//a:    par - {file:jméno souboru v docs,type:'csv'|'xls'[,show:seznam exportovaných show']}
 //      cond - MySQL podmínka umístěná za WHERE
 //      order - nepovinná část za ORDER BY
 //      having - nepovinná část umístěná za HAVING v GROUP BY klauzuli

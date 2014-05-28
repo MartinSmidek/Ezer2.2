@@ -962,10 +962,14 @@
     if ( $x->db ) ezer_connect($x->db);
     $fields= ''; $clmns= ''; $del= '';
     $y->par= $x->par;
-    $db= $x->db ? $x->db : $mysql_db; $table= ($ezer_db[$db][5] ? $ezer_db[$db][5] : $db).'.'.$x->table;
+    $db= $x->db ? $x->db : $mysql_db;
+    $table= ($ezer_db[$db][5] ? $ezer_db[$db][5] : $db).'.'.$x->table;
     $atable= explode(' AS ',$table);
     $key_id= ($atable[1] ? "{$atable[1]}." : '') . $x->key_id;
     $pipe= array();
+    // výběr sloupců
+    $shows= isset($x->par->show) ? explode(',',$x->par->show) : null;
+                                                                debug($shows,"show={$x->par->show}");
     // konstrukce JOIN
     $joins= '';
     if ( isset($x->joins) ) {
@@ -1004,6 +1008,11 @@
         $map= $desc->map;
         $topt= $map->t_options;
         $mopt= $map->m_options;
+        // případná substituce jmen databází
+        if ( isset($topt->db) && isset($ezer_db[$topt->db][5]) )
+          $topt->db= $ezer_db[$topt->db][5];
+        if ( isset($mopt->db) && isset($ezer_db[$mopt->db][5]) )
+          $mopt->db= $ezer_db[$mopt->db][5];
         $mapi++;
         $tab= ($topt->db ? "{$topt->db}." : '').$map->table;
         $where= $mopt->where;
@@ -1014,21 +1023,23 @@
         $fld= "\$m$m$mapi.{$map->field}";
       }
       // konstrukce položek FROM
-      if ( isset($desc->expr) ) {
-        $fields.= "$del$fld as {$desc->id}";
-        $clmns.= "$del{$desc->id}";
-      }
-      else {
-        if ( isset($desc->id) ) {
+      if ( !$shows || in_array($desc->id,$shows) ) {
+        if ( isset($desc->expr) ) {
           $fields.= "$del$fld as {$desc->id}";
           $clmns.= "$del{$desc->id}";
         }
         else {
-          $fields.= "$del$fld";
-          $clmns.= "$del$f";
+          if ( isset($desc->id) ) {
+            $fields.= "$del$fld as {$desc->id}";
+            $clmns.= "$del{$desc->id}";
+          }
+          else {
+            $fields.= "$del$fld";
+            $clmns.= "$del$f";
+          }
         }
+        $del= ',';
       }
-      $del= ',';
     }
     $cond= stripslashes($x->cond);
     // zahájení exportu
