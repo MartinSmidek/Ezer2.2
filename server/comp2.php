@@ -1784,7 +1784,12 @@ function get_ezer (&$top,&$top2,$dbg=false) {
         }
         else {
           if ( !$top->part ) $top->part= (object)array();
-          $top->part->$id= $block;
+          if ( is_array($block) ) {
+            foreach($block as $idx=>$blockx)
+              $top->part->$idx= $blockx;
+          }
+          else
+            $top->part->$id= $block;
         }
       }
     }
@@ -1828,7 +1833,7 @@ function get_ezer_keys (&$keywords,&$attribs1,&$attribs2) {
 }
 # -------------------------------------------------------------------------------------------------- block
 # $root je nadřazený blok
-# block  :: key [ id ] [':' key id] [pars|args] [coord] [code] [struct]
+# block  :: vars | key [ id ] [':' key id] [pars|args] [coord] [code] [struct]
 # struct :: '{' part (',' part)* '}' ]
 # part   :: block | attr
 function get_if_block ($root,&$block,&$id) {
@@ -1836,131 +1841,144 @@ function get_if_block ($root,&$block,&$id) {
   global $blocs, $blocs2, $blocs3, $specs, $attribs1, $attribs2, $tree, $last_lc;
   global $pragma_syntax, $pragma_group, $pragma_box;
   global $errors; if ( $errors ) return false;
+  $TEST_NEW_VAR= 1;  // ------------------------------------------------- testování var !!!!!!!
   $block= null; $nt= null;
   $ok= get_if_keyed_name ($key,$id,$lc,$nt);
   if ( $ok ) {
     $tree.= " ({$root->type}.$key";
-//     if ( in_array($key,$blocs2[$root]) ) {
-    $block= new stdClass;
-    $block->type= $key;
-    $block->options= (object)array();
-    if ( isset($specs[$key]) ) {
-      if ( in_array('map_table' ,$specs[$key])
-           && get_delimiter(':') && get_keyed_name('table',$copy,$lc,$nt) ) $block->table= $copy;
-      if ( in_array('use_form' ,$specs[$key])
-           && get_delimiter(':') && get_if_keyed_name($fg,$copy,$lc,$nt) ) {
-        if ( $fg=='form' || ($pragma_group && $fg=='group') ) {
-          $block->type= 'var';
-          $block->_of= 'form';
+    if ( $TEST_NEW_VAR && $key=='var' ) {
+      get_vars($block,$id,$lc);
+    }
+    else {
+      $block= new stdClass;
+      $block->type= $key;
+      $block->options= (object)array();
+      if ( isset($specs[$key]) ) {
+        if ( in_array('map_table' ,$specs[$key])
+             && get_delimiter(':') && get_keyed_name('table',$copy,$lc,$nt) ) $block->table= $copy;
+        if ( in_array('use_form' ,$specs[$key])
+             && get_delimiter(':') && get_if_keyed_name($fg,$copy,$lc,$nt) ) {
+          if ( $fg=='form' || ($pragma_group && $fg=='group') ) {
+            $block->type= 'var';
+            $block->_of= 'form';
+            $block->_init= $copy;
+          }
+          elseif ( $fg=='area' ) {
+            $block->type= 'var';
+            $block->_of= 'area';
+            $block->_init= $copy;
+          }
+          else $ok= comp_error("SYNTAX: po 'use' smí následovat jen form nebo area"); // nebo group");
+        }
+        if ( in_array('use_table' ,$specs[$key])
+             && get_delimiter(':') && get_keyed_name('table',$copy,$lc,$nt) ) {
+          $block->type= 'view';
+          $block->_of= 'table';
           $block->_init= $copy;
         }
-        elseif ( $fg=='area' ) {
-          $block->type= 'var';
-          $block->_of= 'area';
-          $block->_init= $copy;
-        }
-        else $ok= comp_error("SYNTAX: po 'use' smí následovat jen form nebo area"); // nebo group");
-      }
-      if ( in_array('use_table' ,$specs[$key])
-           && get_delimiter(':') && get_keyed_name('table',$copy,$lc,$nt) ) {
-        $block->type= 'view';
-        $block->_of= 'table';
-        $block->_init= $copy;
-      }
-      if ( in_array('type' ,$specs[$key])
-           && get_delimiter(':') && get_type($typ)               ) $block->_of= $typ;
-      if ( in_array('par'  ,$specs[$key]) && get_if_pars($pars)  ) $block->par= $pars;
-      if ( in_array('code' ,$specs[$key])
-           && get_code($pars,$code,$vars,$prior)                 ) $block->code= $code;
-                                                                   $block->vars= $vars;
-                                                     if ( $prior ) $block->options->prior= $prior;
-      if ( in_array('arg'  ,$specs[$key]) && get_if_args($args)  ) $block->arg= $args;
-      if ( in_array('coord',$specs[$key]) && get_if_coord($block) )  ;
-      if ( in_array('coor+',$specs[$key]) && get_if_coorp($block) )  ;
-      if ( in_array('const',$specs[$key]) && get_def($id,$value,$is_expr) ) {
-        if ( $is_expr )
-          $block->options->_expr= $value;
-        else
-          $block->options->value= $value;
-        if ( !isset($root->part) ) $root->part= (object)array();
-        $root->part->$id= $block;
-        $ok= get_if_delimiter(';');
-        // další konstanty
-        while ( $ok ) {
-          get_id($cid);
-          get_def($cid,$value,$is_expr);
-          $cblock= new stdClass;
-          $cblock->type= 'const';
-          if ( !isset($cblock->options) ) $cblock->options= (object)array();
+        if ( in_array('type' ,$specs[$key])
+             && get_delimiter(':') && get_type($typ)               ) $block->_of= $typ;
+        if ( in_array('par'  ,$specs[$key]) && get_if_pars($pars)  ) $block->par= $pars;
+        if ( in_array('code' ,$specs[$key])
+             && get_code($pars,$code,$vars,$prior)                 ) $block->code= $code;
+                                                                     $block->vars= $vars;
+                                                       if ( $prior ) $block->options->prior= $prior;
+        if ( in_array('arg'  ,$specs[$key]) && get_if_args($args)  ) $block->arg= $args;
+        if ( in_array('coord',$specs[$key]) && get_if_coord($block) )  ;
+        if ( in_array('coor+',$specs[$key]) && get_if_coorp($block) )  ;
+        if ( in_array('const',$specs[$key]) && get_def($id,$value,$is_expr) ) {
           if ( $is_expr )
-            $cblock->options->_expr= $value;
+            $block->options->_expr= $value;
           else
-            $cblock->options->value= $value;
-          $cblock->_lc= $last_lc;
-          $cblock->id= $id;
-          $root->part->$cid= $cblock;
-          $ok= get_if_delimiter(';');
-        }
-        $ok= true;
-      }
-      if ( in_array('note' ,$specs[$key]) && $nt                   ) $block->note= $nt;
-      if ( in_array('cmnt' ,$specs[$key]) && $nt                   ) $block->note= $nt;
-      if ( in_array('part' ,$specs[$key]) ) {
-        $ok= get_if_delimiter('{');
-        if ( $ok ) {
-          // atributy
+            $block->options->value= $value;
+          if ( !isset($root->part) ) $root->part= (object)array();
+          $root->part->$id= $block;
+          $cid= null;
+          $ok= get_if_delimiter(';') || get_if_comma_id($cid);
+          // další konstanty
           while ( $ok ) {
-            if ( $ok= get_if_attrib($key,$aid,$aval)) {
-              if ( !$block->options ) $block->options= (object)array();
-              $block->options->$aid= $aval;
-            }
-            get_if_delimiter(',');
+            if ( !$cid ) get_id($cid);
+            get_def($cid,$value,$is_expr);
+            $cblock= new stdClass;
+            $cblock->type= 'const';
+            if ( !isset($cblock->options) ) $cblock->options= (object)array();
+            if ( $is_expr )
+              $cblock->options->_expr= $value;
+            else
+              $cblock->options->value= $value;
+            $cblock->_lc= $last_lc;
+            $cblock->id= $id;
+            $root->part->$cid= $cblock;
+            $cid= null;
+            $ok= get_if_delimiter(';') || get_if_comma_id($cid);
           }
           $ok= true;
-          // kontrola přípustnosti vnoření $key.$type do $root a úprava $block->type
-          if ( $block->options->type ) {
-            if ( $pragma_box && $block->type=='box' ) {
-              $block->options->css= $block->options->type;
-                                                display("pragma: box - css místo type ");
-            }
-            else {
-              $block->type.= ".{$block->options->type}";
-            }
-            unset($block->options->type);
-          }
-          // bylo-li pragma.syntax - je něco k automatické opravě?
-          if ( $pragma_syntax ) {
-            switch ( $block->type ) {
-            case 'panel.subpanel':       // panel.subpanel => panel
-            case 'panel.panel':          // panel.panel => panel
-                                                display("pragma: {$block->type} => panel");
-              $block->type= 'panel';
-              break;
-            }
-          }
-          $root_tt= $root ? $root->type : '';
-          $block_tt= $block->type;
-          if ( (!$blocs2[$root_tt] || !in_array($block_tt,$blocs2[$root_tt]) )
-            && !in_array($block_tt,$blocs3) ) {
-//                                                                 debug($blocs2);
-            comp_error("SYNTAX: blok '$block_tt' není povolený uvnitř bloku '$root_tt'");
-          }
-          // vnořené bloky
-          while ( $ok ) {
-            $ok= get_if_block($block,$xblock,$xid);
-            if ( $ok ) {
-              if ( !$block->part ) $block->part= (object)array();
-              $block->part->$xid= $xblock;
-            }
-            get_if_delimiter(',');
-          }
-          get_delimiter('}');
         }
-        $ok= true;
+        if ( in_array('note' ,$specs[$key]) && $nt                   ) $block->note= $nt;
+        if ( in_array('cmnt' ,$specs[$key]) && $nt                   ) $block->note= $nt;
+        if ( in_array('part' ,$specs[$key]) ) {
+          $ok= get_if_delimiter('{');
+          if ( $ok ) {
+            // atributy
+            while ( $ok ) {
+              if ( $ok= get_if_attrib($key,$aid,$aval)) {
+                if ( !$block->options ) $block->options= (object)array();
+                $block->options->$aid= $aval;
+              }
+              get_if_delimiter(',');
+            }
+            $ok= true;
+            // kontrola přípustnosti vnoření $key.$type do $root a úprava $block->type
+            if ( $block->options->type ) {
+              if ( $pragma_box && $block->type=='box' ) {
+                $block->options->css= $block->options->type;
+                                                  display("pragma: box - css místo type ");
+              }
+              else {
+                $block->type.= ".{$block->options->type}";
+              }
+              unset($block->options->type);
+            }
+            // bylo-li pragma.syntax - je něco k automatické opravě?
+            if ( $pragma_syntax ) {
+              switch ( $block->type ) {
+              case 'panel.subpanel':       // panel.subpanel => panel
+              case 'panel.panel':          // panel.panel => panel
+                                                  display("pragma: {$block->type} => panel");
+                $block->type= 'panel';
+                break;
+              }
+            }
+            $root_tt= $root ? $root->type : '';
+            $block_tt= $block->type;
+            if ( (!$blocs2[$root_tt] || !in_array($block_tt,$blocs2[$root_tt]) )
+              && !in_array($block_tt,$blocs3) ) {
+  //                                                                 debug($blocs2);
+              comp_error("SYNTAX: blok '$block_tt' není povolený uvnitř bloku '$root_tt'");
+            }
+            // vnořené bloky
+            while ( $ok ) {
+              $ok= get_if_block($block,$xblock,$xid);
+              if ( $ok ) {
+                if ( !$block->part ) $block->part= (object)array();
+                if ( is_array($xblock) ) {
+                  foreach($xblock as $xidx=>$xblockx)
+                    $block->part->$xidx= $xblockx;
+                }
+                else
+                  $block->part->$xid= $xblock;
+              }
+              get_if_delimiter(',');
+            }
+            get_delimiter('}');
+          }
+          $ok= true;
+        }
+        $block->_lc= $lc;
+        $block->id= $id;
       }
-      $block->_lc= $lc;
-      $block->id= $id;
     }
+//                                                 debug($root,"vars old");
     $tree.= ' b)';
   }
   return $ok;
@@ -2095,6 +2113,45 @@ function get_numvalue (&$val,&$id) {
     $val= $const_list[$id]['value'];
   }
   if ( !$ok ) comp_error("SYNTAX: bylo očekávána číslo nebo konstanta místo {$typ[$head]} $val");
+  return true;
+}
+# -------------------------------------------------------------------------------------------------- vars
+# vars    :: 'var' varlist
+# varlist :: vardef | vardef ',' varlist
+# vardef  :: id ':' type | id '=' value
+function get_vars (&$root,$id,$lc) {
+  // připojí proměnné do bloku, id je identifikátor první proměnné
+  global $tree, $last_lc;
+  $types= array('n'=>'number','s'=>'text','o'=>'object','a'=>'array');
+  $root= array();
+  while (1) {
+    $block= new stdClass;
+    $block->type= 'var';
+    $block->_lc= $lc;
+    $block->id= $id;
+    // proměnná s inicializací, určující její typ
+    if ( get_if_delimiter('=') ) {
+      get_value($val,$typval);
+      $block->options= (object)array();
+      $block->options->value= $val;
+      $block->_of= $types[$typval];
+    }
+    // proměnná bez inicializace a s typem
+    else {
+      get_delimiter(':');
+      get_type($typ);
+      $block->_of= $typ;
+    }
+    $root[$id]= $block;
+    // případné pokračování po čárce a identifikátoru
+    if ( get_if_comma_id($id) ) {
+      $lc= $last_lc;
+      continue;
+    }
+    break;
+  }
+//                                                 debug($root,"vars");
+  $tree.= ' v';
   return true;
 }
 # -------------------------------------------------------------------------------------------------- const
@@ -2332,18 +2389,20 @@ function get_if_number (&$number) {
   }
   return $ok;
 }
-# -------------------------------------------------------------------------------------------------- ,ids
-function get_if_comma_ids (&$ids) {
-  global $head, $lex, $typ, $tree;
-  $ok= true;
-  $ok1= $typ[$head]=='del' && $lex[$head]==',';
-  while ( $ok1 && $ok && $typ[$head+1]=='id' ) {
-    $head++;
-    $ids[]= $lex[$head];
-    $head++; $tree.= " i";
-    $ok= $typ[$head]=='del' && $lex[$head]==',';
+# -------------------------------------------------------------------------------------------------- ,id
+function get_if_comma_id (&$id) {
+  global $head, $lex, $typ, $pos, $last_lc, $tree;
+  $ok= $typ[$head]=='del' && $lex[$head]==',';
+  if ( $ok ) {
+    $ok= $typ[$head+1]=='id';
+    if ( $ok ) {
+      $head++;
+      $id= $lex[$head];
+      $last_lc= $pos[$head];
+      $head++; $tree.= " i";
+    }
   }
-  return $ok1;
+  return $ok;
 }
 # -------------------------------------------------------------------------------------------------- id
 # identifikátorem může být i hvězdička - se speciálním významem, podle sémantického kontextu
@@ -2396,7 +2455,7 @@ function get_id_or_key (&$id) {
   return true;
 }
 # -------------------------------------------------------------------------------------------------- value
-# value :: [-]num | str | object | constant_name   --> $value
+# value :: [-]num | str | object | array | constant_name   --> $value
 # vrací 1.písmeno typu
 function get_value (&$val,&$type) {
   global $head, $lex, $typ, $tree, $const_list;
@@ -2490,7 +2549,9 @@ function get_object (&$obj,&$type) {
   return true;
 }
 # ================================================================================================== code
-# body  :: code | 'php' ':' php-code
+# body  :: [ 'var' varlist ] code
+# vlist :: vdef | vdef (','|'var') vlist
+# vdef  :: id ':' type
 # code  :: '{' alt '}'                          --> G(alt)
 # alt   :: seq ( '|' seq )*                     --> {alt:[G(expr),...]}
 # seq   :: expr ( ';' expr )*                   --> {seq:[G(expr),...]}
@@ -2516,15 +2577,13 @@ function get_code($context,&$code,&$vars,&$prior) {
 //   else {
     get_delimiter('{');
     // případné lokální proměnné
-    $ok= true;
+    $ok= get_if_the_key('var',$lc);
     while ( $ok ) {
-      $ok= get_if_the_key('var',$lc);
-      if ( $ok ) {
-        get_id($id);
-        get_delimiter(':');
-        get_type($typ);
-        $vars[$id]= $typ;
-      }
+      get_id($id);
+      get_delimiter(':');
+      get_type($typ);
+      $vars[$id]= $typ;
+      $ok= get_if_delimiter(',') || get_if_the_key('var',$lc);
     }
     if ( !look_delimiter('}') ) {       // je povolena prázdná procedura
       get_alt($context,$code);

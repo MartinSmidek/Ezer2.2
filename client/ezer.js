@@ -1666,7 +1666,11 @@ Ezer.Var= new Class({
   initialize: function(owner,desc,DOM,id) {
     this.parent(owner,desc,DOM,id);
     this._of= desc._of;
-    if ( desc._init ) {
+    if ( this.options.value ) {
+      // proměnná má počáteční hodnotu
+      this.value= this.options.value;
+    }
+    else if ( desc._init ) {
       if ( desc._of=='form' ) {
         var name= desc._init;
         var ctx= Ezer.code_name(name,null,this);
