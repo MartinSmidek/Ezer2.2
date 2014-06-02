@@ -158,7 +158,9 @@ textarea { resize: none; }
 
 /* úpravy Clintcide a Mootools */
 .errorMsg {
-  background-color:transparent; }
+  background-color:transparent; max-height:500px; overflow:auto; }
+.SWclearfix:after {
+  display:none !important; }
 
 /* hlavní Menu a Tabs */
 
