@@ -1054,5 +1054,69 @@ function i_doc_menu($chapters,$section0,$class0) {
 //                                                 debug($mn);
   return $mn;
 }
+# -------------------------------------------------------------------------------------------------- i_doc_table_struct
+# ASK - zobrazení struktury tabulky, předpokládá strukturované okomentování řádků tabulek
+# #cis  - cis je jméno číselníku - expanduje se současná hodnota položek tohoto číselníku
+# -x    - položka je označena jako méně důležitá (tiskne se jen, pokud je all=1)
+function i_doc_table_struct($tab,$all=1) {  #trace();
+  $html= '';
+  $row= 0;
+  $max_note= 200;
+//   query("SET group_concat_max_len=1000000");
+  $res= @mysql_query("SHOW FULL COLUMNS FROM $tab");
+  if ( $res ) {
+    $db= sql_query("SHOW TABLE STATUS LIKE '$tab'");
+    $html.= $db->Comment ? "{$db->Comment}<br><br>" : '';
+    $html.= "<table class='stat' style='width:100%'>";
+    $joins= 0;
+    while ( $res && ($c= mysql_fetch_object($res)) ) {
+      if ( !$row ) {
+        // záhlaví tabulky
+        $html.= "<tr><th></th><th>Sloupec</th><th>Typ</th><th>Komentář</th></tr>";
+      }
+      // řádek tabulky
+      $key= $c->Key ? '*' : '';
+      $note= $c->Comment;
+      if ( $all || $note[0]!='-' ) {
+        if ( $note[0]=='#' ) {
+          // číselníková položka
+          $joins++;
+          $strip= false;
+          $zkratka= substr($note,1);
+          if ( strstr($note,'...') ) {
+            $zkratka= trim(str_replace('...','',$zkratka));
+            $strip= true;
+          }
+          $note= "číselník <b>'$zkratka'</b> <i>";
+          $note.= select("popis","_cis","druh='_meta_' AND zkratka='$zkratka'");
+          $note.= "</i> (";
+          // nelze použít GROUP_CONCAT kvůli omezení v ORDER
+          $del= '';
+          $resd= mysql_query("SELECT * FROM _cis WHERE druh='$zkratka' ORDER BY LPAD(5,'0',data)");
+          while ( (!$strip || strlen($note)<$max_note) && $resd && ($d= mysql_fetch_object($resd))){
+            if ( $d->hodnota != '---' ) {
+              $popis= $d->hodnota ?: $d->zkratka;
+              $note.= "$del{$d->data}:$popis";
+              $del= ", ";
+            }
+          }
+          if ( $strip && strlen($note)>$max_note )
+            $note= substr($note,0,$max_note).' ...';
+          $note.= ")";
+        }
+        $html.= "<tr><td>$key</td><td>{$c->Field}</td><td>{$c->Type}</td><td>$note</td></tr>";
+      }
+      $row++;
+    }
+    $html.= "</table>";
+    $html.= "<br>Hvězdička označuje sloupec s indexem<br>";
+    if ( $joins ) {
+      $html.= "<br>K hodnotám položky 'p' označené v komentáři jako číselník 'x' se lze dostat připojením
+      <pre>      SELECT ... x.hodnota ...
+      LEFT JOIN _cis AS x ON druh='x' AND data=p</pre>";
+    }
+  }
+  return $html;
+}
 // =================================================================================================
 ?>

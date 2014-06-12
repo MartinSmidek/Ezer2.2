@@ -395,6 +395,7 @@ function dbg_context_load ($ctx) {  #trace();
         $including[$i]->includes= $including[$i-1]->in;
       }
       for ($i= 1; $i<count($including); $i++) {
+        if ( !isset($including[$i]->obj->part) ) $including[$i]->obj= (object)array();
         $including[$i]->obj->part= $includes[$including[$i]->includes]->part;
       }
       for ($i= 0; $i<count($including); $i++) {
