@@ -214,7 +214,7 @@ $attribs = array (
 #  area
   'area'   =>  explode(",",'title:s,style:s,css:s'),
 #  form
-  'form'   =>  explode(",",'style:s,css:s,tabindex:n,title:s,key:s'),
+  'form'   =>  explode(",",'style:s,css:s,tabindex:n,title:s,key:s,key_id:s'),
   'view'   =>  explode(",",'order:s,join:s,join_type:s'),
   'label'  =>  explode(",",'type:s,data:i,expr:s,title:s,style:s,css:s,help:s,format:s,attribute:s,skill:s'),
   'field'  =>  explode(",",'title:s,data:i,par:o,expr:s,map_pipe:m,sql_pipe:s,style:s,format:s,help:s,css:s,'

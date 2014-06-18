@@ -2189,6 +2189,8 @@ Ezer.Form= new Class({
     this.parent(owner,desc,DOM,id);
     this.setOptions(options);
 //                                                 Ezer.debug(this.options,'výsledné options');
+    if ( this.options.key_id )
+      this._key_id= this.options.key_id;
     this._coord();
     this.DOM_add1();
     // vložení podčástí
@@ -4537,7 +4539,6 @@ Ezer.Browse= new Class({
       var continuation=  this.findProc('onrefreshed')
         ? {fce:this._ask_queries_,args:[],stack:true,obj:this} : null;
       var code= [{o:'x',i:'browse_refresh',a:1}];
-//c: Eval (code,context,args,id,continuation,no_trow,proc,nvars)
       new Ezer.Eval(code,this,[this,oldkey],'refresh',continuation);
     }
     else {
@@ -8049,7 +8050,7 @@ Ezer.fce.confirm= function () {
 }
 // -------------------------------------------------------------------------------------- prompt
 //ff: fce.prompt (msg[,default=''])
-//      ve zvláštním okně položí otázku msg a přečte odpověď, ketrou vrátí jako výsledek
+//      ve zvláštním okně položí otázku msg a přečte odpověď, kterou vrátí jako výsledek
 //r: odpověď
 //a: msg - text otázky
 //   default - nabídnutá odpověď
