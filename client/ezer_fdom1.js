@@ -446,8 +446,8 @@ Ezer.Application= new Class({
   // ovládá zobrazení okna trasování - on=1 zapne, on=0 vypne
   _showTrace: function (on) {
     Ezer.to_trace= on ? 1 : 0;
+    this._barTrace[on ? 'addClass':'removeClass']('ae_switch_on');
     if ( Ezer.to_trace ) {
-      this._barTrace[on ? 'addClass':'removeClass']('ae_switch_on');
       // povolí změnu výšky trasovací oblasti
       this.resize.attach();
       $('status_bar').setStyles({cursor:'ns-resize'});

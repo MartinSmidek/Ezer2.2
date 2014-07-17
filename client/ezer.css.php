@@ -340,12 +340,14 @@ div.PanelPopup div.bottom_lr {
 div.PanelPopup div.closeButtons {
   background:url($path/clientcide/stickyWinHTML/body.png) top right repeat-y; _background:url($path/clientcide/stickyWinHTML/body.gif) top right repeat-y;
   text-align: center; padding: 0px 30px 8px 0px; margin-left:5px; position:relative; right:-20px}
+/*
 div.PanelPopup a.button:hover {
   background:url($path/clientcide/stickyWinHTML/big_button_over.gif) repeat-x}
 div.PanelPopup a.button {
   background:url($path/clientcide/stickyWinHTML/big_button.gif) repeat-x; margin: 2px 8px 2px 8px;
   padding: 2px 12px; cursor:pointer; border: 1px solid #999 !important; text-decoration:none;
   color: #000 !important;}
+*/
 div.PanelPopup div.closeButton {
   width:13px; height:13px; background:url($path/clientcide/stickyWinHTML/closebtn.gif) no-repeat;
   position: absolute; right: 0px; margin:10px 15px 0px 0px !important; cursor:pointer;top:0px}
@@ -684,9 +686,9 @@ hr.cleaner {
 .ae_switch_on {
   background-color:$b_kuk; color:$c2_kuk;  }
 #kuk div.trace {
-  margin-left:70px; color:#000; padding:0; white-space:pre-line; }
+  margin-left:70px; color:#000; padding:0; white-space:pre-wrap; }
 #kuk div.trace_hide {
-  margin-left:70px; color:#777; height:13px; overflow:hidden; white-space:pre; }
+  margin-left:70px; color:#777; height:13px; overflow:hidden; white-space:pre-line; }
 #kuk span.trace_on {
   background:url($path/tree.png) no-repeat 55px -104px; color:#777;
   width:69px; margin:0; padding:0; float:left; left:0; }

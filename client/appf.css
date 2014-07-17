@@ -224,12 +224,14 @@ div.PanelPopup div.bottom_lr {
 div.PanelPopup div.closeButtons {
   background:url(./img/clientcide/body.png) top right repeat-y; _background:url(./img/clientcide/body.gif) top right repeat-y;
   text-align: center; padding: 0px 30px 8px 0px; margin-left:5px; position:relative; right:-20px}
+/*
 div.PanelPopup a.button:hover {
   background:url(./img/clientcide/big_button_over.gif) repeat-x}
 div.PanelPopup a.button {
   background:url(./img/clientcide/big_button.gif) repeat-x; margin: 2px 8px 2px 8px;
   padding: 2px 12px; cursor:pointer; border: 1px solid #999 !important; text-decoration:none;
   color: #000 !important;}
+*/
 div.PanelPopup div.closeButton {
   width:13px; height:13px; background:url(./img/clientcide/closebtn.gif) no-repeat;
   position: absolute; right: 0px; margin:10px 15px 0px 0px !important; cursor:pointer;top:0px}

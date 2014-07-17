@@ -227,6 +227,12 @@ Ezer.Block= new Class({
     if ( name=='help' && this.DOM_Block ) {
       this.DOM_Block.set('title',val);
     }
+    // promítni změnu do DOM pro: popup.title (nesmí být prázdné)
+    var dom;
+    if ( name=='title' && this instanceof Ezer.PanelPopup
+      && (dom= this.DOM.getElement('.caption'))) {
+      dom.set('text',val);
+    }
     return 1;
   },
 // ------------------------------------------------------------------------------------ add_attrib
@@ -3423,6 +3429,8 @@ Ezer.Elem= new Class({
 //      vstupní část formuláře
 //t: Block,Elem
 //s: Block
+//-
+//os: Field.title - jmenovka pole (bude umístěná před resp. pokud začíná znakem ^ nad polem)
 Ezer.Field= new Class({
   Extends: Ezer.Elem,
   options: {}
@@ -5535,7 +5543,9 @@ Ezer.Show= new Class({
     return this.owner.browse_load_(y)
   },
 // ------------------------------------------------------------------------------------ get_query
-//fm: Show.get_query ([having=false])
+//fm: Show.get_query ([having=false[,i=0]])
+//  pokud i>0 tak vrátí text vzoru na i-tém řádku (having se ignoruje)
+//  pokud i=0 tak
 //    pokud je having=false vrátí aktuální dotaz ve sloupci browse.show pro atribut data ve tvaru:
 //    pokud je formát q/ tak jedna z variant
 //        field BETWEEN 'value1%' AND 'value2%'
@@ -5566,7 +5576,12 @@ Ezer.Show= new Class({
 //        pokud je having=true a expr obsahuje agregační funkci pak je dotaz vrácen
 //          ostatní jsou ignorovány
   get_query_pipe:'',                            // případné modifikátory pro formát q@
-  get_query: function (having) {
+  get_query: function (having,i) {
+    if ( i ) {
+      // pouze vrať text vzoru na i-tém řádku
+      Ezer.assert(this.DOM_qry[i]!==undefined,"get_query má neexistující číslo vzoru");
+      return this.DOM_qry_get(i);
+    }
     having= having ? true : false;
     var qry= '', q, qq, q1, q2, del= '', typ, id, iq, not, end, files=false, pipes= '';
     if ( this.skill && this.qry_type ) {
@@ -8263,9 +8278,6 @@ Ezer.fce.error_= function (info) {
 Ezer.fce.touch= function (type,block,args) {
  server_write:
   if ( Ezer.sys.user.id_user ) {
-    Ezer.App.hits++;
-    Ezer.App.clock_tics= 0;
-    Ezer.App.bar_clock_show(true);
     var to_send= to_logout= false;
     var x= {cmd:'touch',user_id:Ezer.sys.user.id_user,user_abbr:Ezer.sys.user.abbr};
     x.root= Ezer.root;                  // název/složka aplikace
@@ -8292,6 +8304,10 @@ Ezer.fce.touch= function (type,block,args) {
       var r= new Request({method:'post', url:Ezer.App.options.server_url, onComplete:null}).post(x);
       break;
     case 'block':
+      // je to opravdový uživatelský dotek, oddal odhlášení
+      Ezer.App.hits++;
+      Ezer.App.clock_tics= 0;
+      Ezer.App.bar_clock_show(true);
       // pokud k bloku jdeme přes focus|click pak aktualizujeme block_sys
       var block_sys= null;
       if ( block && (args=='focus' || args=='click') ) {
