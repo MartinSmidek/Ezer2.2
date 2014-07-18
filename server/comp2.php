@@ -579,13 +579,19 @@ function link_code(&$c,$name,$isroot,$block) { //trace("{$c->type}");
   $c->_abs= $name;
   if ( $c->type=='view' ) {
     $error_code_lc= $c->_lc;
+    // pokud není table bezejmenné, ověří existenci
     if ( $c->_of=='table' ) {
-      $table= find_part_abs($c->_init,$fullname,$c->_of);
-//       $table= find_part_rel($c->_init,&$fullname/*,$c->_of*/);
-      if ( $table && $table->type=='table' ) {
-        $c->_init= $fullname;
+      if ( $c->_init[0]=='$' ) {
+        $c->_init= '';
+        $c->_of= 'expr';
       }
-      else comp_error("CODE: '{$c->_init}' není jménem {$c->_of} (1)",0);
+      else {
+        $table= find_part_abs($c->_init,$fullname,$c->_of);
+        if ( $table && $table->type=='table' ) {
+          $c->_init= $fullname;
+        }
+        else comp_error("CODE: '{$c->_init}' není jménem {$c->_of} (1)",0);
+      }
     }
   }
   else if ( $c->type=='var' && $c->_of=='form' && $c->_init) {
@@ -770,7 +776,12 @@ function proc(&$c,$name) { #trace();
                 $full= "$full.{$ids[1]}";
 //                                                 display("oi attr $id $name 1");
               }
-              else comp_error("CODE: atribut $id $name je chybný (1,{$ids[0]}-{$ids[1]})",1);
+              else if ( $obj && $obj->_of=='expr' ) {
+                // je to view dané výrazem
+                $full= "$full.{$ids[1]}";
+//                                                 display("oi attr $id $name 1");
+              }
+//               else comp_error("CODE: atribut $id $name je chybný (1,{$ids[0]}-{$ids[1]})",1);
             }
           }
           else {

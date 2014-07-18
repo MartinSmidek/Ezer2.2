@@ -1796,8 +1796,7 @@ Ezer.View= new Class({
   initialize: function(owner,desc,DOM,id) {
     this.parent(owner,desc,DOM,id);
     this._of= desc._of;
-    if ( desc._init ) {
-      // var v: form id
+    if ( this._of!='expr' && desc._init ) {
       var id= desc._init;
       var ctx= Ezer.code_name(id,null,this);
       Ezer.assert(ctx && ctx[0],id+' je neznámé jméno  - očekává se jméno table');
@@ -2696,7 +2695,6 @@ Ezer.Form= new Class({
       if ( !x.table ) {                         // info o table, pokud již v x není
         x.table= field.table.id + (field.view ? ' AS '+field.view.id : '');
         x.key_id= field.table.options.key_id||'id_'+field.table.id;
-//         x.key_id= field.table.options.key_id||'id_'+field.table.id;
         x.db= field.table.options.db||'';
       }
       if ( field.view ) {                       // s odkazem přes view
@@ -2704,8 +2702,10 @@ Ezer.Form= new Class({
           var xx= x.joins[field.view.id]||false;
           if (!xx ) {
             x.joins[field.view.id]= (field.view.options.join_type||'')+' JOIN '
-              + (field.table.options.db ? field.table.options.db+'.' : '')
-              + field.table.id
+              + (field.view.options.expr
+                ? '('+field.view.options.expr+')'
+                : (field.table.options.db ? field.table.options.db+'.' : '') + field.table.id
+                )
               +' AS '+field.view.id+' '+field.view.options.join;
             this._fillx2(field.view.options.join,x);      // doplní potřebná view/join
           }
@@ -3405,23 +3405,59 @@ Ezer.Elem= new Class({
   table: null,
   view: null,
   _data: function() {
-    var name;
+    var name, x;
     if ( (name= this.options.data) ) {
-      var f= [], ids= [];
-      if ( (f= Ezer.code_name(name,ids,this.owner)) ) {
-        this.data= f[0];
-        if ( f[1].type=='view' && f[1].value.type=='table' ) {
-          this.view= f[1];
+      var ctx= [],
+          ids= name.split('.'),
+          ok= Ezer.run_name(name,this.owner,ctx,ids);
+      if ( ok==1 ) {
+        this.data= ctx[0];
+        x= ctx[1];
+        if ( x.type=='view' && x.value.type=='table' ) {
+          // name = položka view odkazujícího na tabulku
+          this.view= x;
           this.table= this.view.value;
         }
-        else if ( f[1].type=='table' )
-          this.table= f[1];
+        else if ( x.type=='table' )
+          // name = položka tabulky
+          this.table= x;
         else
           Ezer.error('jméno '+name+' nelze ve field '+this.owner.id+' pochopit');
       }
-      else
+      else if ( ok==2 ) {
+        x= ctx[0];
+        if ( x.type=='view' && x._of=='expr' ) {
+          // name = položka view zadaného výrazem
+          this.data= {id:ids[ids.length-1],options:{}};
+          this.view= x;
+          this.table= null;
+        }
+        else
+          Ezer.error('jméno '+name+' nelze ve field '+this.owner.id+' pochopit');
+      }
+      else {
         Ezer.error(name+' je neznámé jméno položky v '+this.owner.id,'S',this,this.desc._lc);
+      }
     }
+//   },
+//   _data: function() {       -- předchozí verze bez view s atributem expr
+//     var name;
+//     if ( (name= this.options.data) ) {
+//       var f= [], ids= [];
+//       if ( (f= Ezer.code_name(name,ids,this.owner)) ) {
+//         this.data= f[0];
+//         if ( f[1].type=='view' && f[1].value.type=='table' ) {
+//           this.view= f[1];
+//           this.table= this.view.value;
+//         }
+//         else if ( f[1].type=='table' )
+//           this.table= f[1];
+//         else
+//           Ezer.error('jméno '+name+' nelze ve field '+this.owner.id+' pochopit');
+//       }
+//       else
+//         Ezer.error(name+' je neznámé jméno položky v '+this.owner.id,'S',this,this.desc._lc);
+//     }
   }
 });
 // ================================================================================================= Field
