@@ -1197,6 +1197,29 @@ function narozeni2roky($time,$now=0) {
   $roky= floor((date("Ymd",$now) - date("Ymd", $time)) / 10000);
   return $roky;
 }
+// ------------------------------------------------------------------------------------------------- roku_k
+// roku_k (dat[,kdatu=now])
+// vrací počet roku uplynulých od daného data do daného data (neni-li uvedeno tak od běžného)
+function roku_k($dat,$kdatu='') {
+  if ( !$kdatu ) $kdatu= time();
+  $roku= '';
+  $k= str2date($kdatu,$kd,$km,$ky);
+  $d= str2date($dat,$dd,$dm,$dy);
+  if ( $d && $k ) {
+    $roku= ($km<$dm || ($km==$dm && $kd<$dd)) ? $ky-$dy-1 : $ky-$dy;
+  }
+  return $roku;
+};
+function str2date($s,&$d,&$m,&$y) {
+  list($d,$m,$y)= explode('.',$s);        // formát d.m.Y
+  if ( $y )
+    $d= mktime(0,0,0,$m,$d,$y);
+  else {
+    list($y,$m,$d)= explode('-',$s);      // sql-formát Y-m-d
+    $d= $y ? mktime(0,0,0,$m,$d,$y) : 0;
+  }
+  return $d;
+}
 // ================================================================================================= AJAX - filtry
 // v této sekci jsou oboustranné filtry pro transformaci mezi sql/user podobou dat
 # -------------------------------------------------------------------------------------------------- sql_week

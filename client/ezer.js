@@ -2753,8 +2753,10 @@ Ezer.Form= new Class({
             // je to view s join
             if ( !x.joins[view.id] ) {
               x.joins[view.id]= (view.options.join_type||'')+' JOIN '
-                + (view.value.options.db ? view.value.options.db+'.' : '')
-                + view.value.id
+              + (view.options.expr
+                ? '('+view.options.expr+')'
+                : (view.value.options.db ? view.value.options.db+'.' : '') + view.value.id
+                )
                 +' AS '+view.id+' '+view.options.join;
               this._fillx2(view.options.join,x); // přidej view použitá v join
             }
@@ -3410,7 +3412,7 @@ Ezer.Elem= new Class({
       var ctx= [],
           ids= name.split('.'),
           ok= Ezer.run_name(name,this.owner,ctx,ids);
-      if ( ok==1 ) {
+      if ( ok==1 && ctx.length>1 ) {
         this.data= ctx[0];
         x= ctx[1];
         if ( x.type=='view' && x.value.type=='table' ) {

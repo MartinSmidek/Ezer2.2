@@ -431,7 +431,7 @@ div.LabelDrop progress {
 .FieldList input.FieldList {
   border:0; border-bottom:1px solid #aaa; }
 .FieldList div.SelectDrop {
-  border:1px solid #aaa; position:absolute; z-index:1; -moz-box-shadow:5px 5px 10px #567;
+  border:1px solid #aaa; position:absolute; z-index:1; box-shadow:5px 5px 10px #567;
   overflow-y:auto; overflow-x:hidden; max-height:192px; }
 .Edit {
   position:absolute; font-family:Arial,Helvetica,sans-serif; font-size:9pt; z-index:1;
@@ -484,7 +484,7 @@ label.Check {
   position:absolute; z-index:1; -moz-box-shadow:5px 5px 10px #567;
   color:#000; border:1px solid #ccc; background-color:#fff; margin:0; padding:0; }*/
 ul.SelectDrop {
-  position:absolute; z-index:1; -moz-box-shadow:5px 5px 10px #567; list-style-type:none;
+  position:absolute; z-index:1; box-shadow:5px 5px 10px #567; list-style-type:none;
   color:#000; border:1px solid #ccc; margin:0; padding:0;
   overflow-y:auto; overflow-x:hidden; max-height:192px; }
 .SelectDrop li {
@@ -644,7 +644,7 @@ hr.cleaner {
 #bar_box {
   width:500px; height:4px; margin-top:0px; }
 #bar_perc {
-  background:#ffb454; height:4px; -moz-box-shadow:2px 2px 7px #a60; }
+  background:#ffb454; height:4px; box-shadow:2px 2px 7px #a60; }
 
 /* debugger */
 #form {
