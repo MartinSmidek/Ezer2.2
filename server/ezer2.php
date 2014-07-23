@@ -511,6 +511,12 @@
   // x: table, cond, order, fields, from, cursor, rows, [{joins}] [group [having]]   -- field:{id:i, field:f|expr:s}
   // y: count, from, rows, values[i]
   case 'browse_load':
+    if ( isset($x->optimize->ask) ) {
+      $fce= $x->optimize->ask;
+      if ( function_exists($fce) ) $y= call_user_func($fce,$x);
+      else fce_error("browse/ask: funkce '$fce' neexistuje");
+      break;
+    }
     if ( $x->table=='_file_' ) {
       // scroll files
       load_files($x,$y);

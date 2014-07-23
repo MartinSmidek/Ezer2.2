@@ -4766,6 +4766,7 @@ Ezer.Browse= new Class({
 //      a jejich dynamické obarvení, pokud je definováno css_rows.
 //      Nastaví první řádek jako aktivní a vyvolá na něm onrowclick
 //      Buffer má délku danou atributem buf_rows
+//    pokud je optimize/ask přenechává se zpracování na uživatelské funkci pro všechna show
 //a:    cond - MySQL podmínka umístěná za WHERE
 //      order - nepovinná část za ORDER BY
 //      having - nepovinná část umístěná za HAVING v GROUP BY klauzuli
@@ -4776,8 +4777,10 @@ Ezer.Browse= new Class({
 //r:    - počet přečtených řádků
   browse_load: function(cond,order,having,from,len,quiet,sql) {
     // vytvoř parametry dotazu
-    //                  x,                  cond,order,      having,      from,      cursor,  zapomen_podminku,sql
-    var x= this._params({cmd:'browse_load'},cond,order||null,having||null,from||null,len||null,null,sql||null);
+    var x= this.options && this.options.optimize && this.options.optimize.ask
+      //                  x,                 cond,order,      having,      from,      cursor,  zapomen_podminku,sql
+      ? this._params_ask({cmd:'browse_load'},cond,order||null,having||null,from||null,len||null,null)
+      : this._params    ({cmd:'browse_load'},cond,order||null,having||null,from||null,len||null,null,sql||null);
     x.quiet= quiet||0;
     if ( sql ) x.sql= sql;
     return x;
@@ -5245,6 +5248,36 @@ Ezer.Browse= new Class({
     // explicitní nastavení jména klíče  (120131_MS)
     if ( this.options.key_id )
       x.key_id= this.options.key_id;
+    return x;
+  },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _params_ask
+// vytvoření parametrů pro optimize/ask - bez join, data, ...
+  _params_ask: function (x,cond,order,having,from,cursor,zapomen_podminku) {
+//                                                   Ezer.trace('*','_params:'+cond+','+order+','+having+','+from+','+cursor+','+zapomen_podminku);
+    Ezer.fce.touch('block',this);     // informace do _touch na server
+    x.cond= cond||this.cond||1;
+    if ( !zapomen_podminku ) {
+      // zapamatuj si podmínku
+      this.cond= x.cond;
+    }
+    x.optimize= this.options.optimize;
+    x.order= order||this.order||'';       this.order= x.order;
+    x.having= having||this.having||'';    this.having= x.having;
+    x.from= from||0;
+    x.cursor= cursor||0;
+    // TODO doplň podmínky dotazů
+    // vytvoř parametry dotazu
+    // x: table, cond, order, fields:{id:label,field|expr}, from, cursor, rows, key_id, {joins...} [, group]
+    // y: from, rows, values**, key_id
+    x.rows= this.bmax;
+    x.fields= [];
+    var field;
+    for (var ic in this.part) { // předej id od všech show
+      field= this.part[ic];
+      if ( field.type=='show' && field.skill ) {
+        x.fields.push({id:field.id});
+      }
+    }
     return x;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _fillx+
