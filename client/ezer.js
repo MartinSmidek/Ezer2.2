@@ -3411,7 +3411,7 @@ Ezer.Elem= new Class({
     if ( (name= this.options.data) ) {
       var ctx= [],
           ids= name.split('.'),
-          ok= Ezer.run_name(name,this.owner,ctx,ids);
+          ok= Ezer.code_run_name(name,this.owner,ctx,ids);
       if ( ok==1 && ctx.length>1 ) {
         this.data= ctx[0];
         x= ctx[1];
@@ -6744,7 +6744,12 @@ Ezer.Eval= new Class({
 // kde '#' označuje lokální kořen knihovního bloku (první s atributem library)
 // je volána pouze v době inicializace zaváděného modulu (je v Ezer.app.library_root)
 Ezer.code_name= function (name,ids,context) {
-  var ctx= null, code;
+  var ctx= [], ok;
+  ok= Ezer.code_run_name(name,context,ctx,ids);
+  return ok==1 ? ctx : null;
+}
+Ezer.code_run_name= function (name,context,ctx,ids) {
+  var code, ok= 1;
   if ( !ids ) var ids= [];
   ids.length= 0;
   ids.extend(typeof(name)=='string' ? name.split('.') : name);
@@ -6759,7 +6764,7 @@ Ezer.code_name= function (name,ids,context) {
       Ezer.assert(lib,'code_name:'+name+' in '+context.id+' (a)');
       code= lib.desc;
     }
-    ctx= [code];
+    ctx[0]= code;
     // další id již musí být obsaženy v postupně se upřesňujícím kontextu
     for (var i= 1; i<ids.length; i++) {
       if ( code.part && (code= code.part[ids[i]]) ) {
@@ -6770,16 +6775,16 @@ Ezer.code_name= function (name,ids,context) {
         break;
       }
     }
-    if ( ctx ) ctx.reverse();
+    if ( ctx )
+      ctx.reverse();
+    else
+      ok= 0;
   }
   else {
     // relativní jméno
-    ctx= [];
-    if ( Ezer.run_name(name,context||null,ctx,ids)!=1 )
-      ctx= null;
-//     Ezer.assert(1==Ezer.run_name(name,context||null,ctx,ids),'code_name:'+name+' in '+context.id+' (b)');
+    ok= Ezer.run_name(name,context||null,ctx,ids);
   }
-  return ctx;
+  return ok;
 }
 // -------------------------------------------------------------------------------------- run_name
 // funkce vrací kontextový význam name tzn. Ezer-třídu v kontextu dané Ezer-třídy
