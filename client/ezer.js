@@ -4328,7 +4328,7 @@ Ezer.Browse= new Class({
         this.DOM_add2(true);
         this.DOM_addEvents();
         // znovu načti obsah
-        this._ask_queries(true,old_key);
+//         this._ask_queries(true,old_key);
       }
     }
     else
@@ -4478,10 +4478,21 @@ Ezer.Browse= new Class({
     return this.slen;
   },
 // ------------------------------------------------------------------------------------ browse_active+
-//fm: Browse.browse_active ()
+//fm: Browse.browse_active ([tact])
 //      pokud má browse aktivní řádek, vrátí jej (1..tlen), jinak 0
-  browse_active: function () {
-    return this.tact;
+//      je-li voláno s parametrem, nastaví daný řádek jako aktivní
+  browse_active: function (tact) {
+    var ret;
+    if ( tact==undefined )
+      ret= this.tact;
+    else {
+      Ezer.assert(1<=tact && tact<=this.tlen,"browse_active: chybné číslo řádku");
+      this.DOM_clear_focus(1);
+      this.tact= tact;
+      this.DOM_hi_row(this.t+this.tact-1,1,1);
+      ret= 1;
+    }
+    return ret;
   },
 // ------------------------------------------------------------------------------------ browse_key+
 //fm: Browse.browse_key ()
@@ -4777,10 +4788,9 @@ Ezer.Browse= new Class({
 //r:    - počet přečtených řádků
   browse_load: function(cond,order,having,from,len,quiet,sql) {
     // vytvoř parametry dotazu
-    var x= this.options && this.options.optimize && this.options.optimize.ask
-      //                  x,                 cond,order,      having,      from,      cursor,  zapomen_podminku,sql
-      ? this._params_ask({cmd:'browse_load'},cond,order||null,having||null,from||null,len||null,null)
-      : this._params    ({cmd:'browse_load'},cond,order||null,having||null,from||null,len||null,null,sql||null);
+    var x= this._params({cmd:'browse_load'},
+      //                                            zapomen_podminku,sql
+      cond,order||null,having||null,from||null,len||null,null,sql||null);
     x.quiet= quiet||0;
     if ( sql ) x.sql= sql;
     return x;
@@ -4792,10 +4802,11 @@ Ezer.Browse= new Class({
 //                                                         Ezer.debug(y,'browse_load_');
     // načtení výsledku dotazu do buferu v Browse.buf
     // pokud je y.x.smart==1 bude dotaz doplněn, jinak jej nahradí
-    var from= Number(y.from), cursor= Number(y.cursor);
+    var from= Number(y.from), cursor= Number(y.cursor),
+        asked= this.options.optimize && this.options.optimize.ask;
     this._browse_init1('load');                 // inicializace bufferu
     // inicializace bufferu
-    this._source= 'load';                       // metoda získání záznamů
+    this._source= asked ? 'ask' : 'load';       // metoda získání záznamů
     this.slen= Number(y.count);
     this.blen= Number(y.rows);
     this.b= this.blen>0 ? from : -1;
@@ -4808,7 +4819,15 @@ Ezer.Browse= new Class({
         for (var vi in y.values[bi+1]) {        // vi je identifikátor show
           // hodnota bude do buf transformována show._load
           this.buf[bi][vi]= this.part[vi]._load(y.values[bi+1][vi]);
-          if ( this.keys[bi]===undefined
+          if ( asked ) {
+            if ( vi==y.key_id ) {
+              // klíč je zapsán podle stejnojmenné položky
+              this.keys[bi]= this.buf[bi][vi];
+              if ( rec!=-1 )                      // pokud není blokováno
+                this.owner._key= this.keys[bi];   // změň běžný klíč
+            }
+          }
+          else if ( this.keys[bi]===undefined
             && this.part[vi].data && this.part[vi].data.id==y.key_id ) {
             // klíč je zapsán jen podle první položky, která jej má v data.id
             this.keys[bi]= this.buf[bi][vi];
@@ -5201,13 +5220,48 @@ Ezer.Browse= new Class({
       // zapamatuj si podmínku
       this.cond= x.cond;
     }
-    if ( this.options.optimize )
-      x.optimize= this.options.optimize;
     x.order= order||this.order||'';       this.order= x.order;
     x.having= having||this.having||'';    this.having= x.having;
     x.sql= sql||this.sql||'';             this.sql= x.sql;
     x.from= from||0;
     x.cursor= cursor||0;
+    x.rows= this.bmax;
+    x.fields= [];
+    if ( this.options.group_by )
+      x.group= this.options.group_by;
+    // explicitní nastavení jména klíče  (120131_MS)
+    if ( this.options.key_id )
+      x.key_id= this.options.key_id;
+    // řešení optimize
+    if ( this.options.optimize )  {
+      x.optimize= this.options.optimize;
+      if ( this.options.optimize.ask ) {
+        // zjednodušené předání parametrů pro browse/ask - bez join, data, ...
+        var field;
+        for (var ic in this.part) { // předej id od všech show
+          field= this.part[ic];
+          if ( field.type=='show' && field.skill ) {
+            var desc= {id:field.id};
+            // řazení
+            if ( field.sorting && field.sorting!='n' ) {
+              x.order= field.sorting+' '+ic;
+            }
+            // výběrové podmínky
+            if ( this.options.qry_rows ) {
+              var q= [], qs= 0;
+              for (var i= 1; i<=this.options.qry_rows; i++) {
+                if ( field.DOM_qry[i]==undefined ) break;
+                q[i]= field.get_query(0,i);
+                qs+= q[i] ? 1 : 0;
+              }
+              if ( qs ) desc.q= q;
+            }
+            x.fields.push(desc);
+          }
+        }
+        return x;
+      }
+    }
     // doplň podmínku o dotazy zadané v zobrazených sloupcích browse
     var wcond= this.get_query(false);           // podmínky za WHERE
     if ( this.get_query_pipe )
@@ -5218,16 +5272,12 @@ Ezer.Browse= new Class({
     // vytvoř parametry dotazu
     // x: table, cond, order, fields:{id:label,field|expr}, from, cursor, rows, key_id, {joins...} [, group]
     // y: from, rows, values**, key_id
-    x.rows= this.bmax;
-    x.fields= [];
     x.joins= {};
     var field;
-  //   if ( browse.patt ) browse= browse.patt;
     for (var ic in this.part) { // načti jen zobrazené sloupce použité v browse, vybírej použitá view
       field= this.part[ic];
       if ( field.skill ) this.owner._fillx(field,x,to_map);
     }
-//     this.owner._fillx2(x.cond+x.order,x);
     this._fillx2(x.cond+x.order,x); // s možnou explicitní definicí x.key_id
     // změň podmínku na "jen vybrané", pokud je požadováno
     if ( this.selected_op=='use' ) {
@@ -5243,41 +5293,6 @@ Ezer.Browse= new Class({
     }
     if ( !x.table )
       Ezer.error("RUN ERROR '"+x.cmd+"' chybi ridici tabulka pro browse "+this.id);
-    if ( this.options.group_by )
-      x.group= this.options.group_by;
-    // explicitní nastavení jména klíče  (120131_MS)
-    if ( this.options.key_id )
-      x.key_id= this.options.key_id;
-    return x;
-  },
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _params_ask
-// vytvoření parametrů pro optimize/ask - bez join, data, ...
-  _params_ask: function (x,cond,order,having,from,cursor,zapomen_podminku) {
-//                                                   Ezer.trace('*','_params:'+cond+','+order+','+having+','+from+','+cursor+','+zapomen_podminku);
-    Ezer.fce.touch('block',this);     // informace do _touch na server
-    x.cond= cond||this.cond||1;
-    if ( !zapomen_podminku ) {
-      // zapamatuj si podmínku
-      this.cond= x.cond;
-    }
-    x.optimize= this.options.optimize;
-    x.order= order||this.order||'';       this.order= x.order;
-    x.having= having||this.having||'';    this.having= x.having;
-    x.from= from||0;
-    x.cursor= cursor||0;
-    // TODO doplň podmínky dotazů
-    // vytvoř parametry dotazu
-    // x: table, cond, order, fields:{id:label,field|expr}, from, cursor, rows, key_id, {joins...} [, group]
-    // y: from, rows, values**, key_id
-    x.rows= this.bmax;
-    x.fields= [];
-    var field;
-    for (var ic in this.part) { // předej id od všech show
-      field= this.part[ic];
-      if ( field.type=='show' && field.skill ) {
-        x.fields.push({id:field.id});
-      }
-    }
     return x;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _fillx+
@@ -5650,7 +5665,7 @@ Ezer.Show= new Class({
   get_query: function (having,i) {
     if ( i ) {
       // pouze vrať text vzoru na i-tém řádku
-      Ezer.assert(this.DOM_qry[i]!==undefined,"get_query má neexistující číslo vzoru");
+      Ezer.assert(this.DOM_qry[i]!==undefined,"get_query má neexistující číslo vzoru "+i);
       return this.DOM_qry_get(i);
     }
     having= having ? true : false;
@@ -5936,7 +5951,14 @@ Ezer.Eval= new Class({
     return tr;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  trace_proc
-  trace_proc: function(lc,str,proc,nargs,typ) {
+  trace_proc: function(lc,str,proc,nargs,typ,id) {
+    // nejprve vyřešíme selektivní trasování
+    if ( typeof(Ezer.is_trace.E)=='object' ) {  // v mootools je [x] objekt
+      var ids= id.split('.');
+      id= ids[ids.length-1];
+      if ( !Ezer.is_trace.E.contains(id) )
+        return;
+    }
     typ= typ||'E';
     var tr= '', del= '';
     if ( str ) {
@@ -5961,6 +5983,13 @@ Ezer.Eval= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  trace_fce
 // ms jsou nepovinné milisekundy
   trace_fce: function(lc,str,context,args,typ,val,ms,obj) {
+    // nejprve vyřešíme selektivní trasování
+    if ( typeof(Ezer.is_trace[typ])=='object' ) {  // v mootools je [x] objekt
+      var ids= str.split('.');
+      id= ids[ids.length-1];
+      if ( !Ezer.is_trace[typ].contains(id) )
+        return;
+    }
     var tr= '', del= '';
     if ( str ) {
       while (tr.length < this.calls.length) tr+= ' ';
@@ -6212,7 +6241,7 @@ Ezer.Eval= new Class({
                 if ( Ezer.is_trace.q )
                   this.trace((this.code?padNum(this.code.length,2):'  ')+'::'+(this.context?this.context.id:'?')+'.'+cc.i);
                 if ( Ezer.is_trace.E )
-                  this.trace_proc(cc.s,this.context.id+(cc.o=='C'?'.desc.':'.')+cc.i,this.proc,this.nargs);
+                  this.trace_proc(cc.s,this.context.id+(cc.o=='C'?'.desc.':'.')+cc.i,this.proc,this.nargs,'E',cc.i);
                 else if ( Ezer.is_trace.T && this.proc.trace )
                   this.trace_proc(cc.s,this.context.id+'.'+cc.i,this.proc,this.nargs,'T');
               }
@@ -8188,22 +8217,47 @@ Ezer.fce.popup_help= function (html,title,ykey,xkey,seen,refs) {
   return 1;
 };
 // -------------------------------------------------------------------------------------- set_trace
-//ff: fce.set_trace (id,on) nebo fce.set_trace (on)
-//      změní chování systémového trasování podle parametrů, je-li použit jen jeden parametr
+//ff: fce.set_trace (id,on) nebo fce.set_trace (on) nebo fce.set_trace(id,on,names)
+//    * změní chování systémového trasování podle parametrů, je-li použit jen jeden parametr
 //      umožňuje zobrazit nebo skrýt testovací okno
+//    * pokud jsou použity 3 parametry, zapíná/vypíná trasování typu id (pro id=E) jen pro jména
+//      uvedená v seznamu ids
 //a: id - písmeno označující druh trasování
 //   on - 1 pro zapnutí, 0 pro vypnutí
+//   ids - seznam jmen, oddělených čárkou
 //s: funkce
-Ezer.fce.set_trace= function (id,on) {
+Ezer.fce.set_trace= function (id,on,names) {
   if ( arguments.length==1 ) {
     // ovládá zobrazení trasovacího okna
     Ezer.App._showTrace(id);
   }
-  else {
+  else if ( arguments.length==2 ) {
     // ovládá jednotlivé přepínače
     for (var i=0; i<id.length; i++) {
       Ezer.App._setTraceOnOff(id[i],on);
     }
+  }
+  else {
+    names.split(',').each(function(name) {
+      if ( on ) { // přidání k seznamu
+        if ( typeof(Ezer.is_trace[id])=='boolean' ) {
+          Ezer.App._setTraceOnOff(id,[name]);           // zobraz příznak selektivního trasování
+        }
+        else if ( typeof(Ezer.is_trace[id])=='object' ) {
+          if ( !Ezer.is_trace[id].contains(name) ) {
+            Ezer.is_trace[id].push(name);
+          }
+        }
+      }
+      else if ( !on ) {
+        if ( typeof(Ezer.is_trace[id])=='object' ) {
+          Ezer.is_trace[id].erase(name);
+          if ( !Ezer.is_trace[id].length ) {
+            Ezer.App._setTraceOnOff(id,false);
+          }
+        }
+      }
+    });
   }
   return 1;
 }

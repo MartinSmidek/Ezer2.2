@@ -685,6 +685,8 @@ hr.cleaner {
   background-color:#ffffaa; }
 .ae_switch_on {
   background-color:$b_kuk; color:$c2_kuk;  }
+.ae_switch_sel {
+  background-color:$b_kuk; color:$c_kuk;  }
 #kuk div.trace {
   margin-left:70px; color:#000; padding:0; white-space:pre-wrap; }
 #kuk div.trace_hide {

@@ -772,6 +772,12 @@
   // pokud takový není, bude vráceno y->seek==0 jinak y->seek==key
   // ZATIM bez pořadi (jen podle key_id)
   case 'browse_seek':
+    if ( isset($x->optimize->ask) ) {
+      $fce= $x->optimize->ask;
+      if ( function_exists($fce) ) $y= call_user_func($fce,$x);
+      else fce_error("browse/ask: funkce '$fce' neexistuje");
+      break;
+    }
     $seek_result= 0;
     $fields= ''; $del= '';
     $x->from= $x->from ? $x->from : 0;

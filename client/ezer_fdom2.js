@@ -55,7 +55,7 @@ Ezer.Block.implement({
       var label= title_as_label[0]=='^' ? title_as_label.substr(1) : title_as_label;
       var up= title_as_label[0]=='^';
       var left= ignore_right || !this._fc('r');
-      this.DOM_Label= new Element('div.Label',{text:label,
+      this.DOM_Label= new Element('div.Label',{html:label,
         styles:up ? (left ? {top:-14,left:2} : {top:-14,right:2}) : {top:3,right:this._w+2}});
       this.DOM_Block.grab(this.DOM_Label,'top');
     }
@@ -1953,7 +1953,7 @@ Ezer.Select.implement({
           click: function() {this.DOM_Input.focus();}.bind(this)
         }:{}}).inject(this.DOM_Closure);
     }
-    this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
+    this.DOM_Input= new Element('input',{type:'text'/*,value:this.options.title||''*/,styles:{
         width:this._w-(img ? 20 : 0),height:this._h-4}
     }).inject(this.DOM_Closure);
     this.DOM_optStyle(this.DOM_Input,this.options.title,true); // u title ignorovat zarovnání
@@ -2374,7 +2374,7 @@ Ezer.Browse.implement({
               new Element('td',{'class':'BrowseReload',styles:{width:8}, events:{
                 click: function(el) {
                   // znovu načti obsah
-                  this._ask_queries(true);
+                  this._ask_queries(true,old_key= this.browse_key());
                 }.bind(this)
           }}))),
           // patička s přehledem stavu

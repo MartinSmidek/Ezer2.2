@@ -469,12 +469,21 @@ Ezer.Application= new Class({
     }
   },
   // ----------------------------------------------------------------------------- _setTraceOnOff
-  // nastaví trasování podle klíče id - on=1 vypne, on=0 zapne
+  // nastaví trasování podle klíče id - on=true zapne, on=false vypne,
+  // on=object znázorňuje selektivní trasování některých jmen
   _setTraceOnOff: function (id,on) {
     // uprav zobrazení
     $('status_right').getChildren('span').each(function(el) {
       if ( el.get('text')==id ) {
-        el.toggleClass('ae_switch_on');
+        if ( typeof(on)=='object' )
+          el.addClass('ae_switch_sel');
+        else {
+          el.removeClass('ae_switch_sel');
+          if ( on )
+            el.addClass('ae_switch_on');
+          else
+            el.removeClass('ae_switch_on');
+        }
         return;
       }
     });
