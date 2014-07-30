@@ -372,43 +372,43 @@ Ezer.Application= new Class({
       });
       if ( !Ezer.to_trace )
         this.resize.detach();
-    }
-    this._showTrace(Ezer.to_trace);
-    // speed - pro všechny okno pro zobrazení měření výkonu - zachází se s ním jako s trasováním 'S'
-    Ezer.is_trace['S']= this.options.ae_trace.indexOf('S')>=0;
-    var speed= new Element('span', {text:'speed:','class':Ezer.is_trace['S']?'ae_switch_on':'',
-        title:'zobrazí okno s měřením výkonu', events:{
-      click: function(event) {
-        event.target.toggleClass('ae_switch_on');
-        if ( this.options.ae_trace.indexOf('S')>=0 ) {
-          this.options.ae_trace= this.options.ae_trace.replace('S','');
-          Ezer.is_trace['S']= false;
-        }
-        else {
-          this.options.ae_trace+= 'S';
-          Ezer.is_trace['S']= true;
-        }
-        Ezer.obj.speed.span.setStyles({display:Ezer.is_trace['S'] ? 'block' : 'none'});
-        Ezer.fce.speed('clear');
-        Ezer.fce.speed('show');
-        Ezer.obj.speed.msg= 'měření časové a datové náročnosti'; this._showSpeed();
-      }.bind(this)
-    }}).inject(this._barRightDom);
-    Ezer.obj.speed.span= new Element('span', {text:Ezer.obj.speed.msg, 'class':'measures',
-        styles:{display:Ezer.is_trace['S'] ? 'block' : 'none'},
-        title:'SQL, PHP, Ezer udává čas v ms, NET je ms/KB, kliknutí vynuluje čitače', events:{
-      click: function(event) {
-        Ezer.fce.speed('clear');
-        Ezer.fce.speed('show');
-        return false;
-      }.bind(this)
-    }}).inject(speed);
+      this._showTrace(Ezer.to_trace);
+      // speed - pro všechny okno pro zobrazení měření výkonu - zachází se s ním jako s trasováním 'S'
+      Ezer.is_trace['S']= this.options.ae_trace.indexOf('S')>=0;
+      var speed= new Element('span', {text:'speed:','class':Ezer.is_trace['S']?'ae_switch_on':'',
+          title:'zobrazí okno s měřením výkonu', events:{
+        click: function(event) {
+          event.target.toggleClass('ae_switch_on');
+          if ( this.options.ae_trace.indexOf('S')>=0 ) {
+            this.options.ae_trace= this.options.ae_trace.replace('S','');
+            Ezer.is_trace['S']= false;
+          }
+          else {
+            this.options.ae_trace+= 'S';
+            Ezer.is_trace['S']= true;
+          }
+          Ezer.obj.speed.span.setStyles({display:Ezer.is_trace['S'] ? 'block' : 'none'});
+          Ezer.fce.speed('clear');
+          Ezer.fce.speed('show');
+          Ezer.obj.speed.msg= 'měření časové a datové náročnosti'; this._showSpeed();
+        }.bind(this)
+      }}).inject(this._barRightDom);
+      Ezer.obj.speed.span= new Element('span', {text:Ezer.obj.speed.msg, 'class':'measures',
+          styles:{display:Ezer.is_trace['S'] ? 'block' : 'none'},
+          title:'SQL, PHP, Ezer udává čas v ms, NET je ms/KB, kliknutí vynuluje čitače', events:{
+        click: function(event) {
+          Ezer.fce.speed('clear');
+          Ezer.fce.speed('show');
+          return false;
+        }.bind(this)
+      }}).inject(speed);
 //     // HELP a FAQ
 //     new Element('span', {text:'HELP!',title:'kontextový help formou FAQ', events:{
 //       click: function(event) {
 //         this._help(true);
 //       }.bind(this)
 //     }}).inject(this._barRightDom);
+    }
     $('error').addEvent('dblclick',this._clearError.bind(this));
   },
   // ----------------------------------------------------------------------------- _help
