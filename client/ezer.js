@@ -467,8 +467,8 @@ Ezer.Block= new Class({
 // ------------------------------------------------------------------------------------ enable
 //fm: Block.enable ([on[,tags]])
 //      Nastaví vlastnost enable podle on;
-//      pokud je uveden seznam tags, provede se pro přímé podbloky s atributem
-//      tag vyhovujícím regulárnímu dotazu v tags;
+//      pokud je uveden regulární výraz tags, provede se pro přímé podbloky (a hodnoty use)
+//      s atributem tag vyhovujícím dotazu;
 //      v bezparametrické podobě vrací 1, pokud je blok ve stavu enabled
 //a: on - 0 | 1
 //   tags - regulární výraz popisující vyhovující tagy (např. 'f.|g')
@@ -483,8 +483,9 @@ Ezer.Block= new Class({
     else if ( tags ) {
       var re= new RegExp(tags);
       // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
-      for(var i in this.part) {
-        var part= this.part[i];
+      var block= this instanceof Ezer.Var && this.value ? this.value : this;
+      for(var i in block.part) {
+        var part= block.part[i];
         if ( part.DOM_Block && part.options.tag && re.test(part.options.tag) ) {
           part.options.enabled= enabled;
           part.DOM_enabled(enabled);
@@ -536,7 +537,7 @@ Ezer.Block= new Class({
     }
     else if ( tags ) {
       var re= new RegExp(tags);
-      // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
+      // proveď změnu display pro podbloky s atributem tag vyhovujícím dotazu
       displ(this.part);
       if ( this instanceof Ezer.Var && this.value && this.value.part )
         displ(this.value.part);
@@ -4842,8 +4843,8 @@ Ezer.Browse= new Class({
     this.r= this.b;
     this.tlen= Math.min(this.tmax,this.blen);
     this.tact= this.tlen ? 1 : 0;
-    this.DOM_show();                            // zobrazení
-//     this.DOM_hi_row(this.r,true,true);          // focus jen řádku a bez onrowclick
+    if ( rec!=-1 )                              // pokud není blokováno
+      this.DOM_show();                          // zobrazení
     if ( y.quiet==0 )                           // pokud nebylo zakázáno onrowclick
       this.DOM_hi_row(this.r,false,true);       // pak focus jen řádku a s onrowclick
     // vrací počet přečtených řádků
@@ -4914,8 +4915,9 @@ Ezer.Browse= new Class({
 //  zopakuje předchozí browse_load včetně nastavení záznamu s klíčem key
 //a: key   - klíč
   browse_refresh: function(oldkey) {
-    x= this._params({cmd:'browse_load'},null,null,null,this.b,-1,0,null);
+    x= this._params({cmd:'browse_load',subcmd:'refresh'},null,null,null,this.b,-1,0,null);
     x.oldkey= oldkey;
+    x.quiet= 1;
     return x;
   },
   browse_refresh_: function (y) {
@@ -4926,6 +4928,7 @@ Ezer.Browse= new Class({
       this._row_move(this.b+indx,true);
     }
     this.DOM_show();
+    this.DOM_hi_row(this.r,false,true);         // focus řádku s onrowclick
     return 1;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _row_submit+
@@ -5741,7 +5744,7 @@ Ezer.Show= new Class({
           for ( var iq= 1; iq<=this.owner.options.qry_rows; iq++ ) {
             if ( qq= this.DOM_qry_get(iq) ) {
               q= qq.replace(/\*/g,'%').replace(/\?/g,'_');
-              qry+= del+"UPPER("+id+") LIKE BINARY UPPER('"+q+"')";
+              qry+= del+"UPPER("+id+") LIKE /*BINARY*/ UPPER('"+q+"')";
               var pid= this.options.sql_pipe;
               if ( !pid )
                 Ezer.error('format q@ v show '+this.owner.id+'.'+this.id+' vyžaduje sql_pipe','C');
@@ -5767,7 +5770,7 @@ Ezer.Show= new Class({
                 end= qq.substr(-1,1)=='$' ? '' : (this.qry_type=='@' ? '' : '%');
                 qq= end ? qq : qq.substr(0,qq.length-1);
                 q= qq.replace(/\*/g,'%').replace(/\?/g,'_');
-                qry+= del+"UPPER("+id+")"+not+" LIKE BINARY UPPER('"+q+end+"')";
+                qry+= del+"UPPER("+id+")"+not+" LIKE /*BINARY*/ UPPER('"+q+end+"')";
               }
               del= ' OR ';
             }
@@ -5950,8 +5953,15 @@ Ezer.Eval= new Class({
     }
     return tr;
   },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  trace_debug
+  trace_debug: function(val,str,id) {
+    // nejprve vyřešíme selektivní trasování pro 'x'
+    if ( typeof(Ezer.is_trace.X)=='boolean' || Ezer.is_trace.X.contains(id) ) {
+                                                     Ezer.debug(val,str);
+    }
+  },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  trace_proc
-  trace_proc: function(lc,str,proc,nargs,typ,id) {
+  trace_proc: function(lc,str,proc,nargs,nvars,typ,id) {
     // nejprve vyřešíme selektivní trasování
     if ( typeof(Ezer.is_trace.E)=='object' ) {  // v mootools je [x] objekt
       var ids= id.split('.');
@@ -5967,7 +5977,7 @@ Ezer.Eval= new Class({
     }
     // argumenty
     tr+= '(';
-    for (var i= this.top-nargs+1; i<=this.top; i++) {
+    for (var i= this.top-nargs-nvars+1; i<=this.top-nvars; i++) {
       tr+= del+this.val(this.stack[i]);
       del= ',';
     }
@@ -5984,10 +5994,21 @@ Ezer.Eval= new Class({
 // ms jsou nepovinné milisekundy
   trace_fce: function(lc,str,context,args,typ,val,ms,obj) {
     // nejprve vyřešíme selektivní trasování
-    if ( typeof(Ezer.is_trace[typ])=='object' ) {  // v mootools je [x] objekt
+    var t= typ[0];
+    if ( typeof(Ezer.is_trace[t])=='object' ) {  // v mootools je [x] objekt
       var ids= str.split('.');
-      id= ids[ids.length-1];
-      if ( !Ezer.is_trace[typ].contains(id) )
+//       id= ids[ids.length-1];
+//       if ( !Ezer.is_trace[t].contains(id) )
+//         return;
+      if ( !Object.some(Ezer.is_trace[t],function(x){
+        var ok= false, id= ids[ids.length-1];
+        var xs= x.split('.');
+        if ( xs.length==1 )
+          ok= x==id;
+        else if ( xs.length==2 )
+          ok= xs[1]==id && xs[0]==ids[ids.length-2]
+        return ok;
+      }) )
         return;
     }
     var tr= '', del= '';
@@ -6050,6 +6071,7 @@ Ezer.Eval= new Class({
 //   a i     - sníží zásobník o referenci objektu a na zásobník dá hodnotu jeho atributu c.i
 //   K       - zahájení cyklu foreach pro složky pole nebo objektu
 //   L i     - test pro foreach, volání procedury s jedním či dvěma parametry
+//   S       - test pro switch
 //   + [jmp] [iff] [ift] - obsahují offset pro posun čitače v závislosti na hodnotě na vrcholu zásobníku
 //   + [go] - obsahuje offset pro posun čitače (bez změny a závislosti na zásobníku)
 //   + [s] - pozice ve zdrojovém textu ve tvaru  l,c
@@ -6059,12 +6081,12 @@ Ezer.Eval= new Class({
     try {
 //       // reaguj na stopadresu
 //             if ( this.proc && (this.proc.stop || this.proc.desc && this.proc.desc.stop) ) {
-//               this.trace_proc('>>>STOP '+this.context.id+'.'+this.code[this.c].i,this.proc,this.nargs,'T');
+//               this.trace_proc('>>>STOP '+this.context.id+'.'+this.code[this.c].i,this.proc,this.nargs,this.nvars,'T');
 //               Ezer.continuation= this;
 //               Ezer.App.stopped();
 //               return;
 //             }
-      var i, val, obj, fce, cc, args, nargs, c, top, last_lc;
+      var i, val, obj, fce, cc, args, nargs, c, top, last_lc, no_iff;
       this.step= step||this.step;
       if ( !step && !back )
         if ( Ezer.is_trace.q )
@@ -6085,6 +6107,7 @@ Ezer.Eval= new Class({
             if ( Ezer.is_trace.q ) this.trace('...continue');  // trasování operace
           }
           else {
+            no_iff= false;  // příznak potlačení skoku pro S (switch)
             // reakce na stop
             if ( Ezer.dbg.stop )
               throw 'stop';
@@ -6241,12 +6264,13 @@ Ezer.Eval= new Class({
                 if ( Ezer.is_trace.q )
                   this.trace((this.code?padNum(this.code.length,2):'  ')+'::'+(this.context?this.context.id:'?')+'.'+cc.i);
                 if ( Ezer.is_trace.E )
-                  this.trace_proc(cc.s,this.context.id+(cc.o=='C'?'.desc.':'.')+cc.i,this.proc,this.nargs,'E',cc.i);
+                  this.trace_proc(cc.s,this.context.id+(cc.o=='C'?'.desc.':'.')+cc.i,
+                    this.proc,this.nargs,this.nvars,'E',cc.i);
                 else if ( Ezer.is_trace.T && this.proc.trace )
-                  this.trace_proc(cc.s,this.context.id+'.'+cc.i,this.proc,this.nargs,'T');
+                  this.trace_proc(cc.s,this.context.id+'.'+cc.i,this.proc,this.nargs,this.nvars,'T');
               }
               if ( this.step || this.proc.stop || this.proc.desc && this.proc.desc.stop ) {
-                this.trace_proc(cc.s,'>>>STOP '+this.context.id+'.'+cc.i,this.proc,this.nargs,'T');
+                this.trace_proc(cc.s,'>>>STOP '+this.context.id+'.'+cc.i,this.proc,this.nargs,this.nvars,'T');
                 Ezer.continuation= this;
                 Ezer.App.stopped(this.proc);
                 this.simple= false;
@@ -6416,7 +6440,7 @@ Ezer.Eval= new Class({
                 Ezer.error('EVAL: '+cc.i+' není metoda '+obj.type,'S',this.proc,last_lc);
               val= fce.apply(obj,args);
               if ( Ezer.to_trace && Ezer.is_trace.x ) this.trace_fce(cc.s,obj.id+'.'+cc.i,obj,args,'x1');
-                                                      if (Ezer.is_trace.x) Ezer.debug(val,'fx:'+cc.i+'>');
+              if ( Ezer.to_trace && Ezer.is_trace.X ) this.trace_debug(val,'fx:'+cc.i+'>',cc.i);
               if ( typeof(val)=='object' ) {
                 if ( val && val.cmd ) {
                   this.askx(obj,cc.i,val);
@@ -6442,10 +6466,21 @@ Ezer.Eval= new Class({
                 val= obj[cc.i];
               this.stack[++this.top]= val;
               break;
+            // S - test pro switch; při rovnosti horních 2 elementů je odstraní a pokračuje,
+            //                      při nerovnosti sníží zásobník a skočí
+            case 'S':
+              val= this.stack[this.top--];
+              if ( this.stack[this.top]==val ) {
+                no_iff= true;   // iff jen sníží zásobník
+              }
+              else {
+                this.stack[++this.top]= 0;
+              }
+              break;
             // K - inicializace pro foreach iterující objekt, na zásobník přidá
             //     pole klíčů objektu nebo počet prvků pole
             case 'K':
-              obj= this.stack[this.top];                // objekt nebo pole
+              obj= this.stack[this.top];                  // objekt nebo pole
               if ( $type(obj)=='array' )
                 this.stack[++this.top]= 0;                // první index pole
               else if ( $type(obj)=='object' )
@@ -6516,7 +6551,7 @@ Ezer.Eval= new Class({
               c+= cc.jmp;
               Ezer.eval_jump= ' ';                      // příznak neskoku
             }
-            else if ( cc.iff && !top ) {
+            else if ( cc.iff && !top && !no_iff ) {
               c+= cc.iff;
               Ezer.eval_jump= '*';                      // příznak skoku
             }
@@ -6703,8 +6738,7 @@ Ezer.Eval= new Class({
     Ezer.App._ajax(-1);
     var y, val= false;
     try { y= JSON.decode(ay); } catch (e) { y= null; }
-                                    if (t=='x' && Ezer.is_trace.x) Ezer.debug(y,'fx:>'+fce);
-//                                                         if (Ezer.is_trace.u) Ezer.debug(y,'>fx:'+fce);
+    if ( Ezer.to_trace && Ezer.is_trace.X ) this.trace_debug(y,'fx:>'+fce,fce);
     if ( !y )
       Ezer.error('EVAL: syntaktická chyba na serveru:'+ay,'s',this.proc,this.proc?this.proc.desc._lc:null);
     else {
@@ -7053,79 +7087,6 @@ Ezer.str.new_form= function() {
   that.stack[++that.top]= form;
   that.eval();
 }
-// -------------------------------------------------------------------------------------- switch
-//fs: str.switch (test,case1,stmnt1,...)
-//   řídící struktura switch-case-...[default]
-//   pokud má sudý počet parametrů, použije se poslední jako defaultní
-//   pokud má lichý počet parametrů a žádná testovací hodnota nevyhovuje, ohlásí se chyba
-//   UPOZORNĚNÍ: v test se nepředpokládá žádná asynchronní operace (modální dialog, dotaz na server)
-//   v case-příkazech jsou asynchronní operace povoleny (další příkaz je interpretován
-//   až po jejich skončení)
-//x: switch(x,
-//     'math',{echo(x);echo(2)},
-//     'text',echo(x),
-//      echo('nic')
-//    );
-//s: funkce
-Ezer.str['switch']= function () {
-  Ezer.assert(arguments.length>2,"EVAL: struktura 'switch' má málo argumentů");
-  var that= arguments[0];       // volající objekt Ezer.Eval
-  var args= arguments[1];       // hodnoty parametrů a proměnných volajícího objektu Ezer.Eval
-  var test= new Ezer.Eval(arguments[2],that.context,args,'switch-test',that.continuation,
-    that.no_trow,that.proc,that.nvars);
-  var len= arguments.length;
-  var istmnt= 0;
-  for (var i= 3; i<len-1; i+=2) {
-    var casa= new Ezer.Eval(arguments[i],that.context,args,'switch-case');
-    if ( casa.value==test.value ) {
-      istmnt= i;
-      break;
-    }
-  }
-  if ( !istmnt && len%2==0)
-    istmnt= len-2;
-  if ( istmnt ) {
-    new Ezer.Eval(arguments[istmnt+1],that.context,args,'switch-stmnt',
-      {fce:Ezer.str.switch_,args:[that],stack:true},that.no_trow,that.proc);
-    that.eval();
-  }
-  else
-    Ezer.error("EVAL: struktura 'switch' bez default-části nemá variantu pro '"+test.value+"'");
-};
-Ezer.str.switch_= function (that,value) {
-  that.stack[++that.top]= value;
-  that.eval();
-};
-// -------------------------------------------------------------------------------------- if
-//fs: str.if (test,then_stmnt[,else_stmnt])
-//   řídící struktura if-then-else resp. if-then
-//   UPOZORNĚNÍ: v test se nepředpokládá žádná asynchronní operace (modální dialog, dotaz na server)
-//   v then-příkaze i else-příkaze jsou asynchronní operace povoleny (další příkaz je interpretován
-//   až po jejich skončení)
-//x: if(gt(x,0),{echo('kladné')},{echo('záporné')})
-//s: funkce
-Ezer.str['if']= function () {
-  var that= arguments[0];       // volající objekt Ezer.Eval
-  var args= arguments[1];       // hodnoty parametrů a proměnných volajícího objektu Ezer.Eval
-  var test= new Ezer.Eval(arguments[2],that.context,args,'if-test',that.continuation,
-    that.no_trow,that.proc,that.nvars);
-  if ( test.value ) {
-    new Ezer.Eval(arguments[3],that.context,args,'if-then',
-      {fce:Ezer.str.if_,args:[that],stack:true},that.no_trow,that.proc);
-  }
-  else if ( arguments.length==5 ) {
-    new Ezer.Eval(arguments[4],that.context,args,'if-else',
-      {fce:Ezer.str.if_,args:[that],stack:true},that.no_trow,that.proc);
-  }
-  else {
-    that.stack[++that.top]= 0;
-    that.eval();
-  }
-};
-Ezer.str.if_= function (that,value) {
-  that.stack[++that.top]= value;
-  that.eval();
-};
 // ================================================================================================= fce
 // funkce dostávají jako argumenty hodnoty
 // Ezer.obj= {};                                   // případné hodnoty k funkcím se stavem (trail ap.)
@@ -8203,11 +8164,12 @@ Ezer.fce.echo= function () {
 //ff: fce.warning (a1,...)
 //   vypíše argumenty do dočasné plochy, která vyjede ze spodní lišty
 //   a která po pokračování v práci zase zmizí. Zobrazuje jen poslední varování.
+//   Bezparametrická varianta zruší zobrazené varování.
 //s: funkce
 Ezer.fce.warning= function () {
   var str= '';
   for (var i=0; i<arguments.length; i++) str+= arguments[i];
-  Ezer.fce.DOM.warning(str);
+  Ezer.fce.DOM.warning(arguments.length ? str : null);
   return str;
 };
 // -------------------------------------------------------------------------------------- help

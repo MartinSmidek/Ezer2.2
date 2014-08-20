@@ -1286,6 +1286,12 @@
     list($line,$clmn)= explode(',',$x->lc);
     $y->text= source_line($x->file,$x->app,$line,$clmn);
     break;
+  # ------------------------------------------------------------------------------------------------ edit_source
+  # spustí editor (PSPad) na zdrojový soubor x.file na řádku x.lc
+  case 'edit_source': // (id)
+    list($line,$clmn)= explode(',',$x->lc);
+    $y->text= edit_source($x->file,$x->app,$line);
+    break;
   # ------------------------------------------------------------------------------------------------ source_text
   # vrátí obsah souboru x.file
   case 'source_text': // (id)

@@ -488,6 +488,15 @@ Ezer.Application.implement({
     if ( y && y.text )
       Ezer.fce.error_(y.text);
   },
+// ------------------------------------------------------------------------------------- edit_source
+// zavolání PSPad na zdrojový text na řádku kliknutého elementu
+  edit_source: function(elem) {
+    var pos= elem.app_file();
+    if ( pos.file && elem.desc._lc ) {
+                                                    Ezer.trace('*','edit: PSPad '+pos.file+' '+elem.desc._lc);
+      this.ask({cmd:'edit_source',file:pos.file,app:pos.app,lc:elem.desc._lc});
+    }
+  },
 // ------------------------------------------------------------------------------------- source_text
 // zabezpečí zobrazení zdrojového textu bloku b
   source_text: function(b,lc) {

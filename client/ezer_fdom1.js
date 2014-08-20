@@ -285,6 +285,7 @@ Ezer.Application= new Class({
       this._barSwitch('f','funkce');
       this._barSwitch('m','metody');
       this._barSwitch('x','metody na serveru');
+      this._barSwitch('X','x podrobně');
       this._barSwitch('a','funkce na serveru');
       this._barSwitch('L','zavádění programu');
       this._barSwitch('q','kód interpreta');
@@ -1097,6 +1098,10 @@ Ezer.Help= new Class({
               if ( dom ) {
                 dom.addClass('dbg_context');
               }
+            }
+            else {
+                                                    Ezer.trace('*','click: '+this.self());
+//               Ezer.App.edit_source(this);
             }
             return false;
           }.bind(this)

@@ -3121,23 +3121,25 @@ Ezer.obj.DOM= {};
 Ezer.fce.DOM.warning_timer1= null;
 Ezer.fce.DOM.warning_timer2= null;
 Ezer.fce.DOM.warning= function (str) {
-  if ( !Ezer.App.mooWarn )
-    alert(str);
+  if ( !str ) {
+    if ( Ezer.App.mooWarn )
+      Ezer.App.mooWarn.slideOut();
+  }
   else {
-    $clear(Ezer.fce.DOM.warning_timer1);
-    $clear(Ezer.fce.DOM.warning_timer2);
-    var msg= str;
-//     msg+= '<br>'+Ezer.App.mooWarn.element.get('html');
-//     Ezer.fce.echo(msg);
-    Ezer.App.mooWarn.element.setStyles({'display':'block'});
-    Ezer.App.mooWarn.element.set('html',msg);
-//     if ( !Ezer.fce.DOM.warning_status) {
+    if ( !Ezer.App.mooWarn )
+      alert(str);
+    else {
+      $clear(Ezer.fce.DOM.warning_timer1);
+      $clear(Ezer.fce.DOM.warning_timer2);
+      var msg= str;
+      Ezer.App.mooWarn.element.setStyles({'display':'block'});
+      Ezer.App.mooWarn.element.set('html',msg);
       Ezer.App.mooWarn.slideIn();
       Ezer.fce.DOM.warning_status= 2;
       // minimálně ponechej hlášku po dobu 10s maximálně 60s, hlášku zhasíná fce Eval
       Ezer.fce.DOM.warning_timer1= (function(){Ezer.fce.DOM.warning_status= 1;}).delay(10000);
       Ezer.fce.DOM.warning_timer2= (function(){Ezer.fce.DOM.warning_()}).delay(60000);
-//     }
+    }
   }
 };
 // konec hlášky

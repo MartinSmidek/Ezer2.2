@@ -1557,6 +1557,57 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       $code[]= $call;
       $code_top-= $npar;
     }
+    // -------------------------------------- if e {s1} [{s2}]
+    elseif ( $c->op=='if' ) {
+      // {expr:'call',op:'if',par:[e,s1[,s2]]}
+      if ( count($c->par)>1 ) {
+        $expr= gen($pars,$vars,$c->par[0],0,$struct1);
+        $then= gen($pars,$vars,$c->par[1],0,$struct1);
+      }
+      if ( count($c->par)==2 ) {
+        $iff= (object)array('o'=>0,'iff'=>count($then)+1);
+        $code[]= array($expr,$iff,$then);
+      }
+      elseif ( count($c->par)==3 ) {
+        $iff= (object)array('o'=>0,'iff'=>count($then)+2);
+        $else= gen($pars,$vars,$c->par[2],0,$struct1);
+        $go= (object)array('o'=>0,'go'=>count($else)+1);
+        $code[]= array($expr,$iff,$then,$go,$else);
+      }
+      else comp_error("CODE: if musí mít 2-3 parametry");
+    }
+    // -------------------------------------- switch e l1 {s1}
+    elseif ( $c->op=='switch' ) {
+      // {expr:'call',op:'switch',par:[e,l1,s1,...]}
+      if ( count($c->par)>2 ) {
+        $cds= array();
+        $len= 0;
+        $n= count($c->par);
+        $expr= gen($pars,$vars,$c->par[0],0,$struct1);
+        for ($i= 1; $i<$n-1; $i+=2) {
+          $label= gen($pars,$vars,$c->par[$i],0,$struct1);
+          $stmnt= gen($pars,$vars,$c->par[$i+1],0,$struct1);
+          $test= (object)array('o'=>'S','iff'=>count($stmnt)+2);
+          $len+= count($label)+count($stmnt)+2;
+          $go= (object)array('o'=>0,'go'=>$len);
+          $cds[]= array($label,$test,$stmnt,$go);
+        }
+        if ($i<$n) {
+          $stmnt= gen($pars,$vars,$c->par[$n-1],0,$struct1);
+          $len+= count($stmnt);
+        }
+        // poskládání kódu s opravou délek pro go
+        $code[]= $expr;
+        foreach ($cds as $cd) {
+          $cd[3]->go= $len+1-$cd[3]->go;
+          $code[]= $cd;
+        }
+        if ($i<$n) {
+          $code[]= $stmnt;
+        }
+      }
+      else comp_error("CODE: switch musí mít aspoň 3 parametry");
+    }
     // -------------------------------------- while p {s}
     elseif ( $c->op=='while' ) {
       // {expr:'call',op:'while',par:[p,s]}

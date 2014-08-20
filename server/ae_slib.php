@@ -405,7 +405,8 @@ __EOD;
 # ------------------------------------------------------------------------------- HTML menu
 # template pro zobrazení Ezer.MenuMain jako hlavního objektu aplikace
 $dolni= /*$xtrace ? '' :*/ " style='height:0'";
-$dbg_script= trim($_SESSION[$ezer_root]['dbg_script']) ?: "echo(debug(sys('ezer'))) // příkazy + ctrl-Enter";
+$dbg_script= trim($_SESSION[$ezer_root]['dbg_script'])
+  ?: "set_trace('m',1,'init,set,key'); // selektivní trasování + [shift-]ctrl-Enter";
 $debugger= isset($js_options->dbg) ? <<<__EOD
     <form action="" method="post" enctype="multipart/form-data" id="form">
       <textarea id="dbg" name='query' class='sqlarea jush-sql' spellcheck='false' wrap='off'
@@ -1600,6 +1601,51 @@ function source_text ($file,$app='') {
   $fpath= "$fdir/$file.ezer";
   $text= @file_get_contents($fpath);
   return $text;
+}
+# -------------------------------------------------------------------------------------------------- edit_source
+# nastaví zdrojový text v PSPad
+function edit_source ($file,$app,$line) { trace();
+  global $ezer_path_appl, $ezer_path_root;
+  $ok= "?";
+  $fdir= "$ezer_path_root/$app";
+  $fpath= "$fdir/$file.ezer";
+  $pspad= "c:\\Program Files (x86)\\PSPad editor\\pspad.exe";
+  if ( file_exists($pspad) && file_exists($fpath) )  {
+//     $cmd= "\"$pspad\" /$line $fpath";
+    $cmd= "notepad.exe";
+//     $cmd= "c:\\copy\\install\\PSTools\\psexec.exe \\\\EZER -u Martin -p g -d notepad.exe";
+//     $cmd= "c:\\copy\\install\\PSTools\\psexec.exe \\\\EZER -s -x notepad.exe";
+//     $cmd= "c:\\copy\\install\\PSTools\\psexec.exe \\\\EZER -d -s -x notepad.exe";
+
+//     $status= shell_exec($cmd);
+
+//     $status= shell_exec("runas /user:EZER\\Martin $cmd");
+
+//     $status= popen("runas /user:EZER\\Martin $cmd","a");
+//     $x= fwrite($status,"g\n");
+
+//        exec("start c:\\winnt\\notepad.exe");
+
+//     pclose(popen("start /I $cmd", "r"));
+
+    pclose(popen("start /B $cmd", "r"));
+
+//     pclose(popen("$cmd", "r"));
+
+//     pclose(popen("start $cmd", "r"));
+
+//     exec('"C:\Program Files (x86)\Notepad++\notepad++.exe" "C:\foo.php"');
+
+//     $WshShell = new COM("WScript.Shell");
+//     $oExec= $WshShell->Run($cmd, 0, false);
+
+//     pclose($status= popen($cmd,'r'));
+
+//     $status= popen($cmd,'r');
+
+    $ok= "$status,$x=$cmd";
+  }
+  return $ok;
 }
 # -------------------------------------------------------------------------------------------------- source_line
 # vrátí úsek zdrojového textu $line (+-1) a označí sloupec

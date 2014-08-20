@@ -399,7 +399,7 @@ input.changed:focus, textarea.changed:focus {
 
 div.Element {
   position:absolute; }
-div.Element .Label {
+div.Element .Label, div.Select .Label {
   white-space: pre; }
 
 div.LabelDrop {
