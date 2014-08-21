@@ -5997,16 +5997,13 @@ Ezer.Eval= new Class({
     var t= typ[0];
     if ( typeof(Ezer.is_trace[t])=='object' ) {  // v mootools je [x] objekt
       var ids= str.split('.');
-//       id= ids[ids.length-1];
-//       if ( !Ezer.is_trace[t].contains(id) )
-//         return;
       if ( !Object.some(Ezer.is_trace[t],function(x){
         var ok= false, id= ids[ids.length-1];
         var xs= x.split('.');
         if ( xs.length==1 )
           ok= x==id;
         else if ( xs.length==2 )
-          ok= xs[1]==id && xs[0]==ids[ids.length-2]
+          ok= (xs[1]==id||xs[1]=='*') && xs[0]==ids[ids.length-2]
         return ok;
       }) )
         return;
@@ -7087,6 +7084,79 @@ Ezer.str.new_form= function() {
   that.stack[++that.top]= form;
   that.eval();
 }
+// -------------------------------------------------------------------------------------- switch
+//fs: str.switch (test,case1,stmnt1,...)
+//   řídící struktura switch-case-...[default]
+//   pokud má sudý počet parametrů, použije se poslední jako defaultní
+//   pokud má lichý počet parametrů a žádná testovací hodnota nevyhovuje, ohlásí se chyba
+//   UPOZORNĚNÍ: v test se nepředpokládá žádná asynchronní operace (modální dialog, dotaz na server)
+//   v case-příkazech jsou asynchronní operace povoleny (další příkaz je interpretován
+//   až po jejich skončení)
+//x: switch(x,
+//     'math',{echo(x);echo(2)},
+//     'text',echo(x),
+//      echo('nic')
+//    );
+//s: funkce
+Ezer.str['switch']= function () {
+  Ezer.assert(arguments.length>2,"EVAL: struktura 'switch' má málo argumentů");
+  var that= arguments[0];       // volající objekt Ezer.Eval
+  var args= arguments[1];       // hodnoty parametrů a proměnných volajícího objektu Ezer.Eval
+  var test= new Ezer.Eval(arguments[2],that.context,args,'switch-test',that.continuation,
+    that.no_trow,that.proc,that.nvars);
+  var len= arguments.length;
+  var istmnt= 0;
+  for (var i= 3; i<len-1; i+=2) {
+    var casa= new Ezer.Eval(arguments[i],that.context,args,'switch-case');
+    if ( casa.value==test.value ) {
+      istmnt= i;
+      break;
+    }
+  }
+  if ( !istmnt && len%2==0)
+    istmnt= len-2;
+  if ( istmnt ) {
+    new Ezer.Eval(arguments[istmnt+1],that.context,args,'switch-stmnt',
+      {fce:Ezer.str.switch_,args:[that],stack:true},that.no_trow,that.proc);
+    that.eval();
+  }
+  else
+    Ezer.error("EVAL: struktura 'switch' bez default-části nemá variantu pro '"+test.value+"'");
+};
+Ezer.str.switch_= function (that,value) {
+  that.stack[++that.top]= value;
+  that.eval();
+};
+// -------------------------------------------------------------------------------------- if
+//fs: str.if (test,then_stmnt[,else_stmnt])
+//   řídící struktura if-then-else resp. if-then
+//   UPOZORNĚNÍ: v test se nepředpokládá žádná asynchronní operace (modální dialog, dotaz na server)
+//   v then-příkaze i else-příkaze jsou asynchronní operace povoleny (další příkaz je interpretován
+//   až po jejich skončení)
+//x: if(gt(x,0),{echo('kladné')},{echo('záporné')})
+//s: funkce
+Ezer.str['if']= function () {
+  var that= arguments[0];       // volající objekt Ezer.Eval
+  var args= arguments[1];       // hodnoty parametrů a proměnných volajícího objektu Ezer.Eval
+  var test= new Ezer.Eval(arguments[2],that.context,args,'if-test',that.continuation,
+    that.no_trow,that.proc,that.nvars);
+  if ( test.value ) {
+    new Ezer.Eval(arguments[3],that.context,args,'if-then',
+      {fce:Ezer.str.if_,args:[that],stack:true},that.no_trow,that.proc);
+  }
+  else if ( arguments.length==5 ) {
+    new Ezer.Eval(arguments[4],that.context,args,'if-else',
+      {fce:Ezer.str.if_,args:[that],stack:true},that.no_trow,that.proc);
+  }
+  else {
+    that.stack[++that.top]= 0;
+    that.eval();
+  }
+};
+Ezer.str.if_= function (that,value) {
+  that.stack[++that.top]= value;
+  that.eval();
+};
 // ================================================================================================= fce
 // funkce dostávají jako argumenty hodnoty
 // Ezer.obj= {};                                   // případné hodnoty k funkcím se stavem (trail ap.)

@@ -1071,6 +1071,7 @@ function gen_proc($c,&$desc,$name) {
 //                                          debug($desc->code,"C");
   walk_y($desc->code);
   clean_code($desc->code);
+//   optimize_fs($desc->code);
 //                       debug($desc->code,'po walk_y');
 //                       debug($struct);
 //   walk_subs($struct,$desc->code);
@@ -1082,6 +1083,18 @@ function gen_proc($c,&$desc,$name) {
 //                       display($lst);
 //                     }
 };
+# -------------------------------------------------------------------------------------------------- optimize_fs
+# optimalizuje překlad pro: switch
+// function optimize_fs($code) {
+//   if ( is_array($code) ) {
+//     foreach ($code as $i => $c) {
+//       optimize_fs($c);
+//     }
+//   }
+//   elseif ( $code->o=='y' ) {
+//     optimize_fs($code->c);
+//   }
+// }
 # -------------------------------------------------------------------------------------------------- walk_y
 # definuje v kódu vygenerovaném z $down pole ift, iff jako pokračování pro úspěch či neúspěch
 # pro části kódu interpretované strukturami tj. o.y=code
@@ -1558,7 +1571,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       $code_top-= $npar;
     }
     // -------------------------------------- if e {s1} [{s2}]
-    elseif ( $c->op=='if' ) {
+    elseif ( $c->op=='ifx' ) {
       // {expr:'call',op:'if',par:[e,s1[,s2]]}
       if ( count($c->par)>1 ) {
         $expr= gen($pars,$vars,$c->par[0],0,$struct1);
@@ -1577,13 +1590,14 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       else comp_error("CODE: if musí mít 2-3 parametry");
     }
     // -------------------------------------- switch e l1 {s1}
-    elseif ( $c->op=='switch' ) {
+    elseif ( $c->op=='switchx' ) {
       // {expr:'call',op:'switch',par:[e,l1,s1,...]}
       if ( count($c->par)>2 ) {
         $cds= array();
         $len= 0;
         $n= count($c->par);
         $expr= gen($pars,$vars,$c->par[0],0,$struct1);
+        $struct->arr[]= $struct1;
         for ($i= 1; $i<$n-1; $i+=2) {
           $label= gen($pars,$vars,$c->par[$i],0,$struct1);
           $stmnt= gen($pars,$vars,$c->par[$i+1],0,$struct1);

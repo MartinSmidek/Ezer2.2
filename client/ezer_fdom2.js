@@ -1160,7 +1160,7 @@ Ezer.Elem.implement({
       var value= this.value, spec= this._f(':');
       if ( value==0 && spec=='e' ) value= '';
       this.DOM_Input.value= value;
-      this.DOM_empty(!value);
+      this.DOM_empty(value==='');
     }
   },
 // ------------------------------------------------------------------------------------ DOM_get
