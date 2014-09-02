@@ -1026,9 +1026,10 @@
         if ( isset($mopt->db) && isset($ezer_db[$mopt->db][5]) )
           $mopt->db= $ezer_db[$mopt->db][5];
         $mapi++;
-        $tab= ($topt->db ? "{$topt->db}." : '').$map->table;
+        $tab= ($mopt->db ? "{$mopt->db}." : '').$map->table;
         $where= $mopt->where;
-        if ( $map->table=='_cis' ) $where= str_replace('druh=',"\$m$mapi.druh=",$where);
+        if ( $map->table=='_cis' )
+          $where= str_replace('druh=',"\$m$mapi.druh=",$where);
         $join= "\nLEFT JOIN $tab AS \$m$mapi ";
         $join.= "ON \$m$mapi.{$mopt->key_id}=$fld AND $where ";
         $joins.= $join;
