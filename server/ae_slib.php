@@ -1697,6 +1697,7 @@ function export_head($par,$clmns,$fmt='') { #trace();
     fputcsv($export_par->_f,explode(',',uw($clmns)),";",'"');
     break;
   case 'xls':
+  case 'xlsx':
     $export_par->_xls= "open {$export_par->file}|sheet export;;P;page\n";
     $c= 0;
     $n= 1;
@@ -1735,6 +1736,7 @@ function export_row($row,$fmt='') { #trace();
     }
     break;
   case 'xls':
+  case 'xlsx':
     $c= 0;
     $n= 1+$export_par->rows;
     $export_par->_xls.= "\n";
@@ -1758,11 +1760,12 @@ function export_tail($show_xls=0) { #trace();
     unset($export_par->_f);
     break;
   case 'xls':
+  case 'xlsx':
     $export_par->_xls.= "\n|close";
     if ( $show_xls )
       $ret= $export_par->_xls;
     else {
-      $inf= Excel5($export_par->_xls,1,$wb,$export_par->dir);
+      $inf= Excel5($export_par->_xls,1,$wb,$export_par->dir,$export_par->type);
       $export_par->ok= $inf ? 0 : 1;
 //                                                         debug($export_par,$inf);
       if ( $inf ) fce_warning($inf);
@@ -1828,7 +1831,7 @@ function Excel5_date($tm) {  #trace();
 #       formát=(s|n|d)(r|b|i|t|d)   (string|number|date)(right|bold|italics|title|decimal)
 # CLOSE
 #       close name                              -- zapíše table do souboru
-function Excel5($desc,$gen=1,&$wb=null,$dir='') {  #trace();
+function Excel5($desc,$gen=1,&$wb=null,$dir='',$excel='xls') {  #trace();
   global $ezer_path_serv, $ezer_path_root;
   // pro testování a vývoj
   $list= false;
@@ -1855,7 +1858,6 @@ __XLS;
   // pro ostrý běh natáhneme knihovny
   if ( $gen ) {
     require_once "$ezer_path_serv/licensed/xls2/Classes/PHPExcel.php";
-    require_once "$ezer_path_serv/licensed/xls2/Classes/PHPExcel/RichText.php";
   }
   $html= "";
   $ws= null;
@@ -2029,10 +2031,8 @@ __XLS;
         $active= $m['n'];
         if ( $gen ) {
           $wb->wb->setActiveSheetIndex($active);
-          require_once "$ezer_path_serv/licensed/xls2/Classes/PHPExcel/IOFactory.php";
-          $objWriter= PHPExcel_IOFactory::createWriter($wb->wb, 'Excel5');
-//           $objWriter= PHPExcel_IOFactory::createWriter($wb->wb, 'Excel2007');
-          $fpath= "$ezer_path_root/docs/".($dir?"$dir/":'')."{$wb->name}.xls";
+          $objWriter= PHPExcel_IOFactory::createWriter($wb->wb, $excel=='xls' ? 'Excel5' : 'Excel2007');
+          $fpath= "$ezer_path_root/docs/".($dir?"$dir/":'')."{$wb->name}.{$excel}";
           $objWriter->save($fpath);
           if ( $list ) $html.= "CLOSE $fpath";
         }
