@@ -767,6 +767,7 @@ Ezer.Block= new Class({
               case 'browse':
               case 'browse.smart':  part= new Ezer.Browse(this,desc,DOM,id,skill); break;
               case 'button':        part= new Ezer.Button(this,desc,DOM,id,skill); break;
+              case 'button.html':   part= new Ezer.ButtonHtml(this,desc,DOM,id,skill); break;
               case 'button.submit': part= new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'button.reset':  part= new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'button.upload': part= new Ezer.Button(this,desc,DOM,id,skill); break;
@@ -1079,6 +1080,24 @@ Ezer.Block= new Class({
 //   num|str - hodnota volané funkce
 // onchanged se dědí z položky do jejího formuláře
   fire: function(event_name,args,el) {
+    // trasování události ovlivněné fcí set_trace
+    function trace_event (event_type,id,event_name,fce) {
+      // nejprve vyřešíme selektivní trasování
+      if ( typeof(Ezer.is_trace['e'])=='object' ) {  // v mootools je [x] objekt
+        if ( !Object.some(Ezer.is_trace['e'],function(x){
+          var ok= false;
+          var xs= x.split('.');
+          if ( xs.length==1 )
+            ok= x==event_name;
+          else if ( xs.length==2 )
+            ok= (xs[0]==id||xs[0]=='*') && (xs[1]==event_name||xs[1]=='*')
+          return ok;
+        }) )
+          return;
+      }
+      Ezer.trace('e','EVENT:'+event_type+'.'+id+'.'+event_name+' in '+Ezer.App.block_info(fce),fce);
+    };
+
     args= args||[];
     var fce= null, res= true, v;
     if ( this.part ) {
@@ -1087,8 +1106,8 @@ Ezer.Block= new Class({
           Ezer.fce.source(fce);
         }
         else {
-          Ezer.trace('e','EVENT:'+this.type+'.'+this.id+'.'+event_name+' in '+Ezer.App.block_info(fce),fce);
-//           new Ezer.Eval(fce.code,fce.context||this,args||[],event_name,false,false,fce);
+          trace_event(this.type,this.id,event_name,fce);
+          //Ezer.trace('e','EVENT:'+this.type+'.'+this.id+'.'+event_name+' in '+Ezer.App.block_info(fce),fce);
           v= new Ezer.Eval([{o:'c',i:fce.desc._init||event_name,a:args.length}],
             fce.context||this,args,event_name,false,false,fce);
           res= v.simple ? v.value : false;
@@ -1101,7 +1120,8 @@ Ezer.Block= new Class({
         // některá přerušení se z elementu přenášejí do formuláře: elem.onchange => form.onchanged
         form._changed= true;
         if ( form.part && (fce= form.part['onchanged']) ) {
-          Ezer.trace('e','EVENT:form.'+form.id+'.onchanged in '+Ezer.App.block_info(fce),fce);
+          trace_event('form',form.id,'onchanged',fce);
+          //Ezer.trace('e','EVENT:form.'+form.id+'.onchanged in '+Ezer.App.block_info(fce),fce);
           v= new Ezer.Eval([{o:'c',i:fce.desc._init||'onchanged',a:args.length}],
             fce.context||form,args,'onchanged',false,false,fce);
           res= res && (v.simple ? v.value : false);
@@ -3158,7 +3178,7 @@ Ezer.LabelMap= new Class({
 // ================================================================================================= Button
 //c: Button ()
 //      tlačítko
-//t: Block
+//t: Button,Block
 //s: Block
 //i: Button.onclick - kliknutí na tlačítko
 Ezer.Button= new Class({
@@ -3166,6 +3186,10 @@ Ezer.Button= new Class({
 //os: Button.help - nápovědný text
   title: null,                                  // nápověda položky
 //os: Button.title - název
+//-
+//os: Button.format - vzhled hodnotového prvku
+//  ; 'd' : disabled
+//  ; 'n' : display=none
   options: {},
 //oo: Button.par - {path:podsložka na serveru,mask:'název masky|seznam masek'} pro type:'upload'
 //      path udává cílovou podsložku na serveru, v souboru logs/uploads.log je doplněn záznam
@@ -3202,6 +3226,16 @@ Ezer.Button= new Class({
     return this.value
   }
 });
+// ================================================================================================= ButtonHtml
+//c: ButtonHtml ()
+//      tlačíto s povolenými html atributy v title,
+//      lze také použít škálovatelné ikony podle http://fortawesome.github.io/Font-Awesome/icons/
+//t: Button,Block
+//s: Block
+Ezer.ButtonHtml= new Class({
+  Extends: Ezer.Button
+//os: ButtonHtml.title - název s html tagy a ikonami
+})
 // ================================================================================================= ButtonUpload
 //c: ButtonUpload ()
 //      po stisku se zobrazí popup panel pro upload souborů na server
@@ -3210,7 +3244,7 @@ Ezer.Button= new Class({
 //        - mask -- maska použitá pro výběr souborů klientem
 //        - move -- nepovinné jméno funkce na serveru pro uložení souboru místo move_uploaded_file
 //                  dostane parametry: tmp_name,name,par
-//t: Button
+//t: Button,Block
 //s: Block
 //i: ButtonUpload.onclick - není vyvolán
 //i: ButtonUpload.onload - byl uzavřen dialog pro výběr souborů
@@ -3469,7 +3503,7 @@ Ezer.Elem= new Class({
 //t: Block,Elem
 //s: Block
 //-
-//os: Field.title - jmenovka pole (bude umístěná před resp. pokud začíná znakem ^ nad polem)
+//os: Field.title - jmenovka pole (pokud začíná ^ resp. - bude umístěná nad resp. za, jinak před)
 Ezer.Field= new Class({
   Extends: Ezer.Elem,
   options: {}
@@ -4204,7 +4238,7 @@ Ezer.Browse= new Class({
   Extends: Ezer.Block,
 //on: Browse.rows   - počet datových řádků načtených do paměti
 //-
-//os: Browse.format  - úprava zobrazení browse ('n': nezobrazovat)
+//os: Browse.format  - úprava zobrazení browse ('n': nezobrazovat, 'd': potlačení akcí myší)
 //-
 //on: Browse.qry_rows   - počet dotazových řádků
 //-
@@ -4252,6 +4286,7 @@ Ezer.Browse= new Class({
   tlen: 0,                              // naplněná délka tabulky                       0..tmax
   tmax: 0,                              // maximální délka tabulky = atribut rows
   scrolling: false,                     // probíhá čtení fcí _browse_scroll
+  enabled: true,                        // akce myší jsou povoleny
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  initialize+
   initialize: function(owner,desc,DOM,id,skill) {
     // Ezer.Block
@@ -4471,6 +4506,30 @@ Ezer.Browse= new Class({
     if ( row_blur==1 )
       this.DOM_clear_focus();
     return 1;
+  },
+// ------------------------------------------------------------------------------------ enable
+//fm: Browse.enable ([on])
+//      pokud je on=0 potlačí citlivost na klik, dvojklik a kolečko myši na datový řádek
+//      a skryje řádek, pokud je on=1 obnoví normální citlivost a ukazatel řádku
+//      bezparametrická metoda vrátí stav enable
+  enable: function(enabled) {
+    var ok= 1;
+    enabled= enabled=="0" ? 0 : enabled;
+    if ( enabled===undefined ) {
+      ok= this.enabled;
+    }
+    else {
+      this.enabled= enabled;
+      if ( enabled ) {
+        this.DOM_show_focus();
+        this.slider.attach();
+      }
+      else {
+        this.DOM_clear_focus();
+        this.slider.detach();
+      }
+    }
+    return ok;
   },
 // ------------------------------------------------------------------------------------ browse_count+
 //fm: Browse.browse_count ()
@@ -7161,18 +7220,7 @@ Ezer.str.if_= function (that,value) {
 // funkce dostávají jako argumenty hodnoty
 // Ezer.obj= {};                                   // případné hodnoty k funkcím se stavem (trail ap.)
 // Ezer.fce= {};                                // přesunuto do hlavního programu
-// ------------------------------------------------------------------------------------ object
-//ff: fce.object (name1,value1,name2,value2,...)
-//      zkonstruuje objekt {name1:value1,name2:value2,...
-//s: funkce
-Ezer.fce.object= function () {
-  var o= {}, n, v;
-  for (var i= 0; i<arguments.length; i+=2) {
-    n= arguments[i]; v= arguments[i+1];
-    o[n]= v;
-  }
-  return o;
-}
+// ================================================================================================= fce array
 // ------------------------------------------------------------------------------------ array
 //ff: fce.array (value1,value2,...)
 //      zkonstruuje pole [value1,value2,...]
@@ -7193,6 +7241,18 @@ Ezer.fce.array_length= function (a) {
   return a.length;
 }
 // ================================================================================================= fce objektové
+// ------------------------------------------------------------------------------------ object
+//ff: fce.object (name1,value1,name2,value2,...)
+//      zkonstruuje objekt {name1:value1,name2:value2,...
+//s: funkce
+Ezer.fce.object= function () {
+  var o= {}, n, v;
+  for (var i= 0; i<arguments.length; i+=2) {
+    n= arguments[i]; v= arguments[i+1];
+    o[n]= v;
+  }
+  return o;
+}
 // ------------------------------------------------------------------------------------ copy_by_name
 //ff: fce.copy_by_name (form|browse|object|string,form|browse|object[,delimiters='|:'])
 //      zkopíruje zleva doprava stejně pojmenované hodnoty.
@@ -7454,11 +7514,33 @@ Ezer.fce.strip_tags= function (input,allowed) {
 }
 // -------------------------------------------------------------------------------------- contains
 //ff: fce.contains (x,list[,sep=','])
-//      zjistí zda x je obsaženo v seznamu hodnot, oddělovačem hodnot je čárka nebo 3. parametr
+//    pokud je list string, tak
+//      zjistí zda x je obsaženo v seznamu hodnot, oddělovačem hodnot je čárka nebo 3. parametr;
+//    pokud je list pole, zjistí zda obsahuje x
 //r: 1 - ano
 //s: funkce
 Ezer.fce.contains= function (x,list,sep) {
-  return list.contains(x,sep) ? 1 : 0;
+  var ok= 0, list_type= typeOf(list);
+  if ( list_type=='array' )
+    ok= list.contains(x) ? 1 : 0;
+  else if ( list_type=='string' )
+    ok= list.contains(x,sep) ? 1 : 0;
+  return ok;
+}
+// -------------------------------------------------------------------------------------- erase
+//ff: fce.erase (x,list[,sep=','])
+//    odstraní z list všechny výskyty x a vrátí výsledek,
+//    list je pole nebo string (oddělovačem hodnot je čárka nebo 3. parametr)
+//r: string nebo pole, podle typu list
+//s: funkce
+//h: array,string
+Ezer.fce.erase= function (x,list,sep) {
+  var ok= 0, list_type= typeOf(list);
+  sep= sep||',';
+  if ( list_type=='string' ) list= list.split(sep);
+  list= list.erase(x);
+  if ( list_type=='string' ) list= list.join(sep);
+  return list;
 }
 // -------------------------------------------------------------------------------------- substr
 //ff: fce.substr (x,begin,length)
@@ -8230,18 +8312,6 @@ Ezer.fce.echo= function () {
   Ezer.trace('U',str);
   return str;
 };
-// -------------------------------------------------------------------------------------- warning
-//ff: fce.warning (a1,...)
-//   vypíše argumenty do dočasné plochy, která vyjede ze spodní lišty
-//   a která po pokračování v práci zase zmizí. Zobrazuje jen poslední varování.
-//   Bezparametrická varianta zruší zobrazené varování.
-//s: funkce
-Ezer.fce.warning= function () {
-  var str= '';
-  for (var i=0; i<arguments.length; i++) str+= arguments[i];
-  Ezer.fce.DOM.warning(arguments.length ? str : null);
-  return str;
-};
 // -------------------------------------------------------------------------------------- help
 //ff: fce.popup_help (html,title[,ykey[,xkey[,seen]]])
 //   zobrazí v systémovém popup menu předané html, pokud jsou předány i klíče, je možná editace
@@ -8277,7 +8347,7 @@ Ezer.fce.set_trace= function (id,on,names) {
   else {
     names.split(',').each(function(name) {
       if ( on ) { // přidání k seznamu
-        if ( typeof(Ezer.is_trace[id])=='boolean' ) {
+        if ( typeof(Ezer.is_trace[id])=='boolean' || typeof(Ezer.is_trace[id])=='number' ) {
           Ezer.App._setTraceOnOff(id,[name]);           // zobraz příznak selektivního trasování
         }
         else if ( typeof(Ezer.is_trace[id])=='object' ) {
@@ -8309,7 +8379,7 @@ Ezer.debug= function (o,label) {
 }
 Ezer.fce.debug= function (o,label,depth) {
   return "<div class='dbg'>"+debug(o,label,depth)+"</div>";
-};
+}
 // -------------------------------------------------------------------------------------- assert
 //ff: fce.assert (test,msg[,block])
 //   pokud test selže, vypíše argumenty do trasovací části aplikace a ukončí výpočet procedury
@@ -8326,6 +8396,18 @@ Ezer.fce.assert= function(test,msg,block) {
   }
   return 1;
 }
+// -------------------------------------------------------------------------------------- warning
+//ff: fce.warning (a1,...)
+//   vypíše argumenty do dočasné plochy, která vyjede ze spodní lišty
+//   a která po pokračování v práci zase zmizí. Zobrazuje jen poslední varování.
+//   Bezparametrická varianta zruší zobrazené varování.
+//s: funkce
+Ezer.fce.warning= function () {
+  var str= '';
+  for (var i=0; i<arguments.length; i++) str+= arguments[i];
+  Ezer.fce.DOM.warning(arguments.length ? str : null);
+  return str || 1;
+};
 // -------------------------------------------------------------------------------------- error
 //ff: fce.error (msg,level[,block[,lc]])
 //   vypíše argumenty do trasovací části aplikace a ukončí výpočet procedury

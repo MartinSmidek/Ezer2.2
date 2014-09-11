@@ -38,6 +38,9 @@ client/licensed/datepicker/datepicker_vista/days.png -text
 client/licensed/datepicker/datepicker_vista/frame.png -text
 client/licensed/datepicker/datepicker_vista/months.png -text
 client/licensed/datepicker/datepicker_vista/years.png -text
+client/licensed/font-awesome/css/font-awesome.min.css -text
+client/licensed/font-awesome/fonts/fontawesome-webfont.ttf -text
+client/licensed/font-awesome/fonts/fontawesome-webfont.woff -text
 client/licensed/glfx.js -text
 client/licensed/jush/mini_jush.css -text
 client/licensed/jush/mini_jush.js -text

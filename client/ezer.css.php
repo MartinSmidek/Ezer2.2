@@ -438,6 +438,12 @@ div.LabelDrop progress {
   border:1px solid #aaa; overflow-y:scroll; _overflow:scroll; width:100%; height:100%; }
 .EditHtml {  border:1px dotted green;
   position:absolute; }
+button {
+  position:absolute; font-size:9pt; }
+button::-moz-focus-inner {
+  border:0; padding:0; }
+.fa {
+  font-family:FontAwesome,sans-serif !important; }
 .Button {
   position:absolute; font-size:9pt; z-index:1; text-align:center; $button }
 .ButtonSubmit {
@@ -479,7 +485,7 @@ label.Check {
   margin-top:1px; background-color:#fff; }
 .Select input {
   width:100%; height:16px !important; border:1px solid #aaa; padding:1px 0px; margin:0;
-  display:block; background-color:#fff; overflow:hidden; cursor:default; }
+  display:block; /*background-color:#fff;*/ overflow:hidden; cursor:default; }
 /*.SelectDrop {
   position:absolute; z-index:1; -moz-box-shadow:5px 5px 10px #567;
   color:#000; border:1px solid #ccc; background-color:#fff; margin:0; padding:0; }*/

@@ -36,6 +36,7 @@ Ezer.Block.implement({
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_optStyle
 // doplní případný styl, css-třídu a title
+// předpony title: ^ umístit nad, - umístit napravo, jinak nalevo
   DOM_optStyle: function(dom,title_as_label,ignore_right) {
     // atribut style definuje styly pro parametr
     if ( this.options.style ) {
@@ -52,12 +53,16 @@ Ezer.Block.implement({
     }
     if ( title_as_label ) {
       // případný atribut title jako label
-      var label= title_as_label[0]=='^' ? title_as_label.substr(1) : title_as_label;
+      var label= title_as_label[0]=='^' ? title_as_label.substr(1) : (
+                 title_as_label[0]=='-' ? title_as_label.substr(1) : title_as_label );
       var up= title_as_label[0]=='^';
-      var left= ignore_right || !this._fc('r');
+      var up_left= ignore_right || !this._fc('r');
+      var right= title_as_label[0]=='-';
       this.DOM_Label= new Element('div.Label',{html:label,
-        styles:up ? (left ? {top:-14,left:2} : {top:-14,right:2}) : {top:3,right:this._w+2}});
-      this.DOM_Block.grab(this.DOM_Label,'top');
+        styles:up ? (up_left ? {top:-14,left:2} : {top:-14,right:0}) : (
+               right ? {top:3,left:this._w+3} : {top:3,right:this._w+2})
+      });
+      this.DOM_Block.grab(this.DOM_Label,right ? 'bottom' : 'top');
     }
     else if (this.DOM_Input ) {
       // nepovinná hodnota title
@@ -359,15 +364,23 @@ Ezer.MenuGroup.implement({
 Ezer.MenuContext.implement({
   DOM_add1: function() {
     this.DOM= new Element('ul',{'class':'ContextMenu'}).inject($('body'));
+  },
+  DOM_add2: function() {
     var options= {target:this.owner.DOM_Block,menu:this.DOM,ezer_owner:null};
     if ( this._f('m')>=0 ) {
       // zvýraznit oblast kontextového menu pomocí masky - musí existovat element s id='mask'
       options.focus_mask= true;
       options.focus_css= '';
     }
+    var name= this.options.join;
+    if ( name ) {
+      var ctx= Ezer.code_name(name,null,this);
+      Ezer.assert(ctx && ctx[0],name+' je neznámé jméno pro označení contextmenu');
+      if ( ctx[0].DOM_Block ) {
+        options.focus= ctx[0].DOM_Block;
+      }
+    }
     this.ContextMenu= new ContextMenu(options);
-  },
-  DOM_add2: function() {
     this.ContextMenu.ezer_owner= this;
   }
 });
@@ -388,7 +401,7 @@ Ezer.Tabs.implement({
 // ------------------------------------------------------------------------------------ _setActivePanel
 // pro Menu typu main: zviditelni submenu
   _setActivePanel: function(panel_id) {
-    if ( this.activePanel ) {
+    if ( this.activePanel && this.activePanel._tabDom ) {
       this.activePanel._tabDom.removeClass('Active').addClass('Pasive');
     }
     this.activePanel= this.part[panel_id];
@@ -886,8 +899,9 @@ Ezer.Label.implement({
     // zobrazení label
     var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
     var align= this._fc('c') ? 'center' : this._fc('r') ? 'right' : 'left';
+    var corr= /*Ezer.browser=='FF' ? {top:this._t-2,textAlign:align} :*/ {textAlign:align};
     this.DOM_Block= new Element('div',{'class':'Label',html:this.options.title||'',
-      styles:this.coord({textAlign:align}),events:{
+      styles:this.coord(corr),events:{
         click: function(el) {
           if ( !Ezer.design && (this.options.enabled || this.options.enabled===undefined) ) {
             Ezer.fce.touch('block',this,'click');           // informace do _touch na server
@@ -1113,20 +1127,28 @@ Ezer.Button.implement({
     var owners_block= this.owner.DOM_Block;
     if ( !owners_block )
       owners_block= this.owner.value.DOM_Block;
-    this.DOM_Block= this.DOM_Input= new Element('input',{
-      'class':this.type=='button.submit'?'ButtonSubmit':'Button',
-      styles:this.coord({height:undefined,width:undefined}),
-      type:this.type=='button.submit'?'submit':'submit',events:{
+    if ( this.type=='button.html' ) {
+      this.DOM_Block= this.DOM_Input= new Element('button',{html:this.options.title||''});
+      this.DOM_Input= null;
+    }
+    else {
+      this.DOM_Block= this.DOM_Input= new Element('input',{
+        'class':this.type=='button.submit'?'ButtonSubmit':'Button',
+        type:this.type=='button.submit'?'submit':'submit',
+        value:this.options.title||''                      // u Opery záleží na pořadí
+      })
+    }
+    this.DOM_Block
+      .setStyles(this.coord({height:undefined,width:undefined}))
+      .addEvents({
         mouseup: function(el) {
-//                                                       Ezer.trace('*','button:mouseup');
           if ( !Ezer.design ) {
             Ezer.fce.touch('block',this,'click');     // informace do _touch na server
             this.fire('onclick',[],el);
           }
         }.bind(this)
-      },
-      value:this.options.title||''                      // u Opery záleží na pořadí
-    }).inject(owners_block);
+      })
+      .inject(owners_block);
     this.DOM_optStyle(this.DOM_Block);
     if ( this._fc('d') )
       this.DOM_enabled(0);
@@ -1140,6 +1162,25 @@ Ezer.Button.implement({
 // přenese hodnotu z DOM do this.value
   DOM_get: function () {
     this.value= this.DOM_Input.hasClass('empty') ? '' : this.DOM_Input.value;
+  }
+});
+// ================================================================================================= ButtonHtml-DOM
+Ezer.ButtonHtml.implement({
+  Implements: [Ezer.Drag,Ezer.Help],
+// ------------------------------------------------------------------------------------ DOM_enabled
+// zobrazí this.value v DOM
+  DOM_enabled: function (on) {
+    this.DOM_Block.setProperty('disabled',on ? '' : 'disabled');
+  },
+// ------------------------------------------------------------------------------------ DOM_set
+// zobrazí this.value v DOM
+  DOM_set: function () {
+    this.DOM_Block.set('html',this.value);
+  },
+// ------------------------------------------------------------------------------------ DOM_get
+// přenese hodnotu z DOM do this.value
+  DOM_get: function () {
+    this.value= this.DOM_Block.get('html');
   }
 });
 // ================================================================================================= Elem-DOM
@@ -1552,7 +1593,7 @@ Ezer.FieldList.implement({
 Ezer.Edit.implement({
   DOM_add: function() {
     var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
-    var corr= Ezer.browser=='CH' ? {height:this._h-4,width:this._w-2} : {height:this._h-2};
+    var corr= Ezer.browser=='CH' ? {height:this._h-2,width:this._w-2} : {height:this._h-2};
     this.DOM_Input= new Element('textarea.Edit');
     if ( this.options.title ) {
       // přidej div na obal input a návěští
@@ -2395,8 +2436,10 @@ Ezer.Browse.implement({
         this.DOM_tbody.adopt(
           this.DOM_qry_row[i]= new Element('tr',{events:{
             dblclick: function(event) {
-              event.stop();
-              this.init_queries();
+              if ( this.enabled ) {
+                event.stop();
+                this.init_queries();
+              }
             }.bind(this)
           }}).adopt(
             new Element('td',{'class':'tag0'})
@@ -2430,13 +2473,15 @@ Ezer.Browse.implement({
     for (var i= 1; i<=this.tmax; i++) {
       this.DOM_row[i].addEvents({
         click: function(el) {
-          Ezer.fce.touch('block',this,'click');         // informace do _touch na server
-          var tr= el.target.tagName=='TD' ? el.target.parentNode : el.target;
-          var i= tr.retrieve('i');
-          if ( i && i <= this.tlen ) {
-            this.DOM_focus();
-            this.DOM_hi_row(this.t+i-1,0,0,el.control);
-//             this.fire('onrowclick',[this.keys[i-1]],el);
+          if ( this.enabled ) {
+            Ezer.fce.touch('block',this,'click');         // informace do _touch na server
+            var tr= el.target.tagName=='TD' ? el.target.parentNode : el.target;
+            var i= tr.retrieve('i');
+            if ( i && i <= this.tlen ) {
+              this.DOM_focus();
+              this.DOM_hi_row(this.t+i-1,0,0,el.control);
+//               this.fire('onrowclick',[this.keys[i-1]],el);
+            }
           }
         }.bind(this)
       })
@@ -2520,15 +2565,17 @@ Ezer.Browse.implement({
     // dvojklik vyvolá onsubmit
     this.DOM_table.addEvents({
       dblclick: function(el) {
-        Ezer.fce.touch('block',this,'dblclick');     // informace do _touch na server
-        var tr= el.target.tagName=='TD' ? el.target.parentNode : el.target;
-        var i= tr.retrieve('i');
-        if ( i && i <= this.tlen ) {
-          // dblclick na datovém řádku
-          this.tact= i;
-          this.DOM_focus();
-          this.DOM_hi_row(this.t+i-1,1);
-          this.fire('onsubmit',[this.keys[this.t+i-1-this.b],el.control?1:0]);
+        if ( this.enabled ) {
+          Ezer.fce.touch('block',this,'dblclick');     // informace do _touch na server
+          var tr= el.target.tagName=='TD' ? el.target.parentNode : el.target;
+          var i= tr.retrieve('i');
+          if ( i && i <= this.tlen ) {
+            // dblclick na datovém řádku
+            this.tact= i;
+            this.DOM_focus();
+            this.DOM_hi_row(this.t+i-1,1);
+            this.fire('onsubmit',[this.keys[this.t+i-1-this.b],el.control?1:0]);
+          }
         }
       }.bind(this)
     });
@@ -2557,19 +2604,22 @@ Ezer.Browse.implement({
       this.DOM_th_posun.adopt(
         new Element('td',{'class':'BrowsePosuv',rowspan:this._rows,events:{
           mouseover: function(ev) {
-            if ( this.slen ) {
+            if ( browse.enabled && this.slen ) {
               this.DOM_posuv_up.addClass('act');
               this.DOM_posuv_dn.addClass('act');
             }
           }.bind(this),
           mouseout: function(ev) {
-            this.DOM_posuv_up.removeClass('act');
-            this.DOM_posuv_dn.removeClass('act');
+            if ( browse.enabled ) {
+              this.DOM_posuv_up.removeClass('act');
+              this.DOM_posuv_dn.removeClass('act');
+            }
           }.bind(this)
         }}).adopt(
           this.DOM_posuv_up= new Element('div',{'class':'BrowseUp',events:{
             click: function(el) {
-              this._row_move(this.r-this.tmax+1);
+              if ( browse.enabled )
+                this._row_move(this.r-this.tmax+1);
             }.bind(this)
           }}),
           new Element('div',{'class':'BrowsePosuv',styles:{height:this._posuv_height}}).adopt(
@@ -2581,7 +2631,8 @@ Ezer.Browse.implement({
           ))),
           this.DOM_posuv_dn= new Element('div',{'class':'BrowseDn',events:{
             click: function(el) {
-              this._row_move(this.r+this.tmax-1);
+              if ( browse.enabled )
+                this._row_move(this.r+this.tmax-1);
             }.bind(this)
           }})
         )
@@ -2590,18 +2641,15 @@ Ezer.Browse.implement({
       this.slider.knob.fade('hide');
       $$(this.DOM_tbody, this.DOM_posuv).addEvents({
         mousewheel: function(e) {
-          e= new Event(e).stop();
-          var ewh= e.wheel>0 ? this.options.wheel : -this.options.wheel;
-          this._row_move(this.r-ewh);
-          this.focus();
+          if ( this.enabled ) {
+            e= new Event(e).stop();
+            var ewh= e.wheel>0 ? this.options.wheel : -this.options.wheel;
+            this._row_move(this.r-ewh);
+            this.focus();
+          }
           return false;
         }.bind(this)
       });
-//       $(document.body).addEvents({
-//         mouseleave: function () {
-//           browse.slider.drag.stop()
-//         }
-//       });
     }
     else {
       // pouze úprava pro data_only => úprava délky posuvníku
@@ -2624,6 +2672,10 @@ Ezer.Browse.implement({
     // pokud je format:'n' potlač zobrazení
     if ( this._fc('n') ) {
       this.DOM_Block.setStyles({display:'none'})
+    }
+    // pokud je format:'d' potlač zobrazení
+    if ( this._fc('d') ) {
+      this.enable= false;
     }
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_slider
@@ -2658,12 +2710,13 @@ Ezer.Browse.implement({
       this.DOM_row[i].removeClass('tr-sel');
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_focus+
-//f: Browse-DOM.DOM_focus ()
-//      označení browse jako aktivní
-  DOM_focus: function () {
+//f: Browse-DOM.DOM_focus ([silent=false])
+//      označení browse jako aktivní, pokud je silent nevyvolá se onfocus
+  DOM_focus: function (silent) {
     if ( !this.DOM_table.hasClass('focus') ) {
       this.DOM_table.addClass('focus');
-      this.fire('onfocus',[]);
+      if ( !silent )
+        this.fire('onfocus',[]);
       if ( Ezer.browser=='IE' ) {
         try {
          this.DOM_input.focus();
@@ -2712,7 +2765,7 @@ Ezer.Browse.implement({
       this.DOM_input.focus();
     return true;
   },
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_clear_focus
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - DOM_clear_focus
 // odznačení aktivního řádku
   DOM_clear_focus: function (deep) {
     if ( deep ) {
@@ -2728,6 +2781,15 @@ Ezer.Browse.implement({
         this.DOM_row[this.tact].removeClass('tr-form');
         this.DOM_tag[this.tact].removeClass('tag1').addClass('tag0');
       }
+    }
+  },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_show_focus
+// označení aktivního řádku
+  DOM_show_focus: function () {
+    // spolehni se na označení aktivního řádku
+    if ( this.tact ) {
+      this.DOM_row[this.tact].removeClass('tr-form');
+      this.DOM_tag[this.tact].removeClass('tag0').addClass('tag1');
     }
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_show+
@@ -2979,50 +3041,52 @@ Ezer.Show.implement({
       if ( this._fc('u') && this.skill==2 ) {
         this.DOM_cell[i].addEvents({
           dblclick: function(el) {
-            var td= el.target, tr= td.getParent(), show= this, browse= this.owner;
-            var i= tr.retrieve('i');
-            if ( i && i <= browse.tlen ) {
-              // uzavření případně předchozí otevřené - jakoby bylo blur
-              if ( browse._opened ) {
-                var td1= browse._opened.getParent();
-                if ( td1 )
-                  td1.setProperty('text',browse._opened_value);
-                browse._opened_value= null;
-                browse._opened.destroy();
-                browse._opened= null;
-              }
-              // dblclick na datovém řádku
-              browse.tact= i;
-              var val= td.getProperty('text');
-              browse._opened_value= val;
-              td.setProperty('text','');
-              td.adopt( browse._opened= new Element('input',{'class':'td_input',type:'text',
-                value:val,styles:{width:w},events:{
-                  keypress: function(event) {
-                    switch (event.key) {
-                    case 'esc':   // vrátit původní hodnotu
-                      event.stop();
+            if ( browse.enabled ) {
+              var td= el.target, tr= td.getParent(), show= this, browse= this.owner;
+              var i= tr.retrieve('i');
+              if ( i && i <= browse.tlen ) {
+                // uzavření případně předchozí otevřené - jakoby bylo blur
+                if ( browse._opened ) {
+                  var td1= browse._opened.getParent();
+                  if ( td1 )
+                    td1.setProperty('text',browse._opened_value);
+                  browse._opened_value= null;
+                  browse._opened.destroy();
+                  browse._opened= null;
+                }
+                // dblclick na datovém řádku
+                browse.tact= i;
+                var val= td.getProperty('text');
+                browse._opened_value= val;
+                td.setProperty('text','');
+                td.adopt( browse._opened= new Element('input',{'class':'td_input',type:'text',
+                  value:val,styles:{width:w},events:{
+                    keypress: function(event) {
+                      switch (event.key) {
+                      case 'esc':   // vrátit původní hodnotu
+                        event.stop();
+                        td.setProperty('text',val);
+                        browse._opened_value= null;
+                        this.destroy();
+                        browse._opened= null;
+                        break;
+                      case 'enter': // zavolat onsubmit
+                        event.stop();
+                        event.stopPropagation();
+                        show.let(this.value);
+                        show.fire('onsubmit',[browse.keys[browse.t+i-1-browse.b],event.control?1:0]);
+                        break;
+                      }
+                    },
+                    blur: function(event) {
                       td.setProperty('text',val);
                       browse._opened_value= null;
                       this.destroy();
                       browse._opened= null;
-                      break;
-                    case 'enter': // zavolat onsubmit
-                      event.stop();
-                      event.stopPropagation();
-                      show.let(this.value);
-                      show.fire('onsubmit',[browse.keys[browse.t+i-1-browse.b],event.control?1:0]);
-                      break;
                     }
-                  },
-                  blur: function(event) {
-                    td.setProperty('text',val);
-                    browse._opened_value= null;
-                    this.destroy();
-                    browse._opened= null;
-                  }
-              }}));
-              browse._opened.setAttribute('tabIndex',0);
+                }}));
+                browse._opened.setAttribute('tabIndex',0);
+              }
             }
             return false;
           }.bind(this)

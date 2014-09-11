@@ -294,7 +294,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
       unlink($cname);
   }
   // listing modulu pro trace=7
-  if ($_GET['trace']==7) {
+  if ($_GET['trace']==7 || $_GET['trace']==1) {
     $lst= $dbg= '';
 //     $dbg= debugx($loads->code);
     $lst= xlist($loads->code,0,$list_only);
@@ -1144,6 +1144,7 @@ function clean_code($code) {
 function walk_struct($down,$pcode,$beg,$end,$ift,$iff,$is_arg=0) {
 //                                                 trace();
 //                                                 debug($pcode,"..,$beg,$end,$ift,$iff)");
+//                                                 display("walk_struct {$down->typ},$beg,$end,$ift,$iff");
   if (!$down) $down= (object)array();
   $icode= $beg;
   $i_next= $icode;
@@ -1153,7 +1154,64 @@ function walk_struct($down,$pcode,$beg,$end,$ift,$iff,$is_arg=0) {
   $down->ift= $ift;
   $down->iff= $iff;
   $i_end= $beg + $down->len;
-  if ( $down->arr ) {
+
+  if ( $typ=='sw' ) {  // switch
+//                                         debug($down,"switch beg:$beg,$end,$ift,$iff");
+    $expr= $down->arr[0]; $e_len= $expr->len;
+    walk_struct($expr,$pcode,$icode,$end,0,0,0);
+
+    $n= count($down->arr);
+    $icode+= $e_len;
+    for ($i= 1; $i<$n-1; $i+=3) {
+      $label= $down->arr[$i];   $l_len= $label->len;
+      $test=  $down->arr[$i+1]; $t_len= $test->len;
+      $stmnt= $down->arr[$i+2]; $s_len= $stmnt->len;  $stmnt->is_go= 1;
+      $ts_len= $t_len + $s_len;
+      walk_struct($label,$pcode,$icode,$end,0,0,1);
+      $icode+= $l_len;
+      walk_struct($test,$pcode,$icode,$end,$icode+$t_len,$icode+$ts_len,0);
+      $icode+= 1;
+      walk_struct($stmnt,$pcode,$icode,$end,$i_end,$i_end,1);
+      $icode+= $s_len;
+    }
+    if ($i<$n) {
+      $stmnt= $down->arr[$n-1]; $s_len= $stmnt->len;
+      walk_struct($stmnt,$pcode,$icode,$end,$i_end,$i_end,1);
+    }
+
+//                                         debug($down,"switch end:$beg,$end,$ift,$iff");
+    def_jumps($down,$pcode);
+  }
+
+  elseif ( $typ=='if1' ) {  // if - then
+//                                         debug($down,"if-then");
+    $test= $down->arr[0];
+    $then= $down->arr[1];
+    $t_len= $test->len;
+    $tt_len= $t_len + $then->len;
+    walk_struct($test,$pcode,$icode,$end,$icode+$t_len,$iff,1);
+    $icode+= $t_len;
+    walk_struct($then,$pcode,$icode,$end,$ift,$iff,0);
+    def_jumps($down,$pcode);
+  }
+  elseif ( $typ=='if2' ) {  // if - then - then
+    $test= $down->arr[0];
+    $then= $down->arr[1]; $then->is_go= 1;
+    $else= $down->arr[2];
+    $t_len= $test->len;
+    $tt_len= $t_len + $then->len;
+    $te_len= $then->len + $else->len;
+    $tte_len= $tt_len + $else->len;
+    walk_struct($test,$pcode,$icode,$end,$icode+$t_len,$icode+$tt_len,1);
+    $icode+= $t_len;
+    walk_struct($then,$pcode,$icode,$end,$icode+$te_len,$icode+$te_len,0);
+    $icode+= $tt_len;
+    walk_struct($else,$pcode,$icode,$end,$ift,$iff,0);
+//                                         debug($pcode,"if2");
+    def_jumps($down,$pcode);
+//                                         debug($down,"if-then-then");
+  }
+  elseif ( $down->arr ) {
     $last= count($down->arr) - 1;
     foreach ($down->arr as $i => $sub) {
       $i_next+= $sub->len;
@@ -1192,6 +1250,7 @@ function walk_struct($down,$pcode,$beg,$end,$ift,$iff,$is_arg=0) {
 function def_jumps($c,$pcode) {
 //                                         trace();
 //                                         if ( $c->argx)debug($c,"def_jumps A");
+//                                         debug($c,"def_jumps A");
   $t= $c->ift;
   $f= $c->iff;
   $e= $c->len-1;
@@ -1218,7 +1277,10 @@ function def_jumps($c,$pcode) {
     // a pro poslední instrukci kódu
     elseif ( $pcode[$i]->o!='y' && $i+1!=$len ) {
       if ( $t==$f ) {
-        $pcode[$i]->jmp= $t-$i;
+        if ( $c->is_go )
+          $pcode[$i]->go= $t-$i;
+        else
+          $pcode[$i]->jmp= $t-$i;
 //                                         display("včil $i,{$pcode[$i]->o}");
       }
       else if ( $f && $t ) {
@@ -1571,54 +1633,51 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       $code_top-= $npar;
     }
     // -------------------------------------- if e {s1} [{s2}]
-    elseif ( $c->op=='ifx' ) {
+    elseif ( $c->op=='if' ) {
       // {expr:'call',op:'if',par:[e,s1[,s2]]}
       if ( count($c->par)>1 ) {
         $expr= gen($pars,$vars,$c->par[0],0,$struct1);
+        $struct->arr[]= $struct1;
         $then= gen($pars,$vars,$c->par[1],0,$struct1);
+        $struct->arr[]= $struct1;
       }
       if ( count($c->par)==2 ) {
-        $iff= (object)array('o'=>0,'iff'=>count($then)+1);
-        $code[]= array($expr,$iff,$then);
+        $code[]= array($expr,$then);
+        $struct->typ= 'if1';
       }
       elseif ( count($c->par)==3 ) {
-        $iff= (object)array('o'=>0,'iff'=>count($then)+2);
         $else= gen($pars,$vars,$c->par[2],0,$struct1);
-        $go= (object)array('o'=>0,'go'=>count($else)+1);
-        $code[]= array($expr,$iff,$then,$go,$else);
+        $struct->arr[]= $struct1;
+        $code[]= array($expr,$then,$else);
+        $struct->typ= 'if2';
       }
       else comp_error("CODE: if musí mít 2-3 parametry");
+//                                         debug($struct);
     }
     // -------------------------------------- switch e l1 {s1}
-    elseif ( $c->op=='switchx' ) {
+    elseif ( $c->op=='switch' ) {
       // {expr:'call',op:'switch',par:[e,l1,s1,...]}
       if ( count($c->par)>2 ) {
-        $cds= array();
-        $len= 0;
         $n= count($c->par);
         $expr= gen($pars,$vars,$c->par[0],0,$struct1);
         $struct->arr[]= $struct1;
+        $code[]= $expr;
         for ($i= 1; $i<$n-1; $i+=2) {
           $label= gen($pars,$vars,$c->par[$i],0,$struct1);
-          $stmnt= gen($pars,$vars,$c->par[$i+1],0,$struct1);
+          $struct->arr[]= $struct1;
           $test= (object)array('o'=>'S','iff'=>count($stmnt)+2);
-          $len+= count($label)+count($stmnt)+2;
-          $go= (object)array('o'=>0,'go'=>$len);
-          $cds[]= array($label,$test,$stmnt,$go);
+          $struct->arr[]= (object)array('typ'=>'?','i'=>-1,'ift'=>-1,'iff'=>-1,'len'=>1);
+          $stmnt= gen($pars,$vars,$c->par[$i+1],0,$struct1);
+          $struct->arr[]= $struct1;
+          $code[]= array($label,$test,$stmnt);
         }
         if ($i<$n) {
           $stmnt= gen($pars,$vars,$c->par[$n-1],0,$struct1);
           $len+= count($stmnt);
-        }
-        // poskládání kódu s opravou délek pro go
-        $code[]= $expr;
-        foreach ($cds as $cd) {
-          $cd[3]->go= $len+1-$cd[3]->go;
-          $code[]= $cd;
-        }
-        if ($i<$n) {
+          $struct->arr[]= $struct1;
           $code[]= $stmnt;
         }
+        $struct->typ= 'sw';
       }
       else comp_error("CODE: switch musí mít aspoň 3 parametry");
     }

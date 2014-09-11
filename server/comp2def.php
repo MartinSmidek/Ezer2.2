@@ -56,7 +56,7 @@ $blocs2 = array (                                    // překládají se na AE_<
   'area'        =>  explode(",",'var,proc,panel.popup'),
 #  form
   'form'        =>  explode(",",'view,var,proc,browse,browse.smart,radio,label,label.drop,label.map,edit,edit.html,'
-                               .'button,button.submit,button.reset,button.upload,select,select.auto,'
+                               .'button,button.html,button.submit,button.reset,button.upload,select,select.auto,'
                                .'select.map,select.map0,field,field.date,field.list,menu,chat,check,list'
                                .($pragma_attrs?',select':'')),
   'view'        =>  explode(",",''),
@@ -228,7 +228,7 @@ $attribs = array (
 #  tabs
   'tabs'   =>  explode(",",'type:s,skill:s,title:s,active:i,include:s,where:s'),
 #  menu
-  'menu'   =>  explode(",",'type:s,skill:s,title:s,par:o,active:i,format:s'),
+  'menu'   =>  explode(",",'type:s,skill:s,title:s,par:o,active:i,format:s,join:i'),
   'item'   =>  explode(",",'type:s,title:s,skill:s,par:o,format:s'),
 #  browse
   'browse' =>  explode(",",'key_id:s,type:s,buf_rows:n,qry_rows:n,wheel:n,css_rows:s,rows:nc,group_by:s,optimize:o,format:s'),

@@ -222,9 +222,10 @@ var ContextMenu = new Class({
     onHide: function(){},
     onClick: function(){},
     fadeSpeed: 200,
+    focus: null,                                //140905gn DOM určený pro aplikace focus_css
     focus_css: 'ContextFocus',
-    focus_mask: true,                          //140202gn nenulové znamená označení target maskou
-    event: null                                // show imediately when started by event
+    focus_mask: true,                           //140202gn nenulové znamená označení target maskou
+    event: null                                 // show imediately when started by event
   },
   // initialization
   initialize: function(options) {
@@ -232,6 +233,7 @@ var ContextMenu = new Class({
     this.clear();
     this.menu = $(this.options.menu);                           // option diffs menu
     this.target = $(this.options.target);
+    this.focus = this.options.focus ? $(this.options.focus) : this.target;
     this.hide().startListener();                                // hide and begin the listener
     this.menu.setStyles({position:'absolute',display:'none'});
     if ( this.options.event ) {
@@ -243,6 +245,7 @@ var ContextMenu = new Class({
     this.setOptions(options);                                   // set options
     this.menu = $(this.options.menu);                           // option diffs menu
     this.target = $(this.options.target);
+    this.focus = this.options.focus ? $(this.options.focus) : this.target;
     this.hide().startListener();                                // hide and begin the listener
     this.menu.setStyles({position:'absolute',display:'none'});
     if ( this.options.event ) {
@@ -316,7 +319,7 @@ var ContextMenu = new Class({
     this.clear();
     this.menu.setStyle('display','block');
     this.shown= true;
-    if ( this.options.focus_css ) this.target.addClass(this.options.focus_css);
+    if ( this.options.focus_css ) this.focus.addClass(this.options.focus_css);
     if ( this.options.focus_mask ) {
       // pokud existuje element s id=mask pak jeho zobrazení a pozvednutí elementu nad masku
       var mask= $('mask');
@@ -333,7 +336,7 @@ var ContextMenu = new Class({
     if(this.shown) {
       this.menu.setStyle('display','none');
       this.shown= false;
-      if ( this.options.focus_css ) this.target.removeClass(this.options.focus_css);
+      if ( this.options.focus_css ) this.focus.removeClass(this.options.focus_css);
       if ( this.options.focus_mask ) {
         // případné odstranění masky
         var mask= $('mask');
