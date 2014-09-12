@@ -13,7 +13,7 @@ function ezer2code ($name,$root='') {  #trace();
   global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
     $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes;
   global $pragma_library, $pragma_syntax, $pragma_attrs, $pragma_names, $pragma_get, $pragma_prefix,
-    $pragma_group, $pragma_box, $pragma_using;
+    $pragma_group, $pragma_box, $pragma_using, $pragma_test;
   global $includes,$including;
 }
 # -------------------------------------------------------------------------------------------------- comp
@@ -40,7 +40,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
   global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
     $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes, $onloads;
   global $pragma_library, $pragma_syntax, $pragma_attrs, $pragma_names, $pragma_get, $pragma_prefix,
-    $pragma_group, $pragma_box, $pragma_using;
+    $pragma_group, $pragma_box, $pragma_using, $pragma_test;
   global $call_php;
   $errors= 0;
   try {
@@ -66,6 +66,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
       if ( in_array('prefix',$pragma) ) $pragma_prefix= true;
       if ( in_array('get',$pragma) )    $pragma_get= true;
       if ( in_array('box',$pragma) )    $pragma_box= true;
+      if ( in_array('test',$pragma) )   $pragma_test= true;
 //       if ( in_array('using',$pragma) ) {
 //         $i= array_search('using',$pragma);
 //         $pragma_using= $pragma[$i+1];
@@ -1576,7 +1577,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
   $struct= (object)array('typ'=>$c->expr,'i'=>-1,'ift'=>-1,'iff'=>-1,'len'=>-1);
   global $trace_me;
   global $context, $names, $code_top;
-  global $pragma_names, $pragma_get, $proc_path;
+  global $pragma_names, $pragma_get, $pragma_test, $proc_path;
   global $call_php;
   switch ( $c->expr ) {
   case 'value':
@@ -1633,7 +1634,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       $code_top-= $npar;
     }
     // -------------------------------------- if e {s1} [{s2}]
-    elseif ( $c->op=='if' ) {
+    elseif ( $pragma_test && $c->op=='if' ) {
       // {expr:'call',op:'if',par:[e,s1[,s2]]}
       if ( count($c->par)>1 ) {
         $expr= gen($pars,$vars,$c->par[0],0,$struct1);
@@ -1655,7 +1656,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
 //                                         debug($struct);
     }
     // -------------------------------------- switch e l1 {s1}
-    elseif ( $c->op=='switch' ) {
+    elseif ( $pragma_test && $c->op=='switch' ) {
       // {expr:'call',op:'switch',par:[e,l1,s1,...]}
       if ( count($c->par)>2 ) {
         $n= count($c->par);
