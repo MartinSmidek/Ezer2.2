@@ -453,6 +453,7 @@ function doc_todo($item,$source='app',$nic="<dl class='todo'><dt>V tomto období
 #   hotové        - 4:green,
 #   zkontrolované - 5:green2
 function doc_todo_show($cond,$order="kdy_skoncil DESC") { trace();
+  $tab= $nic= '';
   $users= map_user();
   $typs= map_cis('s_todo_typ','zkratka');
   $casti= map_cis('s_todo_cast','zkratka');

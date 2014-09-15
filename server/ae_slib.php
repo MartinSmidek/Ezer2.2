@@ -316,6 +316,7 @@ __EOD;
     }
   }
   // definice povinného začátku a konce HTML stránky
+  $html_footer= '';
   $html_header= "\xEF\xBB\xBF";    // DOM pro UTF-8
   $html_header.= <<<__EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -402,11 +403,11 @@ $html_footer
 __EOD;
     break;
   case 'menu':
-# ------------------------------------------------------------------------------- HTML menu
 # template pro zobrazení Ezer.MenuMain jako hlavního objektu aplikace
 $dolni= /*$xtrace ? '' :*/ " style='height:0'";
-$dbg_script= trim($_SESSION[$ezer_root]['dbg_script'])
-  ?: "set_trace('m',1,'init,set,key'); // selektivní trasování + [shift-]ctrl-Enter";
+$dbg_script= isset($_SESSION[$ezer_root]['dbg_script'])
+  ? trim($_SESSION[$ezer_root]['dbg_script'])
+  : "set_trace('m',1,'init,set,key'); // selektivní trasování + [shift-]ctrl-Enter";
 $debugger= isset($js_options->dbg) ? <<<__EOD
     <form action="" method="post" enctype="multipart/form-data" id="form">
       <textarea id="dbg" name='query' class='sqlarea jush-sql' spellcheck='false' wrap='off'

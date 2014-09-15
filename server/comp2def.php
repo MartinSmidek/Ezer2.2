@@ -240,7 +240,7 @@ $attribs = array (
   'list'   =>  explode(",",'rows:n'),
 );
 $attribs_type = array (
-  's' => 'string', 'n' => 'number', i => 'name', 'm' => 'map name', 'b' => 'boolean', 'o' => 'object'
+  's' => 'string', 'n' => 'number', 'i' => 'name', 'm' => 'map name', 'b' => 'boolean', 'o' => 'object'
 );
 # tabulky symbolů
 $tab_symb_obj= array();                   // zobrazení: symb => obj
@@ -284,7 +284,12 @@ $attribs1= array();                                 // pomocné pole - attribs p
 $attribs2= array();                                 // pomocné pole - attribs po : tj. typy
 $keywords= array();                                 // pomocné pole - sjednocení blocs
 # definice povolených omezovačů
-$dels= '{[(|)]};:,*';                               // specifickou roli má tečka, apostrof, uvozovka
+$dels= '{[(|)]};:,*';                   // specifickou roli má tečka, apostrof, uvozovka
+// úpravy od PHP
+if (!defined('T_OLD_FUNCTION'))  define('T_OLD_FUNCTION', T_FUNCTION);
+if (!defined('T_ML_COMMENT'))    define('T_ML_COMMENT', T_COMMENT);
+else                             define('T_DOC_COMMENT', T_ML_COMMENT);
+
 $tok2lex= array(
   T_AND_EQUAL => 'del', T_ARRAY => 'id', T_ARRAY_CAST => 'x', T_AS => 'id', T_BAD_CHARACTER => 'x',
   T_BOOL_CAST => 'x', T_BOOLEAN_AND => 'x', T_BOOLEAN_OR => 'x', T_BREAK => 'id', T_CASE => 'id',
@@ -306,7 +311,7 @@ $tok2lex= array(
   T_OLD_FUNCTION => 'id', T_OPEN_TAG => 'x', T_OPEN_TAG_WITH_ECHO => 'x', T_OR_EQUAL => 'x',
   T_PAAMAYIM_NEKUDOTAYIM => 'x', T_PLUS_EQUAL => 'x', T_PRINT => 'id', T_REQUIRE => 'id',
   T_REQUIRE_ONCE => 'id', T_RETURN => 'id', T_SL => 'x', T_SL_EQUAL => 'x',
-  T_SMALLER_OR_EQUAL => 'x', T_SR => 'x', T_SR_EQUAL => 'x', T_START_HEREDOC => 'x',
+  /*T_SMALLER_OR_EQUAL => 'x',*/ T_SR => 'x', T_SR_EQUAL => 'x', T_START_HEREDOC => 'x',
   T_STATIC => 'id', T_STRING => 'id', T_STRING_CAST => 'str', T_STRING_VARNAME => 'str',
   T_SWITCH => 'id', T_UNSET => 'id', T_UNSET_CAST => 'x', T_USE => 'id', T_VAR => 'id',
   T_VARIABLE => 'id', T_WHILE => 'id', T_WHITESPACE => 'blank',  T_XOR_EQUAL => 'x',
