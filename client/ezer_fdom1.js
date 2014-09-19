@@ -493,7 +493,7 @@ Ezer.Application= new Class({
     if ( !on ) {
       this.options.ae_trace= this.options.ae_trace.replace(id,'');
     }
-    else {
+    else if ( this.options.ae_trace.indexOf(id)==-1 ) {
       this.options.ae_trace+= id;
     }
   },

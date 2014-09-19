@@ -4350,9 +4350,9 @@ Ezer.Browse= new Class({
         // odstraň starý obraz
         this.DOM_remove(true);
         // inicializuj stavové promenné
-        this.s= this.slen= this.blen= this.bmax= this.tact= this.tlen= this.tmax= 0;
-        this.buf= this.keys= this.keys_sel= [];
-        this.b= this.t= this.r= -1;
+//         this.s= this.slen= this.blen= this.bmax= this.tact= this.tlen= this.tmax= 0;
+//         this.buf= this.keys= this.keys_sel= [];
+//         this.b= this.t= this.r= -1;
         // definuj nové hodnoty
         this.options.rows= val.toInt();
         this.bmax= Math.max(this.options.buf_rows||0,this.options.rows);
@@ -4363,8 +4363,13 @@ Ezer.Browse= new Class({
         this.subBlocks(this.desc,this.DOM_Block,null,'dom_only');
         this.DOM_add2(true);
         this.DOM_addEvents();
-        // znovu načti obsah
-//         this._ask_queries(true,old_key);
+        // zobrazení viditelné části
+        this.t= this.b;
+        this.r= this.b;
+        this.tlen= Math.min(this.tmax,this.blen);
+        this.tact= this.tlen ? 1 : 0;
+        this.DOM_show();
+//         this.DOM_show_status();
       }
     }
     else
@@ -8686,7 +8691,7 @@ Ezer.obj.speed= {
   sql_g:0, php_g:0, net_g:0, data_g:0, ezer_g:0,        // globální čitače
   msg:'', span:null};                                   // stavové informace
 Ezer.fce.speed= function (op) {
-  var ret= true, del0= '<br>', x= null;
+  var ret= true, del0= '<br>', x= '';
   switch (op) {
   case 'clear':                         // přičte lokální čitače ke globálním a vynuluje lokální
     with (Ezer.obj.speed) {
@@ -8694,6 +8699,7 @@ Ezer.fce.speed= function (op) {
       sql= php= net= data= ezer= 0;
       msg= '';
     }
+    x= 1;
     break;
   case 'hour':                         // vrátí globální čitače a vynuluje je (spolu s lokálními)
     with (Ezer.obj.speed) {
@@ -8710,6 +8716,7 @@ Ezer.fce.speed= function (op) {
       msg+= ', NET:' + net.round()+' / '+(data/1024).round();
     }
     Ezer.app._showSpeed();
+    x= 1;
     break;
   }
   return x;
