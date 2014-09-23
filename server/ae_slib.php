@@ -1690,9 +1690,9 @@ function source_line ($file,$app,$line,$clmn) {
 # $export_par je kontext export obsahující na vstupu (+dočasné informace ve složkách začínajících _)
 #   dir         -- nepovinné jméno složky pod docs
 #   file        -- jméno souboru ve složce docs/dir
-#   type        -- 'csv'|'xls'
-#   title       -- pro 'xls': nadpis od A1, hlavička pak začne od A3
-#   color       -- pro 'xls': podložení hlavičky, default=aabbbbbb (4 barvy)
+#   type        -- 'csv'|'xls'|'xlsx'
+#   title       -- pro 'xls(x)': nadpis od A1, hlavička pak začne od A3
+#   color       -- pro 'xls(x)': podložení hlavičky, default=aabbbbbb (4 barvy)
 # -------------------------------------------------------------------------------------------------- export_head
 # otevření exportovaného souboru, $clmns je seznam jmen sloupců
 function export_head($par,$clmns,$fmt='') { #trace();

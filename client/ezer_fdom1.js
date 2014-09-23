@@ -90,12 +90,13 @@ Ezer.Application= new Class({
       ws.y= hh+hw;
     }
     else {
-      ws.y= $('dolni').getCoordinates().top;
-      var h= ws.y - $('work').getCoordinates().top - 15;
+      var t= $('dolni').getCoordinates().top;
+      var h= t - $('work').getCoordinates().top - 15;
       $('work').setStyle('height',h);
+      $('paticka').setStyle('bottom',ws.y-t+pruh);
+      ws.y= t;
     }
     Ezer.sys.screen= {width:ws.x,height:ws.y};
-//     $('paticka').setStyle('bottom',ws.y-t+pruh);
     // definice sys.screen width a height
     if ( Ezer.run && Ezer.run.$ )
       downto_panels(Ezer.run.$);
