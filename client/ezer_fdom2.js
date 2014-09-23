@@ -2472,6 +2472,18 @@ Ezer.Browse.implement({
     // přidání událostí myši
     for (var i= 1; i<=this.tmax; i++) {
       this.DOM_row[i].addEvents({
+        touch: function(el) {
+          var tr= el.target.tagName=='TD' ? el.target.parentNode : el.target;
+          var i= tr.retrieve('i');
+          if ( i && i <= this.tlen ) {
+//             this.DOM_focus();
+                                                        Ezer.trace('T','browse row touch '+i);
+            this.DOM_hi_row(this.t+i-1,0,0,el.control);
+//             this.fire('onrowclick',[this.keys[i-1]],el);
+          }
+          el.preventDefault();
+          return false;
+        }.bind(this),
         click: function(el) {
           if ( this.enabled ) {
             Ezer.fce.touch('block',this,'click');         // informace do _touch na server
@@ -2645,7 +2657,7 @@ Ezer.Browse.implement({
             e= new Event(e).stop();
             var ewh= e.wheel>0 ? this.options.wheel : -this.options.wheel;
             this._row_move(this.r-ewh);
-            this.focus();
+//             this.focus();
           }
           return false;
         }.bind(this)
@@ -2681,7 +2693,7 @@ Ezer.Browse.implement({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_slider
   DOM_slider: function () {
     var browse= this;
-    this.slider= new Slider(this.DOM_posuv,this.DOM_handle, {
+    this.slider= new (Ezer.platform=='A'?MSlider:Slider)(this.DOM_posuv,this.DOM_handle, {
       snap: false,
       steps: 0,
       last: 0,
@@ -2717,16 +2729,17 @@ Ezer.Browse.implement({
       this.DOM_table.addClass('focus');
       if ( !silent )
         this.fire('onfocus',[]);
-      if ( Ezer.browser=='IE' ) {
-        try {
-         this.DOM_input.focus();
-         this.DOM_input.select();
-        } catch (e) {
-          Ezer.fce.echo('error focus');
-        }
-      }
-      else
-        this.DOM_input.focus();
+//       if ( Ezer.browser=='IE' ) {
+//         try {
+//          this.DOM_input.focus();
+//          this.DOM_input.select();
+//         } catch (e) {
+//           Ezer.fce.echo('error focus');
+//         }
+//       }
+//       else
+        this.DOM_input.addClass('focus');      // MOBILE: focus() zobrazí klávesnici
+//         this.DOM_input.focus();
     }
     return true;
   },
@@ -2761,8 +2774,11 @@ Ezer.Browse.implement({
       }
     }
     this.DOM_show_status();
-    if ( !nofocus )
-      this.DOM_input.focus();
+//     if ( !nofocus )
+//       this.DOM_input.focus();
+    if ( !nofocus ) {
+      this.DOM_input.addClass('focus');      // MOBILE: focus() zobrazí klávesnici
+    }
     return true;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - DOM_clear_focus
@@ -2945,7 +2961,8 @@ Ezer.Show.implement({
             if ( !this._resizing ) {
               this.sorting= this.sorting=='n' ? 'a' : (this.sorting=='a' ? 'd' : 'n');
               this._sort();
-              this.owner.DOM_focus();
+//               this.owner.DOM_focus();
+              this.owner.DOM.addClass('focus');      // MOBILE: focus() zobrazí klávesnici
             }
           }.bind(this)
         });

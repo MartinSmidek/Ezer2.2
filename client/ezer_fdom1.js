@@ -38,12 +38,30 @@ Ezer.Application= new Class({
     this.bar_clock();
   },
   // ----------------------------------------------------------------------------- DOM_layout
+  // pokud inner==true (asi jen pro Android) ...
+  DOM_layout_mode: Ezer.platform=='A' ? 'inner' : 'outer',     // metoda získávání rozměrů
   DOM_layout: function() {
+    // projití aplikace root-tabs-panel a provedení onresize u neaktivovaných panelů
+    function downto_panels(block) {
+      if ( block.part ) {
+        for (var name in block.part) {
+          var x= block.part[name];
+          if ( x.part && (x instanceof Ezer.PanelPlain || x instanceof Ezer.PanelRight) ) {
+            if ( x.part.onresize )
+              x.callProc('onresize',[ws.x,ws.y]);
+          }
+          else if ( x instanceof Ezer.Tabs || x instanceof Ezer.MenuMain ) {
+            downto_panels(x);
+          }
+        }
+      }
+    }
     // změna šířky změní width ve stylu PanelRight
     const pruh= 16;
     var leftMenu= document.getElement('.Accordion');
     var leftMenuWidth= leftMenu ? leftMenu.getStyle('width').toInt() : 210;
-    var ws= window.getSize();
+    var ws= this.DOM_layout_mode=='inner'
+      ? {x:window.innerWidth,y:window.innerHeight} : window.getSize();
     $$('.PanelRight').each(function(dom_panel){
       var panel= dom_panel.retrieve('Ezer');
       var menu_left= panel.menuleft;
@@ -60,29 +78,25 @@ Ezer.Application= new Class({
     });
     // změna výšky definuje velikost pracovní plochy
     Ezer.Shield.top= $('work').getCoordinates().top;
-    var t= $('dolni').getCoordinates().top;
-    var h= t - $('work').getCoordinates().top - 15;
-    $('work').setStyle('height',h);
-    $('paticka').setStyle('bottom',ws.y-t+pruh);
-    // definice sys.screen width a height
-    Ezer.sys.screen= {width:ws.x,height:t};
-    // projití aplikace root-tabs-panel a provedení onresize u neaktivovaných panelů
-    function downto_panels(block) {
-      if ( block.part ) {
-        for (var name in block.part) {
-          var x= block.part[name];
-          if ( x.part && (x instanceof Ezer.PanelPlain || x instanceof Ezer.PanelRight) ) {
-            if ( x.part.onresize ) {
-                                                Ezer.trace('*','resize of '+name+'/'+x.type);
-              x.callProc('onresize',[ws.x,t]);
-            }
-          }
-          else if ( x instanceof Ezer.Tabs || x instanceof Ezer.MenuMain ) {
-            downto_panels(x);
-          }
-        }
-      }
+    if ( this.DOM_layout_mode=='inner' ) {
+      var hh= $('horni').getStyle('height').toInt(),
+          hs= $('status_bar').getStyle('height').toInt(),
+          hd= $('dolni').getStyle('height').toInt();
+      var hw= ws.y - hh - hs - hd;
+      $('work').setStyles({height:hw});
+      // další 2 řádky nastavují korektně velikost, ale nelze použít (upravené) makeResizable
+      $('paticka').setStyles({bottom:hd});
+      $('dolni').setStyles({top:hh+hw+hs-4,bottom:'initial'});
+      ws.y= hh+hw;
     }
+    else {
+      ws.y= $('dolni').getCoordinates().top;
+      var h= ws.y - $('work').getCoordinates().top - 15;
+      $('work').setStyle('height',h);
+    }
+    Ezer.sys.screen= {width:ws.x,height:ws.y};
+//     $('paticka').setStyle('bottom',ws.y-t+pruh);
+    // definice sys.screen width a height
     if ( Ezer.run && Ezer.run.$ )
       downto_panels(Ezer.run.$);
   },
@@ -217,6 +231,40 @@ Ezer.Application= new Class({
           }.bind(this)
         });
       }
+    }
+    // kontextové menu pro Android
+    function actual_dim() {
+      return ""
+        + " window.outerWidth="+window.outerWidth
+        + " window.innerWidth="+window.innerWidth + "<br>"
+        + " window.outerHeight="+window.outerHeight
+        + " window.innerHeight="+window.innerHeight + "<br>"
+        + " HTTP_USER_AGENT="+Ezer.ua + "<br>"
+        + " Browser.Platform.android="+Browser.Platform.android + "<br>"
+        + " Ezer.platform="+Ezer.platform
+        + " Ezer.browser="+Ezer.browser
+      ;
+    }
+    this.android_menu= $('android_menu');
+    if ( this.android_menu ) {
+      this.android_menu.addEvents({
+        click: function(e) {
+          Ezer.fce.contextmenu([
+            [ "<i class='fa fa-compress'></i>&nbsp;&nbsp;&nbsp;přizpůsobit",
+              function(el) { Ezer.App.DOM_layout_mode= 'inner'; Ezer.App.DOM_layout() }],
+            [ "<i class='fa fa-expand'></i>&nbsp;&nbsp;&nbsp;maximalizovat",
+              function(el) { Ezer.App.DOM_layout_mode= 'outer'; Ezer.App.DOM_layout() }],
+            [ "-<i class='fa fa-ban'></i>&nbsp;&nbsp;&nbsp;vyčistit",
+              function(el) { Ezer.fce.clear() }],
+            [ "<i class='fa fa-eye'></i>&nbsp;&nbsp;&nbsp;rozměry?",
+              function(el) { Ezer.fce.alert(actual_dim()) }]
+          ],arguments[0],'android_menu_ul');
+          Ezer.obj.contextmenu.DOM.setStyles({
+            position:'fixed',left:'initial',right:4,top:16,
+            fontSize:15,textIndent:-5,lineHeight:25});
+          return false;
+        }.bind(this)
+      });
     }
     this._mini_debug_virgin= false;
   },

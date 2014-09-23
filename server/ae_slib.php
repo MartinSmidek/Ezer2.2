@@ -51,6 +51,13 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     preg_match('/Firefox/',$_SERVER['HTTP_USER_AGENT'])?'FF':(
     preg_match('/Chrome/',$_SERVER['HTTP_USER_AGENT'])?'CH':(
     '?'))));
+  // identifikace platformy prohlížeče: Android => Ezer.client == 'A'
+  $ua= $_SERVER['HTTP_USER_AGENT'];
+  $platform=          // x11 hlásí Chrome při vzdáleném ladění (chrome://inspect/#devices)
+    preg_match('/android|x11/i',$ua)            ? 'A' : (
+    preg_match('/linux/i',$ua)                  ? 'L' : (
+    preg_match('/macintosh|mac os x/i',$ua)     ? 'M' : (
+    preg_match('/windows|win32/i',$ua)          ? 'W' : '?' )));
   // interpretace parametrů
   $minify= false;
   $ezer_root= $app;
@@ -338,6 +345,8 @@ __EOD;
     Ezer.options= { $options_txt
     };
     Ezer.browser= '$browser';
+    Ezer.platform= '$platform';
+    Ezer.ua= '$ua';
     Ezer.konst= { $const_txt
     };
     Ezer.stop= function(status) {

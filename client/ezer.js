@@ -7447,7 +7447,7 @@ Ezer.fce.contextmenu= function (menu,event,id) {
     if ( item ) {
       var a, title= item[0], fce= item[1];
       new Element('li').adopt(
-        a= new Element('a',{text:title[0]=='-' ? title.substr(1) : title})
+        a= new Element('a',{html:title[0]=='-' ? title.substr(1) : title})
       ).inject(Ezer.obj.contextmenu.DOM);
       if ( title[0]=='-' ) {
         a.setStyles({borderTop:"1px solid #AAAAAA"});
