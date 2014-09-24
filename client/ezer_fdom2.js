@@ -660,6 +660,7 @@ Ezer.fce._DOM_size= function(top,block) {
       // podbloky s rozměry
       case 'browse':
       case 'button':
+      case 'button.html':
       case 'button.submit':
       case 'button.reset':
       case 'case':
@@ -1128,8 +1129,9 @@ Ezer.Button.implement({
     if ( !owners_block )
       owners_block= this.owner.value.DOM_Block;
     if ( this.type=='button.html' ) {
-      this.DOM_Block= this.DOM_Input= new Element('button',{html:this.options.title||''});
-      this.DOM_Input= null;
+      this.DOM_Block= this.DOM_Input= new Element('button',{
+        html:(this.options.title||'').replace(/\[fa-([^\]]+)\]/,"<i class='fa fa fa-$1'></i>")
+      });
     }
     else {
       this.DOM_Block= this.DOM_Input= new Element('input',{
@@ -1167,6 +1169,9 @@ Ezer.Button.implement({
 // ================================================================================================= ButtonHtml-DOM
 Ezer.ButtonHtml.implement({
   Implements: [Ezer.Drag,Ezer.Help],
+//   DOM_add: function() {
+//     this.parent();
+//   },
 // ------------------------------------------------------------------------------------ DOM_enabled
 // zobrazí this.value v DOM
   DOM_enabled: function (on) {

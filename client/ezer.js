@@ -3230,6 +3230,7 @@ Ezer.Button= new Class({
 //c: ButtonHtml ()
 //      tlačíto s povolenými html atributy v title,
 //      lze také použít škálovatelné ikony podle http://fortawesome.github.io/Font-Awesome/icons/
+//      které lze zapsat zkratkou [fa-...] kde fa-... je jméno ikony, případně následované dalšími
 //t: Button,Block
 //s: Block
 Ezer.ButtonHtml= new Class({
@@ -8148,7 +8149,7 @@ Ezer.fce.href= function (path) {
 //      nabídne stáhnutí souboru
 //s: funkce
 Ezer.fce.download= function (file) {
-  window.open(file,'Stáhnout!');
+  window.open("http://"+file,'Stáhnout!');
   return 1;
 }
 // ------------------------------------------------------------------------------------ prints

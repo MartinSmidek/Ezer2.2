@@ -1499,6 +1499,7 @@
     function dbg_includes() {
       # doplní id do includes (korekce kvůli identifikaci jmen knihovních modulů)
       global $includes;
+//                                                 debug($includes,'includes',(object)array('depth'=>2));
       foreach($includes as $ids=>$include) {
         $id= strrpos($ids,'.') ? substr($ids,strrpos($ids,'.')+1) : $ids;
         $includes[$ids]->id= $id;
@@ -1507,36 +1508,42 @@
     }
     function dbg_find_obj($full) {
       # najde objekt pojmenovaný úplným jménem a přebuduje kontext překladu
-      global $context;
+      global $context,$includes;
+      $old_context= $context;
+//                                                 debug($context[0],"context[0]",(object)array('depth'=>9));
       $obj= $context[0]->ctx;
       $obj_id= $context[0]->id;
       $context= array();
       $ids= explode('.',$full);
       $id0= array_shift($ids);
-//                                                 display("$full");
-//       if ( $id0=='$' ) {
-//       }
-//       elseif ( $id0=='#' ) {
-//       }
-//                                                 display("$id0-".implode('!',$ids));
+      $fname= "";
       if ( $id0=='$' || $id0=='#' ) {
         for ($i= 0; $i<count($ids); $i++) {
           $id= $ids[$i];
-//                                                 display("$i:$obj_id.$id");
-          if ( $id && $obj->part->$id ) {
+          $fname.= $fname ? ".$id" : $id;
+//                                                 display("$id - ".isset($obj->part->$id));
+          if ( $id && isset($obj->part->$id) ) {
+//                                                 display("$i:$obj_id.$id - ok {$obj->part->$id->options->include}");
+//             $obi= $obj->part->$id;
+//             if ( $obi->options->include ) {
+//               foreach($old_context as $oi=>$oobj) {
+// //                                                 debug($oobj);
+//                                                 display("{$oobj->ctx->_file}=?=$fname");
+//                 if ( $oobj->ctx->_file==$fname ) {
+//                   $obj= $oobj->ctx;
+//                                                 debug($obj,"obj",(object)array('depth'=>3));
+//                   break;
+//                 }
+//               }
+//             }
           }
           elseif ($obj->options->include) {
-//                                                 display("include:{$obj->options->include}");
-//             list($how,$file)= explode(',',$obj->options->include);
-//             if ( $file && isset($includes[$file]) ) {
-//               $obj->part= $includes[$file];
-//             }
-//             else {
+//                                                 display("$i:$obj_id.$id - no 1");
               $obj= null;
               goto end;
-//             }
           }
           else {
+//                                                 display("$i:$obj_id.$id - no 2");
             $obj= null; goto end;
           }
           context_push($obj_id,$obj);
@@ -1561,7 +1568,7 @@
       array_push($context,(object)array('id'=>$id,'ctx'=>$obj));
     }
     # překlad skriptu $x->script do procedury _dbg_ v zadaném kontextu $x->context->self
-                                                display("debugger context: {$x->context->self}");
+//                                                 display("debugger context: {$x->context->self}");
 //                                                 debug($x->context,"dbg_compile");
     $log= $cd= "";
     $log.= dbg_context_load($x->context);
@@ -1569,6 +1576,7 @@
 //                                                 debug($includes,"includes",(object)array('depth'=>2));
     try {
       $ezer= $x->script;
+//                                                 debug($x,"debugger parms",(object)array('depth'=>4));
       $_SESSION[$ezer_root]['dbg_script']= $ezer;
 //                                                 debug($context,"context",(object)array('depth'=>4));
       $obj= dbg_find_obj($x->context->self);
