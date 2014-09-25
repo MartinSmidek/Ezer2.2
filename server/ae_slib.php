@@ -1841,6 +1841,10 @@ function Excel5_date($tm) {  #trace();
 #       formát=(s|n|d)(r|b|i|t|d)   (string|number|date)(right|bold|italics|title|decimal)
 # CLOSE
 #       close name                              -- zapíše table do souboru
+function Excel2007($desc) {
+  $wb= null;
+  return Excel5($desc,1,$wb,'','xlsx');
+}
 function Excel5($desc,$gen=1,&$wb=null,$dir='',$excel='xls') {  #trace();
   global $ezer_path_serv, $ezer_path_root;
   // pro testování a vývoj

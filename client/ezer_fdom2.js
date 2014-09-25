@@ -1414,7 +1414,7 @@ Ezer.FieldDate.implement({
           width:(this._w||87)-18,height:this._h||16}})
     ).inject(this.owner.DOM_Block);
     this.DOM_ElemEvents();
-    this.DOM_optStyle(this.DOM_Input,this.options.title,true); // u title ignorovat zarovnání
+    this.DOM_optStyle(this.DOM_Block,this.options.title,true); // u title ignorovat zarovnání
     if ( this.skill==2 && !this._fc('d') && !this._fc('o') ) {
       var ox= this._fc('R') ? -106 :  -7;                          // 44
       var oy= this._fc('U') ? -200 : -20;                          // 30
@@ -2504,6 +2504,7 @@ Ezer.Browse.implement({
       })
     }
     // přidání událostí klávesnice
+
     this.DOM_input.addEvents({
       blur: function (event) {
         this.DOM_blur();
@@ -2621,13 +2622,13 @@ Ezer.Browse.implement({
       this.DOM_th_posun.adopt(
         new Element('td',{'class':'BrowsePosuv',rowspan:this._rows,events:{
           mouseover: function(ev) {
-            if ( browse.enabled && this.slen ) {
+            if ( this.enabled && this.slen ) {
               this.DOM_posuv_up.addClass('act');
               this.DOM_posuv_dn.addClass('act');
             }
           }.bind(this),
           mouseout: function(ev) {
-            if ( browse.enabled ) {
+            if ( this.enabled ) {
               this.DOM_posuv_up.removeClass('act');
               this.DOM_posuv_dn.removeClass('act');
             }
@@ -2635,7 +2636,7 @@ Ezer.Browse.implement({
         }}).adopt(
           this.DOM_posuv_up= new Element('div',{'class':'BrowseUp',events:{
             click: function(el) {
-              if ( browse.enabled )
+              if ( this.enabled )
                 this._row_move(this.r-this.tmax+1);
             }.bind(this)
           }}),
@@ -2648,7 +2649,7 @@ Ezer.Browse.implement({
           ))),
           this.DOM_posuv_dn= new Element('div',{'class':'BrowseDn',events:{
             click: function(el) {
-              if ( browse.enabled )
+              if ( this.enabled )
                 this._row_move(this.r+this.tmax-1);
             }.bind(this)
           }})
@@ -2743,8 +2744,8 @@ Ezer.Browse.implement({
 //         }
 //       }
 //       else
-        this.DOM_input.addClass('focus');      // MOBILE: focus() zobrazí klávesnici
-//         this.DOM_input.focus();
+      if ( Ezer.platform!=='A' )                // MOBILE: focus() zobrazí klávesnici
+        this.DOM_input.focus();
     }
     return true;
   },
@@ -3063,8 +3064,8 @@ Ezer.Show.implement({
       if ( this._fc('u') && this.skill==2 ) {
         this.DOM_cell[i].addEvents({
           dblclick: function(el) {
+            var td= el.target, tr= td.getParent(), show= this, browse= this.owner;
             if ( browse.enabled ) {
-              var td= el.target, tr= td.getParent(), show= this, browse= this.owner;
               var i= tr.retrieve('i');
               if ( i && i <= browse.tlen ) {
                 // uzavření případně předchozí otevřené - jakoby bylo blur

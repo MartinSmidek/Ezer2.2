@@ -8149,7 +8149,7 @@ Ezer.fce.href= function (path) {
 //      nabídne stáhnutí souboru
 //s: funkce
 Ezer.fce.download= function (file) {
-  window.open("http://"+file,'Stáhnout!');
+  window.open(file,'Stáhnout!');
   return 1;
 }
 // ------------------------------------------------------------------------------------ prints

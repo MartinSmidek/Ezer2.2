@@ -109,29 +109,31 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
 }
 
 # ================================================================================================== AKTIVITY
-panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a'
+panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a;aa|aa'
   menu left { type:'left', format:'f'
     menu a { title:'Aktivní uživatelé',type:'group'
       item d { title:'dnes'               par:°{s:'uzivatele',c:'dnes',short:'1'}}
-      item { title:'... podrobně'       par:°{s:'uzivatele',c:'dnes',short:'0'}}
-      item { title:'... prostředky'     par:°{s:'uzivatele',c:'dnes',short:'2'}}
+#       item { title:'... podrobně'       par:°{s:'uzivatele',c:'dnes',short:'0'}}
       item { title:'včera'              par:°{s:'uzivatele',c:'vcera',short:'1'}}
-      item { title:'... podrobně'       par:°{s:'uzivatele',c:'vcera',short:'0'}}
-      item { title:'... prostředky'     par:°{s:'uzivatele',c:'vcera',short:'2'}}
+#       item { title:'... podrobně'       par:°{s:'uzivatele',c:'vcera',short:'0'}}
       item { title:'týden'              par:°{s:'uzivatele',c:'dny',days:'8',short:'1'}}
-      item { title:'... podrobně'       par:°{s:'uzivatele',c:'dny',days:'8',short:'0'}}
-      item { title:'... prostředky'     par:°{s:'uzivatele',c:'dny',days:'8',short:'2'}}
+#       item { title:'... podrobně'       par:°{s:'uzivatele',c:'dny',days:'8',short:'0'}}
       item { title:'dva týdny'          par:°{s:'uzivatele',c:'dny',days:'15',short:'1'}}
-      item { title:'... podrobně'       par:°{s:'uzivatele',c:'dny',days:'15',short:'0'}}
-      item { title:'... prostředky'     par:°{s:'uzivatele',c:'dny',days:'15',short:'2'}}
+#       item { title:'... podrobně'       par:°{s:'uzivatele',c:'dny',days:'15',short:'0'}}
       item { title:'měsíc'              par:°{s:'uzivatele',c:'dny',days:'30',short:'1'}}
-      item { title:'... podrobně'       par:°{s:'uzivatele',c:'dny',days:'30',short:'0'}}
-      item { title:'... prostředky'     par:°{s:'uzivatele',c:'dny',days:'30',short:'2'}}
+#       item { title:'... podrobně'       par:°{s:'uzivatele',c:'dny',days:'30',short:'0'}}
       item { title:'nastavený den'      par:°{s:'uzivatele',c:'den',short:'1'}}
       item { title:'... podrobně'       par:°{s:'uzivatele',c:'den',short:'0'}}
-      item { title:'... prostředky'     par:°{s:'uzivatele',c:'den',short:'2'}}
     }
-    menu { title:'Aktivní moduly',type:'group'
+    menu ap { title:'... prostředky',type:'group',skill:'m'
+      item d { title:'dnes'             par:°{s:'uzivatele',c:'dnes',short:'2'}}
+      item { title:'včera'              par:°{s:'uzivatele',c:'vcera',short:'2'}}
+      item { title:'týden'              par:°{s:'uzivatele',c:'dny',days:'8',short:'2'}}
+      item { title:'dva týdny'          par:°{s:'uzivatele',c:'dny',days:'15',short:'2'}}
+      item { title:'měsíc'              par:°{s:'uzivatele',c:'dny',days:'30',short:'2'}}
+      item { title:'nastavený den'      par:°{s:'uzivatele',c:'den',short:'2'}}
+    }
+    menu { title:'Aktivní moduly',type:'group',skill:'a'
       item { title:'dnes'               par:°{s:'moduly',c:'dnes',short:'1'}}
       item { title:'... podrobně'       par:°{s:'moduly',c:'dnes',short:'0'}}
       item { title:'včera'              par:°{s:'moduly',c:'vcera',short:'1'}}
@@ -145,7 +147,7 @@ panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a'
       item { title:'nastavený den'      par:°{s:'moduly',c:'den',days:'30',short:'1'}}
       item { title:'... podrobně'       par:°{s:'moduly',c:'den',days:'30',short:'0'}}
     }
-    menu err { title:'Chyby',type:'group'
+    menu err { title:'Chyby',type:'group',skill:'a'
       item today { title:'dnes'         par:°{s:'chyby',c:'dnes'}}
       item { title:'včera'              par:°{s:'chyby',c:'vcera'}}
       item week { title:'týden'         par:°{s:'chyby',c:'tyden'}}
@@ -155,7 +157,7 @@ panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a'
       item { title:'čekající BUGs'      par:°{s:'chyby',c:'BUG1'}}
       item { title:'vyřešené BUGs'      par:°{s:'chyby',c:'BUG2'}}
     }
-    menu { title:'Přihlášení',type:'group'
+    menu { title:'Přihlášení',type:'group',skill:'a'
       item today { title:'dnes'         par:°{s:'login',c:'dnes'}}
       item { title:'včera'              par:°{s:'login',c:'vcera'}}
       item { title:'týden'              par:°{s:'login',c:'tyden'}}
@@ -168,6 +170,13 @@ panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a'
       item { title:'včetně programátorů' par:°{s:'skip',c:'0'}}
       proc onclick(i) { skip.set(i.par.c) }
     }
+    menu sur { title:'Přehledy',type:'group',skill:'a;aa'
+      item { title:'tabulka oprávnění'}
+      proc onclick() {
+        ask('sys_user_skills','skills');
+        alert("soubor lze stáhnout <a href='docs/skills.xlsx'>zde</a>");
+      }
+    }
     proc onclick (i) {
       u.result.set(conc("<div id='info'>",ask('sys_activity',i.par,skip.get,u.den.get),"</div>"))
     }
@@ -175,7 +184,7 @@ panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a'
   use u: form _touch [12,4,,]
   var skip: number
   form _touch [,,*,50] {
-    field den [-20,19,85,18] { type:'date', style:'z-index:2', format:'Rrt', help:'zvolený den' }
+    field den [-20,19,85,18] { type:'date', style:'z-index:2', format:'Rrt', title:'nastavený&nbsp;den' }
     label result [0,0,*,600] { title:'' }
   }
   proc onstart() { skip.set(0) }
@@ -292,7 +301,8 @@ panel users [,,,543] {type:'plain', title:'Uživatelé', _sys:'uzi', skill:'a|a'
         item { title:'-zkontrolovat konzistentnost'
           proc onclick() { alert(ask('sys_user_skills')) } }
         item { title:'exportovat přehledovou tabulku'
-          proc onclick() { ask('sys_user_skills','skills'); download('docs/skills.xls') } }
+          proc onclick() { ask('sys_user_skills','skills');
+            alert("soubor lze stáhnout <a href='docs/skills.xlsx'>zde</a>"); } }
         item { title:'nositelé nastaveného oprávnění'
           proc onclick() {
             uzivatele.list.selected('clear');

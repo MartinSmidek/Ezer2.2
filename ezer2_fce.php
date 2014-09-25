@@ -274,7 +274,7 @@ function sys_user_skills($file='') {
   $xls.= "\n|close";
   if ( $file ) {
 //                                                 display($xls);
-    $inf= Excel5($xls,1);
+    $inf= Excel2007($xls);
     $result= $inf ? 0 : 1;
   }
   else if ( !$result )
