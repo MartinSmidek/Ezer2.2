@@ -563,7 +563,8 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
   $EZER->version= 'ezer2.2';
   // nastavení databází
   $sada= $ezer_local ? 1 : 0;
-  $mysql_db= $db[$sada];
+//   $mysql_db= $db[$sada];
+  $mysql_db= isset($dbs[$sada][$db[$sada]][5]) ? $dbs[$sada][$db[$sada]][5] : $db[$sada];
   $ezer_db= $dbs[$sada];
   $ezer_sdb= $dbs[$sada];
   $ezer_system= $ezer_system ? $ezer_system : 'ezer_system';
@@ -2168,34 +2169,67 @@ function Excel5_f(&$ws,$range,$v,&$err) {
 # spojení s databází
 # $db = jméno databáze uvedené v konfiguraci aplikace
 # $db = .main. pokud má být připojena první databáze z konfigurace
-function ezer_connect ($db='.main.',$even=false) {
+function ezer_connect ($db0='.main.',$even=false) {
   global $ezer_db;
+  $db= $db0;
   if ( $db=='.main.' ) {
     foreach ( $ezer_db as $db1=>$desc) {
       $db= $db1;
       break;
     }
   }
-        $x= "db=$db";
   // vlastní připojení, pokud nebylo ustanoveno
   $db_name= isset($ezer_db[$db][5]) ? $ezer_db[$db][5] : $db;
+//                                 echo("<br>{$_GET['database']} :: $db0 ~ $db ~ $db_name");
   if ( !$ezer_db[$db][0] || $even ) {
     $ezer_db[$db][0]= @mysql_pconnect($ezer_db[$db][1],$ezer_db[$db][2],$ezer_db[$db][3]);
     if ( !$ezer_db[$db][0] ) {
-      fce_error("$x|connect: server '{$ezer_db[$db][1]}' s databazi '"
+      fce_error("db=$db|connect: server '{$ezer_db[$db][1]}' s databazi '"
         . ($ezer_db[$db][5] ? "$db/$db_name" : $db)."' neni pristupny:").mysql_error();
     }
   }
   // nastavení aktivní databáze pro
   $res= @mysql_select_db($db_name,$ezer_db[$db][0]);
-  if ( !$res )
-    fce_error("connect: databaze '$db_name' je nepristupna ").mysql_error();
+  if ( !$res ) {
+    fce_error("connect: databaze '$db_name' ('$db0'={$ezer_db[$db][5]}) je nepristupna ").mysql_error();
+  }
   if ( $ezer_db[$db][4] ) {
 //                                                         display("SET NAMES '{$ezer_db[$db][4]}'");
     mysql_query("SET NAMES '{$ezer_db[$db][4]}'");
   }
   return 1;
 }
+# -------------------------------------------------------------------------------------------------- ezer_connect
+# spojení s databází
+# $db = jméno databáze uvedené v konfiguraci aplikace
+# $db = .main. pokud má být připojena první databáze z konfigurace
+// function ezer_connect ($db='.main.',$even=false) {
+//   global $ezer_db;
+//   if ( $db=='.main.' ) {
+//     foreach ( $ezer_db as $db1=>$desc) {
+//       $db= $db1;
+//       break;
+//     }
+//   }
+//   // vlastní připojení, pokud nebylo ustanoveno
+//   $db_name= isset($ezer_db[$db][5]) ? $ezer_db[$db][5] : $db;
+//   if ( !$ezer_db[$db][0] || $even ) {
+//     $ezer_db[$db][0]= @mysql_pconnect($ezer_db[$db][1],$ezer_db[$db][2],$ezer_db[$db][3]);
+//     if ( !$ezer_db[$db][0] ) {
+//       fce_error("db=$db|connect: server '{$ezer_db[$db][1]}' s databazi '"
+//         . ($ezer_db[$db][5] ? "$db/$db_name" : $db)."' neni pristupny:").mysql_error();
+//     }
+//   }
+//   // nastavení aktivní databáze pro
+//   $res= @mysql_select_db($db_name,$ezer_db[$db][0]);
+//   if ( !$res ) {
+//     fce_error("connect: databaze '$db_name' ('$db0'={$ezer_db[$db][5]}) je nepristupna ").mysql_error();
+//   }
+//   if ( $ezer_db[$db][4] ) {
+//     mysql_query("SET NAMES '{$ezer_db[$db][4]}'");
+//   }
+//   return 1;
+// }
 # -------------------------------------------------------------------------------------------------- mysql_row
 # provedení dotazu v $y->qry="..." a vrácení mysql_fetch_assoc (případně doplnění $y->err)
 function mysql_row($qry,$err=null) {
