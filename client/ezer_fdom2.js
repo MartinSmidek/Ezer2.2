@@ -3196,6 +3196,13 @@ Ezer.Show.implement({
     return this.DOM_qry_select[i]
       ? this.DOM_qry_select[i]._key
       : this.DOM_qry[i].value;
+  },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - -  DOM_qry_empty
+// funkce vrací true. pokud je dotaz na i-tém qry-řádku definován
+  DOM_qry_empty: function (i) {
+    return this.DOM_qry_select[i]
+      ? this.DOM_qry_select[i]._key==0
+      : this.DOM_qry[i].value=='';
   }
 });
 // ================================================================================================= fce

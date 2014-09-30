@@ -4695,6 +4695,19 @@ Ezer.Browse= new Class({
     }
     return qry;
   },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _get_query
+// vrátí objekt {polozka:[formát,vzor/1,...],...} pro položky s neprázdným vzorem
+// kde formát=q|q/... podle atributu show.format, vzor/i je text vzoru na i-tém řádku
+  _get_query: function () {
+    var cond= {};
+    for ( var ic in this.part ) {
+      part= this.part[ic];
+      if ( part instanceof Ezer.Show && (q= part._get_query()) ) {
+        cond[ic]= q;
+      }
+    }
+    return cond;
+  },
 // ------------------------------------------------------------------------------------ browse_map+
 //fx: Browse.browse_map (fce)
 //      zavolání funkce 'fce' na serveru: fce(keys), kde 'keys' jsou klíče vybraných řádků
@@ -4854,7 +4867,8 @@ Ezer.Browse= new Class({
 //r:    - počet přečtených řádků
   browse_load: function(cond,order,having,from,len,quiet,sql) {
     // vytvoř parametry dotazu
-    var x= this._params({cmd:'browse_load'},
+    var x= {cmd:'browse_load'};
+    x= this._params({cmd:'browse_load'},
       //                                            zapomen_podminku,sql
       cond,order||null,having||null,from||null,len||null,null,sql||null);
     x.quiet= quiet||0;
@@ -5305,28 +5319,19 @@ Ezer.Browse= new Class({
       x.optimize= this.options.optimize;
       if ( this.options.optimize.ask ) {
         // zjednodušené předání parametrů pro browse/ask - bez join, data, ...
-        var field;
-        for (var ic in this.part) { // předej id od všech show
-          field= this.part[ic];
+        for (var ic in this.part) {
+          // předej id od všech show
+          var field= this.part[ic];
           if ( field.type=='show' && field.skill ) {
-            var desc= {id:field.id};
-            // řazení
+            x.fields.push(this.part[ic].id);
+            // a řazení
             if ( field.sorting && field.sorting!='n' ) {
               x.order= field.sorting+' '+ic;
             }
-            // výběrové podmínky
-            if ( this.options.qry_rows ) {
-              var q= [], qs= 0;
-              for (var i= 1; i<=this.options.qry_rows; i++) {
-                if ( field.DOM_qry[i]==undefined ) break;
-                q[i]= field.get_query(0,i);
-                qs+= q[i] ? 1 : 0;
-              }
-              if ( qs ) desc.q= q;
-            }
-            x.fields.push(desc);
           }
         }
+        // a technickou podobu dotazu pro browse/ask
+        x.cond= this._get_query();
         return x;
       }
     }
@@ -5456,6 +5461,7 @@ Ezer.Show= new Class({
 //             počáteční řazení jako '+' (vzestupně) nebo '-' (sestupně)
 //  ; 'q[x]' : u sloupce bude možné vyhledávat podle vzoru, x může doplnit způsob hledání
 //            'q*' regulárním výrazem (default), 'q$' regulárním výrazem bez diakritiky,
+//            'q%' regulární výraz s levostranným %,
 //            'q=' na shodu, 'q/' intervalem (musí být 2 dotazové řádky, další se ignorují)
 //  ; 't' : hodnota bude zobrazena i jako title
 //  ; 'u' : EXPERIMENTÁLNÍ hodnotu lze interaktvně změnit po dvojklik
@@ -5467,7 +5473,7 @@ Ezer.Show= new Class({
 //os: Show.sql_pipe - transformace zobrazených hodnot pomocí funkce v PHP
   js_pipe: null,                        // null nebo jednoparametrická funkce
 //os: Show.js_pipe - transformace zobrazených hodnot pomocí funkce v Javascriptu (člena Ezer.fce)
-  qry_type: null,                       // typ dotazu: * $ / = nebo null
+  qry_type: null,                       // typ dotazu: / = # $ % @ * . nebo null
 //   values: [],                           // hodnoty řádků sloupce (délka je rows, indexuje se od 1)
   css: {},                              // objekt vytvořený podle atributu css_rows
   css_clmn: null,                       // clmn řídící obarvení
@@ -5847,6 +5853,22 @@ Ezer.Show= new Class({
     }
     this.get_query_pipe= pipes; // předej žádost o modifikaci dotazu
     return qry ? (files ? qry : '('+qry+')') : '';
+  },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _get_query
+// vrátí pole [formát,vzor/1,...] nebo null
+//   kde formát=q|q/... podle atributu format, vzor/i je text vzoru na i-tém řádku
+// null vrací, pokud show má všechny vzory prázdné
+  _get_query: function () {
+    var empty= true, cond;
+    if ( this.qry_type ) {
+      cond= [this.qry_type];
+      for ( var iq= 1; iq<=this.owner.options.qry_rows; iq++ ) {
+        if ( !this.DOM_qry_empty(iq) )
+          empty= false;
+        cond[iq]= this.DOM_qry_get(iq);
+      }
+    }
+    return empty ? null : cond;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_sort
 // změní značku řazení podle this.sorting
