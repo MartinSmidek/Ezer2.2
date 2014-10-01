@@ -122,7 +122,7 @@ function sys_user_change_me($typ,$fld,$val,$p1='',$p2='') {  trace();
 # $typ='fld' -- _user->$fld=$val
 # $typ='pas' -- _user->password=$val pokud stávající _user->password==$p1 a $val==$p2
 function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
-  global $json, $ezer_system, $ezer_root;
+  global $json, $ezer_system, $ezer_root, $mysql_db_system,$salt;
   $html= '';
   $err= '';
   if ( $id_user ) {
@@ -155,6 +155,11 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
       if (!$res) $err.= "CHYBA:".mysql_error();
       break;
     case 'pas':                                         // zápis do _user.fld
+    	if (isset($salt)) {
+	    	$p1 = crypt($p1, $salt);
+	    	$p2 = crypt($p2, $salt);
+	    	$val = crypt($val, $salt);
+			}
       if ( $p1!=select('password','_user',"id_user='$id_user'",'ezer_system') )
         $err.= "chybně zapsané původní heslo";
       else if ( !$val )

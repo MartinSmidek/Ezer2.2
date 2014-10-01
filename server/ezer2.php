@@ -2,7 +2,7 @@
   error_reporting(E_ALL & ~E_NOTICE);
   # ------------------------------------------------------------------------------------------------ paths, globals
   # globální objekty ($json bude v PHP6 zrušeno)
-  global $ezer_root, $ezer_path_serv, $ezer_path_appl, $ezer_path_root, $ezer_db, $ezer_system;
+  global $ezer_root, $ezer_path_serv, $ezer_path_appl, $ezer_path_root, $ezer_db, $ezer_system, $salt;
   global $json, $USER, $EZER, $ezer_user_id;
   # ------------------------------------------------------------------------------------------------ requires
   # vložení a inicializace balíků
@@ -1139,7 +1139,12 @@
     if ( $x->uname ) {
       $size= "{$x->size->body->x}/{$x->size->body->y}|{$x->size->screen->x}/{$x->size->screen->y}";
       $info= "{$x->uname}|$ip|$size|$browser";
-      $where= " WHERE username='{$x->uname}' AND password='{$x->pword}' ";
+      if (isset($salt)) {
+				$pword= crypt($x->pword, $salt);
+			} else {
+				$pword= $x->pword;
+			}
+      $where= " WHERE username='{$x->uname}' AND password='{$pword}' ";
       $qry= "SELECT * FROM $ezer_system._user $where";
       $res= mysql_qry($qry,0,0,0,'ezer_system');
       if ( $res && ($u= mysql_fetch_object($res)) ) {
