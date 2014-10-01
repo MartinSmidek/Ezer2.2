@@ -4369,8 +4369,15 @@ Ezer.Browse= new Class({
         this.r= this.b;
         this.tlen= Math.min(this.tmax,this.blen);
         this.tact= this.tlen ? 1 : 0;
+        // pokus nastavit původní řádek
+        var key= old_key;
+        for (var iv= 0; iv<this.blen; iv++) {
+          if ( this.keys[iv]==key ) {             // projdi klíče přečtených řádků browse
+            this._row_move(this.b+iv);
+            break;
+          }
+        }
         this.DOM_show();
-//         this.DOM_show_status();
       }
     }
     else
@@ -5318,7 +5325,7 @@ Ezer.Browse= new Class({
     if ( this.options.optimize )  {
       x.optimize= this.options.optimize;
       if ( this.options.optimize.ask ) {
-        // zjednodušené předání parametrů pro browse/ask - bez join, data, ...
+        // ---------------- browse/ask: zjednodušené předání parametrů - bez join, data, ...
         for (var ic in this.part) {
           // předej id od všech show
           var field= this.part[ic];
@@ -5331,7 +5338,7 @@ Ezer.Browse= new Class({
           }
         }
         // a technickou podobu dotazu pro browse/ask
-        x.cond= this._get_query();
+        x.show= this._get_query();
         return x;
       }
     }
@@ -5654,18 +5661,22 @@ Ezer.Show= new Class({
         }
       }
     }
-    // provedení změny
-    var val= 1;
+    var val= 0;
     if ( this.DOM_th ) {
       if ( w===undefined )
+        // vrácení šířky
         val= this.DOM_th.getStyle('width').toInt();
       else if ( Number(w)==0 ) {
+        // změna šířky
         width_set.call(this,0);
         this.DOM_th.addClass('BrowseNoClmn');
+        val= 1;
       }
       else {
+        // nulová šířka
         width_set.call(this,w);
         this.DOM_th.removeClass('BrowseNoClmn');
+        val= 1;
       }
     }
     return val;

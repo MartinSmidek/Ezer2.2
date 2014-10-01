@@ -1129,9 +1129,9 @@ Ezer.Button.implement({
     if ( !owners_block )
       owners_block= this.owner.value.DOM_Block;
     if ( this.type=='button.html' ) {
-      this.DOM_Block= this.DOM_Input= new Element('button',{
-        html:(this.options.title||'').replace(/\[fa-([^\]]+)\]/,"<i class='fa fa fa-$1'></i>")
-      });
+      this.DOM_Block= this.DOM_Input= new Element('button');
+      this.value= this.options.title||'';
+      this.DOM_set();
     }
     else {
       this.DOM_Block= this.DOM_Input= new Element('input',{
@@ -1169,9 +1169,6 @@ Ezer.Button.implement({
 // ================================================================================================= ButtonHtml-DOM
 Ezer.ButtonHtml.implement({
   Implements: [Ezer.Drag,Ezer.Help],
-//   DOM_add: function() {
-//     this.parent();
-//   },
 // ------------------------------------------------------------------------------------ DOM_enabled
 // zobrazí this.value v DOM
   DOM_enabled: function (on) {
@@ -1180,12 +1177,12 @@ Ezer.ButtonHtml.implement({
 // ------------------------------------------------------------------------------------ DOM_set
 // zobrazí this.value v DOM
   DOM_set: function () {
-    this.DOM_Block.set('html',this.value);
+    this.DOM_Block.set('html',this.value.replace(/\[fa-([^\]]+)\]/,"<i class='fa fa fa-$1'></i>"));
+
   },
 // ------------------------------------------------------------------------------------ DOM_get
-// přenese hodnotu z DOM do this.value
+// nechá hodnotu v this.value
   DOM_get: function () {
-    this.value= this.DOM_Block.get('html');
   }
 });
 // ================================================================================================= Elem-DOM
@@ -2388,6 +2385,12 @@ Ezer.Browse.implement({
 //      odstraní obraz tabulky
   DOM_remove: function(data_only) {
     if ( data_only ) {
+      // odpojení událostí
+      for (var i= 1; i<=this.tmax; i++) {
+        this.DOM_row[i].removeEvents();
+      }
+      this.DOM_input.removeEvents();
+      this.DOM_table.removeEvents();
       // odstranění pouze datové části browse
       for (var i= 1; i<=this.tmax; i++) {
           this.DOM_row[i].destroy();
@@ -2470,7 +2473,7 @@ Ezer.Browse.implement({
   },
 // ------------------------------------------------------------------------------------ DOM_addEvents+
 //f: Browse-DOM.DOM_addEvents ()
-//      zobrazí tabulku
+//      připojí (nebo odpojí) události
   DOM_Input_state: 0,           // 1 se nastaví pomocí ALT - další písmeno je interpretováno
                                 // jako jednopísmenný vzor pro skok na hodnotu prvního sloupce
   DOM_addEvents: function() {
