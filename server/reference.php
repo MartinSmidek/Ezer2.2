@@ -225,6 +225,7 @@ function i_glob($mask) {
 # -------------------------------------------------------------------------------------------------- wiki2html
 # převod z formátu wiki, používaného pro dokumentaci do html kódu
 function wiki2html ($wiki) {
+  global $ezer_path_serv;
   require_once("$ezer_path_serv/licensed/class_WikiParser.php");
   $css= array (
     '<h1>'  => "<div class='CModule'><h3 class='CTitle'>",
