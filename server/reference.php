@@ -222,6 +222,34 @@ function i_glob($mask) {
   }
   return $return;
 }
+# -------------------------------------------------------------------------------------------------- wiki2html
+# převod z formátu wiki, používaného pro dokumentaci do html kódu
+function wiki2html ($wiki) {
+  require_once("$ezer_path_serv/licensed/class_WikiParser.php");
+  $css= array (
+    '<h1>'  => "<div class='CModule'><h3 class='CTitle'>",
+    '</h1>' => "</h3 ></div>",
+    '<h2>'  => "<div class='CSection CMenu'><h3 class='CTitle'>",
+    '</h2>' => "</h3 ></div>",
+    '<h3>'  => "<div class='CSection CForm'><h3 class='CTitle'>",
+    '</h3>' => "</h3 ></div>",
+    '<h4>'  => "<h3 class='STitle'>",
+    '</h4>' => "</h3 >",
+    '<dl>'  => "<table class='CDescriptionList' border='0' cellspacing='5' cellpadding='0'>",
+    '</dl>' => "</table>",
+    '<dt>'  => "<tr><td class='CDLEntry'>",
+    '</dt>' => "</td>",
+    '<dd>'  => "<td class='CDLDescription'>",
+    '</dd>' => "</td></tr>",
+  );
+  $parser= new WikiParser();
+  $parser->reference_wiki = '';
+  $parser->image_uri = './';
+  $parser->ignore_images = false;
+  $html= $parser->parse(str_replace('\n',"\n",$wiki),'');
+  $html= strtr($html,$css);
+  return $html;
+}
 # -------------------------------------------------------------------------------------------------- i_doc_app
 # $fnameslist je maska souborů s dokumentací aplikace ve wiki formátu
 # tyto soubory jsou uloženy vzhledem k cestě $ezer_path_root

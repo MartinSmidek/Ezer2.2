@@ -216,7 +216,7 @@ ul.MainTabs {
 li#_help a {
   color:#ef7f13 !important; font-weight:bold !important; }
 
-/* accordion */
+/* levé menu (accordion) */
 
 .Accordion {
   line-height:1; position:absolute; top: 0; left: 0; width: 210px; height:100%; overflow-y:auto; }
@@ -244,6 +244,11 @@ li#_help a {
 .MSelected {
   background-color:$ab !important; color:$c !important; /*text-shadow:none;*/
   border-right:4px solid $ab !important;}
+
+.Accordion :first-child MGroup { margin-left:20px; }
+.Accordion div.awesome {
+  position:absolute; top:0px; color:white; font-size:15px; margin:4px; }
+i.efa { width:30px; margin-left:-30px; }
   
 /* context menu */
 

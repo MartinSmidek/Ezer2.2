@@ -1332,6 +1332,7 @@ Ezer.MenuLeft= new Class({
   start: function(codes,oneval) {
     this.parent(codes,oneval);
     this.owner.menuleft= this;
+    this.DOM_start();
   },
 // ------------------------------------------------------------------------------------ attach_code
 //fm: MenuLeft.attach_code (o)
@@ -7660,6 +7661,14 @@ Ezer.fce.replace= function () {
     }
   }
   return x;
+}
+// ----------------------------------------------------------------------------------- replace_fa
+//ff: fce.replace_fa (x)
+//      vrátí x ve kterém provede náhradu podřetězců [fa-ikona] za html kód zobrazující ikony
+//      podle http://fortawesome.github.io/Font-Awesome/icons/
+//s: funkce
+Ezer.fce.replace_fa= function (x) {
+  return x.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
 }
 // -------------------------------------------------------------------------------------- conc
 //ff: fce.conc (s1,s2,...)

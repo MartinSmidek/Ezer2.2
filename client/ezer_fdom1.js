@@ -57,7 +57,7 @@ Ezer.Application= new Class({
       }
     }
     // změna šířky změní width ve stylu PanelRight
-    const pruh= 16;
+    const pruh= 30;
     var leftMenu= document.getElement('.Accordion');
     var leftMenuWidth= leftMenu ? leftMenu.getStyle('width').toInt() : 210;
     var ws= this.DOM_layout_mode=='inner'
