@@ -1325,7 +1325,7 @@ Ezer.MenuMain= new Class({
 Ezer.MenuLeft= new Class({
 //oi: MenuLeft.active - vnořený Item, který má být aktivní hned po startu, hvězdička aktivuje první item
 //os: MenuLeft.format - vzhled
-//  ; 'f' : 'foldable' umožní skrývat menu a rozšiřovat pravý panel
+//  ; 'f' : 'foldable' umožní skrývat menu a rozšiřovat pravý panel, lze užít metodu click
   Extends: Ezer.Menu,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start
 //f: MenuLeft.start (code,oneval)
@@ -1349,7 +1349,15 @@ Ezer.MenuLeft= new Class({
     this.subBlocks(o,this.DOM,null,'rewrite');            // true => doplnění a přepis
     this.DOM_excite();
 //     if ( this.DOM_re2 ) this.DOM_re2();                   // specificky doplní menu
-    return true;
+    return 1;
+  },
+// ------------------------------------------------------------------------------------ click
+//fm: MenuLeft.click ([stav=0])
+//      změní stav minimalizovatelného menu (format:'f'), u jiného typu se ignoruje;
+//      je-li zadán parametr, zajistí pro 2 minimalizaci nebo pro 1 plnou viditelnost menu
+  click: function (stav) {
+    this.DOM_click(stav);
+    return 1;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  excite
 //f: MenuLeft.excite ()

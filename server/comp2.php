@@ -13,7 +13,7 @@ function ezer2code ($name,$root='') {  #trace();
   global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
     $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes;
   global $pragma_library, $pragma_syntax, $pragma_attrs, $pragma_names, $pragma_get, $pragma_prefix,
-    $pragma_group, $pragma_box, $pragma_using, $pragma_test;
+    $pragma_group, $pragma_box, $pragma_using, $pragma_test, $pragma_strings;
   global $includes,$including;
 }
 # -------------------------------------------------------------------------------------------------- comp
@@ -40,7 +40,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
   global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
     $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes, $onloads;
   global $pragma_library, $pragma_syntax, $pragma_attrs, $pragma_names, $pragma_get, $pragma_prefix,
-    $pragma_group, $pragma_box, $pragma_using, $pragma_test;
+    $pragma_group, $pragma_box, $pragma_using, $pragma_test, $pragma_strings;
   global $call_php;
   $errors= 0;
   try {
@@ -67,6 +67,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
       if ( in_array('get',$pragma) )    $pragma_get= true;
       if ( in_array('box',$pragma) )    $pragma_box= true;
       if ( in_array('test',$pragma) )   $pragma_test= true;
+      if ( in_array('strings',$pragma)) $pragma_strings= true;
 //       if ( in_array('using',$pragma) ) {
 //         $i= array_search('using',$pragma);
 //         $pragma_using= $pragma[$i+1];
@@ -2595,7 +2596,7 @@ function get_id_or_key (&$id) {
 # value :: [-]num | str | object | array | constant_name   --> $value
 # vrací 1.písmeno typu
 function get_value (&$val,&$type) {
-  global $head, $lex, $typ, $tree, $const_list;
+  global $head, $lex, $typ, $tree, $const_list, $pragma_strings;
   $ok= false;
   $val= $lex[$head];
   if ( $typ[$head]=='del' && $val=='-' ) {
@@ -2607,6 +2608,9 @@ function get_value (&$val,&$type) {
     $ok= $typ[$head]=='num' || $typ[$head]=='str';
   }
   if ( $ok ) {
+    if ( $pragma_strings && $typ[$head]=='str' ) {
+      // zpracování vnitřku stringu
+    }
     $type= substr($typ[$head],0,1);
     $val= $type=='s'
         ? substr(substr($val,1),0,-1)
@@ -2869,7 +2873,7 @@ function get_expr($context,&$expr) {
 # ================================================================================================== LEXICAL
 # -------------------------------------------------------------------------------------------------- lex_analysis2
 function lex_analysis2 ($dbg=false) {
-  global $tok2lex, $ezer, $keywords, $specs, $lex, $typ, $pos, $not, $gen_source;
+  global $tok2lex, $ezer, $keywords, $specs, $lex, $typ, $pos, $not, $gen_source, $pragma_strings;
 
   // rozbor na tokeny podle PHP
   $tok= token_get_all( $dbg
@@ -2879,14 +2883,20 @@ function lex_analysis2 ($dbg=false) {
   note_time('lexical1');
   tok_positions($tok);
   note_time('lexical2');
+  if ( $pragma_strings ) tok_strings($tok);
+  note_time('lexical3');
 //                                                             debug($tok,'tok');
-  $lex= $typ= $pos= $not= array(); $k= 0;
+  $lex= $typ= $pos= $not= $str= array(); $k= 0;
   // poznámky začínající #$ se pokládají za vygenerované a jsou ignorovány
   // poznámky začínající # a mezerou se připojí k prvnímu klíčovému slovu s nastaveným note
   // komentáře začínající // se připojují k předcházejícímu klíčovému slovu s nastaveným cmnt
   $notes= '';
   $cmnt= 0;
-  for ($i= 2; $i<count($tok)-1; $i++) {
+  array_shift($tok);
+  array_pop($tok);
+  $count= count($tok);//-1;
+//                                                             debug($tok,"tok $count");
+  for ($i= 0; $i<$count; $i++) {
     $t= $tok[$i];
     $tp= $tok2lex[$tok[$i][0]];
     switch ( $tp ) {
@@ -2925,18 +2935,55 @@ function lex_analysis2 ($dbg=false) {
       break;
     case 'del':
     case 'num':
-    case 'str':
       $typ[$k]= $tp; $lex[$k]= $t[1]; $pos[$k]= "{$t[2]},{$t[3]}"; $k++;
       break;
+    case 'str':
+      $typ[$k]= $tp; $lex[$k]= $t[1];
+      if ( $pragma_strings && isset($tok[$i][5]) ) {
+        // složený string
+        $str[$k]= array();
+        foreach($tok[$i][5] as $x) {
+          if ( $x[1]!='{' && $x[1]!='}' )
+            $str[$k][]= $x[1];
+        }
+      }
+      $pos[$k]= "{$t[2]},{$t[3]}"; $k++;
+      break;
     default:
-      comp_error("LEXICAL {$t[1]} je nedovolený znak");
+      comp_error("LEXICAL ř.{$t[2]},{$t[3]}: '{$t[1]}' je nedovolený znak");
       break;
     }
   }
 //                                                             debug($lex,'lex');
+//                                                             debug($str,'str');
 //                                                             debug($typ,'typ');
 //                                                             debug($pos,'pos');
 //                                                             debug($not,'not');
+  return true;
+}
+# -------------------------------------------------------------------------------------------------- ezer
+function tok_strings(&$tok) {
+  global $tok2lex;
+  $count= count($tok);
+  for ($i= 0; $i<$count; $i++) {
+    if ($tok[$i][0]==-1 && $tok[$i][1]=='"') {
+      $tok[$i][5]= array();
+      for ($j= $i; $j<$count; $j++) {
+        $tok[$i][4]= 'T_CONSTANT_ENCAPSED_STRING';
+        $tok[$i][5][]= $tok[$j];
+        if ($j>$i ) {
+          $tok[$i][1].= $tok[$j][1];
+          if ( $tok[$j][1]=='"') {
+            $tok[$i][0]= 316;
+            $i= $j+1;
+            unset($tok[$j]);
+            break;
+          }
+          unset($tok[$j]);
+        }
+      }
+    }
+  }
   return true;
 }
 # -------------------------------------------------------------------------------------------------- ezer

@@ -216,7 +216,7 @@ $attribs = array (
 #  form
   'form'   =>  explode(",",'style:s,css:s,tabindex:n,title:s,key:s,key_id:s'),
   'view'   =>  explode(",",'order:s,join:s,join_type:s,expr:s'),
-  'label'  =>  explode(",",'type:s,data:i,expr:s,title:s,style:s,css:s,help:s,format:s,attribute:s,skill:s'),
+  'label'  =>  explode(",",'type:s,data:i,expr:s,title:s,style:s,css:s,help:s,format:s,attribute:s,skill:s,par:o'),
   'field'  =>  explode(",",'title:s,data:i,par:o,expr:s,map_pipe:m,sql_pipe:s,style:s,format:s,help:s,css:s,'
                           .'type:s,attribute:s,value:s,skill:s'),  // help_bg:s
   'button' =>  explode(",",'type:s,title:s,help:s,style:s,css:s,format:s,skill:s,par:o'),

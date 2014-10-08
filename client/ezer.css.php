@@ -219,7 +219,7 @@ li#_help a {
 /* levé menu (accordion) */
 
 .Accordion {
-  line-height:1; position:absolute; top: 0; left: 0; width: 210px; height:100%; overflow-y:auto; }
+  line-height:1; position:absolute; top: 0; left: 0; width: 210px; height:100%; overflow-y:auto; overflow-x:hidden; }
 .Accordion a.disabled {
   color:#999; font-style:italic; }
 .Accordion a.disabled:hover {

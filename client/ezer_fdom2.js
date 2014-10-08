@@ -248,7 +248,7 @@ Ezer.MenuMain.implement({
 //      levostranné menu, obsahuje MenuGroup+ je vnořeno do Tabs
 //s: Block-DOM
 Ezer.MenuLeft.implement({
-  awesome: null,       // smršťovací s ikonami z fontu awesome icons
+  awesome: 0,       // 1|2 pro minimalizovatelné menu (1=plné,2=minimalizované), jinak 0
 // ------------------------------------------------------------------------------------ DOM_add1
 //f: MenuLeft-DOM.DOM_add1 ()
 //      první zobrazení obalu levého menu
@@ -256,24 +256,8 @@ Ezer.MenuLeft.implement({
     Ezer.assert(this.owner.type=='panel.right',"menu typu 'left' může být pouze v panelu typu 'right'");
     // vložení accordionu do panelu na připravené místo
     this.DOM_Block= new Element('div',{'class':'Accordion',styles:{display:'none'}}).inject($('work'));
-//     // přidání smršťovacího tlačítka pro format:'f' (foldable)
-//     if ( this._f('f')>=0 ) {
-//       this.owner._folded= false; // panel si pamatuje, zda je levé menu zúžené (viz Ezez.app.DOM_layout)
-//       new Element('img',{src:Ezer.paths.images_cc+'/left_fold.png',styles:{
-//         position:'absolute',right:0,opacity:0.5},events:{
-//           click: function(event) {
-//             event.target.src= Ezer.paths.images_cc+(this._folded?'/left_fold.png':'/left_unfold.png');
-//             this._folded= !this._folded;
-//             Ezer.app.DOM_layout();
-//           }.bind(this.owner)
-//       }}).inject(this.DOM_Block);
-//     }
-//     else
-//     // přidání smršťovacího tlačítka pro format:'F' (foldable + font icons)
-    if ( this._f('f')>=0 ) {
-      this.awesome= true;
-    }
     this.owner.sel_group= null;
+    this.awesome= this._f('f')>=0 ? 1 : 0;
   },
 // ------------------------------------------------------------------------------------ DOM_re1
 //f: MenuLeft-DOM.DOM_re1 ()
@@ -290,14 +274,21 @@ Ezer.MenuLeft.implement({
     if ( this.awesome ) {
       this.owner._folded= false; // panel si pamatuje, zda je levé menu zúžené (viz Ezez.app.DOM_layout)
       new Element('div',{'class':'awesome',events:{
-        click: function(event) {
-          event.target.toggleClass('fa-caret-square-o-right');
-          event.target.toggleClass('fa-caret-square-o-left');
-          this._folded= !this._folded;
-          Ezer.app.DOM_layout();
-        }.bind(this.owner)
-      }}).adopt(new Element('i',{'class':'fa fa-caret-square-o-left'}))
+        click: function(event) { this.DOM_click(); }.bind(this)
+      }}).adopt(this.DOM_awesome= new Element('i',{'class':'fa fa-caret-square-o-left'}))
          .inject(this.DOM_Block);
+    }
+  },
+// ------------------------------------------------------------------------------------ DOM_excite
+//f: MenuLeft-DOM.DOM_click ([stav=0])
+//   změna stavu minimalizovatelného menu, pro stav=1 na plné, 2 na stažené, 0 na opak
+  DOM_click: function (stav) {
+    if ( this.awesome && (!stav || stav!=this.awesome) ) {
+      this.DOM_awesome.toggleClass('fa-caret-square-o-right').toggleClass('fa-caret-square-o-left');
+      this.owner.DOM_Block.setStyle('left',this.owner._folded ? 30 : 210);
+      this.owner._folded= !this.owner._folded;
+      this.awesome= this.awesome==1 ? 2 : 1;
+      Ezer.app.DOM_layout();
     }
   },
 // ------------------------------------------------------------------------------------ DOM_excite
@@ -350,11 +341,15 @@ Ezer.MenuGroup.implement({
     Ezer.assert(this.owner.type=='menu.left','chybné menu - group mimo accordion');
     this.DOM= new Element('div',{'class':'MGroup MEntry'}).inject(this.owner.DOM_Block);
     var href= make_url_menu([this.owner.owner.owner.id,this.owner.owner.id,this.owner.id,this.id]);
-    // 'ezer://'+this.owner.owner.owner.id+'.'+this.owner.owner.id+'.'+this.owner.id+'.'+this.id;
-    this.domA= new Element('a',{href:href,text:this.options.title||this.id}).inject(this.DOM);
-    if ( this.owner.awesome && this.owner.DOM_Block.getChildren().length==1 ) {
-      // první skupinu odsaď aby se tam vešla ikona
-      this.domA.setStyle('padding-left','20px');
+    var title= this.options.title||this.id;
+    this.domA= new Element('a',{href:href,text:title}).inject(this.DOM);
+    if ( this.owner.awesome ) {
+      // přidej title
+      this.domA.set('title',title.toUpperCase());
+      if ( this.owner.DOM_Block.getChildren().length==1 ) {
+        // první skupinu odsaď aby se tam vešla ikona
+        this.domA.setStyle('padding-left','20px');
+      }
     }
     this.DOM_Block= new Element('div',{'class':'MGroupContent'}).inject(this.DOM);
     if ( !this.owner.sel_group ) {
@@ -512,12 +507,15 @@ Ezer.Item.implement({
       this.DOM_Block= new Element('div',{'class':'MFile MEntry'}).inject(this.owner.DOM_Block);
       var href= make_url_menu([this.owner.owner.owner.owner.id,this.owner.owner.owner.id,
         this.owner.owner.id,this.owner.id,this.id]);
-      var title= this.options.title||this.id;
+      var title= this.options.title||this.id, pop;
       // náhrada ikony na začátku, případně uprostřed
-      title= title.replace(/^\[fa-([^\]]+)\]/,"<i class='fa fa-$1 fa-fw efa'></i>");
+      var s_ikonou= this.owner.owner.awesome;
+      if ( s_ikonou ) {
+        pop= title.replace(/\[fa-([^\]]+)\]/g,'');
+        title= title.replace(/^\[fa-([^\]]+)\]/,"<i class='fa fa-$1 fa-fw efa'></i>");
+      }
       title= title.replace(/\[fa-([^\]]+)\]/,"<i class='fa fa-$1'></i>");
-      this.domA= new Element('a',{href:href,html:title}).inject(this.DOM_Block);
-      this.domA.addEvents({
+      this.domA= new Element('a',{href:href,html:title,events:{
         click: function(el) {
           if ( !el.target.hasClass('disabled') ) {
             Ezer.pushState(href);
@@ -526,7 +524,9 @@ Ezer.Item.implement({
           }
           return false;
         }.bind(this)
-      });
+      }}).inject(this.DOM_Block);
+      if ( s_ikonou )
+        this.domA.set('title',pop);
       if ( this._fc('d') ) {
         this.domA.addClass('disabled');
       }
@@ -630,7 +630,9 @@ Ezer.Panel.implement({
 // ------------------------------------------------------------------------------------  _show
 //f: Panel-DOM._show ()
   _show: function(l,t,noevent) {
-    this.DOM_Block.setStyles({display:'block',left:l,top:t});
+    this.DOM_Block.setStyle('display','block');
+    if ( l!==undefined ) this.DOM_Block.setStyle('left',l);
+    if ( t!==undefined ) this.DOM_Block.setStyle('top',t);
 //   this.DOM_Block.setStyles({display:'block'});
 //   if ( !this._DOM_displayed ) {
 //     // při prvním zobrazení upravíme rozměry
@@ -924,10 +926,9 @@ Ezer.Label.implement({
   DOM_add: function() {
     // zobrazení label
     var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
-    var align= this._fc('c') ? 'center' : this._fc('r') ? 'right' : 'left';
-    var corr= /*Ezer.browser=='FF' ? {top:this._t-2,textAlign:align} :*/ {textAlign:align};
+    var align= this._fc('c') ? {textAlign:'center'} : this._fc('r') ? {textAlign:'right'} : {};
     this.DOM_Block= new Element('div',{'class':'Label',html:this.options.title||'',
-      styles:this.coord(corr),events:{
+      styles:this.coord(align),events:{
         click: function(el) {
           if ( !Ezer.design && (this.options.enabled || this.options.enabled===undefined) ) {
             Ezer.fce.touch('block',this,'click');           // informace do _touch na server
