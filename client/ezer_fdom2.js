@@ -293,7 +293,7 @@ Ezer.MenuLeft.implement({
   DOM_click: function (stav) {
     if ( this.awesome && (!stav || stav!=this.awesome) ) {
       this.DOM_awesome.toggleClass('fa-caret-square-o-right').toggleClass('fa-caret-square-o-left');
-      this.owner.DOM_Block.setStyles({left:this.owner._folded ? 30 : 210});
+      this.owner.DOM_Block.setStyle('left',this.owner._folded ? '30px' : '210px');
       this.owner._folded= !this.owner._folded;
       this.awesome= this.awesome==1 ? 2 : 1;
       Ezer.app.DOM_layout();
