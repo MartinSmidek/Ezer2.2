@@ -98,21 +98,13 @@ Ezer.Block.implement({
       if ( prop.left!==undefined )                                  // left
         style.left= Number(prop.left);
       else if ( prop.aside!==undefined ) {                          // nebo aside
-        style.top= this._l + Number(prop.aside);
+        style.left= this._l + Number(prop.aside);
       }
       if ( prop.top!==undefined )                                   // top
         style.top= Number(prop.top);
       else if ( prop.down!==undefined ) {                           // nebo down
         style.top= this._t + Number(prop.down);
       }
-      else if ( prop._down!==undefined ) {                          // nebo _down
-        style.top= div.getStyle('top').toInt() + Number(prop._down);
-      }
-//       if ( prop.bottom!==undefined )                                // bottom
-//         style.bottom= Number(prop.bottom);
-//       else if ( prop.up!==undefined ) {                             // nebo up
-//         style.bottom= this._t + Number(prop.up);
-//       }
       if ( prop.width!==undefined ) {                               // width
         style.width= Number(prop.width);
         if ( prop.width=='*' ) {
@@ -293,7 +285,7 @@ Ezer.MenuLeft.implement({
   DOM_click: function (stav) {
     if ( this.awesome && (!stav || stav!=this.awesome) ) {
       this.DOM_awesome.toggleClass('fa-caret-square-o-right').toggleClass('fa-caret-square-o-left');
-      this.owner.DOM_Block.setStyle('left',this.owner._folded ? '30px' : '210px');
+      this.owner.DOM_Block.setStyle('left',this.owner._folded ? 30 : 210);
       this.owner._folded= !this.owner._folded;
       this.awesome= this.awesome==1 ? 2 : 1;
       Ezer.app.DOM_layout();

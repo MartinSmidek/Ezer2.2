@@ -614,12 +614,7 @@ Ezer.Block= new Class({
           // pokud je u elementů použito ^title, je třeba opravit hranice rect
           var lpos= label.getPosition(dom);     // x, y
           var lsiz= label.getSize();            // x, y
-//           var clab= label.getCoordinates();     // left, right, top, bottom
           // opravy rect (_l, _r, _t, _b)
-//           rect._l= mmin(rect._l,clab.left);
-//           rect._r= mmax(rect._r,clab.right);
-//           rect._t= mmin(rect._t,clab.top);
-//           rect._b= mmax(rect._b,clab.bottom);
           rect._l= mmin(rect._l,_l+lpos.x);
           rect._r= mmax(rect._r,_l+lpos.x+lsiz.x);
           rect._t= mmin(rect._t,_t+lpos.y);
@@ -2273,6 +2268,32 @@ Ezer.Form= new Class({
       }
     }
     return 1;
+  },
+// ----------------------------------------------------------------------------------- stacks
+//fm: Form.stacks (tag_list[,smer='down',space_h=0,space_i=0,space_b=0])
+//      přeskládá formulář podle seznamu tagů, podle smer - down:shora dolů | up:zdola nahoru;
+//      prázdné tagy ignoruje;
+//      nepovinné parametry obsahují postupně mezeru přidávanou na začátek, mezi tagy a na konec
+//      upraví rozměry a polohu form, navrací výslednou výšku
+  stacks: function (tag_list,smer,space_h,space_i,space_b) {
+//     var form= this instanceof Ezer.Var && this.value && this.value.DOM_Block ? this.value : this;
+    smer= smer || 'down';
+    space_h= space_h||0;
+    space_i= space_i||0;
+    space_b= space_b||0;
+    var sum_h= space_h;
+    var tags= tag_list.split(','), tags_= del= '';
+    for (var i= 0; i<tags.length; i++) if ( tags[i] ) {
+      var tag= tags[i];
+      this.display(1,tag);
+      this.property({down:sum_h},tag);
+      tags_+= del+tag; del= '|';
+      var bounds= this.property({return:'bounds'},tags_);
+      sum_h= (bounds._t||0) + bounds._h + space_i;
+    }
+    sum_h+= space_b;
+    this.DOM_Block.setStyles({height:sum_h,top:this.options._t+(smer=='up'?this.options._h-sum_h:0)});
+    return sum_h;
   },
 // ------------------------------------------------------------------------------------ json
 //fm: Form.json ([obj][changed_only])
@@ -5985,7 +6006,7 @@ Ezer.Eval= new Class({
     this.eval();
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  val
-  val: function(x) {
+  val: function(x,depth) {
     var t= '?', tp= $type(x), tpi= '<i>'+tp+'</i>';
     if ( x==null ) t= '<b>null</b>';
     else if ( x===undefined ) t= '<b>undefined</b>';
@@ -6001,7 +6022,18 @@ Ezer.Eval= new Class({
       t= x;
       break;
     case 'object':
-      t= x.type ? '<b>'+x.type+'</b> '+x.id : '<b>o</b> '+tpi;
+      if ( depth || x instanceof Ezer.Block ) {
+        t= x instanceof Ezer.Block ? '<b>'+x.type+'</b> '+x.id : '<b>o</b> '+tpi;
+      }
+      else {
+        t= '';
+        var del= '{';
+        Object.each(x,function(xval,xi){
+          t+= del+xi+':'+this.val(xval,1);
+          del= ',';
+        },this);
+        t+= '}';
+      }
       break;
     case 'boolean':
       t= x ? '<b>true</b>' : '<b>false</b>';

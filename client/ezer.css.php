@@ -231,6 +231,8 @@ li#_help a {
   text-align:right; border-right:4px solid $s_group;
   cursor:pointer; font-weight:bold; _width:186px;
   white-space:nowrap; }
+.MGroupContent i {
+  font-size: 14px; }
 .MGroupContent {
   font-size: 11px; padding-top: 5px; font-weight: normal; text-transform:none; }
 .MSelected, .MFile a, .MIndex a, .MFile span {
