@@ -788,6 +788,7 @@ Ezer.Block= new Class({
               case 'panel.main':    part= new Ezer.PanelMain(this,desc,DOM,id,skill); break;
               case 'panel.plain':   part= new Ezer.PanelPlain(this,desc,DOM,id,skill); break;
               case 'panel.popup':   part= new Ezer.PanelPopup(this,desc,DOM,id,skill); break;
+              case 'panel.free':    part= new Ezer.PanelFree(this,desc,DOM,id,skill); break;
               case 'panel.right':   part= new Ezer.PanelRight(this,desc,DOM,id,skill); break;
               case 'radio':         part= new Ezer.Radio(this,desc,DOM,id,skill); break;
               case 'select':        part= new Ezer.Select(this,desc,DOM,id,skill); break;
@@ -1319,8 +1320,12 @@ Ezer.MenuMain= new Class({
 //s: Block
 Ezer.MenuLeft= new Class({
 //oi: MenuLeft.active - vnořený Item, který má být aktivní hned po startu, hvězdička aktivuje první item
+//-
+//i: MenuLeft.onresize - volá se při změně šíře minimalizovatelného menu, parametr udává šíři v px
+//-
 //os: MenuLeft.format - vzhled
-//  ; 'f' : 'foldable' umožní skrývat menu a rozšiřovat pravý panel, lze užít metodu click
+//  ; 'f' : 'foldable' umožní skrývat menu a rozšiřovat pravý panel, lze užít metodu click,
+//                     při změně šířky je volána metoda menu.onresize(aktuální šířka v px)
   Extends: Ezer.Menu,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start
 //f: MenuLeft.start (code,oneval)
@@ -1537,6 +1542,7 @@ Ezer.Item= new Class({
 //i: Panel.onfirstfocus - panel se poprvé stal viditelný, v tomto případě nenastane onfocus
 //i: Panel.onfocus - panel se stal viditelný
 //i: Panel.onblur - panel přestal být viditelný
+//i: Panel.onresize - volá se při změně rozměru okna, parametry dávají šířku a výšku (okna) v px
 Ezer.Panel= new Class({
   Extends: Ezer.Block,
   virgin: true,                         // stav před prvním focusem
@@ -1684,6 +1690,14 @@ Ezer.PanelPopup= new Class({
 // aliasy
 //fm: PanelPopup.close ([value])
 Ezer.PanelPopup.prototype.close= Ezer.PanelPopup.prototype.hide;
+// ================================================================================================= PanelFree
+//c: PanelFree
+//      pokud je Panel vnořen do Tabs reaguje i na události
+//t: Block
+//s: Block
+Ezer.PanelFree= new Class({
+  Extends: Ezer.PanelPopup
+});
 // ================================================================================================= Var
 //c: Var
 //      proměnná si ponechává pouze jméno - ostatní znaky přejímá ze své hodnoty
@@ -2838,6 +2852,7 @@ Ezer.Label= new Class({
   Extends:Ezer.Block,
 //os: Label.title - zobrazovaný text
   options: {},
+//oo: Label.par - parametr pro přenos nezobrazených informací
 //-
 //os: Label.format - vzhled
 //  ; 'c' : 'center' zarovnávat doprostřed

@@ -2092,7 +2092,7 @@ function get_if_block ($root,&$block,&$id) {
             if ( (!$blocs2[$root_tt] || !in_array($block_tt,$blocs2[$root_tt]) )
               && !in_array($block_tt,$blocs3) ) {
   //                                                                 debug($blocs2);
-              comp_error("SYNTAX: blok '$block_tt' není povolený uvnitř bloku '$root_tt'");
+              comp_error("SYNTAX: blok '$block_tt' není povolený uvnitř bloku '$root_tt' (1)");
             }
             // vnořené bloky
             while ( $ok ) {
@@ -2166,7 +2166,7 @@ function get_if_attrib ($root,&$id,&$val) {
       }
       $tree.= ' a';
     }
-    else { comp_error("SYNTAX atribut '$id' není povolený v bloku '$root'"); return false; }
+    else { comp_error("SYNTAX atribut '$id' není povolený v bloku '$root' (2)"); return false; }
   }
   return $ok;
 }

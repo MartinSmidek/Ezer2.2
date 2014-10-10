@@ -289,6 +289,7 @@ Ezer.MenuLeft.implement({
       this.owner._folded= !this.owner._folded;
       this.awesome= this.awesome==1 ? 2 : 1;
       Ezer.app.DOM_layout();
+      this.callProc('onresize',[this.awesome==1?210:30]);       // volání onresize(šíře)
     }
   },
 // ------------------------------------------------------------------------------------ DOM_excite
@@ -901,6 +902,40 @@ Ezer.PanelPopup.implement({
       Ezer.Shield.show();
     else
       Ezer.Shield.hide();
+  }
+});
+// ----------------------------------------------------------------------------------- PanelFree-DOM
+Ezer.PanelFree.implement({
+  DOM_shown: false,                           // true - pokud bylo poprvé ukázáno
+  // ---------------------------------------------------------------------------------- DOM_add1
+  DOM_add1: function() {
+    this.DOM_Block= this.DOM=
+      new Element('div',{'class':'Panel',styles:{display:'none'}}).inject($('work'));
+//     this.DOM_Block.setStyles({width:this._w,height:this._h,});
+  },
+  // ---------------------------------------------------------------------------------- DOM_add2
+  DOM_add2: function() {
+  },
+  // ---------------------------------------------------------------------------------- _show
+  _show: function(l,t) {
+    this.DOM.setStyles({display:'block',left:Number(l),top:Number(t)});
+    if ( this.virgin ) {
+      this.virgin= false;
+      Ezer.app.onfirstfocus(this);
+      if ( this.part && this.part['onfirstfocus'] )
+        this.fire('onfirstfocus',[]);
+      else
+        this.fire('onfocus',[]);
+    }
+    else
+      this.fire('onfocus',[]);
+    return this;
+  },
+  // ---------------------------------------------------------------------------------- _hide
+  _hide: function() {
+    this.fire('onblur',[]);
+    this.DOM.setStyles({display:'none'});
+    return this;
   }
 });
 // ================================================================================================= Form, View

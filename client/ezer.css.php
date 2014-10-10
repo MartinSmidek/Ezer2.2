@@ -728,6 +728,7 @@ hr.cleaner {
 #MainTopic .CTitle, .IPageTitle
          	{ padding: 5px 10px; background: #78ba91; color: #fff; margin-bottom: 10px;
                   /*text-shadow: 2px 2px 1px #679956;*/ }
+.CTitle,.STitle { white-space:nowrap; }
 .CClass .CTitle, .CSection .CTitle, .CModule .CTitle
          	{ background-color:$b_doc_modul; padding: 5px 10px; background-repeat: no-repeat;
                   background-position: center left; color: #fff; /*text-shadow: 2px 2px 1px #935b5c;*/ }

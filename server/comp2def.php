@@ -17,7 +17,7 @@ else
 # parametrizace chování
 $wiki= 0;                                           // 0 => překlad, 1 => dokumentace
 $blocs3 = array (                                    // universálně zanořitelné bloky
-  'table','report','map','group','form','area','panel.popup','menu.context'
+  'table','report','map','group','form','area','panel.popup','panel.free','menu.context'
 );
 $blocs2 = array (                                    // překládají se na AE_<part>
   ''            =>  explode(",",'pragma,group,system,module,ezer,table,report,form,area,map,panel.main,'
@@ -37,6 +37,7 @@ $blocs2 = array (                                    // překládají se na AE_<
 #  top
   'panel'       =>  explode(",",'use,proc,var,form,panel.popup'),
   'panel.popup' =>  explode(",",'use,proc,var,form'),
+  'panel.free'  =>  explode(",",'use,proc,var,form'),
   'panel.plain' =>  explode(",",'use,proc,var,form,panel'),
   'panel.right' =>  explode(",",'use,proc,var,form,menu.left,panel'),
   'use'         =>  explode(",",'form,group'),
@@ -266,11 +267,11 @@ $cmd_lib= // funkce nad stringy
          . 'set_sort'
 ;
 # funkce realizované některou třídou QE_... (this=env)
-$cmd_metd= ',form_show,form_init,form_copy,form_focus,form_browse,form_key,form_key_id,form_same,browse_blur,browse_focus,browse_key,browse_init'
-	 . ',browse_count,selected,init_queries,get_query,raise,fire,set,let,init,plain,change,get,self,popup,active,fold,html_edit'
-         . ',group_add,group_init,curr,elem_key,form_option,form_wide,add_key,enable,select_key,select_init'
-         . ',get_html,get_json,get_page,print,debug,report_init,report_check,report_repage,report_batch,'
-         . 'graft,button_display,button_enable,ref_attr,def_attr,display';
+// $cmd_metd= ',form_show,form_init,form_copy,form_focus,form_browse,form_key,form_key_id,form_same,browse_blur,browse_focus,browse_key,browse_init'
+// 	 . ',browse_count,selected,init_queries,get_query,raise,fire,set,let,init,plain,change,get,self,popup,active,fold,html_edit'
+//          . ',group_add,group_init,curr,elem_key,form_option,form_wide,add_key,enable,select_key,select_init'
+//          . ',get_html,get_json,get_page,print,debug,report_init,report_check,report_repage,report_batch,'
+//          . 'graft,button_display,button_enable,ref_attr,def_attr,display';
 # inicializace skalárních proměnných (kvůli dávkové kompilaci)
 $first_panel= '';
 $cmd_type= array();                                 // pomocné: op_id -> ajax|
