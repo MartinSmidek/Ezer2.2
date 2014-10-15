@@ -21,7 +21,6 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=8" />
-  <link rel="shortcut icon" href="./$ezer_root/img/$favicon" />
   <title>Ezer help</title>
   <script type="text/javascript">
 //     function ask_help(status) {
@@ -31,7 +30,6 @@
 //     ask_help('me');
   </script>
   <link charset="utf-8" media="screen" type="text/css" href="./ezer2.2/client/ezer.css.php" rel="stylesheet">
-  $head
 </head>
 __EOD;
   // definice možných HTML template stránky
@@ -48,7 +46,6 @@ $html_header
       <div id='status_center' style="float:left;"></div>
       <div id='status_right' style="float:right;"></div>
     </div>
-    <pre id="kuk">$trace</pre>
   </div>
 <!-- konec -->
 </body>

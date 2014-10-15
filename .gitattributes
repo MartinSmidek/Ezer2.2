@@ -30,6 +30,8 @@ client/img/submenu_bg.png -text
 client/img/tab_top.png -text
 client/img/tree.png -text
 client/lib.js -text
+client/licensed/Mdrag.js -text
+client/licensed/Mslider.js -text
 client/licensed/clientcide.js -text
 client/licensed/datepicker.js -text
 client/licensed/datepicker/datepicker_vista/buttons.png -text

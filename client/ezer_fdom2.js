@@ -626,7 +626,15 @@ Ezer.Panel.implement({
 // ------------------------------------------------------------------------------------ DOM_add2
 //f: Panel-DOM.DOM_add2 ()
   DOM_add2: function() {
-    if ( this.options.css ) this.DOM_Block.addClass(this.options.css);
+    if ( this.options.css )   this.DOM_Block.addClass(this.options.css);
+    if ( this.options.style ) {
+      var oss= this.options.style.split(';');
+      for (var io= 0; io < oss.length; io++ ) {
+        var os= oss[io].split(':');
+        Ezer.assert(os[0],'prázdný název stylu',this);
+        this.DOM_Block.setStyle(os[0],os[1]);
+      }
+    }
   },
 // ------------------------------------------------------------------------------------  _show
 //f: Panel-DOM._show ()
@@ -739,8 +747,8 @@ Ezer.PanelMain.implement({
     this.DOM_Block=
       new Element('div',{'class':'Panel',styles:{display:'block'}}).inject($('work'));
   },
-  DOM_add2: function() {
-  }
+//   DOM_add2: function() {
+//   }
 });
 // ================================================================================================= Panel pod Tabs
 // --------------------------------------------------------------------------- fce pro panely v Tabs
@@ -785,8 +793,8 @@ Ezer.PanelPlain.implement({
     this.DOM_Block=
       new Element('div',{'class':'Panel',styles:{display:'none'}}).inject($('work'));
   },
-  DOM_add2: function() {
-  },
+//   DOM_add2: function() {
+//   },
   _show: function(l,t,noevent) {
     this.DOM_Block.setStyles({display:'block',left:l,top:t+Ezer.Shield.top});
     if ( !noevent ) {
@@ -822,8 +830,8 @@ Ezer.PanelRight.implement({
     this.DOM_Block.setStyles({width:this._w,height:this._h});
     this.DOM_Block.store('Ezer',this); // kvůli Ezer.app.DOM_layout
   },
-  DOM_add2: function() {
-  },
+//   DOM_add2: function() {
+//   },
   _show: function(l,t) {
     if ( this.menuleft ) {
       this.menuleft.DOM_Block.setStyles({display:'block'});
@@ -862,9 +870,9 @@ Ezer.PanelPopup.implement({
     this.DOM_Block= this.DOM.getElement('.body');
     this.DOM_Block.setStyles({width:this._w,height:this._h});
   },
-  // ---------------------------------------------------------------------------------- DOM_add2
-  DOM_add2: function() {
-  },
+//   // ---------------------------------------------------------------------------------- DOM_add2
+//   DOM_add2: function() {
+//   },
   // ---------------------------------------------------------------------------------- _show
   _show: function(l,t,noevent,title) {
     this.DOM.setStyles({display:'block'});
@@ -913,9 +921,9 @@ Ezer.PanelFree.implement({
       new Element('div',{'class':'Panel',styles:{display:'none'}}).inject($('work'));
 //     this.DOM_Block.setStyles({width:this._w,height:this._h,});
   },
-  // ---------------------------------------------------------------------------------- DOM_add2
-  DOM_add2: function() {
-  },
+//   // ---------------------------------------------------------------------------------- DOM_add2
+//   DOM_add2: function() {
+//   },
   // ---------------------------------------------------------------------------------- _show
   _show: function(l,t) {
     this.DOM.setStyles({display:'block',left:Number(l),top:Number(t)});
@@ -946,9 +954,15 @@ Ezer.Form.implement({
     // nalezení nadřazeného bloku (vynechání var,group)
     var owner= this.DOM_owner();
     // zobrazení rámečku
-    this.DOM_Block= new Element('div',{'class':'Form',styles:this.coord()
+    this.DOM_Block= new Element('div',{'class':'Form',styles:this.coord(),events:{
+        click: function(el) {
+          if ( !Ezer.design && (this.options.enabled || this.options.enabled===undefined) ) {
+            Ezer.fce.touch('block',this,'click');           // informace do _touch na server
+            this.fire('onclick',[],el);
+          }
+        }.bind(this)
+      }
     }).inject(owner.DOM_Block);
-//     }).inject(this.owner.owner.DOM_Block);
     this.DOM_optStyle(this.DOM_Block);
   },
   DOM_add2: function() {
@@ -1193,6 +1207,7 @@ Ezer.Button.implement({
       this.DOM_Block= this.DOM_Input= new Element('button');
       this.value= this.options.title||'';
       this.DOM_set();
+      this.DOM_Block.setStyles(this.coord());
     }
     else {
       this.DOM_Block= this.DOM_Input= new Element('input',{
@@ -1200,10 +1215,9 @@ Ezer.Button.implement({
         type:this.type=='button.submit'?'submit':'submit',
         value:this.options.title||''                      // u Opery záleží na pořadí
       })
+      this.DOM_Block.setStyles(this.coord({height:undefined,width:undefined}));
     }
-    this.DOM_Block
-      .setStyles(this.coord({height:undefined,width:undefined}))
-      .addEvents({
+    this.DOM_Block.addEvents({
         mouseup: function(el) {
           if ( !Ezer.design ) {
             Ezer.fce.touch('block',this,'click');     // informace do _touch na server

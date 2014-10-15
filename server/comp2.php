@@ -1583,7 +1583,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
   switch ( $c->expr ) {
   case 'value':
     $code= $c->type=='this'
-      ? (object)array('o'=>'t','v'=>$c->value[0])
+      ? (object)array('o'=>'t','i'=>$c->value[0])
       : (object)array('o'=>'v','v'=>$c->value);
     $code_top++;
     break;
@@ -2329,8 +2329,9 @@ function get_def ($id,&$value,&$is_expr) {
       $op= get_if_delimiter('+') ? '+' : (get_if_delimiter('-') ? '-' : false);
     }
   }
-  // přidání do seznamu konstant
-  elseif ( !isset($const_list[$id]) ) {
+  // přidání do seznamu konstant (povoluje se přepsání stejnou hodnotou)
+  elseif ( !isset($const_list[$id])
+    || $const_list[$id]['value']==$value && $const_list[$id]['type']==$type ) {
     $const_list[$id]= array('value'=>$value,'type'=>$type);
     $is_expr= false;
   }
