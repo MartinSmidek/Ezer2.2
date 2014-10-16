@@ -1213,7 +1213,7 @@ function narozeni2roky($time,$now=0) {
 // roku_k (dat[,kdatu=now])
 // vrací počet roku uplynulých od daného data do daného data (neni-li uvedeno tak od běžného)
 function roku_k($dat,$kdatu='') {
-  if ( !$kdatu ) $kdatu= time();
+  if ( $kdatu=='' ) $kdatu= date('Y-m-d');
   $roku= '';
   $k= str2date($kdatu,$kd,$km,$ky);
   $d= str2date($dat,$dd,$dm,$dy);

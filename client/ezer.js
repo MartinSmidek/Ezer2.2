@@ -345,8 +345,8 @@ Ezer.Block= new Class({
       for (var i= 2; i<arguments.length; i++) {
         args.push(arguments[i]);
       }
-      new Ezer.Eval([{o:'c',i:o.id,a:args.length,s:lc}],o.context||form,args,o.id);
-      ok= 1;
+      var ret= new Ezer.Eval([{o:'c',i:o.id,a:args.length,s:lc}],o.context||form,args,o.id);
+      ok= ret.value;
     }
     return ok;
   },
@@ -7059,6 +7059,7 @@ Ezer.run_name= function (name,run_context,ctx,ids0) {
         // pokud se nepozná poslední id, je navrácena hodnota 2 (u mapy 1)
         for (; i<ids.length; i++) {
           Ezer.assert(context,'run_name');
+          // případná dereference
           if ( context.type=='var' && context._of=='object' ) {
             // dereference objektové proměnné
             if ( !context.value ) {
@@ -7068,6 +7069,7 @@ Ezer.run_name= function (name,run_context,ctx,ids0) {
             }
             context= context.value;
           }
+          // rozbor významu
           if ( context.part && context.part[ids[i]] ) {
             ctx[++c]= context= context.part[ids[i]];
           }
