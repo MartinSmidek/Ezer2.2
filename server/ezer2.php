@@ -596,10 +596,8 @@
       if ( isset($x->group) || isset($x->having) && $x->having ) {
         // pokud je GROUP musíme použít SQL_CALC_FOUND_ROWS
         $qry= "SELECT SQL_CALC_FOUND_ROWS $fields FROM $table $joins WHERE $cond ";
-        if ( $x->group ) {
-          $qry.= " GROUP BY {$x->group}";
-          if ( $x->having ) $qry.= " HAVING {$x->having}";
-        }
+        if ( $x->group )  $qry.= " GROUP BY {$x->group}";
+        if ( $x->having ) $qry.= " HAVING {$x->having}";
         $qry.= $order;
         if ( isset($x->rows) ) $qry.= " LIMIT {$x->from},{$x->rows}";
         $res= mysql_qry($qry);

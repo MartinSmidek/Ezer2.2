@@ -257,7 +257,7 @@ Ezer.MenuLeft.implement({
     // vložení accordionu do panelu na připravené místo
     this.DOM_Block= new Element('div',{'class':'Accordion',styles:{display:'none'}}).inject($('work'));
     this.owner.sel_group= null;
-    this.awesome= this._f('f')>=0 ? 1 : 0;
+    this.awesome= this._f('f')<0 ? 0 : (this.options.format.substr(this._f('f')+1,1)=='-' ? 2 : 1);
   },
 // ------------------------------------------------------------------------------------ DOM_re1
 //f: MenuLeft-DOM.DOM_re1 ()
@@ -272,10 +272,12 @@ Ezer.MenuLeft.implement({
   DOM_start: function() {
     // přidání smršťovacího tlačítka pro format:'f' (foldable + font icons)
     if ( this.awesome ) {
-      this.owner._folded= false; // panel si pamatuje, zda je levé menu zúžené (viz Ezez.app.DOM_layout)
+      // panel si pamatuje, zda je levé menu zúžené (viz Ezez.app.DOM_layout)
+      this.owner._folded= this.awesome==2;
       new Element('div',{'class':'awesome',events:{
         click: function(event) { this.DOM_click(); }.bind(this)
-      }}).adopt(this.DOM_awesome= new Element('i',{'class':'fa fa-caret-square-o-left'}))
+      }}).adopt(this.DOM_awesome= new Element('i',{
+        'class':this.awesome==2 ? 'fa fa-caret-square-o-right' : 'fa fa-caret-square-o-left'}))
          .inject(this.DOM_Block);
     }
   },

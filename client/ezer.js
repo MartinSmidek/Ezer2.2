@@ -1325,7 +1325,8 @@ Ezer.MenuLeft= new Class({
 //-
 //os: MenuLeft.format - vzhled
 //  ; 'f' : 'foldable' umožní skrývat menu a rozšiřovat pravý panel, lze užít metodu click,
-//                     při změně šířky je volána metoda menu.onresize(aktuální šířka v px)
+//                     při změně šířky je volána metoda menu.onresize(aktuální šířka v px);
+//                     f- zobrazí menu jako minimalizované
   Extends: Ezer.Menu,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start
 //f: MenuLeft.start (code,oneval)
