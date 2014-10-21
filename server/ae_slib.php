@@ -149,7 +149,7 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   }
   // klíčová slova pro debugger
   $head_jush= '';
-  if ( $pars->dbg ) {
+  if ( isset($pars->dbg) ) {
     require_once("$ezer_path_serv/sys_doc.php");
     pspad_keys($res,$key1,$key2,$key3);
     $k= strtr(substr($key2,0,-1),array("="=>'|',"\n"=>''));
@@ -246,7 +246,7 @@ __EOD
     $info= "<div class='login_a_msg'><br>$info</div>";
     break;
   case 'test':                          // zobraz stav SESSION, pokud je url parametr
-    $info= $_GET['session']
+    $info= isset($_GET['session'])
       ? "<div class='dbg'>".debugx($_SESSION,'$_SESSION:')."</div>"
       : "...&session=1 zobrazí \$_SESSION<br/><br/>".
         (is_array($welcome) ? $welcome[1] : $kontakt);
