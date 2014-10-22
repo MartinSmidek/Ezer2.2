@@ -22,15 +22,17 @@ Ezer.Block.implement({
     if ( this.DOM_Block ) {
       if (on!==false && this.options.enabled) {
         this.DOM_Block.removeClass('jxDisabled');
-        if (this.DOM_Input) {
+        if (this.DOM_Input)
           this.DOM_Input.disabled= false;
-        }
+        if (this.DOM_Button)
+          this.DOM_Button.disabled= false;
       }
       else {
         this.DOM_Block.addClass('jxDisabled');
-        if (this.DOM_Input) {
+        if (this.DOM_Input)
           this.DOM_Input.disabled= true;
-        }
+        if (this.DOM_Button)
+          this.DOM_Button.disabled= true;
       }
     }
   },
@@ -520,7 +522,7 @@ Ezer.Item.implement({
       title= title.replace(/\[fa-([^\]]+)\]/,"<i class='fa fa-$1'></i>");
       this.domA= new Element('a',{href:href,html:title,events:{
         click: function(el) {
-          if ( !el.target.hasClass('disabled') ) {
+          if ( !el.target.hasClass('disabled') && this.owner.owner.enabled ) {
             Ezer.pushState(href);
             this._click(el);
             Ezer.fce.touch('block',this,'click');     // informace do _touch na server
@@ -1205,7 +1207,7 @@ Ezer.Button.implement({
     var owners_block= this.owner.DOM_Block;
     if ( !owners_block )
       owners_block= this.owner.value.DOM_Block;
-    if ( this.type=='button.html' ) {
+    if ( this.type=='button.html' || this.type=='button' ) {
       this.DOM_Block= this.DOM_Input= new Element('button');
       this.value= this.options.title||'';
       this.DOM_set();
@@ -1483,9 +1485,11 @@ Ezer.FieldDate.implement({
 //      zobrazí prvek field
   DOM_add: function() {
     this.DOM_Block= new Element('div',{'class':'FieldDate',styles:this.coord()}).adopt(
-        this.DOM_icon= new Element('img',{align:'right',src:Ezer.paths.images_cc+'/calendar.gif'}),
+        this.DOM_Button= this.DOM_icon= Ezer.options.awesome      // varianta s awesome ikonami
+            ? new Element('button',{html:"<i class='fa fa-calendar'></i>"})
+            : new Element('img',{align:'right',src:Ezer.paths.images_cc+'/calendar.gif'}),
         this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
-          width:(this._w||87)-18,height:this._h||16}})
+          width:(this._w||87)-18-(Ezer.options.awesome?2:0)}})
     ).inject(this.owner.DOM_Block);
     this.DOM_ElemEvents();
     this.DOM_optStyle(this.DOM_Block,this.options.title,true); // u title ignorovat zarovnání
@@ -1537,9 +1541,11 @@ Ezer.FieldList.implement({
     this.DOM_Block= new Element('div',{'class':'Select FieldList',styles:this.coord()
     }).inject(this.owner.DOM_Block);
     this.DOM_Closure= new Element('div',{'class':'SelectClosure'}).inject(this.DOM_Block);
-    new Element('img',{align:'right',src:Ezer.version+'/client/img/field_list.gif',events:{
+    this.DOM_Button= Ezer.options.awesome      // varianta s awesome ikonami
+      ? new Element('button',{html:"<i class='fa fa-ellipsis-h'></i>"})
+      : new Element('img',{align:'right',src:Ezer.version+'/client/img/field_list.gif'});
+    this.DOM_Button.inject(this.DOM_Closure).addEvents({
       click: function() {
-//                                                         Ezer.trace('*','onfocus B '+this._focus);
         if ( this.DOM_Input.hasClass('empty') ) {
           this.DOM_Input.value= this.value;
           this.DOM_Input.removeClass('empty').addClass('empty_focus');
@@ -1548,7 +1554,7 @@ Ezer.FieldList.implement({
         this.fire('onfocus');
         this.DOM_show();
       }.bind(this)
-    }}).inject(this.DOM_Closure);
+    });
     this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
         width:this._w-(img ? 20 : 0),height:this._h-4}
     }).inject(this.DOM_Closure);
@@ -2067,11 +2073,20 @@ Ezer.Select.implement({
 //o: Select-DOM.DOM_Closure - obal pro input a ikonu
     this.DOM_Closure= new Element('div',{'class':'SelectClosure'}).inject(this.DOM_Block);
     if ( img ) {
-      // varianta s obrázkem šipky
-      var src= this.type=='select.auto' ? 'select_auto.gif' : 'select.gif';
-        new Element('img',{align:'right',src:Ezer.version+'/client/img/'+src,events:this.skill==2? {
+      if ( Ezer.options.awesome ) {
+        // varianta s awesome ikonami
+        var fa= this.type=='select.auto' ? 'fa-eject fa-flip-vertical' : 'fa-chevron-down';
+        this.DOM_Button= new Element('button',{html:"<i class='fa "+fa+"'></i>",events:this.skill==2? {
           click: function() {this.DOM_Input.focus();}.bind(this)
         }:{}}).inject(this.DOM_Closure);
+      }
+      else {
+        // varianta s obrázkem šipky
+        var src= this.type=='select.auto' ? 'select_auto.gif' : 'select.gif';
+          new Element('img',{align:'right',src:Ezer.version+'/client/img/'+src,events:this.skill==2? {
+            click: function() {this.DOM_Input.focus();}.bind(this)
+          }:{}}).inject(this.DOM_Closure);
+      }
     }
     this.DOM_Input= new Element('input',{type:'text'/*,value:this.options.title||''*/,styles:{
         width:this._w-(img ? 20 : 0),height:this._h-4}

@@ -761,7 +761,7 @@ Ezer.Block= new Class({
               // s vizualizací
               case 'browse':
               case 'browse.smart':  part= new Ezer.Browse(this,desc,DOM,id,skill); break;
-              case 'button':        part= new Ezer.Button(this,desc,DOM,id,skill); break;
+              case 'button':        part= new Ezer.ButtonHtml(this,desc,DOM,id,skill); break;
               case 'button.html':   part= new Ezer.ButtonHtml(this,desc,DOM,id,skill); break;
               case 'button.submit': part= new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'button.reset':  part= new Ezer.Button(this,desc,DOM,id,skill); break;
@@ -1074,7 +1074,7 @@ Ezer.Block= new Class({
 //   false   - pokud je obsluha fire asynchronní fce (došlo k volání serveru nebo jinému přerušení)
 //   true    - pokud obsluha neexistuje
 //   num|str - hodnota volané funkce
-// onchanged se dědí z položky do jejího formuláře
+// onchanged se dědí z položky do jejího formuláře, pokud není format:'T'
   fire: function(event_name,args,el) {
     // trasování události ovlivněné fcí set_trace
     function trace_event (event_type,id,event_name,fce) {
@@ -1114,13 +1114,15 @@ Ezer.Block= new Class({
       var form= this.owner;
       if ( event_name=='onchanged' || !form._changed && event_name=='onchange' ) {
         // některá přerušení se z elementu přenášejí do formuláře: elem.onchange => form.onchanged
-        form._changed= true;
-        if ( form.part && (fce= form.part['onchanged']) ) {
-          trace_event('form',form.id,'onchanged',fce);
-          //Ezer.trace('e','EVENT:form.'+form.id+'.onchanged in '+Ezer.App.block_info(fce),fce);
-          v= new Ezer.Eval([{o:'c',i:fce.desc._init||'onchanged',a:args.length}],
-            fce.context||form,args,'onchanged',false,false,fce);
-          res= res && (v.simple ? v.value : false);
+        if ( !this._fc('T') ) {
+          form._changed= true;
+          if ( form.part && (fce= form.part['onchanged']) ) {
+            trace_event('form',form.id,'onchanged',fce);
+            //Ezer.trace('e','EVENT:form.'+form.id+'.onchanged in '+Ezer.App.block_info(fce),fce);
+            v= new Ezer.Eval([{o:'c',i:fce.desc._init||'onchanged',a:args.length}],
+              fce.context||form,args,'onchanged',false,false,fce);
+            res= res && (v.simple ? v.value : false);
+          }
         }
       }
     }
@@ -1328,6 +1330,7 @@ Ezer.MenuLeft= new Class({
 //                     při změně šířky je volána metoda menu.onresize(aktuální šířka v px);
 //                     f- zobrazí menu jako minimalizované
   Extends: Ezer.Menu,
+  enabled: true,                        // akce myší jsou povoleny
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start
 //f: MenuLeft.start (code,oneval)
   start: function(codes,oneval) {
@@ -1359,6 +1362,17 @@ Ezer.MenuLeft= new Class({
   click: function (stav) {
     this.DOM_click(stav);
     return 1;
+  },
+// ------------------------------------------------------------------------------------ enable
+//fm: MenuLeft.enable (enabled)
+//      parametr enabled=0 znecitliví levé menu, enabled=1 je opět povolí
+  enable: function (enabled) {
+    this.enabled= enabled=="0" ? 0 : enabled;
+    if ( this.enabled )
+      this.DOM_Block.removeClass('disabled')
+    else
+      this.DOM_Block.addClass('disabled')
+    return true;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  excite
 //f: MenuLeft.excite ()
@@ -2241,6 +2255,21 @@ Ezer.Form= new Class({
     // vložení podčástí
     this.subBlocks(desc,this.DOM_Block);
     this.DOM_add2();
+  },
+// ------------------------------------------------------------------------------------ tagged
+//fm: Form.tagged (tags)
+//      vrátí pole elementů vyhovujících podmínce tags, pole lze zpracovávat například příkazem
+//      foreach(form.tagged('x'),procx); kde procx je jednoparametrická procedura
+  tagged: function(tags) {
+    var list= [];
+    var re= new RegExp(tags);
+    for (var ie in this.part) {           // projdi elementy
+      var elem= this.part[ie];
+      if ( elem.options.tag && re.test(elem.options.tag) ) {
+        list.push(elem);
+      }
+    }
+    return list;
   },
 // ------------------------------------------------------------------------------------ init
 //fm: Form.init ([init_values=0])
@@ -3322,6 +3351,7 @@ Ezer.Elem= new Class({
 //  ; 'p' : 'password' zobrazit hvězdičky
 //  ; 'r' : 'right' zarovnávat doprava
 //  ; 't' : 'tiše' nezobrazuje se rámeček při změně
+//  ; 'T' : 'Tiše' změna vyvolá Elem.onchange(d) ale nikoliv Form.onchanged (rámeček udělá)
 //  ;     : po dvojtečce
 //  ; 'e' : místo 0 se zobrazuje ''
 /*  ; 'F' : první písmeno zobrazit jako velké */

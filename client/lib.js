@@ -232,6 +232,7 @@ var ContextMenu = new Class({
     this.setOptions(options);                                   // set options
     this.clear();
     this.menu = $(this.options.menu);                           // option diffs menu
+    this.menu.store('THIS',this);
     this.target = $(this.options.target);
     this.focus = this.options.focus ? $(this.options.focus) : this.target;
     this.hide().startListener();                                // hide and begin the listener
@@ -311,7 +312,8 @@ var ContextMenu = new Class({
   // remove all menus but this
   clear: function() {
     $$('.ContextMenu').each(function(menu) {
-      menu.setStyle('display','none');
+      var myself= menu.retrieve('THIS');
+      if ( myself ) myself.hide();
     });
   },
   // show menu

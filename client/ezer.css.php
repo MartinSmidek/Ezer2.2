@@ -241,6 +241,8 @@ li#_help a {
   border-right: 4px solid $s_item; font-weight: bold; }
 .MFile span {
   background-color:$bd_item; }
+.disabled div.MFile a:hover {
+  background-color:transparent !important; color:inherit; }
 .MFile a:hover, .MFile a:active, .MIndex a:hover, .MIndex a:active {
   background-color:$fb_item; color:$fc_item; border-right: 4px solid $s2_item; }
 .MSelected {
@@ -490,8 +492,16 @@ label.Check {
   /*background-color:#fff; margin:0; padding:1px 1px 0 0; */ }
 .SelectClosure img {
   margin-top:1px; background-color:#fff; }
+.SelectClosure button, .FieldDate button, .button {
+  width:16px; height:16px; position:absolute; right:1px; padding:0; margin-top:2px; }
+@-moz-document url-prefix() {
+  .SelectClosure button, .FieldDate button, .button {
+    width:18px; height:19px; right:-2px; margin-top:1px; }
+}
+.SelectClosure button .fa, .FieldDate button .fa {
+  display:block; }
 .Select input {
-  width:100%; height:16px !important; border:1px solid #aaa; padding:1px 0px; margin:0;
+  width:100%; height:16px !important; border:1px solid #aaa; /*padding:1px 0px;*/ margin:0;
   display:block; /*background-color:#fff;*/ overflow:hidden; cursor:default; }
 /*.SelectDrop {
   position:absolute; z-index:1; -moz-box-shadow:5px 5px 10px #567;
