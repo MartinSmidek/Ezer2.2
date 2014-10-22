@@ -761,7 +761,9 @@ Ezer.Block= new Class({
               // s vizualizací
               case 'browse':
               case 'browse.smart':  part= new Ezer.Browse(this,desc,DOM,id,skill); break;
-              case 'button':        part= new Ezer.ButtonHtml(this,desc,DOM,id,skill); break;
+              case 'button':        part= Ezer.options.awesome & 2
+                                        ? new Ezer.ButtonHtml(this,desc,DOM,id,skill)
+                                        : new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'button.html':   part= new Ezer.ButtonHtml(this,desc,DOM,id,skill); break;
               case 'button.submit': part= new Ezer.Button(this,desc,DOM,id,skill); break;
               case 'button.reset':  part= new Ezer.Button(this,desc,DOM,id,skill); break;

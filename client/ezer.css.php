@@ -493,7 +493,7 @@ label.Check {
 .SelectClosure img {
   margin-top:1px; background-color:#fff; }
 .SelectClosure button, .FieldDate button, .button {
-  width:16px; height:16px; position:absolute; right:1px; padding:0; margin-top:2px; }
+  width:16px; height:16px; position:absolute; right:1px; padding:0; margin-top:2px; font-size:8pt; }
 @-moz-document url-prefix() {
   .SelectClosure button, .FieldDate button, .button {
     width:18px; height:19px; right:-2px; margin-top:1px; }
