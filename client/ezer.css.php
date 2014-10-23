@@ -492,10 +492,10 @@ label.Check {
   /*background-color:#fff; margin:0; padding:1px 1px 0 0; */ }
 .SelectClosure img {
   margin-top:1px; background-color:#fff; }
-.SelectClosure button, .FieldDate button, .button {
+.SelectClosure button, .FieldDate button, .Form .button {
   width:16px; height:16px; position:absolute; right:1px; padding:0; margin-top:2px; font-size:8pt; }
 @-moz-document url-prefix() {
-  .SelectClosure button, .FieldDate button, .button {
+  .SelectClosure button, .FieldDate button, .Form .button {
     width:18px; height:19px; right:-2px; margin-top:1px; }
 }
 .SelectClosure button .fa, .FieldDate button .fa {
