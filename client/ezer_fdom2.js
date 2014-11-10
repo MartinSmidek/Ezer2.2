@@ -519,7 +519,7 @@ Ezer.Item.implement({
         pop= title.replace(/\[fa-([^\]]+)\]/g,'');
         title= title.replace(/^\[fa-([^\]]+)\]/,"<i class='fa fa-$1 fa-fw efa'></i>");
       }
-      title= title.replace(/\[fa-([^\]]+)\]/,"<i class='fa fa-$1'></i>");
+      title= title.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
       this.domA= new Element('a',{href:href,html:title,events:{
         click: function(el) {
           if ( !el.target.hasClass('disabled') && this.owner.owner.enabled ) {
@@ -858,7 +858,7 @@ Ezer.PanelPopup.implement({
   DOM_add1: function() {
     var close= this.options.par && this.options.par.close=='no' ? false : true;
     this.DOM= $(this.StickyWin= new StickyWin({draggable:true,
-      content:StickyWin.ui(this.options.title||'',null,{
+      content:StickyWin.ui(this.options.title||' ',null,{
         cornerHandle:true, width:this._w+55,
         cssClassName:'PanelPopup',closeButton:close
       })
@@ -873,6 +873,11 @@ Ezer.PanelPopup.implement({
     this.DOM.setStyles({display:'none'});
     this.DOM_Block= this.DOM.getElement('.body');
     this.DOM_Block.setStyles({width:this._w,height:this._h});
+    if ( this._fc('c') || this._fc('r') ) {
+      var DOM_title= this.DOM.getElement('h1.caption');
+      if ( DOM_title )
+        DOM_title.setStyle('textAlign',this._fc('c')?'center':'right');
+    }
   },
 //   // ---------------------------------------------------------------------------------- DOM_add2
 //   DOM_add2: function() {
@@ -887,7 +892,7 @@ Ezer.PanelPopup.implement({
     this.DOM_shown= true;
     this.StickyWin.showWin();
     if ( title )
-      this.DOM.getElement('.caption').set('text',title);
+      this.DOM.getElement('h1.caption').set('text',title);
     if ( !noevent ) {
       if ( this.virgin ) {
         this.virgin= false;
@@ -1256,7 +1261,7 @@ Ezer.ButtonHtml.implement({
 // ------------------------------------------------------------------------------------ DOM_set
 // zobrazí this.value v DOM
   DOM_set: function () {
-    this.DOM_Block.set('html',this.value.replace(/\[fa-([^\]]+)\]/,"<i class='fa fa-$1'></i>"));
+    this.DOM_Block.set('html',this.value.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>"));
 
   },
 // ------------------------------------------------------------------------------------ DOM_get
@@ -2788,8 +2793,17 @@ Ezer.Browse.implement({
     }
     // pokud je format:'d' potlač zobrazení
     if ( this._fc('d') ) {
-      this.enable= false;
+      this.enable(false);
     }
+  },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_slider
+//      změní vzhled na enabled/disabled podle parametru nebo this.options.enabled
+  DOM_enabled: function(on) {
+    this.enabled= on;
+    if ( this.enabled )
+      this.DOM_Block.removeClass('disabled');
+    else
+      this.DOM_Block.addClass('disabled');
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_slider
   DOM_slider: function () {
@@ -3372,6 +3386,16 @@ Ezer.fce.DOM.alert= function (str,continuation) {
       maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
     });
   }
+  return win;
+};
+// -------------------------------------------------------------------------------------- confirm
+Ezer.fce.DOM.confirm= function (str,continuation) {
+  var win= new StickyWin.Alert('Dotaz',str,{hideOnClick:false,closeOnEsc:true,
+    uiOptions:{closeButton:false,width:350,
+      buttons:[{text:'Ano',onClick: function(){ continuation(1) }},
+               {text:'Ne',onClick: function(){ continuation(0) }} ]},
+    maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
+  });
   return win;
 };
 // -------------------------------------------------------------------------------------- help

@@ -199,7 +199,7 @@ $attribs = array (
   'group'  =>  explode(",",'skill:s,include:s'),
   'ezer'   =>  explode(",",'active:i,units:s'),
   'module' =>  explode(",",'active:i,units:s,title:s,help:s,skill:s'),
-  'panel'  =>  explode(",",'title:s,type:s,under:i,style:s,css:s,skill:s,include:s,value:s,par:o'),
+  'panel'  =>  explode(",",'title:s,type:s,under:i,style:s,css:s,skill:s,include:s,value:s,par:o,format:s'),
   'use'    =>  explode(",",'tabindex:n,skill:s,format:s'),
 #  map
   'map'    =>  explode(",",'db:s,where:s,order:s,key_id:s'),

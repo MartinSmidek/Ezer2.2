@@ -576,9 +576,12 @@ Ezer.Block= new Class({
         }
       }
     }
-    else if ( this.DOM_Block ) {
-      if ( id1 ) id1.split(' ').each(function(id){this.DOM_Block.addClass(id)}.bind(this));
-      if ( id2 ) id2.split(' ').each(function(id){this.DOM_Block.removeClass(id)}.bind(this));
+    else {
+      var dom= this instanceof Ezer.Var && this.value ? this.value.DOM_Block : this.DOM_Block;
+      if ( dom ) {
+        if ( id1 ) id1.split(' ').each(function(id){dom.addClass(id)}.bind(this));
+        if ( id2 ) id2.split(' ').each(function(id){dom.removeClass(id)}.bind(this));
+      }
     }
     return 1;
   },
@@ -594,6 +597,7 @@ Ezer.Block= new Class({
 //               pokud bude definováno x.onproperty jako ezer-objekt bude v něm po skončení
 //               transition zavolána procedura onproperty
 //      return:'bounds' metoda vrátí rozměry ohraničujícího obdélníku (před případnou transformací)
+//      reset:
 //a: height:*   - upraví výšku podle nejvyššího obsaženého elementu (s opravou u panelu na levé menu)
 //   min_height:n - minimální výška
 //   width:*    - upraví šířku podle nejširšího obsaženého elementu (s opravou u panelu na levé menu)
@@ -601,6 +605,7 @@ Ezer.Block= new Class({
 //r: object - pozice a velikost ohraničujícího obdélníku, pokud props.return='bounds'
   property: function(props,tags) {
     var rect= {_l:undefined,_t:undefined,_r:undefined,_b:undefined};
+    // pomocné funkce
     function mmax(a,b) { return (a==undefined || a<b) ? b : a; }
     function mmin(a,b) { return (a==undefined || a>b) ? b : a; }
     function bounds(block) {
@@ -627,11 +632,35 @@ Ezer.Block= new Class({
       rect._r= mmax(rect._r,_l+size.x); // = right
       rect._b= mmax(rect._b,_t+size.y);
     }
+    function rects(block) {
+      var dom= block.DOM_Block;
+      var _l= dom.getStyle('left').toInt(),
+          _t= dom.getStyle('top').toInt();
+      var size= dom.getSize();                 // x, y
+      var label= dom.getElement('div.Label');
+//       if ( label ) {
+//         // pokud je u elementů použito ^title, je třeba opravit hranice rect
+//         var lpos= label.getPosition(dom);     // x, y
+//         var lsiz= label.getSize();            // x, y
+//         // opravy rect (_l, _r, _t, _b)
+//         rect._l= mmin(rect._l,_l+lpos.x);
+//         rect._r= mmax(rect._r,_l+lpos.x+lsiz.x);
+//         rect._t= mmin(rect._t,_t+lpos.y);
+//         rect._b= mmax(rect._b,_t+lpos.y+lsiz.y);
+//       }
+      rect._l= mmin(rect._l,_l);
+      rect._t= mmin(rect._t,_t);
+      rect._r= mmax(rect._r,_l+size.x); // = right
+      rect._b= mmax(rect._b,_t+size.y);
+    }
+    // výpočet
     if ( tags ) {
       var re= new RegExp(tags);
       var parts= this instanceof Ezer.Var && this.value ? this.value.part : this.part;
       // proveď změnu pro podbloky s atributem tag vyhovujícím dotazu
+//                                                         var xxx= 0;
       for (var i in parts) {
+//                                                         xxx++;
         var part= parts[i];
         var block= part instanceof Ezer.Var && part.value ? part.value : part;
         if ( block && block.DOM_Block && part.options.tag ) {
@@ -641,6 +670,7 @@ Ezer.Block= new Class({
           });
           if ( some ) {
             if ( props.return=='bounds' ) bounds(block);
+            else if ( props.return=='rects' ) rects(block);
             block.DOM_set_properties(props);
             // zabráníme vícenásobnému volání onproperty
             if ( props.smooth && props.smooth.onproperty )
@@ -648,18 +678,25 @@ Ezer.Block= new Class({
           }
         }
       }
+//                                                         Ezer.trace('*','property/'+tags+' = '+xxx);
     }
     else if ( this instanceof Ezer.Var ) {
       if ( this.value && this.value.DOM_Block ) {
         if ( props.return=='bounds' ) bounds(this.value);
+        else if ( props.return=='rects' ) rects(this.value);
         this.value.DOM_set_properties(props);
       }
     }
     else if ( this.DOM_Block ) {
       if ( props.return=='bounds' ) bounds(this);
+      else if ( props.return=='rects' ) rects(this);
       this.DOM_set_properties(props);
     }
     if ( props.return=='bounds' ) {
+      rect._w= rect._l==undefined ? 0 : rect._r - rect._l;
+      rect._h= rect._t==undefined ? 0 : rect._b - rect._t;
+    }
+    else if ( props.return=='rects' ) {
       rect._w= rect._l==undefined ? 0 : rect._r - rect._l;
       rect._h= rect._t==undefined ? 0 : rect._b - rect._t;
     }
@@ -1675,6 +1712,9 @@ Ezer.PanelRight= new Class({
 //oo: PanelPopup.par - {close:'no'} zakáže zavírací tlačítko
 Ezer.PanelPopup= new Class({
   Extends: Ezer.Panel,
+//os: PanelPopup.format - zarovnání nadpisu
+//  ; 'c' : 'center' doprostřed
+//  ; 'r' : 'right' doprava
   continuation: null,                   // bod pokračování pro modální dialog
 // -------------------------------------------------------------------------------------- modal
 //fi: PanelPopup.modal ([l,t[,title]])
@@ -2316,12 +2356,12 @@ Ezer.Form= new Class({
     return 1;
   },
 // ----------------------------------------------------------------------------------- stacks
-//fm: Form.stacks (tag_list[,smer='down',space_h=0,space_i=0,space_b=0])
+//      fm: Form.stacks (tag_list[,smer='down',space_h=0,space_i=0,space_b=0])
 //      přeskládá formulář podle seznamu tagů, podle smer - down:shora dolů | up:zdola nahoru;
 //      prázdné tagy ignoruje;
 //      nepovinné parametry obsahují postupně mezeru přidávanou na začátek, mezi tagy a na konec
 //      upraví rozměry a polohu form, navrací výslednou výšku
-  stacks: function (tag_list,smer,space_h,space_i,space_b) {
+  stacks_old: function (tag_list,smer,space_h,space_i,space_b) {
 //     var form= this instanceof Ezer.Var && this.value && this.value.DOM_Block ? this.value : this;
     smer= smer || 'down';
     space_h= space_h||0;
@@ -2336,6 +2376,37 @@ Ezer.Form= new Class({
       tags_+= del+tag; del= '|';
       var bounds= this.property({return:'bounds'},tags_);
       sum_h= (bounds._t||0) + bounds._h + space_i;
+    }
+    sum_h+= space_b;
+    this.DOM_Block.setStyles({height:sum_h,top:this.options._t+(smer=='up'?this.options._h-sum_h:0)});
+    return sum_h;
+  },
+// ----------------------------------------------------------------------------------- stacks
+//fm: Form.stacks (tag_list[,smer='down',space_h=0,space_i=0,space_b=0])
+//      přeskládá formulář podle seznamu tagů, podle smer - down:shora dolů | up:zdola nahoru;
+//      prázdné tagy ignoruje;
+//      nepovinné parametry obsahují postupně mezeru přidávanou na začátek, mezi tagy a na konec
+//      upraví rozměry a polohu form, navrací výslednou výšku
+  stacks: function (tag_list,smer,space_h,space_i,space_b) {
+//     function mmax(a,b) { return (a==undefined || a<b) ? b : a; }
+//     function mmin(a,b) { return (a==undefined || a>b) ? b : a; }
+//     function glue(x,y) { x._t
+//     var form= this instanceof Ezer.Var && this.value && this.value.DOM_Block ? this.value : this;
+    smer= smer || 'down';
+    space_h= space_h||0;
+    space_i= space_i||0;
+    space_b= space_b||0;
+    var sum_h= space_h;
+    var tags= tag_list.split(','), tag= tags_= del= '';
+    var rect= {_l:0,_t:0,_w:0,_h:0}, rects= [];
+    for (var i= 0; i<tags.length; i++) if ( tags[i] ) {
+      tag= tags[i];
+      this.display(1,tag);
+      this.property({down:0},tag);
+      rect= this.property({return:'bounds'},tag); rect.tag= tag;
+//                                                         Ezer.debug(rect,tag+': '+rect._t+'+'+sum_h);
+      this.property({down:sum_h},tag);
+      sum_h+= (rect._t||0) + rect._h + space_i;
     }
     sum_h+= space_b;
     this.DOM_Block.setStyles({height:sum_h,top:this.options._t+(smer=='up'?this.options._h-sum_h:0)});
@@ -4619,6 +4690,7 @@ Ezer.Browse= new Class({
         this.DOM_clear_focus();
         this.slider.detach();
       }
+      this.DOM_enabled(enabled);
     }
     return ok;
   },
@@ -7856,19 +7928,20 @@ Ezer.fce.date2sql= function (dmy0,wild) {
   return s;
 }
 // -------------------------------------------------------------------------------------- sql2date
-//ff: fce.sql2date (sql_date)
+//ff: fce.sql2date (sql_date[,del='. '])
 //      převod MySQL formátu data na český formát
 //a: yyyy-mm-dd - tvar pro SQL
 //r: d. m. yyyy  - český tvar data
 //s: funkce
-Ezer.fce.sql2date= function (ymd) {
+Ezer.fce.sql2date= function (ymd,del) {
   var y, m, d, s= '';
+  del= del||'. ';
   if ( ymd.length > 0 ) {
     ymd= ymd.split('-');
     d= ymd[2]; if ( d[0]=='0' ) d= d[1];
     m= ymd[1]; if ( m[0]=='0' ) m= m[1];
     y= ymd[0];
-    s= d+'. '+m+'. '+y;
+    s= d+del+m+del+y;
   }
   return s;
 }
@@ -8418,6 +8491,25 @@ Ezer.fce.confirm= function () {
   var msg= '';
   for (var i=0; i<arguments.length; i++) { msg+= arguments[i]; }
   return confirm(msg) ? 1 : 0;
+}
+// -------------------------------------------------------------------------------------- confirm2
+//fj: fce.confirm2 (msg1,...)
+//   zobrazí argumenty ve vyskakovacím okně - modální funkce
+//s: funkce
+Ezer.fce.confirm2= function () {
+  var str= '';
+  for (var i=0; i<arguments.length; i++) str+= arguments[i];
+  Ezer.fce.DOM.confirm(str,Ezer.fce._confirm);
+  return 1;
+};
+Ezer.fce._confirm= function (res) {
+  if ( Ezer.modal_fce ) {
+    // konec modálního dialogu - jeho hodnotu (pro conform 0/1) dej na zásobník
+    Ezer.modal_fce.stack[++Ezer.modal_fce.top]= res;
+    Ezer.modal_fce.eval.apply(Ezer.modal_fce,[Ezer.modal_fce.step,true]);
+    Ezer.modal_fce= null;
+  }
+  return 1;
 }
 // -------------------------------------------------------------------------------------- prompt
 //ff: fce.prompt (msg[,default=''])

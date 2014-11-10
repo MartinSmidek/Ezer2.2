@@ -448,7 +448,7 @@ div.LabelDrop progress {
 .EditHtml {  border:1px dotted green;
   position:absolute; }
 button {
-  position:absolute; font-size:9pt; }
+  position:absolute; font-size:9pt; white-space:nowrap; z-index:1; }
 button::-moz-focus-inner {
   border:0; padding:0; }
 .fa {
@@ -555,6 +555,8 @@ __EOD
 .BrowseSmart td img.resize {
   float:right !important; padding:0; cursor: w-resize; z-index:200;
   margin-bottom:-10px; height:10px; width:5px; }
+.BrowseSmart.disabled td {
+  color:#545454; }
 /* dotazy */
 .BrowseSmart td.BrowseNoQry {
   padding:0; background-color:$b6_brow;
