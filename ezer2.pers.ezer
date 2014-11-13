@@ -93,7 +93,7 @@ form _chng [,,700,120] { style:'z-index:2'
     {stop}) }
   # tlačítka
   proc _init() { _form_state('bn','bc'); form.init }
-  button    [20,70,100,16]  { tag:'bc', title:'Uložit změnu',
+  button    [20,70,,]  { tag:'bc', title:'Uložit změnu',
     help:'zapsat novou hodnotu do osobního nastavení'
     proc onclick () {
       var t: text var f: text
@@ -105,7 +105,7 @@ form _chng [,,700,120] { style:'z-index:2'
       'pas',{ _form_show('p','o'); rp.fill('',ask('sys_user_change',the_user.get,t,'',nps.get,ops.get,rep.get));
               _init });
   } }
-  button    [110,70,100,16] { tag:'bc', title:' Zpět ',
+  button    [110,70,,] { tag:'bc', title:' Zpět ',
     help:'ponechat starou hodnotu osobního nastavení'
     proc onclick () { the_itm.click } }
 }

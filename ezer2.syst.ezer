@@ -39,7 +39,7 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
     klic.key_load }
   # ------------------------------------------------------------------------------------------------ keys
   form keys [0,0,200,200] {
-    button meta [0,1,50,20] { title:'Číselníky',
+    button meta [0,1,,] { title:'Číselníky',
       proc onclick () {
         druh_cond.set("druh='_meta_'");
         reload_keys }
@@ -101,10 +101,10 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
     }
     # události
     proc onsubmit () { key_uloz }
-    button save [11,435,50,15] { type:'submit',_sys:'ulo', title:'Uložit', proc onclick () { key_uloz } },
-    button cancel [101,435,50,11] { title:'Zpět', proc onclick () { key_load } },
-    button create [182,435,50,26] { title:'Nový', proc onclick () { key_novy } },
-    button delete [262,435,50,26] { title:'Smazat', proc onclick () { key_smaz } },
+    button save [11,435,,] { type:'submit',_sys:'ulo', title:'Uložit', proc onclick () { key_uloz } },
+    button cancel [101,435,,] { title:'Zpět', proc onclick () { key_load } },
+    button create [182,435,,] { title:'Nový', proc onclick () { key_novy } },
+    button delete [262,435,,] { title:'Smazat', proc onclick () { key_smaz } },
   }
 }
 
@@ -322,24 +322,24 @@ panel users [,,,543] {type:'plain', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   }
   # ------------------------------------------------------------------- butt
   form butt [,,647,39] {
-    button uloz_clena [11,8,50,12] { tag:'c', type:'submit', title:'Uložit'
+    button uloz_clena [11,8,,] { tag:'c', type:'submit', title:'Uložit'
       proc onclick () { u_uloz
     } }
-    button zpet_clena [75,8,50,15] { tag:'c', title:'Zpět'
+    button zpet_clena [75,8,,] { tag:'c', title:'Zpět'
       proc onclick () {
         uzivatel.key; uzivatel.load;
         cmd.get.enable(0,'c');
     } }
-    button vytvor_clena [130,8,50,19] { title:'Vytvořit'
+    button vytvor_clena [130,8,,] { title:'Vytvořit'
       proc onclick () {
         cmd.get.enable(0,'c');
         dskill.seznam.selected('clear');
         uzivatele.list.blur; uzivatel.init; uzivatel.kdo.set(sys('user','id_user'));
         uzivatel.kdy.set(now);
     } }
-    button zrus_clena [199,8,50,37] { title:'Smazat', format:'d' }
-    button obnov_clena [275,8,50,15] { title:'Obnovit', format:'d' }
-    button watch_key [355,8,50,15] { title:'Vygenerovat klíč', format:'n'
+    button zrus_clena [199,8,,] { title:'Smazat', format:'d' }
+    button obnov_clena [275,8,,] { title:'Obnovit', format:'d' }
+    button watch_key [355,8,,] { title:'Vygenerovat klíč', format:'n'
       proc onclick() {
         confirm("Vygenerování nového klíče znemožní přístup současným uživatelům. Pokračovat?");
         watch_ref.set(ask('sys_watch_key'))
@@ -574,14 +574,14 @@ panel needs [,,770,] {type:'right', title:'Požadavky', _sys:'poz', skill:'sp'
     edit  zprava [155,T+145,565,90] { data:t.zprava }
 
     //  příkazy
-    button [150,280,50,] {title:'Nový požadavek', proc onclick() {
+    button [150,280,,] {title:'Nový požadavek', proc onclick() {
       form.init(1); drop.set('');
       email.set(sys('ezer','options','mail')); email.change; // z osobního nastavení
       [ do_notify.get; notify.key(2); notify.change ]; // změna stavu
       typ.key(1); typ.change; cast.key(1); cast.change; zadani.change; show_diskuse(je_diskuse.get);
       kdy_zadal.set(now); kdy_zadal.change; kdo_zadal.key(sys('user','id_user')); kdo_zadal.change;
     }}
-    button[150,Tc,109,5] {type:'submit', title:'Uložit změny', proc onclick() {
+    button[150,Tc,,] {type:'submit', title:'Uložit změny', proc onclick() {
       var fields: object
       var old_notify: number
       old_notify.set(not(nono.get));
@@ -595,18 +595,18 @@ panel needs [,,770,] {type:'right', title:'Požadavky', _sys:'poz', skill:'sp'
       todo.raise('onrowclick',todo.browse_seek(conc(form.id_key,'=',form.key)));
       [ do_notify; notify; ask('sys_todo_notify','new',form.key,fields) ]
     }}
-    button [461,Tc,50,] {title:'Smazat', skill:'m|m', proc onclick() {
+    button [461,Tc,,] {title:'Smazat', skill:'m|m', proc onclick() {
       confirm("opravdu smazat požadavek č.",form.key);
       _todo.delete_record(conc("id_todo=",form.key));
       left.over.news.click
     }}
-    button [535,Tc,50,] {title:'Odložit', proc onclick() {
+    button [535,Tc,,] {title:'Odložit', proc onclick() {
       stav.set(1); stav.change; the_formsave (form,todo);
     }}
-    button [603,Tc,50,] {title:'Zrušit', proc onclick() {
+    button [603,Tc,,] {title:'Zrušit', proc onclick() {
       stav.set(2); stav.change; the_formsave (form,todo);
     }}
-    button [663,Tc,50,] {title:'Obnovit', proc onclick() {
+    button [663,Tc,,] {title:'Obnovit', proc onclick() {
       stav.set(0); stav.change; the_formsave (form,todo);
     }}
     // Případná diskuse

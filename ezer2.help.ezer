@@ -181,10 +181,10 @@ panel faq [,,770,] {type:'right', title:'Kontextový help', _sys:'faq'
     use h: form _hlp [0,0,,],
     # ------------------------------------------------------------------------ _hlp
     form _hlp [10,10,600,460] {
-      button  [540,9,45,20] { title:'Uložit', help:'ukončit editor a uložit změny'
+      button  [540,9,,] { title:'Uložit', help:'ukončit editor a uložit změny'
         proc onclick() {panel.hide(1); }
       }
-      button  [600,9,45,20] { title:'Zpět', help:'ukončit editor bez uložení změn'
+      button  [600,9,,] { title:'Zpět', help:'ukončit editor bez uložení změn'
         proc onclick() { panel.hide(0); }
       }
       edit txt [0,40,655,480] {type:'html', par:°{toolbar:'EzerMail'} },
