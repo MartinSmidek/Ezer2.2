@@ -23,6 +23,7 @@ Ezer.used= [];                  // seznam vyžádaných zdrojů ???
 Ezer.evals= 0;                  // počet aktivních objektů Ezer.Eval (nuluje i DblClick na trace)
 Ezer.process= 0;                // jednoznačné číslo procesu
 Ezer.calls= [];                 // fronta volání čekajících na Ezer.evals==0
+Ezer._MenuMain= null;
 Ezer.excited= 0;                // >0 pokud bylo již použito Ezer.options.start
 Ezer.konst= Ezer.konst || {};   // hodnoty nedefinovaných konsta(const x;y;z)
 Ezer.curr= {panel:null};        // zobrazený panel
@@ -373,12 +374,11 @@ Ezer.Application.implement({
   //     desc :: <id>:{type:<id> options:<attr># [part:<desc>#] }
   // bude naplněna struktura Ezer.run podle $.menu
   load_$: function(y) {
-//     this.queue= [];
     // načtení zdrojových textů
     if ( y.error ) {
       Ezer.error(y.error);
     }
-    else /*try*/ {
+    else {
       Ezer.code= {'$':y.app};
       Ezer.file.$= y.app;
       if ( this.options.debug /*window.top.dbg*/ && window.top.dbg.show_code ) window.top.dbg.show_code(Ezer);
@@ -390,15 +390,6 @@ Ezer.Application.implement({
       this.status= 'loaded';
       this.DOM_layout();  // přepočet layoutu
     }
-    /*catch (e) {
-      this.status= 'error';
-      if (typeof(e)=='object' && e.level );      // chyba ošetřená uživatelem: Ezer.fce.error
-      else if ( e.message && Browser.Engine.gecko )
-        Ezer.error(e.message+" in "+e.fileName+" at "+e.lineNumber,'E');
-      else if ( e.message ) Ezer.error(e.message,'E');
-//       else if ( Browser.Engine.gecko ) console.error(e);
-      else Ezer.error(e);      // neošetřená chyba
-    };*/
   },
 // ----------------------------------------------------------------------------------------- include
 // voláním 'include' bude natažen kód
@@ -435,9 +426,10 @@ Ezer.Application.implement({
   start_code_seq: function(top,code,end) {
     if ( code.length ) {
       new Ezer.Eval(code,top,[],'(startup)',{fce:function(id,val){
-        Ezer.trace('L',id+' skončila se stavem '+this.value);
+        Ezer.trace('L',id+' skončila se stavem '+this.value+", pokračuje "+end);
         if ( end )
           Ezer.app[end](top);
+        Ezer._MenuMain.excite();                        // vlastní spuštění aplikace
       },args:['inicializace '+top.id],stack:true},true);
     }
     else if ( end ) {

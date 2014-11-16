@@ -448,7 +448,10 @@ div.LabelDrop progress {
 .EditHtml {  border:1px dotted green;
   position:absolute; }
 button {
-  position:absolute; font-size:9pt; white-space:nowrap; z-index:1; }
+  position:absolute; font-size:9pt; white-space:nowrap; z-index:1; padding:1px 4px; }
+@-moz-document url-prefix() {
+  button { padding:0px 4px; }
+}
 button::-moz-focus-inner {
   border:0; padding:0; }
 .fa {

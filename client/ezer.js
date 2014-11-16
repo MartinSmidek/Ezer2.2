@@ -60,6 +60,7 @@ Ezer.Block= new Class({
     this.parent(DOM);
     if ( this instanceof Ezer.MenuMain ) {
       var i= 1;
+      Ezer._MenuMain= this;
     }
     this.owner= owner;
     this.skill= skill;
@@ -209,7 +210,7 @@ Ezer.Block= new Class({
 //fm: Block.set_attrib (name,val[,desc=])       nedokumentováno, může být změněno
 //      změní hodnotu atributu 'name' na 'val'
 //      name může být složeným jménem
-//      pokud je val objekt, bude jím nahrazena celá hodnota - narozdíl od set_attrib
+//      pokud je val objekt, bude jím nahrazena celá hodnota - narozdíl od add_attrib
 //      pokud je definováno desc bude změna provedena v popisu (ve this.desc, ne v this)
 //a: name - jméno atributu
 //   val - nová hodnota atributu
@@ -1309,10 +1310,10 @@ Ezer.MenuMain= new Class({
   Extends: Ezer.Menu,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start
 //f: MenuMain.start (code,oneval)
-  start: function(codes,oneval) {
-    this.parent(codes,oneval);
-    this.excite();
-  },
+//   start: function(codes,oneval) {
+//     this.parent(codes,oneval);
+//     this.excite();                           -- je spuštěno z Ezer.app po načtení map
+//   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  excite
 //f: MenuMain.excite ()
 //      zajistí prvotní zobrazení menu s vyznačením aktivního
@@ -1397,9 +1398,9 @@ Ezer.MenuLeft= new Class({
 // ------------------------------------------------------------------------------------ click
 //fm: MenuLeft.click ([stav=0])
 //      změní stav minimalizovatelného menu (format:'f'), u jiného typu se ignoruje;
-//      je-li zadán parametr, zajistí pro 2 minimalizaci nebo pro 1 plnou viditelnost menu
+//      je-li zadán stav, zajistí pro 2 minimalizaci nebo pro 1 plnou viditelnost menu
   click: function (stav) {
-    this.DOM_click(stav);
+    this.DOM_click(stav,quiet);
     return 1;
   },
 // ------------------------------------------------------------------------------------ enable
@@ -1572,9 +1573,11 @@ Ezer.Item= new Class({
     this.subBlocks(desc,DOM);
     this.DOM_add2();
   },
-//fm: Item.click ([only])
-//      nastavení položky jakoby kliknuté vč. vyvolání onclick; pokud je only tak zavře jiné skupiny
-  click: function(only) {
+// ------------------------------------------------------------------------------------ click
+//fm: Item.click ([only=0,quiet=0])
+//      nastavení položky jakoby kliknuté vč. vyvolání onclick (pokud není quiet=1);
+//      pokud je only tak zavře jiné skupiny
+  click: function(only,quiet) {
     if ( only ) {
       $each(this.owner.owner.part,function(group,id) {        // projdi skupiny
         if ( group.type=='menu.group' ) {
@@ -1583,7 +1586,10 @@ Ezer.Item= new Class({
       });
     }
     this._show();               // zajisti zobrazení itemu
-    this._click();
+    if ( quiet )
+      this._focus();            // jen zvýrazní
+    else
+      this._click();            // jinak taky a provede onclick
     return 1;
   }
 });
@@ -4920,6 +4926,7 @@ Ezer.Browse= new Class({
 //      first - první z dat načtený do browse
 //      cond,order,having - budou zapamatovány pro případný následný browse_load
   browse_fill: function(data,del,first,cond,order,having) {
+    this.DOM_enable_reload(false);
     del= del||'|';
     first= first||0;
     this.cond= cond||this.cond||'';
@@ -5024,6 +5031,7 @@ Ezer.Browse= new Class({
 //r:    - počet přečtených řádků
   browse_load: function(cond,order,having,from,len,quiet,sql) {
     // vytvoř parametry dotazu
+    this.DOM_enable_reload(true);
     var x= {cmd:'browse_load'};
     x= this._params({cmd:'browse_load'},
       //                                            zapomen_podminku,sql

@@ -2517,10 +2517,11 @@ Ezer.Browse.implement({
           // tady budou hlavičky sloupců
           new Element('thead').adopt(
             this.DOM_head= new Element('tr').adopt(
-              new Element('td',{'class':'BrowseReload',styles:{width:8}, events:{
+              this.DOM_reload= new Element('td',{'class':'tag0',styles:{width:8}, events:{
                 click: function(el) {
-                  // znovu načti obsah
-                  this._ask_queries(true,old_key= this.browse_key());
+                  // znovu načti obsah, pokud je povoleno
+                  if ( this.DOM_reload.hasClass('BrowseReload') )
+                    this._ask_queries(true,old_key= this.browse_key());
                 }.bind(this)
           }}))),
           // patička s přehledem stavu
@@ -2567,6 +2568,15 @@ Ezer.Browse.implement({
     }
     if ( !this.DOM_th_posun )
       this.DOM_th_posun= this.DOM_row[1];         // scrollbar na úrovni dat
+  },
+// ------------------------------------------------------------------------------- DOM_enable_reload
+//f: Browse-DOM.DOM_enable_reload ()
+//      připojí (nebo odpojí) události
+  DOM_enable_reload: function(on) {
+    if ( on )
+      this.DOM_reload.addClass('BrowseReload');
+    else
+      this.DOM_reload.removeClass('BrowseReload');
   },
 // ------------------------------------------------------------------------------------ DOM_addEvents+
 //f: Browse-DOM.DOM_addEvents ()
