@@ -210,3 +210,19 @@ table _help {  key_id:'id_help'
   text seen
   text help
 }
+
+# ================================================================================================== META
+# Systém Ezer - knihovní modul Meta
+
+panel meta [0,0,300,300] {type:'popup', _sys:'', title:'Struktura aplikace - menu a panely'
+  proc app() { panel.popup }
+  use t: form t_ [0,0,,]
+  proc onfirstfocus() { t.a.app }
+  form t_ [,,300,300] {
+    button [-1,11,,] { type:'html', title:"[fa-refresh]", proc onclick() { a.app }}
+    use a: area a_
+    area a_ { title:"<div id='x' class='ae_work' style='overflow:auto;position:absolute;left:3px;top:10px;width:300px;height:300px'></div>"
+      proc app() { this.tree_show(meta_tree,'x'); this.tree_expand(1) }
+    }
+  }
+}

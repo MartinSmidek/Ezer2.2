@@ -223,6 +223,7 @@ var ContextMenu = new Class({
     onClick: function(){},
     fadeSpeed: 200,
     focus: null,                                //140905gn DOM určený pro aplikace focus_css
+    up:false,
     focus_css: 'ContextFocus',
     focus_mask: true,                           //140202gn nenulové znamená označení target maskou
     event: null                                 // show imediately when started by event
@@ -255,7 +256,7 @@ var ContextMenu = new Class({
   },
   // get things started
   startListener: function() {
-    if ( !this.options.own_listener ) {
+    if ( !this.options.own_listener && this.target ) {
       this.target.addEvent(this.options.trigger,function(e) {     // show the menu
         if(!this.options.disabled) {                              // enabled?
           if(this.options.stopEvent) {                            // prevent default, if told to
@@ -320,6 +321,12 @@ var ContextMenu = new Class({
   show: function() {
     this.clear();
     this.menu.setStyle('display','block');
+    if ( this.options.up ) {
+      var height= this.menu.getSize().y;
+      var top= this.menu.getStyle('top').toInt();
+      top-= height;
+      this.menu.setStyle('top',top);
+    }
     this.shown= true;
     if ( this.options.focus_css ) this.focus.addClass(this.options.focus_css);
     if ( this.options.focus_mask ) {

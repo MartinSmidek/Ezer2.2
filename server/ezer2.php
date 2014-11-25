@@ -1499,8 +1499,8 @@
   case 'dbg_compile':
     require_once("$ezer_path_serv/comp2.php");
     require_once("$ezer_path_serv/comp2def.php");
-    function dbg_includes() {
-      # doplní id do includes (korekce kvůli identifikaci jmen knihovních modulů)
+    # -------------------- doplní id do includes (korekce kvůli identifikaci jmen knihovních modulů)
+    function dbg_includes() { trace();
       global $includes;
 //                                                 debug($includes,'includes',(object)array('depth'=>2));
       foreach($includes as $ids=>$include) {
@@ -1509,11 +1509,11 @@
 //                                                 display("$ids-$id-{$includes[$ids]->id}");
       }
     }
-    function dbg_find_obj($full) {
-      # najde objekt pojmenovaný úplným jménem a přebuduje kontext překladu
+    # -------------------------- najde objekt pojmenovaný úplným jménem a přebuduje kontext překladu
+    function dbg_find_obj($full) { //trace();
       global $context,$includes;
       $old_context= $context;
-//                                                 debug($context[0],"context[0]",(object)array('depth'=>9));
+//                                                 debug($context[0],"context[0]",(object)array('depth'=>2)); //9
       $obj= $context[0]->ctx;
       $obj_id= $context[0]->id;
       $context= array();
@@ -1559,7 +1559,8 @@
     end:
       return $obj;
     }
-    function context_push($id,$obj) {
+    # -------------------------------------------------------------------------------- přidá kontext
+    function context_push($id,$obj) { //trace();
       # obohatí kontext
       global $context, $includes;
       foreach($includes as $include) {
@@ -1570,9 +1571,9 @@
       }
       array_push($context,(object)array('id'=>$id,'ctx'=>$obj));
     }
-    # překlad skriptu $x->script do procedury _dbg_ v zadaném kontextu $x->context->self
+    # ----------- překlad skriptu $x->script do procedury _dbg_ v zadaném kontextu $x->context->self
 //                                                 display("debugger context: {$x->context->self}");
-//                                                 debug($x->context,"dbg_compile");
+                                                debug($x,"dbg_compile",(object)array('depth'=>3));
     $log= $cd= "";
     $log.= dbg_context_load($x->context);
     dbg_includes();
@@ -1739,14 +1740,14 @@
           if ( isset($loads->code->_app) )  $obj->_app=  $loads->code->_app;
           if ( isset($loads->code->_file) ) $obj->_file= $loads->code->_file;
           if ( isset($loads->code->_lc) )   $obj->_lc=   $loads->code->_lc;
-          if ( isset($loads->code->library) ) {
+          if ( isset($loads->code->library) && $loads->code->library ) {
             $obj->library= 1;
             $y->msg.= "#";
           }
         }
         # ------------------------------------------------------------------------------------------
         # přidej includes
-        if ( isset($loads->includes) ) {
+        if ( isset($loads->includes) && $loads->includes ) {
           foreach($loads->includes as $udesc) {
             $new_part= (object)array('file'=>$udesc->file,'block'=>$udesc->block,'code'=>$loads->code,
               'old_file'=>$fname,'old_app'=>$app);
@@ -1763,6 +1764,7 @@
 //                                         debug($y,'y->app');
 //     file_put_contents("snap.json",$y->error);
 //     file_put_contents("snap.json",$json->encode($y->app));
+//     file_put_contents("snap.json",$json->encode($y));
     break;
   # ------------------------------------------------------------------------------------------- code
   case 'code': // (files)

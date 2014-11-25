@@ -130,7 +130,7 @@ textarea { resize: none; }
   /*overflow:auto;*/ position:relative; }
 #dolni {
   bottom:0; margin-top:2px; color:$c3_kuk; font-size:8pt;
-  width:100%; height:{$h_kuk}px; z-index:6000; border-top:1px solid $c_kuk;
+  width:100%; height:{$h_kuk}px; z-index:998; border-top:1px solid $c_kuk;
   position:absolute; }
 .nogrid {
   background: $b url($path/body_bg.png) repeat-x; }
@@ -449,13 +449,12 @@ div.LabelDrop progress {
   position:absolute; }
 button {
   position:absolute; font-size:9pt; white-space:nowrap; z-index:1; padding:1px 4px; }
-@-moz-document url-prefix() {
-  button { padding:0px 4px; }
-}
-button::-moz-focus-inner {
-  border:0; padding:0; }
+@-moz-document url-prefix() { button { padding:0px 4px; } }
+button::-moz-focus-inner { border:0; padding:0; }
 .fa {
   font-family:FontAwesome,sans-serif !important; }
+button i.fa-red, a i.fa-red  { color:red }
+button:disabled i.fa-red { color:grey }
 .Button {
   position:absolute; font-size:9pt; z-index:1; text-align:center; $button }
 .ButtonSubmit {

@@ -859,6 +859,9 @@ Ezer.Block= new Class({
               default:
                 Ezer.error('neimplementovaný blok '+desc.type,'C');
             };
+            if ( desc.library ) {
+              part._library= 1;
+            }
             if ( part ) {
               // nově vložená část
               part.id= id;
@@ -1070,7 +1073,9 @@ Ezer.Block= new Class({
       // start podbloků
       for(var i in this.part) {
         if ( this.part[i].start )
+//                                                 Ezer.trace('L','starting '+this.part[i].type+'.'+this.part[i]._id );
           this.part[i].start(codes,oneval);
+//                                                 Ezer.trace('L','started  '+this.part[i].type+'.'+this.part[i]._id);
       }
     }
     if ( this.start_code ) {
@@ -1311,8 +1316,10 @@ Ezer.MenuMain= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start
 //f: MenuMain.start (code,oneval)
 //   start: function(codes,oneval) {
+//                                                 Ezer.trace('L','starting '+this.type);
 //     this.parent(codes,oneval);
-//     this.excite();                           -- je spuštěno z Ezer.app po načtení map
+//     this.excite();                           // je spuštěno z Ezer.app po načtení map
+//                                                 Ezer.trace('L','started  '+this.type);
 //   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  excite
 //f: MenuMain.excite ()
@@ -2221,7 +2228,7 @@ Ezer.Map= new Class({
         this.data[vi][key]= y.values[i][vi];
       }
     }
-                                                Ezer.trace('L','loaded map '+this.id);
+//                                                 Ezer.trace('L','loaded map '+this.id);
 //                                                         Ezer.debug(this.data);
     return y.rows;
   },
@@ -4167,7 +4174,7 @@ Ezer.SelectMap= new Class({
     var m= [];
     Ezer.assert(1==Ezer.run_name(this.options.options,this.owner.owner,m)
       ,'options:'+this.options.options+' je chybné jméno map',this);
-    Ezer.trace('L','_options_load '+this.options.options+' '+(m&&m[1]?m[1].id:'???'));
+//     Ezer.trace('L','_options_load '+this.options.options+' '+(m&&m[1]?m[1].id:'???'));
     this.map_options= m[1];
     this.Items= this instanceof Ezer.SelectMap0 ? {0:''} : {};
     for (var im in m[0]) {
@@ -4734,7 +4741,7 @@ Ezer.Browse= new Class({
 //      simulace kliknutí na řádek se zadaným klíčem, nebo na první zobrazený řádek;
 //      klíč vyznačeného řádku lze získat funkcí browse_key;
 //      pokud je noevent=1 nevyvolává se event;
-//      pokud je definováno key a řádek není načtený tak raise selže
+//      pokud je browse prázdný nebo je definováno key a řádek není načtený tak raise selže
 //      (toho lze využít v alternativě k volání browse_seek)
 //a: event - onrowclick
 //   key - primární klíč záznamu (nepovinně)
@@ -4747,7 +4754,10 @@ Ezer.Browse= new Class({
    raised:
     switch ( event ) {
     case 'onrowclick':
-      if ( row ) {
+      if ( !this.blen ) {                       // pokud je browse prázdný
+        ok= 0;
+      }
+      else if ( row ) {
         this.DOM_hi_row(this.t+row-1,noevent,true);
       }
       else {
@@ -5674,7 +5684,7 @@ Ezer.Show= new Class({
       Ezer.assert(1==Ezer.run_name(id,this.owner,m,ids),
         this.options.map_pipe+' je neznámé jméno map',this);
       this.map_pipe= {map:m[1],field:ids[ids.length-1]}
-                                                Ezer.trace('L','map_pipe '+this.options.map_pipe);
+//                                                 Ezer.trace('L','map_pipe '+this.options.map_pipe);
     }
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _start2
@@ -7631,14 +7641,14 @@ Ezer.fce.get_cookie= function (id,val,form,refs) {
   return ret;
 }
 //--------------------------------------------------------------------------------------- contextmenu
-//ff: fce.contextmenu (menu,el[,id])
+//ff: fce.contextmenu (menu,el[,id,up=0])
 //      zobrazení kontextového menu
 //a: menu - [[text_položky_menu,funkce],...]
 //   event - událost vyvolaná pravým tlačítkem myši
 //   id - nepovinné id
 //s: funkce
 Ezer.obj.contextmenu= {DOM:null,menu:null};
-Ezer.fce.contextmenu= function (menu,event,id) {
+Ezer.fce.contextmenu= function (menu,event,id,up) {
   event= event||window.event;
   if ( Ezer.obj.contextmenu.DOM ) {
     Ezer.obj.contextmenu.DOM.getChildren().destroy();
@@ -7668,12 +7678,12 @@ Ezer.fce.contextmenu= function (menu,event,id) {
   });
   if ( Ezer.obj.contextmenu.menu ) {
     Ezer.obj.contextmenu.menu.reinitialize({event:event,target:event.originalTarget||event.target,
-      menu:Ezer.obj.contextmenu.DOM,own_listener:true});
+      menu:Ezer.obj.contextmenu.DOM,own_listener:true,up:up});
   }
   else {
     Ezer.obj.contextmenu.menu=
       new ContextMenu({event:event,target:event.originalTarget||event.target,
-        menu:Ezer.obj.contextmenu.DOM,own_listener:true});
+        menu:Ezer.obj.contextmenu.DOM,own_listener:true,up:up});
   }
   return 1;
 }

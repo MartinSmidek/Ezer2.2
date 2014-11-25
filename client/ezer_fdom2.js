@@ -885,9 +885,15 @@ Ezer.PanelPopup.implement({
   // ---------------------------------------------------------------------------------- _show
   _show: function(l,t,noevent,title) {
     this.DOM.setStyles({display:'block'});
-    if ( !this.DOM_shown && l!==undefined && t!==undefined ) {
-      // pokud není definován počátek, bude dialog centrální
-      this.DOM.setStyles({left:l,top:t+Ezer.Shield.top});
+    if ( !this.DOM_shown ) {
+      if ( l==undefined || t==undefined ) {
+        // pokud není definován počátek, bude dialog centrální
+        this.DOM.setStyles({left:Ezer.sys.screen.width/2 - this._w/2,
+          top:Ezer.sys.screen.height/2 - this._h/2});
+      }
+      else {
+        this.DOM.setStyles({left:l,top:t+Ezer.Shield.top});
+      }
     }
     this.DOM_shown= true;
     this.StickyWin.showWin();

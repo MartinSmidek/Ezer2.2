@@ -177,7 +177,7 @@ __EOD;
       $my_ip= isset($_SERVER['HTTP_X_FORWARDED_FOR'])
         ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
       // zjištění dosud povolených IP
-      ezer_connect();
+      ezer_connect(".main.",false,true);
       $ips= select("GROUP_CONCAT(ips)","_user","ips!=''",'ezer_system');
       // kontrola
       $ips= str_replace(' ','',$ips);
@@ -259,17 +259,22 @@ __EOD
     require_once("$ezer_path_serv/reference.php");
     require_once("$ezer_path_serv/sys_doc.php");
     $kontakt= is_array($welcome) ? $welcome[1] : $kontakt;
-    ezer_connect();
-    $cond= isset($pars->news_cond) ? $pars->news_cond : 'cast!=1';
-    $cond= $cond ? "$cond AND" : '';
-    $dnu= isset($pars->news_days) ? $pars->news_days : 12;
-    $info= doc_todo_show("$cond SUBDATE(NOW(),$dnu)<=kdy_skoncil AND kdy_skoncil!='0000-00-00' ");
-    if ( !$info )
-      $info= "<div class='login_a_msg'>
-        Během posledních $dnu dnů nedošlo v&nbsp;systému k&nbsp;podstatným změnám.<br/><br/>
-        $kontakt</div>";
-    else
-      $info.= "<hr/>$kontakt";
+    $db_err= ezer_connect(".main.",false,true);
+    if ( !$db_err ) {
+      $cond= isset($pars->news_cond) ? $pars->news_cond : 'cast!=1';
+      $cond= $cond ? "$cond AND" : '';
+      $dnu= isset($pars->news_days) ? $pars->news_days : 12;
+      $info= doc_todo_show("$cond SUBDATE(NOW(),$dnu)<=kdy_skoncil AND kdy_skoncil!='0000-00-00' ");
+      if ( !$info )
+        $info= "<div class='login_a_msg'>
+          Během posledních $dnu dnů nedošlo v&nbsp;systému k&nbsp;podstatným změnám.<br/><br/>
+          $kontakt</div>";
+      else
+        $info.= "<hr/>$kontakt";
+    }
+    else {
+      $info= "<hr/>databáze není přístupná";
+    }
     // přidání NOTIFY informace dodané nepovinnou funkcí ezer_login_notify
     if ( function_exists("ezer_login_notify") ) {
       $notify= ezer_login_notify();
@@ -953,6 +958,15 @@ function sql_query($qry,$db='.main.') {
   return $obj;
 }
 # ================================================================================================== OSVĚDČENÉ FUNKCE
+# -------------------------------------------------------------------------------------------------- test_session
+# vypíše session
+function test_session() {
+  global $ezer_root;
+  $html= "";
+  $html.= "<br>session_id=".session_id()." :{$_SESSION[$ezer_root]['user_state']}";
+                                                debug($_SESSION,'$_SESSION');
+  return $html;
+}
 # -------------------------------------------------------------------------------------------------- simple_glob
 /** Jednodušší náhrada funkce glob()
 * @param string $mask vyhledávací maska může v názvu souboru obsahovat znak * a ?
@@ -2169,8 +2183,10 @@ function Excel5_f(&$ws,$range,$v,&$err) {
 # spojení s databází
 # $db = jméno databáze uvedené v konfiguraci aplikace
 # $db = .main. pokud má být připojena první databáze z konfigurace
-function ezer_connect ($db0='.main.',$even=false) {
+# $initial=1 pokud není ještě aktivní fce_error
+function ezer_connect ($db0='.main.',$even=false,$initial=0) {
   global $ezer_db;
+  $err= '';
   $db= $db0;
   if ( $db=='.main.' ) {
     foreach ( $ezer_db as $db1=>$desc) {
@@ -2191,13 +2207,15 @@ function ezer_connect ($db0='.main.',$even=false) {
   // nastavení aktivní databáze pro
   $res= @mysql_select_db($db_name,$ezer_db[$db][0]);
   if ( !$res ) {
-    fce_error("connect: databaze '$db_name' ('$db0'={$ezer_db[$db][5]}) je nepristupna ").mysql_error();
+    $ok= 0;
+    $err= "databaze '$db_name' je nepristupna";
+    if ( !$initial ) fce_error("connect: $err".mysql_error());
   }
   if ( $ezer_db[$db][4] ) {
 //                                                         display("SET NAMES '{$ezer_db[$db][4]}'");
     mysql_query("SET NAMES '{$ezer_db[$db][4]}'");
   }
-  return 1;
+  return $err;
 }
 # -------------------------------------------------------------------------------------------------- ezer_connect
 # spojení s databází

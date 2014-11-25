@@ -411,6 +411,7 @@ Ezer.Application.implement({
   },
 // -------------------------------------------------------------------------------------- start_code
 // provede kód pro načtení 1.map,2.select,3.includes,4.onstart a inicializuje novou část systému
+//? provede kód pro načtení 1.includes,2.select,3.map,4.onstart a inicializuje novou část systému
   start_code: function(top,end) {
     var codes= {map:[],select:[],onstart:[]/*,include:[]*/};
     top.start(codes,null);
@@ -429,7 +430,6 @@ Ezer.Application.implement({
         Ezer.trace('L',id+' skončila se stavem '+this.value+", pokračuje "+end);
         if ( end )
           Ezer.app[end](top);
-        Ezer._MenuMain.excite();                        // vlastní spuštění aplikace
       },args:['inicializace '+top.id],stack:true},true);
     }
     else if ( end ) {
@@ -452,6 +452,7 @@ Ezer.Application.implement({
         }
       }
     })
+    Ezer._MenuMain.excite();                        // vlastní spuštění aplikace
   },
 // ------------------------------------------------------------------------------------ onfirstfocus
 // je voláno v případě prvního focus panelu - obdoba události domready

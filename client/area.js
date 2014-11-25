@@ -294,19 +294,21 @@ Ezer.Area= new Class({
     return js;
   },
 // -------------------------------------------------------------------------------------- tree_show
-//fm: Area.tree_show (desc[,id])
+//fm: Area.tree_show (desc[,id,clone=0])
 //      zobrazí v area strom pomocí balíku MooTree, desc je popis ve formátu
-//      pokud je dáno id, bude strom pod tímto elementem
+//      pokud je dáno id, bude strom pod tímto elementem.
+//      Zadání clone=1 způsobí zkopírování desc do vntřní kopie před konstrukcí stromu (to je
+//      zapotřebí, pokud je desc zadáné jako konstanta Ezert skriptu)
 //   nodes: [ node, ... ]
 //   node:  {prop:{text:<string>,down:nodes}}
 //e: tree_onclick - (id,node,node.data.json,merge.data.json)
-  tree_show: function (desc,id) {
+  tree_show: function (desc0,id,clone) {
     // načte další generaci pod root podle popisu v desc
     function load(root,desc) {
       if ( desc.down ) {
         for (var i= 0; i<desc.down.length; i++) {
           var down= desc.down[i];
-          down.prop.text= down.prop.data.name||down.prop.id;
+          down.prop.text= down.prop.data && down.prop.data.name||down.prop.id;
           // úprava down.prop.id na složené jméno
           down.prop.id= root.id+','+down.prop.id;
           var node= root.insert(down.prop);
@@ -315,6 +317,9 @@ Ezer.Area= new Class({
       }
     }
     var active= null;
+    var desc= desc0;
+    if ( clone )
+      desc= Object.clone(desc);
     if ( !this.tree ) {
       var root= {text:'site',open:true};
       this.tree= new MooTreeControl({div:id ? id : this.DOM_Block,grid:true,
@@ -349,7 +354,7 @@ Ezer.Area= new Class({
     this.tree.disable(); // potlačí zobrazení
     if ( desc && desc.prop ) {
       Object.append(this.tree.root,desc.prop);
-      this.tree.root.text= this.tree.root.data.name||this.tree.root.id;
+      this.tree.root.text= this.tree.root.data && this.tree.root.data.name||this.tree.root.id;
       this.tree.index[this.tree.root.id]= this.tree.root;
       load(this.tree.root,desc);
       this.tree.expand();
@@ -466,4 +471,27 @@ Ezer.fce.json_decode= function (string) {
 //s: funkce
 Ezer.fce.json_encode= function (obj) {
   return JSON.encode(obj);
+}
+// ================================================================================================= META
+// --------------------------------------------------------------------------------------- meta_tree
+//ff: meta_tree ()
+//      vrátí strom aplikace
+Ezer.fce.meta_tree= function (depth) {
+  var tree;
+  function walk(root) {
+    var name= root.id
+            +(root.options.include ? ' '+root.options.include : '')
+            +(root._library        ? ' #' : '')
+            ;
+    var node= {prop:{id:name},down:[]};
+    if ( root.part ) {
+      $each(root.part,function(x,xi) {
+        if ( x instanceof Ezer.Panel || x instanceof Ezer.MenuMain || x instanceof Ezer.Tabs )
+          node.down.push(walk(x));
+      });
+    }
+    return node;
+  }
+  tree= walk(Ezer.run.$).down[0];
+  return tree;
 }

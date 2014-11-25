@@ -359,7 +359,7 @@ Ezer.Application= new Class({
             }
           }.bind(this),
           contextmenu: function(e) {
-            Ezer.fce.contextmenu([
+            menu= [
               ['run (ctrl-Enter)',              function(el) { __run() }],
               ['clear & run (shift-ctrl-Enter)',function(el) { Ezer.fce.clear(); __run() }],
               ['-výběr kontextu myší',          function(el) {
@@ -367,8 +367,23 @@ Ezer.Application= new Class({
                 Ezer.help.dbg= true;
                 Ezer.run.$.helpBlock(1)
               }],
-              ['kontextem je běžný panel',      function(el) { __clear() }]
-            ],arguments[0]);
+              ['kontextem je běžný panel',      function(el) { __clear() }]];
+            if ( true ) {
+              menu.push(
+              ['-zobrazit strukturu aplikace',   function(el) {
+                var elem= Ezer.run.$.part[Ezer.root];
+                if ( elem && elem.part && elem.part[Ezer.root] ) elem= elem.part[Ezer.root];
+                if ( elem && elem.part && elem.part.doc ) elem= elem.part.doc;
+                if ( elem && elem.part && elem.part.meta ) elem= elem.part.meta;
+                if ( elem && elem instanceof Ezer.Panel ) {
+                  elem.popup();
+                }
+                else {
+                  Ezer.fce.alert("pro zobrazení musí být přístupný modul ezer2.help.ezer s cestou $.<i>root</i>.doc Je-li include:onclick, stačí kliknout na Nápověda");
+                }
+              }]);
+            }
+            Ezer.fce.contextmenu(menu,arguments[0],0,1);
             return false;
           }.bind(this)
         }}).inject(this._barRightDom);
