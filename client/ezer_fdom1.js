@@ -291,14 +291,21 @@ Ezer.Application= new Class({
   // vytvoření ovládání trasování, hlášení chyb, FAQ
   _setTrace: function() {
     // provedení skriptu
-    function __run() {
-      if ( Ezer.help.block )
-        Ezer.help.block.runScript($('dbg').value);
-      else if ( Ezer.panel ) {
-        Ezer.panel.runScript($('dbg').value);
+    function __run(script) {
+      if ( script ) {
+        // skript je dán parametrem
+        Ezer.run.$.runScript(script);
       }
-      else
-        Ezer.run.$.runScript($('dbg').value);
+      else {
+        // skript je v okně debug
+        if ( Ezer.help.block )
+          Ezer.help.block.runScript($('dbg').value);
+        else if ( Ezer.panel ) {
+          Ezer.panel.runScript($('dbg').value);
+        }
+        else
+          Ezer.run.$.runScript($('dbg').value);
+      }
     }
     // odstranění nastaveného kontextu pro skript
     function __clear() {
@@ -368,7 +375,10 @@ Ezer.Application= new Class({
                 Ezer.help.dbg= true;
                 Ezer.run.$.helpBlock(1)
               }],
-              ['kontextem je běžný panel',      function(el) { __clear() }]];
+              ['kontextem je běžný panel',      function(el) { __clear() }],
+              ["-trace: session",    function(el) { __run("ask('test_session')") }],
+              ["trace: sys",         function(el) { __run("echo(debug(sys))") }],
+              ["trace: database",    function(el) { __run("echo(debug(ask('sql_query','SELECT DATABASE() AS selected FROM DUAL')))") }]];
             if ( true ) {
               menu.push(
               ['-zobrazit strukturu aplikace',   function(el) {
