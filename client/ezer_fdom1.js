@@ -125,6 +125,7 @@ Ezer.Application= new Class({
   },
   // ----------------------------------------------------------------------------- loginDomMsg
   loginDomMsg: function (msg) {
+    $('login').setStyle('display','block');
     $('login_msg').set('text',msg);
   },
   // ----------------------------------------------------------------------------- loginDomKey

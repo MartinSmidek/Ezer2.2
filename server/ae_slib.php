@@ -12,12 +12,13 @@
 #   $app_name           -- jméno aplikace
 #   $welcome            -- typ=('test'|'news'|'info')
 #                          může být i pole, kde pole[0]=typ, pole[1]=(info|kontakt|info)
-#   $options: object    -- položky předané do Ezer.options
+#   $options: object    -- položky předané do Ezer.options a $EZER->options
 #     group_login
 #     skill
 #     autoskill
 #     skin
 #     login_interval       -- povolená nečinnost v minutách (default 2 hodiny)
+#     tabu_db              -- databáze, se kterou se nesmí pracovat (např. "ostrá")
 #   $js                 -- seznam skriptů
 #   $css                -- seznam stylů
 #   $pars: object       -- položky parametrizující aplikaci
@@ -36,7 +37,7 @@
 #   $ezer_local         -- bool: ladící běh
 #   $ezer_path_serv     -- string: cesta ke skriptům
 # -------------------------------------------------------------------------------------------------- root_php
-function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$const=null) {
+function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$const=null,$start_sess=true) {
   global $EZER, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system, $gc_maxlifetime;
   // převzetí url-parametrů
   $menu=    isset($_GET['menu']) ? $_GET['menu'] : '';
@@ -69,14 +70,16 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   $favicon= $ezer_local ? "favicon_local.ico" : "favicon.ico";
   $favicon= file_exists("./{$ezer_root}/img/{$favicon}") ? $favicon
     : ($ezer_local ? "{$ezer_root}_local.png" : "{$ezer_root}.png");
-  // promítnutí nastavení do SESSION
-  $gc_maxlifetime= isset($pars->gc_maxlifetime) ? $pars->gc_maxlifetime : 12*60*60;
-  $session= "php";                      // standardní práce se SESSION
-  ini_set('session.gc_maxlifetime',$gc_maxlifetime);
-  session_start();                      // defaultní práce se session, $session=='php'
-  $_SESSION['gc_maxlifetime']= $gc_maxlifetime;
-  if ( isset($_GET['session']) ) {             // zobraz stav session hned po startu
-    $info= $_SESSION;
+  if ( $start_sess ) {
+    // promítnutí nastavení do SESSION
+    $gc_maxlifetime= isset($pars->gc_maxlifetime) ? $pars->gc_maxlifetime : 12*60*60;
+    $session= "php";                      // standardní práce se SESSION
+    ini_set('session.gc_maxlifetime',$gc_maxlifetime);
+    session_start();                      // defaultní práce se session, $session=='php'
+    $_SESSION['gc_maxlifetime']= $gc_maxlifetime;
+    if ( isset($_GET['session']) ) {             // zobraz stav session hned po startu
+      $info= $_SESSION;
+    }
   }
   // přenesení GET parametrů do SESSION aby byly přístupné i v root.ini volané z ezer2.php
   // a do Ezer.get aby byly přístupné v klientu, klíč menu je vynechán
@@ -130,6 +133,7 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     $js_options->ae_trace= "'{$_GET['trace']}'";
   }
   foreach ($options as $id=>$val) {
+    $EZER->options->$id= $val;
     $js_options->$id= $val;
     if ( $id=='group_login' ) {
       $_SESSION[$id]= strtr($val,array('"'=>'',"'"=>''));
@@ -2185,7 +2189,7 @@ function Excel5_f(&$ws,$range,$v,&$err) {
 # $db = .main. pokud má být připojena první databáze z konfigurace
 # $initial=1 pokud není ještě aktivní fce_error
 function ezer_connect ($db0='.main.',$even=false,$initial=0) {
-  global $ezer_db;
+  global $ezer_db, $EZER;
   $err= '';
   $db= $db0;
   if ( $db=='.main.' ) {
@@ -2204,16 +2208,21 @@ function ezer_connect ($db0='.main.',$even=false,$initial=0) {
         . ($ezer_db[$db][5] ? "$db/$db_name" : $db)."' neni pristupny:").mysql_error();
     }
   }
-  // nastavení aktivní databáze pro
-  $res= @mysql_select_db($db_name,$ezer_db[$db][0]);
-  if ( !$res ) {
-    $ok= 0;
-    $err= "databaze '$db_name' je nepristupna";
-    if ( !$initial ) fce_error("connect: $err".mysql_error());
+  // nastavení aktivní databáze a ohlídání, jestli není tabu
+  if ( isset($EZER->options->tabu_db) && $EZER->options->tabu_db==$db_name ) {
+    $err= "databaze $db_name je nepristupna";
   }
-  if ( $ezer_db[$db][4] ) {
+  else {
+    $res= @mysql_select_db($db_name,$ezer_db[$db][0]);
+    if ( !$res ) {
+      $ok= 0;
+      $err= "databaze '$db_name' je nepristupna";
+      if ( !$initial ) fce_error("connect: $err".mysql_error());
+    }
+    if ( $ezer_db[$db][4] ) {
 //                                                         display("SET NAMES '{$ezer_db[$db][4]}'");
-    mysql_query("SET NAMES '{$ezer_db[$db][4]}'");
+      mysql_query("SET NAMES '{$ezer_db[$db][4]}'");
+    }
   }
   return $err;
 }
