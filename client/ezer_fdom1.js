@@ -173,6 +173,7 @@ Ezer.Application= new Class({
             text+= e.target.result
             var w= $('watch_try');
             w.value= text;
+            dropZone.action= dropZone.baseURI;     // aby se neztratily GET parametry
             dropZone.submit();
           }
           r.readAsText(files[0]);
