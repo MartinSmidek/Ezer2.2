@@ -8501,11 +8501,12 @@ Ezer.fce._wait= function () {
 }
 // -------------------------------------------------------------------------------------- confirm
 //ff: fce.confirm (msg,...)
-//      ve zvláštním okně položí otázku msg a dvě tlačítka Ano a Ne
+//      ve zvláštním okně položí otázku msg a dvě tlačítka Ano a Ne  - modální funkce
 //r: 1 - pokud bylo stisknuto Ano
 //   0 - pokud bylo stisknuto Ne
 //s: funkce
-Ezer.fce.confirm= function () {
+Ezer.fce.confirm=
+  function () {
   var msg= '';
   for (var i=0; i<arguments.length; i++) { msg+= arguments[i]; }
   return confirm(msg) ? 1 : 0;

@@ -303,6 +303,7 @@ function sys_user_skills($file='') {
 #   kontrola - kontrola existence dnešní zálohy
 function sys_backup_make($par) {  trace();
   global $path_backup, $ezer_root, $EZER;
+                                                        display("path_backup=$path_backup, ezer_root=$ezer_root");
   $html= '';
   $sign= date("Ymd_Hi");
   if ( $EZER->options->local )

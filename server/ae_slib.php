@@ -2208,11 +2208,11 @@ function ezer_connect ($db0='.main.',$even=false,$initial=0) {
         . ($ezer_db[$db][5] ? "$db/$db_name" : $db)."' neni pristupny:").mysql_error();
     }
   }
-  // nastavení aktivní databáze a ohlídání, jestli není tabu
-  if ( isset($EZER->options->tabu_db) && $EZER->options->tabu_db==$db_name ) {
-    $err= "databaze $db_name je nepristupna";
-  }
-  else {
+//   // nastavení aktivní databáze a ohlídání, jestli není tabu
+//   if ( isset($EZER->options->tabu_db) && $EZER->options->tabu_db==$db_name ) {
+//     $err= "databaze $db_name je nepristupna";
+//   }
+//   else {
     $res= @mysql_select_db($db_name,$ezer_db[$db][0]);
     if ( !$res ) {
       $ok= 0;
@@ -2223,7 +2223,7 @@ function ezer_connect ($db0='.main.',$even=false,$initial=0) {
 //                                                         display("SET NAMES '{$ezer_db[$db][4]}'");
       mysql_query("SET NAMES '{$ezer_db[$db][4]}'");
     }
-  }
+//   }
   return $err;
 }
 # -------------------------------------------------------------------------------------------------- ezer_connect

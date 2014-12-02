@@ -27,7 +27,11 @@ Ezer.Application= new Class({
     this.mooWarn.element.addEvent('click',function(){Ezer.App.mooWarn.slideOut()});
 //     if ( this.options.to_trace )
 //       this._setTrace();
-    window.addEvent('resize',function(e){ this.DOM_layout(); }.bind(this));
+
+    window.addEvent('resize',function(e){
+      this.DOM_layout();
+    }.bind(this));
+
     // úprava výšky trasovací oblasti
 //     if ( this.options.show_trace )
 //       $('dolni').setStyle('height',this.theight);
@@ -1190,3 +1194,68 @@ Ezer.Help= new Class({
     }
   }
 });
+/*
+// https://developer.mozilla.org/en-US/docs/Web/Events/resize
+var optimizedResize = (function() {
+    var callbacks = [],
+        running = false;
+    // fired on resize event
+    function resize() {
+        if (!running) {
+            running = true;
+            if (window.requestAnimationFrame) {
+                window.requestAnimationFrame(runCallbacks);
+            } else {
+                setTimeout(runCallbacks, 66);
+            }
+        }
+    }
+    // run the actual callbacks
+    function runCallbacks() {
+        callbacks.forEach(function(callback) {
+            callback();
+        });
+        running = false;
+    }
+    // adds callback to loop
+    function addCallback(callback) {
+        if (callback) {
+            callbacks.push(callback);
+        }
+    }
+    return {
+        // initalize resize event listener
+        init: function(callback) {
+            window.addEventListener('resize', resize);
+            addCallback(callback);
+        },
+        // public method to add additional callback
+        add: function(callback) {
+            addCallback(callback);
+        }
+    }
+}());
+
+// start process
+optimizedResize.init(function() {
+    console.log('Resource conscious resize callback!')
+});
+setTimeout(function() {
+  window.addEventListener("resize", resizeThrottler, false);
+  var resizeTimeout;
+  function resizeThrottler() {
+    // ignore resize events as long as an actualResizeHandler execution is in the queue
+    if ( !resizeTimeout ) {
+      resizeTimeout = setTimeout(function() {
+        resizeTimeout = null;
+        actualResizeHandler();
+       // The actualResizeHandler will execute at a rate of 15fps
+       }, 66);
+    }
+  }
+  function actualResizeHandler() {
+    // handle the resize event
+    Ezer.app.DOM_layout()
+  }
+}());
+*/
