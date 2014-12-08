@@ -859,7 +859,9 @@
       }
       // zjištění počtu před záznamem, včetně něj
       //       $qry2= "SELECT $fields FROM $table $joins WHERE $cond $scond $group $order";
-      $qry2= "SELECT count(*) as _pocet_ FROM $table $joins WHERE $cond $scond $group $order";
+      // pokud je HAVING musíme nechat pole i kvůli dotazu na počet
+      $qry2_fields= $x->having ? ",$fields" : '';
+      $qry2= "SELECT count(*) as _pocet_ $qry2_fields FROM $table $joins WHERE $cond $scond $group $order";
       $res2= mysql_qry($qry2);
       $from= mysql_num_rows($res2);
       $from= max(0,$from-1);
