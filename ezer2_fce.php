@@ -433,7 +433,7 @@ function sys_backup_into($into,$sign) {   trace();
   if ( file_exists($into) ) {
     foreach ( $ezer_db as $db_id=>$db_desc ) {
       list($n,$host,$user,$pasw,$lang,$db_name,$omitt)= $db_desc;
-      if ( !$omitt && !isset($ezer_db[$db_name]) ) {
+      if ( !$omitt ) { //&& !isset($ezer_db[$db_name]) ) {
         $name= $db_name ? $db_name : $db_id;
                                                 debug($db_desc,$db_id);
         $file= "{$name}_$sign.sql";
