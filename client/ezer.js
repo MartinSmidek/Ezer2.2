@@ -3152,7 +3152,7 @@ Ezer.LabelMap= new Class({
             if ( p[7] )
               map_opts.zIndex= google.maps.Marker.MAX_ZINDEX + 1;
             if ( p[8] )
-              map_opts.icon.scale= p[8];
+              map_opts.icon.scale= p[8].toInt();
           }
           else {
             map_opts.icon= p[4];
@@ -6927,8 +6927,9 @@ Ezer.Eval= new Class({
           }
           else {
             if ( Ezer.browser=='CH' ) {
-              var astack= e.stack.split("\n");
-              Ezer.error(e?'Javascript '+(astack[0]+astack[1]||e):'error in eval','E',e);
+//               var astack= e.stack.split("\n");
+//               Ezer.error(e?'Javascript '+(astack[0]+astack[1]||e):'error in eval','E',e);
+              Ezer.error(e ? 'Javascript '+(e.message||'')+e.stack : 'error in eval','E',e);
             }
             else
               Ezer.error(e?'Javascript '+(e.msg||e):'error in eval','E',e);
