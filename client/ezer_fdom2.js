@@ -2317,7 +2317,8 @@ Ezer.Select.implement({
         li.setProperties({value:key,text:name});
 //                                                         Ezer.trace('*',li.getProperty('ivalue')+':'+li.get('text'));
     };
-    this.DOM_DropList.getChildren().destroy();
+    if ( this.DOM_DropList )
+      this.DOM_DropList.getChildren().destroy();
     if ( this.map_options && this.map_options.data_order ) {
       if ( this instanceof Ezer.SelectMap0 ) {
         create.bind(this)(this.Items[0],0);

@@ -3980,11 +3980,14 @@ Ezer.Select= new Class({
 //  ; 'w' : 'wide' seznam hodnot bude zobrazen v plné šířce
   Extends: Ezer.Elem,
   Items: {},
+  _values: 0,
 // ------------------------------------------------------------------------------------ selects
-//fm: Select.selects (list[,delimiters=',:'])
+//fm: Select.selects (list[,delimiters=',:'][,values:0)
 //a: list - seznam volitelných hodnot pro select ve tvaru: hodnota[:klíč],...
 //   delimiters - řetězec definující 2 znaky použité jako oddělovače
-  selects: function(list,delimiters) {
+//   values - 1:funkce key,_save,_load bude vracet/číst místo klíče hodnotu
+  selects: function(list,delimiters,values) {
+    this._values= values?1:0;
     this.Items= {};
     var del1= ',', del2= ':';
     if ( delimiters ) {
@@ -4023,7 +4026,7 @@ Ezer.Select= new Class({
     var ret= 1;
     if ( key!==undefined ) {
       // definuj hodnotu klíče
-      this._key= $type(key)=='string' ? Number(key) : key;
+      this._key= $type(key)=='string' ? (Number(key)==NaN ? key : Number(key))  : key;
       Ezer.assert(this.Items,'nedefinované položky v select',this);
       this.value= this.Items[this._key];
 //       this.empty= false;
@@ -4032,7 +4035,7 @@ Ezer.Select= new Class({
       this.DOM_set();
     }
     else {
-      ret= key= this._key;
+      ret= key= this._values ? this.value : this._key;
     }
     return ret;
   },
