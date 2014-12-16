@@ -3058,15 +3058,17 @@ Ezer.LabelMap= new Class({
   zoom: null,           // aktivní výřez mapy (LatLngBounds)
   rect: null,           // zobrazený obdélník (Polygon)
 // ------------------------------------------------------------------------------- LabelMap.init
-//fm: LabelMap.init ([TERRAIN|ROADMAP])
+//fm: LabelMap.init ([TERRAIN|ROADMAP][,options])
 // inicializace oblasti se zobrazením mapy ČR
-  init: function (type) {
+  init: function (type,options) {
     var stredCR= new google.maps.LatLng(49.8, 15.6);
     var map_id= google.maps.MapTypeId[type||'TERRAIN'];
     var g_options= {zoom:7, center:stredCR, mapTypeId:map_id,
       mapTypeControlOptions:{position: google.maps.ControlPosition.RIGHT_BOTTOM},
       zoomControlOptions:{position: google.maps.ControlPosition.LEFT_BOTTOM}
     };
+    if ( options )
+      g_options= Object.merge(g_options,options);
     this.map= new google.maps.Map(this.DOM_Block,g_options);
     this.poly= null;
     this.rect= null;
@@ -3298,10 +3300,12 @@ Ezer.LabelMap= new Class({
 //       if ( (this.geocode_counter % 100) == 0 )
 //         ms+= 20000;
     }
+    var addr= {address:geo.address};
+    if ( geo.region ) addr.region= geo.region;
     if ( ms )
-      this.geocoder.geocode.delay(ms,this,[{address:geo.address},this._geocode.bind(this)]);
+      this.geocoder.geocode.delay(ms,this,[addr,this._geocode.bind(this)]);
     else
-      this.geocoder.geocode({address:geo.address},this._geocode.bind(this));
+      this.geocoder.geocode(addr,this._geocode.bind(this));
     // pokud google vrátí chybu nebude nastavené continuation a geocode vrátí 0
     return this;
   },
