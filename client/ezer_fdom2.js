@@ -187,9 +187,10 @@ Ezer.MenuMain.implement({
       $each(this.part,function(desc,id) {
         var href= make_url_menu([id]); // 'ezer://'+id;
         if ( desc.type=='tabs' ) {
-          var a= new Element('a',{href:href,html:desc.options.title||id}).inject(new Element('div').inject(
+          var title= desc.options.title||id;
+          title= title.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
+          var a= new Element('a',{href:href,html:title}).inject(new Element('div').inject(
           desc.DOM_li= new Element('li',{
-  //           'class': id==active ? 'Active' : '',
             events:{
               click: function(event) {
                 Ezer.pushState(href);
@@ -204,7 +205,6 @@ Ezer.MenuMain.implement({
           var key= desc.self_sys().sys;
           if ( key && desc.options._sys && Ezer.sys.ezer.help_keys
             && Ezer.sys.ezer.help_keys.contains(key,',') ) {
-//             a.innerHTML+= "<sub>&hearts;</sub>";
             a.innerHTML+= "<sub> ?</sub>";
           }
         }
@@ -538,8 +538,9 @@ Ezer.Item.implement({
       break;
     case 'menu.context':
       var title= this.options.title||this.id;
+      title= title.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
       new Element('li').adopt(
-        a= new Element('a',{text:title[0]=='-' ? title.substr(1) : title})
+        a= new Element('a',{html:title[0]=='-' ? title.substr(1) : title})
       ).inject(this.owner.DOM);
       if ( title[0]=='-' ) {
         a.setStyles({borderTop:"1px solid #AAAAAA"});
@@ -760,7 +761,9 @@ Ezer.PanelMain.implement({
 // a přihlášeného uživatele vynucený, naplní panel.force_help
 Ezer.PanelInTabs_add= function(panel) {
   var href= make_url_menu([panel.owner.id,panel.id]); // 'ezer://'+panel.owner.id+'.'+panel.id;
-  var a= new Element('a',{href:href,html:panel.options.title||panel.id}).inject(
+  var title= panel.options.title||panel.id;
+  title= title.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
+  var a= new Element('a',{href:href,html:title}).inject(
     new Element('div').inject(
       panel._tabDom= new Element('li',{styles:{display:'none'},events:{
         click: function(event) {
@@ -779,7 +782,6 @@ Ezer.PanelInTabs_add= function(panel) {
   // zvýraznění nadpisu, pokud právě k němu existuje _help
   var key= panel.self_sys().sys;
   if ( panel.options._sys && Ezer.sys.ezer.help_keys.contains(key,',') ) {
-//     a.innerHTML+= "<sub>&hearts;</sub>";
     a.innerHTML+= "<sub> ?</sub>";
     // posouzení, zda má být help navíc vnucen při firstfocus
     if ( Ezer.sys.ezer.help_keys.contains('*'+key,',') ) {
@@ -3410,7 +3412,9 @@ Ezer.fce.DOM.confirm= function (str,continuation) {
   var win= new StickyWin.Alert('Dotaz',str,{hideOnClick:false,closeOnEsc:true,
     uiOptions:{closeButton:false,width:350,
       buttons:[{text:'Ano',onClick: function(){ continuation(1) }},
-               {text:'Ne',onClick: function(){ continuation(0) }} ]},
+               {text:'Nevím co chtít',onClick: function(){ continuation(-1) }},
+               {text:'Ne',onClick: function(){ continuation(0) }}
+              ]},
     maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
   });
   return win;
