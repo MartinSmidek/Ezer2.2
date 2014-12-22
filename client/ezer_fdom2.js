@@ -3408,13 +3408,15 @@ Ezer.fce.DOM.alert= function (str,continuation) {
   return win;
 };
 // -------------------------------------------------------------------------------------- confirm
-Ezer.fce.DOM.confirm= function (str,continuation) {
+// default butts={Ano:1,Ne:0}
+Ezer.fce.DOM.confirm= function (str,continuation,butts) {
+  butts= butts || {Ano:1,Ne:0};
+  var buttons= [];
+  Object.each(butts,function(value,title){
+    buttons.push({text:title,onClick:function(){continuation(value)}});
+  });
   var win= new StickyWin.Alert('Dotaz',str,{hideOnClick:false,closeOnEsc:true,
-    uiOptions:{closeButton:false,width:350,
-      buttons:[{text:'Ano',onClick: function(){ continuation(1) }},
-               {text:'Nevím co chtít',onClick: function(){ continuation(-1) }},
-               {text:'Ne',onClick: function(){ continuation(0) }}
-              ]},
+    uiOptions:{closeButton:false,width:350,buttons:buttons},
     maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
   });
   return win;

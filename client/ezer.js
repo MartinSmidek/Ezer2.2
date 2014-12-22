@@ -8507,23 +8507,31 @@ Ezer.fce._wait= function () {
   }
   return 1;
 }
+// -------------------------------------------------------------------------------------- choose
+//fj: fce.choose (query,buttons)
+//   zobrazí variantní otázku ve vyskakovacím okně, spolu s tlačítky pro odpovědi - modální funkce
+//   buttons= řetězec název:hodnota,...
+//s: funkce
+Ezer.fce.choose= function (query,buttons) {
+  var ok= 0, butts= {};
+  if ( $type(buttons)=='string' ) {
+    ok= 1;
+    buttons.split(',').each(function(but) {
+      var iv= but.split(':');
+      butts[iv[0]]= iv[1];
+    });
+    Ezer.fce.DOM.confirm(query,Ezer.fce._confirm,butts);
+  }
+  return ok;
+};
 // -------------------------------------------------------------------------------------- confirm
-//ff: fce.confirm (msg,...)
+//fj: fce.confirm (msg,...)
 //      ve zvláštním okně položí otázku msg a dvě tlačítka Ano a Ne  - modální funkce
 //r: 1 - pokud bylo stisknuto Ano
 //   0 - pokud bylo stisknuto Ne
 //s: funkce
 Ezer.fce.confirm=
-  function () {
-  var msg= '';
-  for (var i=0; i<arguments.length; i++) { msg+= arguments[i]; }
-  return confirm(msg) ? 1 : 0;
-}
-// -------------------------------------------------------------------------------------- confirm2
-//fj: fce.confirm2 (msg1,...)
-//   zobrazí argumenty ve vyskakovacím okně - modální funkce
-//s: funkce
-Ezer.fce.confirm2= function () {
+Ezer.fce.confirm= function () {
   var str= '';
   for (var i=0; i<arguments.length; i++) str+= arguments[i];
   Ezer.fce.DOM.confirm(str,Ezer.fce._confirm);
