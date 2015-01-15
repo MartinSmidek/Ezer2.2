@@ -23,17 +23,17 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
     cis_druh.set('_meta_');
     reload_keys }
   proc reload_keys () {
-    klice.list.browse_load(druh_cond.get);
-    klice.list.raise('onrowclick'); klice.list.browse_focus
+    klice.lst.browse_load(druh_cond.get);
+    klice.lst.raise('onrowclick'); klice.lst.browse_focus
   | klic.key_novy;
   }
-  proc klice.list.onsubmit () {
-    eq(klice.list.druh.get,'_meta_');
-    druh_cond.set(conc("druh='",klice.list.zkratka.get,"'"));
-    cis_druh.set(klice.list.zkratka.get);
-    cis_id.set(klice.list.id.get);
+  proc klice.lst.onsubmit () {
+    eq(klice.lst.druh.get,'_meta_');
+    druh_cond.set(conc("druh='",klice.lst.zkratka.get,"'"));
+    cis_druh.set(klice.lst.zkratka.get);
+    cis_id.set(klice.lst.id.get);
     reload_keys }
-  proc klice.list.onrowclick () {
+  proc klice.lst.onrowclick () {
     reload_key }
   proc reload_key () {
     klic.key_load }
@@ -45,7 +45,7 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
         reload_keys }
     }
     view k: table _cis,
-    browse list [2,32,0,54] { rows:sys_cis_list, qry_rows:1, buf_rows:100
+    browse lst [2,32,0,54] { rows:sys_cis_list, qry_rows:1, buf_rows:100
       show id [,,40,] { title:'id_cis', data:k.id_cis, format:'sr' },
       show poradi [,,20,] { title:'n.', data:k.poradi, format:'s+r' },
       show druh [,,70,] { title:'druh', data:k.druh, format:'qs' },
@@ -80,7 +80,7 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
     # procedury
     proc key_novy () {
       var count: number
-      count.set(klice.list.browse_count);
+      count.set(klice.lst.browse_count);
       form.init; kdruh.set(cis_druh.get); kdruh.change;
       // návrh klíče
       { eq(kdruh.get,'_meta_'); id.set(sum(1,ask('select','max(id_cis)','_cis')))
@@ -90,11 +90,11 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
       kdata.set(poradi.get); kdata.change;
     }
     proc key_load () {
-      form.load(/*id_self.get.get*/klice.list.id.get)
+      form.load(/*id_self.get.get*/klice.lst.id.get)
     }
     proc key_uloz () {
-      form.same; alert('nebyla provedena žádná změna'); klice.list.browse_focus
-    | the_formsave(form,klice.list/*brow_self.get*/); klice.list.browse_focus
+      form.same; alert('nebyla provedena žádná změna'); klice.lst.browse_focus
+    | the_formsave(form,klice.lst/*brow_self.get*/); klice.lst.browse_focus
     }
     proc key_smaz () {
       _cis.delete_record(conc("id_cis=",id.get)); reload_keys
@@ -191,36 +191,71 @@ panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a;aa|aa'
   proc onfirstfocus() { left.a.d.click }
 }
 # ================================================================================================== UŽIVATELÉ
-panel users [,,,543] {type:'plain', title:'Uživatelé', _sys:'uzi', skill:'a|a'
+panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
+
   const sys_users_list = 22
   const sys_users_skills = 16
   const sys_users_cmd = 476
+
+  var last_par: object
   var novy: number,
   var new_skill: text,
   var sel: text,
+
   use uzivatele: form users [20,7,,],
   use uzivatel: form user [440,7,,],
   use cmd: form butt [146,sys_users_cmd,,],
   use dskill: form desc_skills [440,127,,]
+
   proc onstart () {
+    last_par.set(see.all.actives.par);
     sel.set('use');
+    refresh;
     uzivatel.get.display(sys('options','watch_ip'),'ip');
-    uzivatele.list.browse_load;
     cmd.watch_key.display(sys('options','watch_key'));
   }
-  proc u_uloz () {
-    cmd.get.enable(0,'c');
+  proc u_uloz () { var msg:text
     uzivatel.same;
   | uzivatel.kdo.set(sys('user','id_user')); uzivatel.kdo.change; uzivatel.kdy.set(now_sql(1));
-    uzivatel.kdy.change; uzivatel.key; uzivatel.save; uzivatel.load;
-    uzivatele.list.browse_seek
-  | uzivatel.insert; novy.set(uzivatel.key); uzivatel.load;
-    uzivatele.list.browse_load; uzivatele.list.raise('onrowclick',novy.get)}
+    uzivatel.kdy.change;
+    uzivatel.key;
+    { msg.set(ask('sys_user_unique',uzivatel.key,uzivatel.username.get,uzivatel.znacka.get));
+      msg; alert(msg)
+    | uzivatel.save; uzivatel.load;
+      uzivatele.lst.browse_seek;
+      cmd.get.enable(0,'c');
+    }
+  | not(uzivatel.key);
+    { msg.set(ask('sys_user_unique',0,uzivatel.username.get,uzivatel.znacka.get));
+      msg; alert(msg)
+    | uzivatel.insert; novy.set(uzivatel.key); uzivatel.load;
+      uzivatele.lst.browse_load; uzivatele.lst.raise('onrowclick',novy.get);
+      cmd.get.enable(0,'c');
+    }
+  }
+  # obnovení seznamu uživatelů
+  proc refresh() {
+    uzivatele.lst.browse_load(last_par.get('cond'));
+    cmd.enable(1,last_par.get('on'));
+    cmd.enable(0,last_par.get('off'));
+  }
+  # ------------------------------------------------------------------- menu
+  menu see { type:'left', active:*, format:'f-'
+    menu all { title:'přehled',type:'group'
+      item actives { title:'[fa-search-plus] aktivní uživatelé', par:°{on:'h',off:'u',cond:"deleted=''"}}
+      item         { title:'[fa-search-minus] skrytí uživatelé', par:°{on:'u',off:'h',cond:"deleted LIKE 'H%'"}}
+      item         { title:'[fa-search] všichni uživatelé',      par:°{on:'h|u',off:'',cond:1}}
+    }
+    proc onclick (i) {
+      last_par.set(i.par);
+      refresh;
+    }
+  }
   # ------------------------------------------------------------------- uživatelé
   form users [0,0,200,400] {
     view u: table _user,
     label [6,3,89,15] { title:'<h1>Uživatelé</h1>' },
-    browse list [4,35,0,54] { rows:sys_users_list, qry_rows:1, buf_rows:100
+    browse lst [4,35,0,54] { rows:sys_users_list, qry_rows:1, buf_rows:100
       show user [,,20,] { title:'č.', help:'jednoznačné číslo uživatele',
         data:u.id_user, format:'rsq' },
       show zkratka [,,35,] { title:'značka', help:'jednoznačná třípísmenná zkratka',
@@ -231,10 +266,11 @@ panel users [,,,543] {type:'plain', title:'Uživatelé', _sys:'uzi', skill:'a|a'
       show jmeno [,,70,] { title:'jméno', data:u.forename, format:'sq' },
       show skills [,,100,] { title:'oprávnění', help:'seznam kódů oprávnění',
         data:u.skills, format:'tsq' },
-      proc onrowclick () {  echo("sel=",sel.get);
+      proc onrowclick () {
         new_skill.set('');
         cmd.get.enable(0,'c');
         uzivatel.load(user.get);
+        uzivatel.znacka.enable(0);
         // zobrazení v seznamu vlastností jako vybraných
         dskill.missing.set(ask('sys_skills_test',uzivatel.skills.get));
         dskill.seznam.selected('set',ask('sys_skills2ids',uzivatel.skills.get));
@@ -265,7 +301,6 @@ panel users [,,,543] {type:'plain', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     label [2,71,50,15] { title:'příjmení' },
     label [218,27,53,15] { tag:'ac', title:'přístup k' },
     label [295,27,130,15] { tag:'ip', title:'povolené IP adresy' },
-    proc onsubmit() { u_uloz }
     proc onchanged() { cmd.get.enable(1,'c') }
   }
   # ------------------------------------------------------------------- desc_skills
@@ -305,14 +340,14 @@ panel users [,,,543] {type:'plain', title:'Uživatelé', _sys:'uzi', skill:'a|a'
             alert("soubor lze stáhnout <a href='docs/skills.xlsx'>zde</a>"); } }
         item { title:'nositelé nastaveného oprávnění'
           proc onclick() {
-            uzivatele.list.selected('clear');
-            uzivatele.list.selected('set',ask('sys_user_skilled',abb.get))
+            uzivatele.lst.selected('clear');
+            uzivatele.lst.selected('set',ask('sys_user_skilled',abb.get))
           } }
       }
       proc onchoice() {
         // pokud je přihlášený administrátor, zablokujeme mu možnost změnit si oprávnění
-        eq(uzivatele.list.user.get,sys('user','id_user'));
-        contains(uzivatele.list.user.get,sys('ezer','options','admins'));
+        eq(uzivatele.lst.user.get,sys('user','id_user'));
+        contains(uzivatele.lst.user.get,sys('ezer','options','admins'));
         warning('Administrátor si nemůže měnit svoje práva');
       | uzivatel.skills.set(ask('sys_ids2skills',this.selected('get')));
         uzivatel.skills.change;
@@ -321,31 +356,39 @@ panel users [,,,543] {type:'plain', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     }
   }
   # ------------------------------------------------------------------- butt
-  form butt [,,647,39] {
-    button uloz_clena [11,8,,] { tag:'c', type:'submit', title:'Uložit'
-      proc onclick () { u_uloz
-    } }
-    button zpet_clena [75,8,,] { tag:'c', title:'Zpět'
+  form butt [,,721,39] {
+  label  [0,2,136,30] { css:'ae_parm', skill:'yaa+;faa+;caa+' }
+    button zpet_clena [10,8,,] { tag:'c', title:'[fa-undo] Zpět'
       proc onclick () {
         uzivatel.key; uzivatel.load;
         cmd.get.enable(0,'c');
     } }
-    button vytvor_clena [130,8,,] { title:'Vytvořit'
+    button uloz_clena [72,8,,] { tag:'c', title:'[fa-save] Uložit'
+      proc onclick () { u_uloz
+    } }
+    button vytvor_clena [146,8,,] { title:'[fa-heart] Vytvořit'
       proc onclick () {
         cmd.get.enable(0,'c');
         dskill.seznam.selected('clear');
-        uzivatele.list.blur; uzivatel.init; uzivatel.kdo.set(sys('user','id_user'));
+        uzivatele.lst.blur; uzivatel.init; uzivatel.kdo.set(sys('user','id_user'));
         uzivatel.kdy.set(now);
+        uzivatel.znacka.enable(1);
     } }
-    button zrus_clena [199,8,,] { title:'Smazat', format:'d' }
-    button obnov_clena [275,8,,] { title:'Obnovit', format:'d' }
+    button zrus_clena [219,8,,] { tag:'h', title:'[fa-plug fa-rotate-180 fa-red] Skrýt'
+      proc onclick() { confirm("Opravdu znemožnit přihlášení uživateli ",uzivatel.username.get,'?');
+        alert(ask('sys_user_hide',uzivatele.lst.user.get,1)); refresh
+    }}
+    button obnov_clena [279,8,,] { tag:'u', title:'[fa-plug] Obnovit'
+      proc onclick() { confirm("Opravdu obnovit uživatele ",uzivatel.username.get,'?');
+        alert(ask('sys_user_hide',uzivatele.lst.user.get,0)); refresh
+    }}
     button watch_key [355,8,,] { title:'Vygenerovat klíč', format:'n'
       proc onclick() {
         confirm("Vygenerování nového klíče znemožní přístup současným uživatelům. Pokračovat?");
         watch_ref.set(ask('sys_watch_key'))
       }
     }
-    label watch_ref [474,15,250,15]
+    label watch_ref [468,11,250,15]
   }
 }
 # ================================================================================================== POŽADAVKY

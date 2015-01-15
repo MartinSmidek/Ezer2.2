@@ -463,7 +463,7 @@ button:disabled i.fa-red { color:grey }
 .Check {
   position:absolute; display:block; z-index:1; }
 .Check input {
-  vertical-align:bottom; position:relative; top:2px; }
+  /*vertical-align:bottom;*/ position:relative; top:2px; }
 __EOD
 .(($browser=='OP')?"
 label.Check {

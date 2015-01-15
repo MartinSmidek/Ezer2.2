@@ -512,7 +512,7 @@ Ezer.Item.implement({
       this.DOM_Block= new Element('div',{'class':'MFile MEntry'}).inject(this.owner.DOM_Block);
       var href= make_url_menu([this.owner.owner.owner.owner.id,this.owner.owner.owner.id,
         this.owner.owner.id,this.owner.id,this.id]);
-      var title= this.options.title||this.id, pop;
+      var title= ''+(this.options.title||this.id), pop;
       // náhrada ikony na začátku, případně uprostřed
       var s_ikonou= this.owner.owner.awesome;
       if ( s_ikonou ) {

@@ -523,18 +523,46 @@ function sys_session() {
   $html= "<div class='dbg'>".debugx($_SESSION,'$_SESSION')."</div>";
   return $html;
 }
-# ------------------------------------------------------------------------------------------ sys_user
+# ----------------------------------------------------------------------------------------- sys_user
 # vygeneruje tabulku běžného $USER
 function sys_user() {
   global $USER;
   $html= "<div class='dbg'>".debugx($USER,'$USER')."</div>";
   return $html;
 }
-# ------------------------------------------------------------------------------------------ sys_ezer
+# ----------------------------------------------------------------------------------------- sys_ezer
 # vygeneruje tabulku běžného $EZER
 function sys_ezer() {
   global $EZER;
   $html= "<div class='dbg'>".debugx($EZER,'$EZER')."</div>";
+  return $html;
+}
+# ---------------------------------------------------------------------------------- sys_user_unique
+# zkontroluje, zda uživatel má jedinečnou zkratku a jméno
+function sys_user_unique($id_user,$username,$abbr) {
+  $msg= '';
+  $x= select1("CONCAT(forename,' ',surname)","_user","id_user!=$id_user AND username='$username'");
+  $msg.= $x ? " uživatelské jméno '$username' již používá $x" : '';
+  $x= select1("CONCAT(forename,' ',surname)","_user","id_user!=$id_user AND abbr='$abbr'");
+  $msg.= $x ? " zkratku '$abbr' již používá $x" : '';
+  return $msg;
+}
+# ------------------------------------------------------------------------------------ sys_user_hide
+# 1: skryje daného uživatele, smaže mu všechna skills
+# 0: obnoví daného uživatele
+function sys_user_hide($id_user,$to_hide) {
+  global $USER;
+  switch($to_hide) {
+  case 1:
+    $kdokdy= $USER->abbr.' '.date('Y-m-d');
+    query("UPDATE _user SET deleted='H$kdokdy',skills='' WHERE id_user=$id_user");
+    $html= "Uživateli byla zrušena všechna přístupová práva, jeho značka ale je zachována!";
+    break;
+  case 0:
+    query("UPDATE _user SET deleted='' WHERE id_user=$id_user");
+    $html= "Uživatel byl obnoven, je mu potřeba nastavit přístupová práva!";
+    break;
+  }
   return $html;
 }
 # ---------------------------------------------------------------------------------- sys_skills_test
