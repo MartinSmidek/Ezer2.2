@@ -203,9 +203,9 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   var sel: text,
 
   use uzivatele: form users [20,7,,],
-  use uzivatel: form user [440,7,,],
+  use uzivatel: form user [440+180,7,,],
   use cmd: form butt [146,sys_users_cmd,,],
-  use dskill: form desc_skills [440,127,,]
+  use dskill: form desc_skills [440+180,127,,]
 
   proc onstart () {
     last_par.set(see.all.actives.par);
@@ -257,15 +257,15 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     label [6,3,89,15] { title:'<h1>Uživatelé</h1>' },
     browse lst [4,35,0,54] { rows:sys_users_list, qry_rows:1, buf_rows:100
       show user [,,20,] { title:'č.', help:'jednoznačné číslo uživatele',
-        data:u.id_user, format:'rsq' },
+        data:u.id_user, format:'rsq=' },
       show zkratka [,,35,] { title:'značka', help:'jednoznačná třípísmenná zkratka',
-        data:u.abbr, format:'sq' },
+        data:u.abbr, format:'sq*' },
       show username [,,70,] { title:'uživatel', help:'jednoznačné přihlašovací jméno',
-        data:u.username, format:'s+q' },
-      show prijmeni [,,70,] { title:'příjmení', data:u.surname, format:'sq' },
-      show jmeno [,,70,] { title:'jméno', data:u.forename, format:'sq' },
-      show skills [,,100,] { title:'oprávnění', help:'seznam kódů oprávnění',
-        data:u.skills, format:'tsq' },
+        data:u.username, format:'sq*' },
+      show prijmeni [,,70,] { title:'příjmení', data:u.surname, format:'s+q*' },
+      show jmeno [,,70,] { title:'jméno', data:u.forename, format:'sq*' },
+      show skills [,,280,] { title:'oprávnění', help:'seznam kódů oprávnění',
+        data:u.skills, format:'tsq*' },
       proc onrowclick () {
         new_skill.set('');
         cmd.get.enable(0,'c');
@@ -343,6 +343,8 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
             uzivatele.lst.selected('clear');
             uzivatele.lst.selected('set',ask('sys_user_skilled',abb.get))
           } }
+        item { title:'-zobrazit user.options'
+          proc onclick() { alert(ask('sys_user_options',uzivatele.lst.user.get)) } }
       }
       proc onchoice() {
         // pokud je přihlášený administrátor, zablokujeme mu možnost změnit si oprávnění
@@ -356,7 +358,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     }
   }
   # ------------------------------------------------------------------- butt
-  form butt [,,721,39] {
+  form butt [,,852,39] {
   label  [0,2,136,30] { css:'ae_parm', skill:'yaa+;faa+;caa+' }
     button zpet_clena [10,8,,] { tag:'c', title:'[fa-undo] Zpět'
       proc onclick () {
@@ -382,13 +384,13 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
       proc onclick() { confirm("Opravdu obnovit uživatele ",uzivatel.username.get,'?');
         alert(ask('sys_user_hide',uzivatele.lst.user.get,0)); refresh
     }}
-    button watch_key [355,8,,] { title:'Vygenerovat klíč', format:'n'
+    button watch_key [477,8,,] { title:'Vygenerovat klíč', format:'n'
       proc onclick() {
         confirm("Vygenerování nového klíče znemožní přístup současným uživatelům. Pokračovat?");
         watch_ref.set(ask('sys_watch_key'))
       }
     }
-    label watch_ref [468,11,250,15]
+    label watch_ref [590,11,250,15]
   }
 }
 # ================================================================================================== POŽADAVKY

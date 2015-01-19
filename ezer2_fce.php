@@ -185,6 +185,7 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
 function sys_user_skilled($skill) {
   global $ezer_system;
   $ids= '';
+  $skill= str_replace('+','[+]',$skill);
   $qu= "SELECT GROUP_CONCAT(id_user ORDER BY id_user) AS _ids FROM $ezer_system._user
         WHERE skills RLIKE '^{$skill}[ ]|[ ]{$skill}[ ]|[ ]{$skill}\$|^{$skill}\$' ";
   $ru= mysql_qry($qu,0,0,0,'ezer_system');
@@ -535,6 +536,16 @@ function sys_user() {
 function sys_ezer() {
   global $EZER;
   $html= "<div class='dbg'>".debugx($EZER,'$EZER')."</div>";
+  return $html;
+}
+# --------------------------------------------------------------------------------- sys_user_options
+# zobrazí options daného uživatele
+function sys_user_options($id_user) {
+  list($user,$options)= select("username,options","_user","id_user=$id_user");
+                                                display($options);
+  $obj= json_decode($options);
+                                                debug($obj);
+  $html= "<div class='dbg'>".debugx($obj,'$user')."</div>";
   return $html;
 }
 # ---------------------------------------------------------------------------------- sys_user_unique
