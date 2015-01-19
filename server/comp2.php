@@ -1,4 +1,4 @@
-<?php # (c) 2007-2009 Martin Smidek <martin@smidek.eu>
+<?php # (c) 2007-2015 Martin Smidek <martin@smidek.eu>
 
 global $x, $y, $trace, $err,$ezer_path_code, $debugger;
 // $debugger= false; // true => kompilátor spuštěn v okně debug
