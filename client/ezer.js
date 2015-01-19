@@ -8930,6 +8930,7 @@ Ezer.fce.trail= function (op) {
     if ( Ezer.obj.trail.elems.length > Ezer.obj.trail.max ) {
       Ezer.obj.trail.elems.shift();
     }
+                Ezer.trace('*',(arguments[1].options.title || arguments[1].id)+':'+arguments[2]);
     Ezer.obj.trail.elems.push({o:arguments[1],m:arguments[2],t:new Date().format("%M:%S")});
     break;
   }

@@ -360,15 +360,15 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   # ------------------------------------------------------------------- butt
   form butt [,,852,39] {
   label  [0,2,136,30] { css:'ae_parm', skill:'yaa+;faa+;caa+' }
-    button zpet_clena [10,8,,] { tag:'c', title:'[fa-undo] Zpět'
+    button zpet_clena [10,8,,] { tag:'c', type:'html', title:'[fa-undo] Zpět'
       proc onclick () {
         uzivatel.key; uzivatel.load;
         cmd.get.enable(0,'c');
     } }
-    button uloz_clena [72,8,,] { tag:'c', title:'[fa-save] Uložit'
+    button uloz_clena [72,8,,] { tag:'c', type:'html', title:'[fa-save] Uložit'
       proc onclick () { u_uloz
     } }
-    button vytvor_clena [146,8,,] { title:'[fa-heart] Vytvořit'
+    button vytvor_clena [146,8,,] { type:'html', title:'[fa-heart] Vytvořit'
       proc onclick () {
         cmd.get.enable(0,'c');
         dskill.seznam.selected('clear');
@@ -376,11 +376,11 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
         uzivatel.kdy.set(now);
         uzivatel.znacka.enable(1);
     } }
-    button zrus_clena [219,8,,] { tag:'h', title:'[fa-plug fa-rotate-180 fa-red] Skrýt'
+    button zrus_clena [219,8,,] { tag:'h', type:'html', title:'[fa-plug fa-rotate-180 fa-red] Skrýt'
       proc onclick() { confirm("Opravdu znemožnit přihlášení uživateli ",uzivatel.username.get,'?');
         alert(ask('sys_user_hide',uzivatele.lst.user.get,1)); refresh
     }}
-    button obnov_clena [279,8,,] { tag:'u', title:'[fa-plug] Obnovit'
+    button obnov_clena [279,8,,] { tag:'u', type:'html', title:'[fa-plug] Obnovit'
       proc onclick() { confirm("Opravdu obnovit uživatele ",uzivatel.username.get,'?');
         alert(ask('sys_user_hide',uzivatele.lst.user.get,0)); refresh
     }}
