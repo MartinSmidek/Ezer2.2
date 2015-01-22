@@ -1270,7 +1270,6 @@ Ezer.ButtonHtml.implement({
 // zobrazí this.value v DOM
   DOM_set: function () {
     this.DOM_Block.set('html',this.value.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>"));
-
   },
 // ------------------------------------------------------------------------------------ DOM_get
 // nechá hodnotu v this.value

@@ -13,6 +13,7 @@ Ezer.run= {};                   // běhové struktury
 Ezer.dbg= {stop:false};         // ladící struktury
 Ezer.design= false;             // design-mode
 Ezer.continuation= null;        // pokračování po stop-adrese
+Ezer.modal_fce= [];             // zásobník pro operaci 'j'
 Ezer.DOM= null;                 // uživatelská plocha
 Ezer.paths= Ezer.paths || {};   // parametry z nadřazené aplikace
 Ezer.paths.images_lib= './'+Ezer.version+'/client/img/';

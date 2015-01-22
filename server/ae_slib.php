@@ -27,6 +27,7 @@
 #     no_local             -- bool: nezohledňovat lokální přístup pro watch_key,watch_ip
 #     watch_key            -- bool: povolit přístup jen po vložení klíče
 #     watch_ip             -- bool: povolit přihlášení pouze z IP adres v tabulce _user (default false)
+#     autologin            -- string: dvojice uname/pword použitá pro automatické přihlášení
 #     contact              -- string: alternativní kontaktní údaje při přihlášení
 #     news_days            -- int: počet dnů pro novinky (default 12)
 #     news_cond            -- string: výběrová relace pro novinky (default 'cast!=1')
@@ -62,7 +63,8 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     preg_match('/windows|win32/i',$ua)          ? 'W' : '?' )));
   // interpretace parametrů
   $minify= false;
-  $app_root= $pars->app_root ? 1 : 0;
+  $autologin= isset($pars->autologin) ? explode('/',$pars->autologin) : null;
+  $app_root=  isset($pars->app_root) ? $pars->app_root : 0;
   if ( $app_root ) chdir("..");
   $ezer_root= $app;
 //                                                 echo("ezer_root/1=$ezer_root");
@@ -115,7 +117,6 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   //     autoskill: oprávnění, které dostává automaticky ten, kdo aplikaci spustí
   $js_options= (object)array(
     'debug'             => $ezer_template=='menu' ? "window.parent!=window" : 'false',
-    'must_log_in'       => $ezer_template=='menu' ? 'true' : 'false',
     'refresh'           => $refresh,
     'skin'              => "'$skin'",
     'login_interval'    => 2*60,                // povolená nečinnost v minutách - default=2 hodiny
@@ -126,6 +127,14 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     'path_docs'         => "'$ezer_path_docs'",  // složka pro upload skrze LabelDrop
     'theight'           => $theight
   );
+  if ( $autologin ) {
+    $js_options->must_log_in= 'false';
+    $js_options->uname= "'$autologin[0]'";
+    $js_options->pword= "'$autologin[1]'";
+  }
+  else {
+    $js_options->must_log_in= $ezer_template=='menu' ? 'true' : 'false';
+  }
   $js_options->watch_ip= $EZER->options->watch_ip= isset($pars->watch_ip) ? '1' : '0';
   $js_options->watch_key= $EZER->options->watch_key= isset($pars->watch_key) ? '1' : '0';
   $js_options->CKEditor= isset($pars->CKEditor) ? $pars->CKEditor : '{}';
@@ -213,14 +222,16 @@ __EOD;
 __EOD
     : ( $ip_ok
     ? <<<__EOD
-        <form  method="post" onsubmit="return false;" enctype="multipart/form-data">
+        <form id='logme' method="post" onsubmit="return false;" enctype="multipart/form-data">
           <span>uživatelské jméno</span><br />
           <input id="username" type="text" tabindex="1" title="jméno" name="name" value="" /><br />
           <span>heslo</span><br />
           <input id="password" type="password" tabindex="2" title="heslo" name="pass"  value="" /><br />
           <span id="login_msg"></span><br />
           <input id="login_on" type="submit" tabindex="3" value="Přihlásit se" />
-          <input id="login_no" type="button" tabindex="4" value="... ne, děkuji" />
+          <input id="login_no"
+            onclick="document.getElementById('logme').submit();"
+          type="button" tabindex="4" value="... ne, děkuji" />
         </form>
 __EOD
     : ( $pars->watch_key ? <<<__EOD
@@ -442,7 +453,7 @@ __EOD
  : '';
 $template= <<<__EOD
 $html_header
-<body id="body" class='nogrid'>
+<body id="body" class='nogrid' xonload="$('logme').submit();">
 <!-- menu a submenu -->
   <div id='horni' class="MainBar">
     <div id="appl" $version>$title_right</div>

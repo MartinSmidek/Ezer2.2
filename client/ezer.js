@@ -6691,7 +6691,7 @@ Ezer.Eval= new Class({
               if ( val ) {
                 // pokud se start přerušení povedl
                 this.c= c;
-                Ezer.modal_fce= this;  // pokračování se zajistí voláním eval(this.step,true)
+                Ezer.modal_fce.push(this);  // pokračování se zajistí voláním eval(this.step,true)
                 this.simple= false;
                 if ( Ezer.options.to_speed ) this.speed(eval_start);
                 return;
@@ -8485,12 +8485,10 @@ Ezer.fce.alert= function () {
   return 1;
 };
 Ezer.fce._alert= function () {
-  if ( Ezer.modal_fce ) {
-    // konec modálního dialogu - jeho hodnotu (pro alert 1) dej na zásobník
-    Ezer.modal_fce.stack[++Ezer.modal_fce.top]= 1;
-    Ezer.modal_fce.eval.apply(Ezer.modal_fce,[Ezer.modal_fce.step,true]);
-    Ezer.modal_fce= null;
-  }
+  // konec modálního dialogu - jeho hodnotu (pro alert 1) dej na zásobník
+  var x= Ezer.modal_fce.pop();
+  x.stack[++x.top]= 1;
+  x.eval.apply(x,[x.step,true]);
   return 1;
 }
 // -------------------------------------------------------------------------------------- wait
@@ -8502,13 +8500,42 @@ Ezer.fce.wait= function (ms) {
   return 1;
 };
 Ezer.fce._wait= function () {
-  if ( Ezer.modal_fce ) {
-    // konec modálního dialogu - jeho hodnotu (pro wait 1) dej na zásobník
-    Ezer.modal_fce.stack[++Ezer.modal_fce.top]= 1;
-    Ezer.modal_fce.eval.apply(Ezer.modal_fce,[Ezer.modal_fce.step,true]);
-    Ezer.modal_fce= null;
-  }
+  // konec modálního dialogu - jeho hodnotu (pro wait 1) dej na zásobník
+  var x= Ezer.modal_fce.pop();
+  x.stack[++x.top]= 1;
+  x.eval.apply(x,[x.step,true]);
   return 1;
+}
+// -------------------------------------------------------------------------------------- exec
+//fj: fce.exec (proc,arg1,..)
+//   provede proceduru proc(arg1,...) a počká na ukončení (je-li volána z ezerscriptu)
+//   vaarianta _exec_ se stejnými argumenty je určena pro volání z javsriptu, na konec se nečeká
+//s: funkce
+Ezer.fce.exec= function (proc) {
+  var args= [];
+  for (var i= 1; i<arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  Ezer.fce._exec.delay(10,null,['$.'+proc,args,{fce:Ezer.fce.exec_,args:[],stack:true,obj:null}]);
+  return 1;
+}
+Ezer.fce._exec= function (procname,args,continuation) {
+ new Ezer.Eval([{o:'c',i:procname,a:args.length}],Ezer.run.$,args,procname,continuation);
+}
+Ezer.fce.exec_= function () {
+  // konec modálního dialogu - jeho hodnotu (pro alert 1) dej na zásobník
+  var x= Ezer.modal_fce.pop();
+  x.stack[++x.top]= 1;
+  x.eval.apply(x,[x.step,true]);
+  return 1;
+}
+Ezer.fce._exec_= function (procname) {
+  var args= [];
+  for (var i= 1; i<arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+//  new Ezer.Eval([{o:'c',i:'$.'+proc,a:args.length}],null,args,proc);
+ new Ezer.Eval([{o:'c',i:procname,a:args.length}],Ezer.run.$,args,procname);
 }
 // -------------------------------------------------------------------------------------- choose
 //fj: fce.choose (query,buttons)
@@ -8541,12 +8568,10 @@ Ezer.fce.confirm= function () {
   return 1;
 };
 Ezer.fce._confirm= function (res) {
-  if ( Ezer.modal_fce ) {
-    // konec modálního dialogu - jeho hodnotu (pro conform 0/1) dej na zásobník
-    Ezer.modal_fce.stack[++Ezer.modal_fce.top]= res;
-    Ezer.modal_fce.eval.apply(Ezer.modal_fce,[Ezer.modal_fce.step,true]);
-    Ezer.modal_fce= null;
-  }
+  // konec modálního dialogu - jeho hodnotu (pro conform 0/1) dej na zásobník
+  var x= Ezer.modal_fce.pop();
+  x.stack[++x.top]= 1;
+  x.eval.apply(x,[x.step,true]);
   return 1;
 }
 // -------------------------------------------------------------------------------------- prompt
