@@ -2,8 +2,9 @@
   error_reporting(E_ALL & ~E_NOTICE);
   # ------------------------------------------------------------------------------------------------ paths, globals
   # globální objekty ($json bude v PHP6 zrušeno)
-  global $ezer_root, $ezer_path_serv, $ezer_path_appl, $ezer_path_root, $ezer_db, $ezer_system, $salt;
+  global $app_root, $ezer_root, $ezer_path_serv, $ezer_path_appl, $ezer_path_root, $ezer_db, $ezer_system, $salt;
   global $json, $USER, $EZER, $ezer_user_id;
+//   if ( $_POST['app_root'] ) chdir("..");
   # ------------------------------------------------------------------------------------------------ requires
   # vložení a inicializace balíků
   $ezer_root= $_POST['root'];                        // jméno adresáře a hlavního objektu aplikace
@@ -21,7 +22,8 @@
     $USER= $_SESSION[$ezer_root]['USER'];
   }
   # ------------------------------------------------------------------------------------------------ root.ini
-  require_once("./../../$ezer_root.inc");
+//                                                         die("--".getcwd());
+  require_once($_POST['app_root'] ? "./../../$ezer_root/$ezer_root.inc" : "./../../$ezer_root.inc");
   require_once("$ezer_path_serv/ae_slib.php");
   $php_start= getmicrotime();                        // měření času
 //                                                         debug(array($mysql_db,$ezer_db),'tabulka databází $mysql_db,$ezer_db');

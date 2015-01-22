@@ -99,9 +99,12 @@ Ezer.Application= new Class({
       $('paticka').setStyle('bottom',ws.y-t+pruh);
       ws.y= t;
     }
-    Ezer.sys.screen= {width:ws.x,height:ws.y};
     // definice sys.screen width a height
-    if ( Ezer.run && Ezer.run.$ )
+    Ezer.sys.screen= {width:ws.x,height:ws.y};
+    // reakce na změnu
+    if ( Ezer.run && Ezer.run.$
+//       && Ezer.browser!='FF'
+    )
       downto_panels(Ezer.run.$);
   },
   // ----------------------------------------------------------------------------- DOM_destroy
@@ -693,7 +696,7 @@ Ezer.Application= new Class({
       var speeds= Ezer.fce.speed('hour');
       // informace do _touch na server
       var x= {cmd:'touch',user_id:Ezer.sys.user.id_user,user_abbr:Ezer.sys.user.abbr,root:Ezer.root,
-        session:Ezer.options.session,module:'speed',hits:0,menu:'',msg:speeds
+        app_root:Ezer.app_root,session:Ezer.options.session,module:'speed',hits:0,menu:'',msg:speeds
       };
       var r= new Request({method:'post', url:Ezer.App.options.server_url, onComplete:null}).post(x);
     }

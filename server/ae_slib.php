@@ -22,6 +22,7 @@
 #   $js                 -- seznam skriptů
 #   $css                -- seznam stylů
 #   $pars: object       -- položky parametrizující aplikaci
+#     app_root             -- bool: startovní soubory $app.php a $app.inc jsou ve složce $app
 #     title_right          -- string: zobrazovat formátované jméno aplikace nebo selektor aplikace
 #     no_local             -- bool: nezohledňovat lokální přístup pro watch_key,watch_ip
 #     watch_key            -- bool: povolit přístup jen po vložení klíče
@@ -38,7 +39,7 @@
 #   $ezer_path_serv     -- string: cesta ke skriptům
 # -------------------------------------------------------------------------------------------------- root_php
 function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$const=null,$start_sess=true) {
-  global $EZER, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system, $gc_maxlifetime;
+  global $EZER, $app_root, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system, $gc_maxlifetime;
   // převzetí url-parametrů
   $menu=    isset($_GET['menu']) ? $_GET['menu'] : '';
   $xtrace=  isset($_GET['trace']) ? $_GET['trace'] : '';
@@ -61,15 +62,18 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     preg_match('/windows|win32/i',$ua)          ? 'W' : '?' )));
   // interpretace parametrů
   $minify= false;
+  $app_root= $pars->app_root ? 1 : 0;
+  if ( $app_root ) chdir("..");
   $ezer_root= $app;
+//                                                 echo("ezer_root/1=$ezer_root");
   $title= isset($pars->title) ? $pars->title : '';
   $title_right= isset($pars->title_right) ? $pars->title_right : $app_name;
   $ezer_template= $browser=='IE' ? 'IE' : (isset($pars->template) ? $pars->template : 'menu');
   $post_server= isset($pars->post_server) ? $pars->post_server[$ezer_local] : null;
   // ikona aplikace
   $favicon= $ezer_local ? "favicon_local.ico" : "favicon.ico";
-  $favicon= file_exists("./{$ezer_root}/img/{$favicon}") ? $favicon
-    : ($ezer_local ? "{$ezer_root}_local.png" : "{$ezer_root}.png");
+  $favicon= file_exists("./$app/img/{$favicon}") ? $favicon
+    : ($ezer_local ? "{$app}_local.png" : "{$app}.png");
   if ( $start_sess ) {
     // promítnutí nastavení do SESSION
     $gc_maxlifetime= isset($pars->gc_maxlifetime) ? $pars->gc_maxlifetime : 12*60*60;
@@ -333,11 +337,12 @@ __EOD;
   }
   // definice povinného začátku a konce HTML stránky
   $html_footer= '';
+  $html_base= $app_root ? "\n  <base href=\"http://".$_SERVER["HTTP_HOST"].'">' : '';
   $html_header= "\xEF\xBB\xBF";    // DOM pro UTF-8
   $html_header.= <<<__EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
-<head>
+<head>$html_base
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=9" />
   <link rel="shortcut icon" href="./$ezer_root/img/$favicon" />
@@ -349,7 +354,8 @@ __EOD;
     Ezer.fce= {};
     Ezer.str= {};
     Ezer.obj= {};
-    Ezer.root= '$ezer_root';
+    Ezer.root= '$app';
+    Ezer.app_root= '$app_root';
     Ezer.version= '{$EZER->version}';
     Ezer.options= { $options_txt
     };
@@ -441,8 +447,8 @@ $html_header
   <div id='horni' class="MainBar">
     <div id="appl" $version>$title_right</div>
     <div id='logo'>
-      <img class="StatusIcon" id="StatusIcon_idle" src="./$ezer_root/img/-logo.gif" />
-      <img class="StatusIcon" id="StatusIcon_server" src="./$ezer_root/img/+logo.gif" />
+      <img class="StatusIcon" id="StatusIcon_idle" src="./$app/img/-logo.gif" />
+      <img class="StatusIcon" id="StatusIcon_server" src="./$app/img/+logo.gif" />
     </div>
     <ul id="menu" class="MainMenu"></ul>
     <ul id="submenu" class="MainTabs">

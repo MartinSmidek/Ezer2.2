@@ -983,7 +983,8 @@ Ezer.Block= new Class({
   // ask(x,then): dotaz na server se jménem funkce po dokončení
   ask: function(x,then) {
     var app= this;
-    x.root= Ezer.root;          // název/složka aplikace
+    x.root= Ezer.root;                  // název/složka aplikace
+    x.app_root= Ezer.app_root;          // {root].inc je ve složce aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     var ajax= new Request({url:Ezer.App.options.server_url, data:x, method: 'post',
       onSuccess: function(ay) {
@@ -6975,6 +6976,7 @@ Ezer.Eval= new Class({
     var app= this;
     var ms= new Date().valueOf();
     x.root= Ezer.root;                  // název/složka aplikace
+    x.app_root= Ezer.app_root;          // {root].inc je ve složce aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     x.totrace= Ezer.App.options.ae_trace;
     var ajax= new Request({url:Ezer.App.options.server_url, data:x, method:'post',
@@ -6998,7 +7000,8 @@ Ezer.Eval= new Class({
     var x= {cmd:'ask',fce:fce,args:args,nargs:args.length,parm:Ezer.parm,
       totrace:Ezer.App.options.ae_trace};
     if ( lc ) x.lc= lc;
-    x.root= Ezer.root;          // název/složka aplikace
+    x.root= Ezer.root;                  // název/složka aplikace
+    x.app_root= Ezer.app_root;          // {root].inc je ve složce aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     var ajax= new Request({url:Ezer.App.options.server_url, data:x, method:'post',
 //       onComplete: function(ay){
@@ -8757,7 +8760,7 @@ Ezer.fce.error= function (str,level,block,lc,calls) {
       Ezer.fce.touch('error',str,[inside,trail]);
       // provede volání funkce 'send_error' (nečeká na výsledek)
       var x= {cmd:'run',fce:'send_error',args:[msg],nargs:1,
-              root:Ezer.root,session:Ezer.options.session};
+              app_root:Ezer.app_root,root:Ezer.root,session:Ezer.options.session};
       var r= new Request({method:'post', url:Ezer.App.options.server_url, onComplete:null}).post(x);
     }
     else {
@@ -8790,6 +8793,7 @@ Ezer.fce.touch= function (type,block,args) {
     var to_send= to_logout= false;
     var x= {cmd:'touch',user_id:Ezer.sys.user.id_user,user_abbr:Ezer.sys.user.abbr};
     x.root= Ezer.root;                  // název/složka aplikace
+    x.app_root= Ezer.app_root;          // {root].inc je ve složce aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     switch ( type ) {
     case 'server':

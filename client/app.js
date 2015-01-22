@@ -593,7 +593,8 @@ Ezer.Application.implement({
 // ask(x,then): dotaz na server se jménem funkce po dokončení
   ask: function(x,then,parm,env) {
     var app= this;
-    x.root= Ezer.root;          // název/složka aplikace
+    x.root= Ezer.root;                  // název/složka aplikace
+    x.app_root= Ezer.app_root;          // {root].inc je ve složce aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
     var ajax= new Request({url:this.options.server_url, data:x, method: 'post',
       onSuccess: function(ay) {
