@@ -8570,7 +8570,7 @@ Ezer.fce.confirm= function () {
 Ezer.fce._confirm= function (res) {
   // konec modálního dialogu - jeho hodnotu (pro conform 0/1) dej na zásobník
   var x= Ezer.modal_fce.pop();
-  x.stack[++x.top]= 1;
+  x.stack[++x.top]= res;
   x.eval.apply(x,[x.step,true]);
   return 1;
 }
