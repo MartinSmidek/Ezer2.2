@@ -506,7 +506,6 @@ Ezer.Item.implement({
   },
 // ------------------------------------------------------------------------------------  DOM_add2
   DOM_add2: function() {
-    var a;
     switch (this.owner.type) {
     case 'menu.group':
       this.DOM_Block= new Element('div',{'class':'MFile MEntry'}).inject(this.owner.DOM_Block);
@@ -540,16 +539,19 @@ Ezer.Item.implement({
       var title= this.options.title||this.id;
       title= title.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
       new Element('li').adopt(
-        a= new Element('a',{html:title[0]=='-' ? title.substr(1) : title})
+        this.DOM_Block= new Element('a',{html:title[0]=='-' ? title.substr(1) : title})
       ).inject(this.owner.DOM);
+      if ( this._fc('d') ) {
+        this.DOM_Block.addClass('disabled');
+      }
       if ( title[0]=='-' ) {
-        a.setStyles({borderTop:"1px solid #AAAAAA"});
+        this.DOM_Block.setStyles({borderTop:"1px solid #AAAAAA"});
       }
       if ( this.type=='item.clipboard' ) {
         // pokud je definováno
-        a.set('id','clipboard');
+        this.DOM_Block.set('id','clipboard');
         clipboard_init();
-        a.addEvent(Ezer.browser=='CH' ? 'mouseover' : 'mousedown',
+        this.DOM_Block.addEvent(Ezer.browser=='CH' ? 'mouseover' : 'mousedown',
           function(el) {
             this.fire('onclick',[],el);
             return false;
@@ -557,7 +559,7 @@ Ezer.Item.implement({
         );
       }
       else {
-        a.addEvents({
+        this.DOM_Block.addEvents({
           click: function(el) {
             if ( !el.target.hasClass('disabled') ) {
               Ezer.fce.touch('block',this,'click');       // informace do _touch na server
@@ -581,6 +583,12 @@ Ezer.Item.implement({
         this.domA.removeClass('disabled');
       else
         this.domA.addClass('disabled');
+    }
+    else if (this.owner.type=='menu.context') {
+      if ( on )
+        this.DOM_Block.removeClass('disabled');
+      else
+        this.DOM_Block.addClass('disabled');
     }
   },
 // ------------------------------------------------------------------------------------  _click
