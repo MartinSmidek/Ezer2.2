@@ -1229,7 +1229,7 @@ Ezer.Button.implement({
     if ( !owners_block )
       owners_block= this.owner.value.DOM_Block;
     if ( this.type=='button.html' || Ezer.options.awesome & 2 && this.type=='button' ) {
-      this.DOM_Block= this.DOM_Input= new Element('button');
+      this.DOM_Block= this.DOM_Input= new Element('button',{tabindex:-1});
       this.value= this.options.title||'';
       this.DOM_set();
       this.DOM_Block.setStyles(this.coord());
@@ -1506,7 +1506,7 @@ Ezer.FieldDate.implement({
   DOM_add: function() {
     this.DOM_Block= new Element('div',{'class':'FieldDate',styles:this.coord()}).adopt(
         this.DOM_Button= this.DOM_icon= Ezer.options.awesome & 1  // varianta s awesome ikonami
-            ? new Element('button',{html:"<i class='fa fa-calendar'></i>"})
+            ? new Element('button',{html:"<i class='fa fa-calendar'></i>",tabindex:-1})
             : new Element('img',{align:'right',src:Ezer.paths.images_cc+'/calendar.gif'}),
         this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
           width:(this._w||87)-18-(Ezer.options.awesome&1?2:0),height:this._h||16}})
@@ -1562,7 +1562,7 @@ Ezer.FieldList.implement({
     }).inject(this.owner.DOM_Block);
     this.DOM_Closure= new Element('div',{'class':'SelectClosure'}).inject(this.DOM_Block);
     this.DOM_Button= Ezer.options.awesome & 1  // varianta s awesome ikonami
-      ? new Element('button',{html:"<i class='fa fa-ellipsis-h'></i>"})
+      ? new Element('button',{html:"<i class='fa fa-ellipsis-h'></i>",tabindex:-1})
       : new Element('img',{align:'right',src:Ezer.version+'/client/img/field_list.gif'});
     this.DOM_Button.inject(this.DOM_Closure).addEvents({
       click: function() {
@@ -2096,8 +2096,9 @@ Ezer.Select.implement({
       if ( Ezer.options.awesome & 1 ) {
         // varianta s awesome ikonami
         var fa= this.type=='select.auto' ? 'fa-eject fa-flip-vertical' : 'fa-chevron-down';
-        this.DOM_Button= new Element('button',{html:"<i class='fa "+fa+"'></i>",events:this.skill==2? {
-          click: function() {this.DOM_Input.focus();}.bind(this)
+        this.DOM_Button= new Element('button',{html:"<i class='fa "+fa+"'></i>",tabindex:-1,
+          events:this.skill==2? {
+            click: function() {this.DOM_Input.focus();}.bind(this)
         }:{}}).inject(this.DOM_Closure);
       }
       else {
@@ -3397,17 +3398,18 @@ Ezer.fce.DOM.error= function (str,nonl) {
   }
 };
 // -------------------------------------------------------------------------------------- alert
-Ezer.fce.DOM.alert= function (str,continuation) {
+Ezer.fce.DOM.alert= function (str,continuation,heading) {
   var win= null;
+  heading= heading||'Upozornění';
   if ( continuation ) {
-    win= new StickyWin.Alert('Upozornění',str,{hideOnClick:false,closeOnEsc:true,
+    win= new StickyWin.Alert(heading,str,{hideOnClick:false,closeOnEsc:true,
       uiOptions:{closeButton:false,width:350,
         buttons:[{text:'Ok',onClick: function(){ continuation();}}]},
       maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
     });
   }
   else {
-    win= StickyWin.alert('Upozornění',str,{
+    win= StickyWin.alert(heading,str,{
       uiOptions:{closeButton:false},
       maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
     });
