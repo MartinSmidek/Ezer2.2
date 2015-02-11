@@ -1945,6 +1945,7 @@ function browse_status($x) {
 # předá informaci při změně verze jádra
 function check_version($y) {
   // kontrola verze systému, pokud je definováno $EZER->options->version
+//   $y->a_version= $y->g_version= $y->k_version= 0; return;
   global $EZER, $ezer_root;
   if ( isset($_SESSION['curr_version']) ) {
     $y->version= $_SESSION['curr_version'];

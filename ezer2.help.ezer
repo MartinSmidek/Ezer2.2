@@ -211,7 +211,8 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
     // příkazy
     label  [12,5,145,30] { css:'ae_parm'}
     button [20,11,,] { title:"[fa-database] Nový", proc onclick() {
-        form.init(2); kind.change; datum.set(now); datum.change; topic.change; hlp.change; }}
+        form.init(2); version.set(sys('options','curr_version')); version.change;
+        kind.change; datum.set(now); datum.change; topic.change; hlp.change; }}
     button [79,11,,] { title:"[fa-trash-o] Vymazat", proc onclick() {
       confirm("Opravdu vymazat zprávu ",s.topic.get,"?");
       _help.delete_record(conc("id_help=",s.id_help.get)); refresh }}
@@ -250,7 +251,8 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
     // příkazy
     label  [12,5,145,30] { css:'ae_parm'}
     button [20,11,,] { title:"[fa-database] Nový", proc onclick() {
-        form.init(2); kind.change; datum.set(now); datum.change; version.change; hlp.change; }}
+        form.init(2); version.set(sys('options','curr_version')); version.change;
+        kind.change; datum.set(now); datum.change; hlp.change; }}
     button [79,11,,] { title:"[fa-trash-o] Vymazat", proc onclick() {
       confirm("Opravdu vymazat zprávu ",s.hlp.get,"?");
       kernel._help.delete_record(conc("id_help=",s.id_help.get)); refresh }}

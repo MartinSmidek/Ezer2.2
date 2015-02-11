@@ -387,13 +387,13 @@ Ezer.Application= new Class({
               ["-trace: session",    function(el) { __run("ask('test_session')") }],
               ["trace: sys",         function(el) { __run("echo(debug(sys))") }],
               ["trace: database",    function(el) { __run("echo(debug(ask('sql_query','SELECT DATABASE() AS selected FROM DUAL')))") }]];
-            if ( Ezer.options.curr_version ) {
+            if ( Ezer.options.curr_version!=undefined ) {
               menu.push(
               // v případě hlídání verzí
               ["-show:  version",    function(el) {
                 __run("alert('verze (revize SVN) aplikace a jádra při startu byla ',"
                   +Ezer.options.curr_version+")") }],
-              ["test version",       function(el) { Ezer.app.bar_chat({op:'message?'}) }]
+              ["test version",       function(el) { Ezer.app.bar_chat({op:'message?'},true) }]
               )
             };
             if ( true ) {
@@ -723,7 +723,7 @@ Ezer.Application= new Class({
   },
   // ----------------------------------------------------------------------------- bar_chat
   // udržuje se serverem konverzaci
-  bar_chat: function (x) {
+  bar_chat: function (x,test) {
     x.cmd= 'chat';
     x.root= Ezer.root;                  // název/složka aplikace
     x.app_root= Ezer.app_root;          // {root].inc je ve složce aplikace
@@ -736,9 +736,10 @@ Ezer.Application= new Class({
         try { y= JSON.decode(ay); } catch (e) { y= null; }
         if ( !y )
           Ezer.error('EVAL: syntaktická chyba na serveru:'+ay,'E');
-        if ( y.k_version>y.version || y.a_version>y.version
-          || (y.g_version && y.g_version>y.version) ) {
-//                                                         Ezer.debug(y,'bar_chat (response)');
+        if ( test ) Ezer.debug(y,'bar_chat (response)');
+        var yv= y.version.toInt(), yav= y.a_version.toInt(),
+           ygv= y.g_version.toInt(), ykv= y.k_version.toInt();
+        if ( ykv > yv || yav > yv || (ygv && ygv > yv) ) {
           var msg= "Použijte prosím <b>Ctrl-R</b> pro obnovu stavu programu. "
             + "<br>Na serveru byly provedeny následující změny:<hr>"+y.help;
           Ezer.fce.DOM.alert(msg,false,{
