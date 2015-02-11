@@ -141,7 +141,7 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     $o= select_object("MAX(version) AS _max","_help","kind='v' GROUP BY kind",'ezer_kernel');
     if ( $o ) $version= max($version,$o->_max);
     // verze podle db skupiny - je-li group_db
-    if ( isset($options->group_db) && isset($ezer_db['group_db']) ) {
+    if ( isset($options->group_db) ) {
       $o= select_object("MAX(version) AS _max","_help","kind='v' GROUP BY kind",'ezer_group');
       if ( $o ) $version= max($version,$o->_max);
     }

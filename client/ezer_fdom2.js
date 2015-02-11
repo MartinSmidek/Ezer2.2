@@ -1489,6 +1489,8 @@ Ezer.Field.implement({
     else {
       this.DOM_Block= this.DOM_Input.inject(owners_block);
     }
+    if ( this.options.tabindex!=undefined )
+      this.DOM_Input.set('tabindex',this.options.tabindex||-1);
     this.DOM_Block.setStyles(this.coord({height:this._h||15}));
     this.DOM_ElemEvents();
     this.DOM_optStyle(this.DOM_Block,this.options.title);
@@ -1881,6 +1883,8 @@ Ezer.Check.implement({
       ).inject(this.owner.DOM_Block);
     if ( this.options.title )
       this.DOM_Block.appendText(this.options.title);
+    if ( this.options.tabindex!=undefined )
+      this.DOM_Input.set('tabindex',this.options.tabindex||-1);
     this.DOM_ElemEvents();
     this.DOM_optStyle(this.DOM_Block);
   },
