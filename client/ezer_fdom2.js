@@ -3398,19 +3398,21 @@ Ezer.fce.DOM.error= function (str,nonl) {
   }
 };
 // -------------------------------------------------------------------------------------- alert
-Ezer.fce.DOM.alert= function (str,continuation,heading) {
-  var win= null;
-  heading= heading||'Upozornění';
+// podobu alertu lze modifikovat pomoví nepovinných částí options
+// options = {heading:hlavička, width:šířka}
+Ezer.fce.DOM.alert= function (str,continuation,options) {
+  var win= null, width= options&&options.width||350;
+  heading= options&&options.heading||'Upozornění';
   if ( continuation ) {
     win= new StickyWin.Alert(heading,str,{hideOnClick:false,closeOnEsc:true,
-      uiOptions:{closeButton:false,width:350,
+      uiOptions:{closeButton:false,width:width,
         buttons:[{text:'Ok',onClick: function(){ continuation();}}]},
       maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
     });
   }
   else {
     win= StickyWin.alert(heading,str,{
-      uiOptions:{closeButton:false},
+      uiOptions:{closeButton:false,width:width},
       maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
     });
   }

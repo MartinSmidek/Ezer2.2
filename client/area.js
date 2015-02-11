@@ -199,7 +199,7 @@ Ezer.Area= new Class({
   tree_insert: function (id) {
     var node= null, old= this.tree.get(id);
     if ( old ) {
-      var node_id= id+',*';
+      var node_id= id+'.*';
       node= old.insert({id:node_id,text:'*'});
     }
     return node;
@@ -260,7 +260,7 @@ Ezer.Area= new Class({
       node.data= data;
       if ( new_idn ) {
         delete this.tree.index[id];
-        var fid= id.split(',');
+        var fid= id.split('.');
         fid[fid.length-1]= new_idn;
         node.text= new_idn;
         node.id= fid.toString();
@@ -276,7 +276,7 @@ Ezer.Area= new Class({
   tree_dump: function () {
     var js= '';
     function walk(root) {
-      var id= root.id.split(',');
+      var id= root.id.split('.');
       js+= '{"prop":{"id":"'+id[id.length-1]+'","data":'+JSON.stringify(root.data, undefined, 2)+'}';
       if ( root.nodes.length ) {
         js+= ',\n "down":[';
@@ -308,9 +308,10 @@ Ezer.Area= new Class({
       if ( desc.down ) {
         for (var i= 0; i<desc.down.length; i++) {
           var down= desc.down[i];
-          down.prop.text= down.prop.data && down.prop.data.name||down.prop.id;
+          if ( !down.prop.text )
+            down.prop.text= down.prop.data && down.prop.data.name||down.prop.id;
           // úprava down.prop.id na složené jméno
-          down.prop.id= root.id+','+down.prop.id;
+          down.prop.id= root.id+'.'+down.prop.id;
           var node= root.insert(down.prop);
           load(node,down);
         }
@@ -330,18 +331,19 @@ Ezer.Area= new Class({
         onClick: function(node) { // při kliknutí na libovolný uzel
           // spočítáme sumu data - shora dolů
           if ( node ) {
-            var data= {}, datas= [];
+            var data= {}, datas= [], texts= del= '';
             for (var x= node; x; x= x.parent) {
               datas.unshift(x.data);
+              texts= (x.text||'')+del+texts; del= '|';
             }
             datas.each(function(d){
               Object.merge(data,d);
             })
             var ndata= JSON.stringify(node.data, undefined, 2);
             var adata= JSON.stringify(data, undefined, 2);
-            var fid= node.id.split(',');
+            var fid= node.id.split('.');
             var idn= fid[fid.length-1];
-            this.fire('tree_onclick',[node.id,idn,node.data,ndata,adata]);
+            this.fire('tree_onclick',[node.id,idn,node.data,ndata,adata,texts,node.text]);
           }
           return false;
         }.bind(this)
@@ -479,15 +481,24 @@ Ezer.fce.json_encode= function (obj) {
 Ezer.fce.meta_tree= function (depth) {
   var tree;
   function walk(root) {
-    var name= root.id
-            +(root.options.include ? ' '+root.options.include : '')
-            +(root._library        ? ' #' : '')
-            ;
-    var node= {prop:{id:name},down:[]};
+    var title= (root.options.include ? ' '+root.options.include : '')
+             + (root._library        ? ' #' : '');
+    var data= {include:root.options.include|'',library:root._library ? '#' : ''};
+    var name= root.options.title ? Ezer.fce.replace_fa(root.options.title) : '';
+    var node= {prop:{id:root.id,text:name,title:title,data:data},down:[]};
     if ( root.part ) {
-      $each(root.part,function(x,xi) {
-        if ( x instanceof Ezer.Panel || x instanceof Ezer.MenuMain || x instanceof Ezer.Tabs )
+      $each(root.part,function(x) {
+        if ( x instanceof Ezer.MenuLeft ) {
+          $each(x.part,function(g) {
+            if ( g instanceof Ezer.MenuGroup ) {
+              node.down.push(walk(g));
+            }
+          });
+        }
+        else if ( x instanceof Ezer.MenuMain || x instanceof Ezer.Tabs || x instanceof Ezer.Panel
+          || x instanceof Ezer.MenuGroup || x instanceof Ezer.Item ) {
           node.down.push(walk(x));
+        }
       });
     }
     return node;

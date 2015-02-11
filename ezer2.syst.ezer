@@ -242,9 +242,9 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   # ------------------------------------------------------------------- menu
   menu see { type:'left', active:*, format:'f-'
     menu all { title:'přehled',type:'group'
-      item actives { title:'[fa-search-plus] aktivní uživatelé', par:°{on:'h',off:'u',cond:"deleted=''"}}
-      item         { title:'[fa-search-minus] skrytí uživatelé', par:°{on:'u',off:'h',cond:"deleted LIKE 'H%'"}}
-      item         { title:'[fa-search] všichni uživatelé',      par:°{on:'h|u',off:'',cond:1}}
+      item actives { title:'[fa-user-plus] aktivní uživatelé', par:°{on:'h',off:'u',cond:"deleted=''"}}
+      item         { title:'[fa-user-times] skrytí uživatelé', par:°{on:'u',off:'h',cond:"deleted LIKE 'H%'"}}
+      item         { title:'[fa-user] všichni uživatelé',      par:°{on:'h|u',off:'',cond:1}}
     }
     proc onclick (i) {
       last_par.set(i.par);

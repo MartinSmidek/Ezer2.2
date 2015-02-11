@@ -242,6 +242,7 @@ var MooTreeNode = new Class({
 	initialize: function(options) {
 		
 		this.text = options.text;       // the text displayed by this node
+		this.title = options.title;     // the text displayed by this node +gn150203
 		this.id = options.id || null;   // the node's unique id
 		this.nodes = new Array();       // subnodes nested beneath this node (MooTreeNode objects)
 		this.parent = null;             // this node's parent node (another MooTreeNode object)
@@ -433,7 +434,9 @@ var MooTreeNode = new Class({
 			// update the text:
 			x = this.div.text;
 			x.empty();
-			x.appendText(this.text);
+// 			x.appendText(this.text);                     //-gn150203
+			x.set('html',this.text);                     //+gn150203 show node text as html
+			if ( this.title ) x.set('title',this.title); //+gn150203 show node title
 			if (this.color) x.style.color = this.color;
 			
 			// update the icon:

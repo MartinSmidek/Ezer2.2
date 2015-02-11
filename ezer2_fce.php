@@ -31,12 +31,10 @@ function sys_svn_cmd($par) {
   }
   return $html;
 }
-/** ================================================================================================ POŽADAVKY */
-# ---------------------------------------------------------------------------------------- abbr2user
-# zjištění uživatele podle jeho zkratky
-function abbr2user($abbr) {
-  $id= select("id_user","_user","abbr='$abbr'",'ezer_system');
-  return $id ? $id : 0;
+/** ================================================================================================ HELP */
+# funkce pro údržbu systému nápovědy v tabulkách _help
+# ---------------------------------------------------------------------------------- sys_help
+function sys_help($id_user=0) {  trace();
 }
 /** ================================================================================================ NASTAVENÍ */
 # ---------------------------------------------------------------------------------- sys_user_record
@@ -1256,6 +1254,12 @@ function sys_days_table($touch,$days,$type,$color,$config_colors=false) { #trace
   return $tab;
 }
 /** ================================================================================================ POŽADAVKY */
+# ---------------------------------------------------------------------------------------- abbr2user
+# zjištění uživatele podle jeho zkratky
+function abbr2user($abbr) {
+  $id= select("id_user","_user","abbr='$abbr'",'ezer_system');
+  return $id ? $id : 0;
+}
 # ---------------------------------------------------------------------------------- sys_todo_notify
 # pošle mail na adresu
 #  $type= new|upd|att

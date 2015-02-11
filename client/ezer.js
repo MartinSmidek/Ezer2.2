@@ -179,16 +179,21 @@ Ezer.Block= new Class({
     return true;
   },
 // ------------------------------------------------------------------------------------ self_sys
-//fm: Block.self_sys ()
+//fm: Block.self_sys ([excluding_root=0])
 //      vrátí objekt {sys:...,title:...} kde sys je vytvořené zřetězením atributu _sys
 //      od this ke kořenu aplikace a title je zřetězením odpovídajících title
-//      s odstraněnými formátovacími znaky
-  self_sys: function() {
+//      s odstraněnými formátovacími znaky;
+//      pokud je excluding_root=1 bude vynechána nejvyšší úroveň (root aplikace)
+  self_sys: function(excluding_root) {
+    excluding_root= excluding_root||0;
     var id= tit= '';
     for (var o= this; o.owner; o= o.owner) {
+      if ( excluding_root && !o.owner.owner )
+        break;
       if ( o.options._sys ) {
         id= (o.options._sys=='*'?o.id:o.options._sys)+(id ? '.'+id : '');
         tit= (Ezer.fce.strip_tags(o.options.title)||'') + (tit ? '|'+tit : '');
+        tit= Ezer.fce.replace(tit,"\\[fa-[^\\]]+\\]",'');
       }
     }
     if ( id=='' ) id= '@';
@@ -7859,6 +7864,8 @@ Ezer.fce.replace= function () {
 //      podle http://fortawesome.github.io/Font-Awesome/icons/
 //s: funkce
 Ezer.fce.replace_fa= function (x) {
+  if ( typeof(x)!='string' && x.toString() )
+    x= x.toString();
   return x.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
 }
 // -------------------------------------------------------------------------------------- conc

@@ -387,8 +387,18 @@ Ezer.Application= new Class({
               ["-trace: session",    function(el) { __run("ask('test_session')") }],
               ["trace: sys",         function(el) { __run("echo(debug(sys))") }],
               ["trace: database",    function(el) { __run("echo(debug(ask('sql_query','SELECT DATABASE() AS selected FROM DUAL')))") }]];
+            if ( Ezer.options.curr_version ) {
+              menu.push(
+              // v případě hlídání verzí
+              ["-show:  version",    function(el) {
+                __run("alert('verze (revize SVN) aplikace a jádra při startu byla ',"
+                  +Ezer.options.curr_version+")") }],
+              ["test version",       function(el) { Ezer.app.bar_chat({op:'message?'}) }]
+              )
+            };
             if ( true ) {
               menu.push(
+              // spuštění panel meta z ezer2.help.ezer - zobrazí výsledek Ezer.fce.meta_tree (area.js)
               ['-zobrazit strukturu aplikace',   function(el) {
                 var elem= Ezer.run.$.part[Ezer.root];
                 if ( elem && elem.part && elem.part[Ezer.root] ) elem= elem.part[Ezer.root];
@@ -498,9 +508,9 @@ Ezer.Application= new Class({
   // ukázání kontextového helpu
   _help: function(on) {
     if ( on && Ezer.App.hits_block ) {
-      var key= Ezer.App.hits_block.self_sys();
-//                                                 Ezer.trace('*',"FAQ "+key.sys+'  '+key.title);
-//                                                 Ezer.debug(key,'trace/key');
+      var key= Ezer.App.hits_block.self_sys(1);
+                                                Ezer.trace('*',"FAQ "+key.sys+'  '+key.title);
+                                                Ezer.debug(key,'trace/key');
       Ezer.App.help_text(key);
     }
     else if ( !on && Ezer.obj.DOM.help.sticky ) {
@@ -663,6 +673,7 @@ Ezer.Application= new Class({
       }
       else {
         // uživatel neaktivní ale nepřekročen limit NEBO čekáme
+        this.bar_chat({op:'message?'});
       }
       var hm= this.bar_clock_show(true);
       if ( hm.substr(-2)=='59' )
@@ -714,7 +725,8 @@ Ezer.Application= new Class({
   // udržuje se serverem konverzaci
   bar_chat: function (x) {
     x.cmd= 'chat';
-    x.root= Ezer.root;          // název/složka aplikace
+    x.root= Ezer.root;                  // název/složka aplikace
+    x.app_root= Ezer.app_root;          // {root].inc je ve složce aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
 //                                                         Ezer.debug(x,'bar_chat');
     var ajax= new Request({url:this.options.server_url, data:x, method: 'post',
@@ -724,9 +736,15 @@ Ezer.Application= new Class({
         try { y= JSON.decode(ay); } catch (e) { y= null; }
         if ( !y )
           Ezer.error('EVAL: syntaktická chyba na serveru:'+ay,'E');
+        if ( y.k_version>y.version || y.a_version>y.version
+          || (y.g_version && y.g_version>y.version) ) {
 //                                                         Ezer.debug(y,'bar_chat (response)');
-        if ( y.update )
-          Ezer.fce.warning(y.update);
+          var msg= "Použijte prosím <b>Ctrl-R</b> pro obnovu stavu programu. "
+            + "<br>Na serveru byly provedeny následující změny:<hr>"+y.help;
+          Ezer.fce.DOM.alert(msg,false,{
+            heading:"<span style='color:orange;text-align:center;display:block'>Upozornění systému</span>",
+            width:500});
+        }
         if ( y.log_out )
           location.replace(window.location.href);
         this.putFootDom(ae_time()+' '+(y?y.msg:'?'));

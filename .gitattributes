@@ -85,6 +85,8 @@ client/skins/default/class.png -text
 client/skins/default/clientcide/calendar.gif -text
 client/skins/default/clientcide/left_fold.png -text
 client/skins/default/clientcide/left_unfold.png -text
+client/skins/default/clientcide/stickyWinHTML/big_button.gif -text
+client/skins/default/clientcide/stickyWinHTML/big_button_over.gif -text
 client/skins/default/clientcide/stickyWinHTML/body.gif -text
 client/skins/default/clientcide/stickyWinHTML/body.png -text
 client/skins/default/clientcide/stickyWinHTML/closebtn.gif -text

@@ -13,6 +13,8 @@
 #   $welcome            -- typ=('test'|'news'|'info')
 #                          může být i pole, kde pole[0]=typ, pole[1]=(info|kontakt|info)
 #   $options: object    -- položky předané do Ezer.options a $EZER->options
+#     curr_version         -- při přihlášení je nahrazeno nejvyšší hodnotou ezer_kernel.version
+#     group_db             -- databáze s tabulkami společnými pro skupinu aplikací např. _help
 #     group_login
 #     skill
 #     autoskill
@@ -40,7 +42,7 @@
 #   $ezer_path_serv     -- string: cesta ke skriptům
 # -------------------------------------------------------------------------------------------------- root_php
 function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$const=null,$start_sess=true) {
-  global $EZER, $app_root, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system, $gc_maxlifetime;
+  global $EZER, $app_root, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system, $gc_maxlifetime, $ezer_db;
   // převzetí url-parametrů
   $menu=    isset($_GET['menu']) ? $_GET['menu'] : '';
   $xtrace=  isset($_GET['trace']) ? $_GET['trace'] : '';
@@ -106,11 +108,12 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     $_SESSION['skin']= $skin;
     $title.= "/$skin";
   }
-  // zjištění a zapamatování svn-verze (jen na serveru, kam je ukládáno pomocí svn.update)
-  $verze= root_svn("{$EZER->version},$ezer_root");
-  if ( $verze ) {
-    $_SESSION[$ezer_root]['svn_version']= $verze;
-  }
+//                                                                                 ZRUŠENO 31.1.2015
+//   // zjištění a zapamatování svn-verze (jen na serveru, kam je ukládáno pomocí svn.update)
+//   $verze= root_svn("{$EZER->version},$ezer_root");
+//   if ( $verze ) {
+//     $_SESSION[$ezer_root]['svn_version']= $verze;
+//   }
   // ZPRACOVANÍ OPTIONS
   //   přenesení informace do klienta
   //     skill: oprávnění, který uživatel musí mít, aby aplikaci vůbec spustil
@@ -127,6 +130,26 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     'path_docs'         => "'$ezer_path_docs'",  // složka pro upload skrze LabelDrop
     'theight'           => $theight
   );
+  if ( isset($options->group_db) )
+    $_SESSION[$ezer_root]['group_db']= $options->group_db;
+  //  pokud je definováno $options->curr_version a dostupná db ezer_kernel přečte verzi jádra
+  if ( isset($options->curr_version) ) {
+    $version= 0;
+    // verze podle db jádra - je, když je curr_version
+    $o= select_object("MAX(version) AS _max","_help","kind='v' GROUP BY kind",'ezer_kernel');
+    if ( $o ) $version= max($version,$o->_max);
+    // verze podle db skupiny - je-li group_db
+    if ( isset($options->group_db) && isset($ezer_db['group_db']) ) {
+      $o= select_object("MAX(version) AS _max","_help","kind='v' GROUP BY kind",'ezer_group');
+      if ( $o ) $version= max($version,$o->_max);
+    }
+    // verze podle db aplikace
+    $o= select_object("MAX(version) AS _max","_help","kind='v' GROUP BY kind");
+    if ( $o ) $version= max($version,$o->_max);
+    // zapamatování verze
+    $_SESSION['curr_version']= $options->curr_version= $version;
+  }
+  // ošetření autologin
   if ( $autologin ) {
     $js_options->must_log_in= 'false';
     $js_options->uname= "'$autologin[0]'";
@@ -950,7 +973,6 @@ function select1($expr,$table,$cond=1,$db='.main.') {
   if ( !$res ) fce_error(wu("chyba funkce select1:$qry/".mysql_error()));
   $o= mysql_fetch_object($res);
   $result= $o->_result_;
-//                                                 debug($result,"select1");
   return $result;
 }
 # -------------------------------------------------------------------------------------------------- select_object
@@ -2235,6 +2257,7 @@ function ezer_connect ($db0='.main.',$even=false,$initial=0) {
       $ok= 0;
       $err= "databaze '$db_name' je nepristupna";
       if ( !$initial ) fce_error("connect: $err".mysql_error());
+      else die("connect: $err".mysql_error());
     }
     if ( $ezer_db[$db][4] ) {
 //                                                         display("SET NAMES '{$ezer_db[$db][4]}'");

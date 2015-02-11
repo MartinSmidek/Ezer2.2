@@ -147,32 +147,9 @@
   case 'chat':
     $answer= (object)array();
     switch ( $x->op ) {
-//     case 'log_out':           // {op:'log_out});
-//       $answer->msg= "timeout";
-//       $answer->log_out= 1;
-//       $user= $_SESSION[$ezer_root]['user_id'];
-//       $ezer_user_id= $_SESSION[$ezer_root]['user_id']= $y->user_id= 0;
-//       $_SESSION[$ezer_root]['last_op'].= ' log_out';
-//       $_SESSION[$ezer_root]['sess_state']= 'off';
-//       // zapiš do aktivity
-//       $day= date('Y-m-d');
-//       $time= date('H:i:s');
-//       $qry= "INSERT _touch (day,time,hits,user,module,menu) "
-//         . "VALUES ('$day','$time',0,'{$x->user_abbr}','app','timeout')";
-//       $res= mysql_query($qry);
-//       // zruš případné sdružené aplikace
-//       if  ( $_SESSION['group_login'] ) {
-//         foreach(explode(',',$_SESSION['group_login']) as $root) {
-//           if ( $root!=$ezer_root ) {
-//             $_SESSION[$ezer_root]= array('sess_state'=>"$user timeout $day $time due to $ezer_root");
-//           }
-//         }
-//       }
-//       // zruš session
-//       $_SESSION[$ezer_root]= array('sess_state'=>"{$_SESSION[$ezer_root]['user_id']} timeout $day $time");
-//       session_write_close();
-// //       $x1= session_destroy();
-//       break;
+    case 'message?':          // {op:'message?',user_id:...,hits:n});
+      check_version($answer);
+      break;
     case 're_log_me':         // {op:'re_log_me',user_id:...,hits:n});
       $_SESSION[$ezer_root]['relog']++;
       // obnova SESSION
@@ -1381,6 +1358,33 @@
   # vrátí y->text z tabulky _help podle klíče a poznamená uživatele do seen
   # vrátí y->refs = html obsahující další odkazy
   case 'help_text':
+    global $ezer_db, $ezer_root;
+    $db= '?';
+    $fetch_help= function($qh) use (&$db) {
+      global $ezer_db, $ezer_root;
+      $h= null;
+      // 1. pokus - help aplikace
+      $db= '.main.';
+      ezer_connect($db);
+      $rh= mysql_query($qh);
+      if ( $rh && mysql_num_rows($rh) ) { goto ok; }
+      // 2. pokus - help skupiny
+      if ( isset($_SESSION[$ezer_root]['group_db']) ) {
+        $db= 'ezer_group';
+        ezer_connect($db);
+        $rh= mysql_query($qh);
+        if ( $rh && mysql_num_rows($rh) ) { goto ok; }
+      }
+      // 3. pokus - help jádra
+      $db= 'ezer_kernel';
+      ezer_connect($db);
+      $rh= mysql_query($qh);
+      if ( $rh && mysql_num_rows($rh) ) { goto ok; }
+      $db= '';
+    ok:
+      return $rh;
+    };
+    // Získání textu helpu
     $abbr= $_SESSION[$ezer_root]['user_abbr'];
     $y->text= "<center><big><br><br><br><br>K této kartě zatím není napsána nápověda,
       avšak pomocí tlačítka <br><br><b>[Chci&nbsp;se&nbsp;zeptat&nbsp;k&nbsp;této&nbsp;kartě]</b>
@@ -1394,18 +1398,16 @@
     while (count($akey)) {
       $key= implode('.',$akey);
       $tit= implode('|',$atit);
-      $qh= "SELECT help,seen,name FROM _help WHERE topic='$key'";
-//                                                         display("qh=$qh");
-      $rh= @mysql_query($qh);
-      if ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
-        $y->text= $h->help;
+      $rh= $fetch_help("SELECT id_help,help,seen,name FROM _help WHERE topic='$key'");
+      if ( $rh && ($h= mysql_fetch_object($rh)) ) {
+        $y->text= "$h->help<small>$db</small>";
         $y->seen= $h->seen;
         $y->key= (object)array('sys'=>$key,'title'=>$h->name?$h->name:$tit);
-        // poznamená uživatele do seen, pokud tam není
-        if ( $abbr && strpos($h->seen,$abbr)===false ) {
-          $qs= "UPDATE _help SET seen='{$h->seen},$abbr' WHERE topic='$key' ";
-          $rs= mysql_qry($qs);
-        }
+//         // poznamená uživatele do seen, pokud tam není
+//         if ( $abbr && strpos($h->seen,$abbr)===false ) {
+//           $qs= "UPDATE _help SET seen='{$h->seen},$abbr' WHERE topic='$key' ";
+//           $rs= mysql_qry($qs);
+//         }
         break;
       }
       array_pop($akey);
@@ -1422,8 +1424,7 @@
     }
     $ul= '';
     $nh= 0;
-    $qh= "SELECT topic,name FROM _help WHERE topic LIKE '$key.%' OR topic IN ($refs) ";
-    $rh= @mysql_query($qh);
+    $rh= $fetch_help("SELECT topic,name FROM _help WHERE topic LIKE '$key.%' OR topic IN ($refs)");
     while ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
       $ref= $h->name ? $h->name : $h->topic;
       $ul.= "<li><a href='help://{$h->topic}'>$ref</a></li>";
@@ -1807,21 +1808,37 @@
 # -------------------------------------------------------------------------------------------------- help_keys
 # přečte seznam klíčů tabulky _help, pokud existuje
 function help_keys() {
-  $keys= '';
-  ezer_connect();
-  // zjištění seznamu všech klíčů
-  $qh= "SELECT GROUP_CONCAT(topic) AS _k FROM _help ";
-  $rh= @mysql_query($qh);
-  if ( $rh && $h= mysql_fetch_object($rh) ) {
-    $keys.= $h->_k;
+  global $ezer_db, $ezer_root;
+  $keys= array();
+  $_keys= function($db='.main.') use ($ezer_db,&$keys) {
+    if ( $db=='.main.' || isset($ezer_db[$db]) ) {
+      // zjištění seznamu klíčů z $db
+      ezer_connect($db);
+      $qh= "SELECT topic FROM _help WHERE kind='h' ";
+      $rh= mysql_query($qh);
+      while ( $rh && ($h= mysql_fetch_object($rh)) ) {
+        $x= trim($h->topic);
+        if ( !in_array($x,$keys) )
+          $keys[]= $x;
+      }
+    }
+  };
+  // zjištění klíčů se vzrůstající prioritou: kernel - group - application
+  $_keys('ezer_kernel');
+  if ( isset($_SESSION[$ezer_root]['group_db']) ) {
+    $_keys($_SESSION[$ezer_root]['group_db']);
   }
-  // zjištění seznamu klíčů s vynuceným zobrazením helpu pro přihlášeného uživatele
-  $qh= "SELECT COUNT(*) AS _pocet,GROUP_CONCAT(topic SEPARATOR ',*') AS _k FROM _help
-        WHERE LEFT(seen,1)='*' AND NOT FIND_IN_SET('GAN',seen) ";
-  $rh= @mysql_query($qh);
-  if ( $rh && $h= mysql_fetch_object($rh) ) {
-    if ( $h->_pocet ) $keys.= ",*{$h->_k}";
-  }
+  $_keys();
+
+//   // zjištění seznamu klíčů s vynuceným zobrazením helpu pro přihlášeného uživatele
+//   $qh= "SELECT COUNT(*) AS _pocet,GROUP_CONCAT(topic SEPARATOR ',*') AS _k FROM _help
+//         WHERE LEFT(seen,1)='*' AND NOT FIND_IN_SET('GAN',seen) ";
+//   $rh= @mysql_query($qh);
+//   if ( $rh && $h= mysql_fetch_object($rh) ) {
+//     if ( $h->_pocet ) $keys.= ",*{$h->_k}";
+//   }
+  sort($keys);
+  $keys= implode(',',$keys);
   return $keys;
 }
 # -------------------------------------------------------------------------------------------------- json_encode_short
@@ -1925,17 +1942,34 @@ function browse_status($x) {
   return $y;
 }
 # -------------------------------------------------------------------------------------------------- check_version
-# předá informaci o změně verze jádra při obnově přihlášení
+# předá informaci při změně verze jádra
 function check_version($y) {
-  // kontrola verze systému
-  global $ezer_root, $y;
-  $verze= root_svn();
-  if ( $verze ) {
-    $old= $_SESSION[$ezer_root]['svn_version'];
-    $y->verze= $verze;
-    if ( $verze!=$old )
-      $y->update= "Na serveru je k dispozici nová verze $verze systému (pracujete "
-        . ($old?"s $old":"se starou")."), doporučuji obnovit okno prohlížeče (F5 nebo ctrl-r).";
+  // kontrola verze systému, pokud je definováno $EZER->options->version
+  global $EZER, $ezer_root;
+  if ( isset($_SESSION['curr_version']) ) {
+    $y->version= $_SESSION['curr_version'];
+    // verze aplikace
+    $y->a_version= select1("MAX(version)","_help","kind='v' GROUP BY kind");
+    if ( $y->a_version > $y->version ) {
+      $y->help= str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","_help",
+        "kind='v' AND version>$y->version GROUP BY kind"));
+    }
+    // verze skupiny
+    if ( isset($_SESSION[$ezer_root]['group_db']) ) {
+      $y->g_version= select1("MAX(version)","_help","kind='v' GROUP BY kind",'ezer_group');
+      if ( $y->g_version > $y->version ) {
+        $y->help.= ($y->help ? "<br>" : '')
+          . str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","_help",
+            "kind='v' AND version>$y->version GROUP BY kind",'ezer_group'));
+      }
+    }
+    // verze jádra
+    $y->k_version= select1("MAX(version)","ezer_kernel._help","kind='v' GROUP BY kind");
+    if ( $y->k_version > $y->version ) {
+      $y->help.= ($y->help ? "<br>" : '')
+        . str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","ezer_kernel._help",
+          "kind='v' AND version>$y->version GROUP BY kind"));
+    }
   }
 }
 # -------------------------------------------------------------------------------------------------- answer
