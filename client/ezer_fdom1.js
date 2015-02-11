@@ -390,7 +390,8 @@ Ezer.Application= new Class({
             if ( Ezer.options.curr_version!=undefined ) {
               menu.push(
               // v případě hlídání verzí
-              ["-alert:  version",    function(el) { Ezer.app.bar_chat({op:'message?'},true) }]
+              ["-alert:  verze",    function(el) { Ezer.app.bar_chat({op:'message?'},true) }],
+              ["test verze",    function(el) { Ezer.app.bar_chat({op:'message?'}) }]
               )
             };
             if ( true ) {
@@ -725,6 +726,7 @@ Ezer.Application= new Class({
     x.root= Ezer.root;                  // název/složka aplikace
     x.app_root= Ezer.app_root;          // {root].inc je ve složce aplikace
     x.session= Ezer.options.session;    // způsob práce se SESSION
+    x.curr_version= Ezer.options.curr_version; // verze při startu
     if ( test )
       x.svn= 1;                         // zjištění verze SVN pro aplikaci a jádro
 //                                                         Ezer.debug(x,'bar_chat');
@@ -739,18 +741,21 @@ Ezer.Application= new Class({
           Ezer.debug(y,'bar_chat (response)');
           Ezer.fce.DOM.alert(y.msg);
         }
-        var yv= y.version ? y.version.toInt() : 0, yav= y.a_version ? y.a_version.toInt() : 0,
-           ygv= y.g_version ? y.g_version.toInt() :0, ykv= y.k_version ? y.k_version.toInt() : 0;
-        if ( ykv > yv || yav > yv || (ygv && ygv > yv) ) {
-          var msg= "Použijte prosím <b>Ctrl-R</b> pro obnovu stavu programu. "
-            + "<br>Na serveru byly provedeny následující změny:<hr>"+y.help;
-          Ezer.fce.DOM.alert(msg,false,{
-            heading:"<span style='color:orange;text-align:center;display:block'>Upozornění systému</span>",
-            width:500});
+        else {
+          var cv= y.curr_version ? y.curr_version.toInt() : 0,
+             yav= y.a_version ? y.a_version.toInt() : 0,
+             ygv= y.g_version ? y.g_version.toInt() :0, ykv= y.k_version ? y.k_version.toInt() : 0;
+          if ( ykv > cv || yav > cv || (ygv && ygv > cv) ) {
+            var msg= "Použijte prosím <b>Ctrl-R</b> pro obnovu stavu programu. "
+              + "<br>Na serveru byly provedeny následující změny:<hr>"+y.help;
+            Ezer.fce.DOM.alert(msg,false,{
+              heading:"<span style='color:orange;text-align:center;display:block'>Upozornění systému</span>",
+              width:500});
+          }
         }
         if ( y.log_out )
           location.replace(window.location.href);
-        this.putFootDom(ae_time()+' '+(y?y.msg:'?'));
+        //this.putFootDom(ae_time()+' '+(y?y.msg:'?'));
       }.bind(this)});
     ajax.send();
     this._ajax(1);

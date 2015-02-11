@@ -148,11 +148,12 @@
     $answer= (object)array();
     switch ( $x->op ) {
     case 'message?':          // {op:'message?',user_id:...,hits:n});
+      $answer->curr_version= $x->curr_version;
       check_version($answer);
       if ( $x->svn ) {
         $answer->sa_version= root_svn(1);
         $answer->sk_version= root_svn(0);
-        $answer->msg.= "<br>svn $ezer_root=$answer->sa_version, svn jádro=$answer->sk_version";
+        $answer->msg.= "<br><br><b>SVN</b><br>$ezer_root=$answer->sa_version, ezer=$answer->sk_version";
       }
       break;
     case 're_log_me':         // {op:'re_log_me',user_id:...,hits:n});
@@ -1947,18 +1948,18 @@ function browse_status($x) {
   return $y;
 }
 # -------------------------------------------------------------------------------------------------- check_version
-# předá informaci při změně verze jádra
+# předá informaci při změně verze jádra; při $y->curr_version porovná verze
 function check_version($y) {
   // kontrola verze systému, pokud je definováno $EZER->options->version
 //   $y->a_version= $y->g_version= $y->k_version= 0; return;
   global $EZER, $ezer_root;
   $msg= '';
-  if ( isset($_SESSION['curr_version']) ) {
-    $yv= $y->version= $_SESSION['curr_version'];
-    $msg.= "verze při startu =$yv<br>";
+  if ( $y->curr_version ) {
+    $yv= $y->curr_version;
+    $msg.= "<b>verze</b><br>start=$yv";
     // verze aplikace
     $ya= $y->a_version= select1("MAX(version)","_help","kind='v' GROUP BY kind");
-    $msg.= "verze $ezer_root=$ya";
+    $msg.= ", $ezer_root=$ya";
     if ( $ya > $yv ) {
       $y->help= str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","_help",
         "kind='v' AND version>$yv GROUP BY kind"));
@@ -1966,7 +1967,7 @@ function check_version($y) {
     // verze skupiny
     if ( isset($_SESSION[$ezer_root]['group_db']) ) {
       $yg= $y->g_version= select1("MAX(version)","_help","kind='v' GROUP BY kind",'ezer_group');
-      $msg.= ", verze systému=$yg";
+      $msg.= ", group=$yg";
       if ( $yg > $yv ) {
         $y->help.= ($y->help ? "<br>" : '')
           . str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","_help",
@@ -1975,7 +1976,7 @@ function check_version($y) {
     }
     // verze jádra
     $yk= $y->k_version= select1("MAX(version)","ezer_kernel._help","kind='v' GROUP BY kind");
-    $msg.= ", verze jádra=$yk";
+    $msg.= ", ezer=$yk";
     if ( $yk > $yv ) {
       $y->help.= ($y->help ? "<br>" : '')
         . str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","ezer_kernel._help",

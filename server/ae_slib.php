@@ -653,10 +653,16 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
 # zjistí svn-verzi běžící aplikace pro $app=1 nebo jádra pro $app=0
 function root_svn($app=0) {
   global $EZER, $ezer_root, $ezer_path_root;
-  $sub_root= $_SESSION[$ezer_root]['app_root'] ? "/$ezer_root": '';
-  $sub= $app ? ($sub_root ?: '') : "/$EZER->version";
-  $db= new SQLite3("$ezer_path_root$sub/.svn/wc.db");
-  $verze= $db->querySingle("SELECT MAX(revision) from NODES");
+  $verze= "?";
+  if ( defined("SQLITE3_ASSOC") ) {
+    $sub_root= $_SESSION[$ezer_root]['app_root'] ? "/$ezer_root": '';
+    $sub= $app ? ($sub_root ?: '') : "/$EZER->version";
+    $verze= "$ezer_path_root$sub/.svn/wc.db";
+    $db=@ new SQLite3("$ezer_path_root$sub/.svn/wc.db");
+    if ( $db ) {
+      $verze=@ $db->querySingle("SELECT MAX(revision) from NODES");
+    }
+  }
   return $verze;
 }
 # ================================================================================================== SYSTEM
