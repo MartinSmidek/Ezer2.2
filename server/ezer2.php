@@ -149,6 +149,11 @@
     switch ( $x->op ) {
     case 'message?':          // {op:'message?',user_id:...,hits:n});
       check_version($answer);
+      if ( $x->svn ) {
+        $answer->sa_version= root_svn(1);
+        $answer->sk_version= root_svn(0);
+        $answer->msg.= "<br>svn $ezer_root=$answer->sa_version, svn jádro=$answer->sk_version";
+      }
       break;
     case 're_log_me':         // {op:'re_log_me',user_id:...,hits:n});
       $_SESSION[$ezer_root]['relog']++;
@@ -1947,30 +1952,36 @@ function check_version($y) {
   // kontrola verze systému, pokud je definováno $EZER->options->version
 //   $y->a_version= $y->g_version= $y->k_version= 0; return;
   global $EZER, $ezer_root;
+  $msg= '';
   if ( isset($_SESSION['curr_version']) ) {
-    $y->version= $_SESSION['curr_version'];
+    $yv= $y->version= $_SESSION['curr_version'];
+    $msg.= "verze při startu =$yv<br>";
     // verze aplikace
-    $y->a_version= select1("MAX(version)","_help","kind='v' GROUP BY kind");
-    if ( $y->a_version > $y->version ) {
+    $ya= $y->a_version= select1("MAX(version)","_help","kind='v' GROUP BY kind");
+    $msg.= "verze $ezer_root=$ya";
+    if ( $ya > $yv ) {
       $y->help= str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","_help",
-        "kind='v' AND version>$y->version GROUP BY kind"));
+        "kind='v' AND version>$yv GROUP BY kind"));
     }
     // verze skupiny
     if ( isset($_SESSION[$ezer_root]['group_db']) ) {
-      $y->g_version= select1("MAX(version)","_help","kind='v' GROUP BY kind",'ezer_group');
-      if ( $y->g_version > $y->version ) {
+      $yg= $y->g_version= select1("MAX(version)","_help","kind='v' GROUP BY kind",'ezer_group');
+      $msg.= ", verze systému=$yg";
+      if ( $yg > $yv ) {
         $y->help.= ($y->help ? "<br>" : '')
           . str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","_help",
-            "kind='v' AND version>$y->version GROUP BY kind",'ezer_group'));
+            "kind='v' AND version>$yv GROUP BY kind",'ezer_group'));
       }
     }
     // verze jádra
-    $y->k_version= select1("MAX(version)","ezer_kernel._help","kind='v' GROUP BY kind");
-    if ( $y->k_version > $y->version ) {
+    $yk= $y->k_version= select1("MAX(version)","ezer_kernel._help","kind='v' GROUP BY kind");
+    $msg.= ", verze jádra=$yk";
+    if ( $yk > $yv ) {
       $y->help.= ($y->help ? "<br>" : '')
         . str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","ezer_kernel._help",
-          "kind='v' AND version>$y->version GROUP BY kind"));
+          "kind='v' AND version>$yv GROUP BY kind"));
     }
+    $y->msg= $msg;
   }
 }
 # -------------------------------------------------------------------------------------------------- answer

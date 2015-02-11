@@ -101,6 +101,8 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   $_SESSION['trace_height']= $theight;
   $_SESSION[$ezer_root]['skin']= $skin;
   $_SESSION[$ezer_root]['app_name']= $app_name;
+  if ( $app_root )
+    $_SESSION[$ezer_root]['app_root']= $app_root;
   $_SESSION['skin']= $skin;
   $refresh= isset($_SESSION[$ezer_root]['sess_state']) && $_SESSION[$ezer_root]['sess_state']=='on'
     ? 'true' : 'false';
@@ -648,26 +650,13 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
   require_once("$ezer_path_root/{$EZER->version}/ezer2_fce.php");
 }
 # -------------------------------------------------------------------------------------------------- root_svn
-# zjistí svn-verzi běžící aplikace a jádra a porovná se zapamatovanou
-#   $roots      -- seznam podsložek, default=ezer2,app
-function root_svn($roots='') {
+# zjistí svn-verzi běžící aplikace pro $app=1 nebo jádra pro $app=0
+function root_svn($app=0) {
   global $EZER, $ezer_root, $ezer_path_root;
-  $roots= $roots ? $roots : "{$EZER->version},$ezer_root";
-  $verze= 0;
-  foreach (explode(',',$roots) as $root) {
-    $entry= "$ezer_path_root/$root/.svn/entries";
-    $f= @fopen($entry,'r');
-    if ( $f ) {
-      fgets($f); fgets($f); fgets($f);
-      $verze= max($verze,trim(fgets($f)));
-      fclose($f);
-    }
-//     else {
-//       $verze= "$entry:$php_errormsg";
-//       break;
-//     }
-  }
-//                                                         display("svn.version=$verze");
+  $sub_root= $_SESSION[$ezer_root]['app_root'] ? "/$ezer_root": '';
+  $sub= $app ? ($sub_root ?: '') : "/$EZER->version";
+  $db= new SQLite3("$ezer_path_root$sub/.svn/wc.db");
+  $verze= $db->querySingle("SELECT MAX(revision) from NODES");
   return $verze;
 }
 # ================================================================================================== SYSTEM
