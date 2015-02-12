@@ -732,7 +732,7 @@ Ezer.Application= new Class({
 //                                                         Ezer.debug(x,'bar_chat');
     var ajax= new Request({url:this.options.server_url, data:x, method: 'post',
       onSuccess: function(ay) {
-        this._ajax(-1);
+        //this._ajax(-1);
         var y;
         try { y= JSON.decode(ay); } catch (e) { y= null; }
         if ( !y )
@@ -758,7 +758,7 @@ Ezer.Application= new Class({
         //this.putFootDom(ae_time()+' '+(y?y.msg:'?'));
       }.bind(this)});
     ajax.send();
-    this._ajax(1);
+    //this._ajax(1);
     return true;
   },
   // ----------------------------------------------------------------------------- bar_click
