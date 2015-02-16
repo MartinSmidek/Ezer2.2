@@ -445,55 +445,6 @@ function doc_todo($item,$source='app',$nic="<dl class='todo'><dt>V tomto období
   $html.= "</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- doc_chngs_show
-function doc_chngs_show($type='ak',$days=30) { trace();
-  global $ezer_db, $ezer_root;
-  $lines= array();
-  $get_help= function($db='.main.',$abbr='a') use (&$lines,$ezer_db,$days) {
-    if ( $db=='.main.' || isset($ezer_db[$db]) ) {
-      ezer_connect($db);
-      $qh= "SELECT datum, name, help FROM _help WHERE kind='v' AND SUBDATE(NOW(),$days)<=datum";
-      $rh= mysql_qry($qh);
-      while ( $rh && ($h= mysql_fetch_object($rh)) ) {
-        $d= $h->datum;
-        $d= substr($d,8,2).'.'.substr($d,5,2).'.'.substr($d,2,2);
-        $n= $h->name;
-        if ( $n )
-          list($n)= array_reverse(explode('|',$h->name));
-        else
-          $n= $abbr=='k' ? 'jádro Ezer' : ' ';
-        $lines[]= "$h->datum $d: $n: $h->help [$abbr]";
-      }
-    }
-  };
-  // zhromáždění změn z trojice databází s tabulkou _help
-  if ( strstr($type,'k') !== false ) {
-    $get_help('ezer_kernel','k');
-  }
-  if ( strstr($type,'a') !== false ) {
-    if ( isset($_SESSION[$ezer_root]['group_db']) ) {
-      $get_help($_SESSION[$ezer_root]['group_db'],'g');
-    }
-    $get_help();
-  }
-  // přidání změn z _todo
-  $cond= strstr($type,'a')===false ? "cast=1" : "1";
-  $cond.= strstr($type,'k')===false ? " OR cast!=1" : "";
-  ezer_connect('.main.');
-  $qh= "SELECT kdy_skoncil, zprava, zkratka FROM _todo JOIN _cis ON druh='s_todo_cast' AND data=cast
-        WHERE kdy_skoncil!='0000-00-00' AND SUBDATE(NOW(),$days)<=kdy_skoncil AND ($cond)";
-  $rh= mysql_qry($qh);
-  while ( $rh && ($h= mysql_fetch_object($rh)) ) {
-    $d= $h->kdy_skoncil;
-    $d= substr($d,8,2).'.'.substr($d,5,2).'.'.substr($d,2,2);
-    $lines[]= "$h->kdy_skoncil 00:00:00 $d: $h->zkratka: $h->zprava [d]";
-  }
-  // redakce
-  rsort($lines);
-  foreach($lines as $i=>$line) $lines[$i]= substr($line,20);
-  $html= implode('<br>',$lines);
-  return $html;
-}
 # -------------------------------------------------------------------------------------------------- doc_todo_show
 # zobrazí přehled Novinek resp. Požadavků pro běžného uživatele
 #   cond = podmínka

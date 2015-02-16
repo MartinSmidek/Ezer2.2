@@ -154,7 +154,12 @@ textarea { resize: none; }
 #login h1 { background-color:$b_group; color:#FFFFFF; font-size:9pt; margin:0; padding:2px 5px;}
 #login_on { text-decoration:underline; position:absolute; }
 #login_no { position:absolute; left:110px; }
-#watch_key      { padding:5px !important; }
+#watch_key   { padding:5px !important; }
+#login_chngs { margin-top:193px; border:1px solid $b_group; height:180px; background-color:$b_item; }
+#login_chngs > div { padding:10px 5px; overflow-x:auto; height:142px; }
+#login_chngs span { color:black; padding:1px 5px; }
+#login_chngs span.chng_day { background-color:#eee; }
+#login_chngs div.chng { margin:-5px 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* úpravy Clintcide a Mootools */
 .errorMsg {
@@ -672,6 +677,14 @@ hr.cleaner {
   width:500px; height:4px; margin-top:0px; }
 #bar_perc {
   background:#ffb454; height:4px; box-shadow:2px 2px 7px #a60; }
+
+/* seznam změn */
+div.chng {
+    width:100%; }
+span.chng_day {
+    background-color:$b_item; color:$c_item;padding:1px 5px; }
+span.chng_hlp {
+    padding:1px 5px; }
 
 /* debugger */
 #form {

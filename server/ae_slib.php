@@ -133,7 +133,7 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     'theight'           => $theight
   );
   if ( isset($options->group_db) )
-    $_SESSION[$ezer_root]['group_db']= $options->group_db;
+    $_SESSION[$ezer_root]['group_db']= strtr($options->group_db,array('"'=>'',"'"=>''));
   //  pokud je definováno $options->curr_version a dostupná db ezer_kernel přečte verzi jádra
   if ( isset($options->curr_version) ) {
     $version= 0;
@@ -277,6 +277,7 @@ __EOD
 __EOD
   ));
   // PŘIHLAŠOVACÍ DIALOG
+  $chngs= "";
   $kontakt= $pars->contact ? $pars->contact
     : " V případě zjištění problému nebo potřeby konzultace mi prosím:<br/>
        <ul><li>napište na mail&nbsp;<a href='mailto:{$EZER->options->mail}{$EZER->options->mail_subject}'>{$EZER->options->mail}</a></li>"
@@ -298,6 +299,11 @@ __EOD
   case 'info':
     $info= is_array($welcome) ? $welcome[1] : $kontakt;
     $info= "<div class='login_a_msg'>$info</div>";
+    break;
+  case 'chngs':
+    $info= "<div class='login_a_msg'><br>$kontakt</div>";
+    $chng= doc_chngs_show('ak',30,$app_name);
+    $chngs= "<div id='login_chngs'><h1>Přehled posledních změn aplikace</h1><div>$chng</div></div>";
     break;
   case 'news':
     require_once("$ezer_path_serv/reference.php");
@@ -505,7 +511,7 @@ $html_header
       <div class="login_a">
         $info
       </div>
-    </div>
+    </div>$chngs
   </div>
 <!-- pracovní plocha -->
   <div id="stred">
@@ -665,7 +671,65 @@ function root_svn($app=0) {
   }
   return $verze;
 }
-# ================================================================================================== SYSTEM
+# -------------------------------------------------------------------------------------------------- doc_chngs_show
+function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
+  global $ezer_db, $ezer_root;
+  list($grp_name)= preg_split("/\s-_/",$app_name);
+  $lines= array();
+  $header= function($d,$w,$a='') {
+    $d= substr($d,8,2).'.'.substr($d,5,2).'.'.substr($d,0,4);
+    if ( $a ) $a.= ':';
+    return "<b>$d $a(".trim($w).")</b>";
+  };
+  $get_help= function($db='.main.',$level='a',$abbr) use (&$lines,$ezer_db,$days,$header) {
+    ezer_connect($db);
+    $qh= "SELECT datum, name, help FROM /*$db*/ _help WHERE kind='v' AND SUBDATE(NOW(),$days)<=datum";
+    $rh= mysql_qry($qh);
+    while ( $rh && ($h= mysql_fetch_object($rh)) ) {
+      $n= $h->name;
+      if ( $n )
+        list($n)= array_reverse(explode('|',$h->name));
+      else
+        $n= $level=='k' ? 'Ezer' : ' ';
+      $hdr= $header($h->datum,$n,$abbr);
+      $lines[]= $h->datum
+              . "<div class='chng'><span class='chng_day'>$hdr</span>"
+              .   "<span class='chng_hlp'>$h->help [$level]</span>"
+              . "</div>";
+    }
+  };
+  // zhromáždění změn z trojice databází s tabulkou _help
+  if ( strstr($type,'k') !== false ) {
+    $get_help('ezer_kernel','k',"Ezer");
+  }
+  if ( strstr($type,'a') !== false ) {
+    if ( isset($_SESSION[$ezer_root]['group_db']) ) {
+      $get_help('ezer_group','g',$grp_name);
+    }
+    $get_help('.main.','a',$ezer_root);
+  }
+  // přidání změn z _todo
+  $cond= strstr($type,'a')===false ? "cast=1" : "1";
+  $cond.= strstr($type,'k')===false ? " OR cast!=1" : "";
+  ezer_connect('.main.');
+  $qh= "SELECT kdy_skoncil, zprava, zkratka FROM _todo JOIN _cis ON druh='s_todo_cast' AND data=cast
+        WHERE kdy_skoncil!='0000-00-00' AND SUBDATE(NOW(),$days)<=kdy_skoncil AND ($cond)";
+  $rh= mysql_qry($qh);
+  while ( $rh && ($h= mysql_fetch_object($rh)) ) {
+    $hdr= $header($h->kdy_skoncil,$h->zkratka);
+    $lines[]= "$h->kdy_skoncil 00:00:00 "
+            . "<div class='chng'><span class='chng_day'>$hdr</span>"
+            .   "<span class='chng_hlp'>$h->zprava [d]</span>"
+            . "</div>";
+//     $lines[]= "$h->kdy_skoncil 00:00:00 $d: $h->zkratka: $h->zprava [d]";
+  }
+  // redakce
+  rsort($lines);
+  foreach($lines as $i=>$line) $lines[$i]= substr($line,19);
+  $html= implode('<br>',$lines);
+  return $html;
+}
+/** ================================================================================================ SYSTEM */
 # knihovna funkcí pro moduly server, compiler, reference
 # -------------------------------------------------------------------------------------------------- fce_error
 # $send_mail může obsahovat doplňkové informace zaslané správci aplikace mailem
@@ -928,7 +992,7 @@ function debugx(&$gt,$label=false,$html=0,$depth=64,$length=64,$win1250=0,$getty
   }
   return $x;
 }
-# ================================================================================================== MySQL
+/*** =============================================================================================== MySQL */
 # -------------------------------------------------------------------------------------------------- select
 # navrácení hodnoty jednoduchého dotazu
 # pokud $expr obsahuje čárku, vrací pole hodnot, pokud $expr je hvězdička vrací objekt
@@ -995,7 +1059,7 @@ function sql_query($qry,$db='.main.') {
   }
   return $obj;
 }
-# ================================================================================================== OSVĚDČENÉ FUNKCE
+/** ================================================================================================ OSVĚDČENÉ FUNKCE */
 # -------------------------------------------------------------------------------------------------- test_session
 # vypíše session
 function test_session() {
@@ -1145,7 +1209,7 @@ function emailIsValid($email,&$reason) {
    $reason= count($reasons) ? implode(', ',$reasons) : '';
    return $isValid;
 }
-# ================================================================================================== AJAX - kontroly
+/** ================================================================================================ AJAX - kontroly */
 # v této sekci jsou testy korektnosti dat
 # -------------------------------------------------------------------------------------------------- verify_rodcis
 # podle http://latrine.dgx.cz/jak-overit-platne-ic-a-rodne-cislo
@@ -1284,7 +1348,7 @@ function str2date($s,&$d,&$m,&$y) {
   }
   return $d;
 }
-// ================================================================================================= AJAX - filtry
+/** ================================================================================================ AJAX - filtry */
 // v této sekci jsou oboustranné filtry pro transformaci mezi sql/user podobou dat
 # -------------------------------------------------------------------------------------------------- sql_week
 // datum bez dne v týdnu
