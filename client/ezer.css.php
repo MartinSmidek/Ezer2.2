@@ -144,7 +144,7 @@ textarea { resize: none; }
 #login_1  { float:left; }
 #login_2  { float:right; }
 #login_1, #login_2  { width:250px; border:1px solid $b_group; height:220px; background-color:$b_item; }
-#login_1 div.login_a { padding:20px; }
+#login_1 div.login_a { padding:15px; }
 #login_2 div.login_a { padding:5px; height:180px; overflow-y:auto; }
 #login_2 div.login_a_msg { padding:5px; }
 #login_2 div.login_notify { padding:5px; background-color:$b_kuk; color:$c2_kuk; }
