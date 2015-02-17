@@ -674,12 +674,12 @@ function root_svn($app=0) {
 # -------------------------------------------------------------------------------------------------- doc_chngs_show
 function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
   global $ezer_db, $ezer_root;
-  list($grp_name)= preg_split("/\s-_/",$app_name);
+  list($grp_name)= preg_split("/[\s-_]/",$app_name);
   $lines= array();
   $header= function($d,$w,$a='') {
     $d= substr($d,8,2).'.'.substr($d,5,2).'.'.substr($d,0,4);
-    if ( $a ) $a.= ':';
-    return "<b>$d $a(".trim($w).")</b>";
+    $w= trim($w);
+    return "<span class='chng_day' title='$a'>$d $w</span>";
   };
   $get_help= function($db='.main.',$level='a',$abbr) use (&$lines,$ezer_db,$days,$header) {
     ezer_connect($db);
@@ -693,9 +693,7 @@ function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
         $n= $level=='k' ? 'Ezer' : ' ';
       $hdr= $header($h->datum,$n,$abbr);
       $lines[]= $h->datum
-              . "<div class='chng'><span class='chng_day'>$hdr</span>"
-              .   "<span class='chng_hlp'>$h->help [$level]</span>"
-              . "</div>";
+              . "<div class='chng'>$hdr<span class='chng_hlp'>$h->help</span></div>";
     }
   };
   // zhromáždění změn z trojice databází s tabulkou _help
@@ -718,9 +716,7 @@ function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
   while ( $rh && ($h= mysql_fetch_object($rh)) ) {
     $hdr= $header($h->kdy_skoncil,$h->zkratka);
     $lines[]= "$h->kdy_skoncil 00:00:00 "
-            . "<div class='chng'><span class='chng_day'>$hdr</span>"
-            .   "<span class='chng_hlp'>$h->zprava [d]</span>"
-            . "</div>";
+            . "<div class='chng'>$hdr<span class='chng_hlp'>$h->zprava</span></div>";
 //     $lines[]= "$h->kdy_skoncil 00:00:00 $d: $h->zkratka: $h->zprava [d]";
   }
   // redakce
