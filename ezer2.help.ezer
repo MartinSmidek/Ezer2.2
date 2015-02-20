@@ -218,7 +218,7 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
         kind.change; datum.set(now); datum.change; topic.change; hlp.change; }}
     button [79,11,,] { title:"[fa-trash-o] Vymazat", proc onclick() {
       confirm("Opravdu vymazat zprávu ",s.topic.get,"?");
-      _help.delete_record(conc("id_help=",s.id_help.get)); refresh }}
+      group._help.delete_record(conc("id_help=",s.id_help.get)); refresh }}
 
     label  [240,5,123,30] { css:'ae_parm'}
     button [250,11,,] { title:"[fa-save] Ulož",  proc onclick() { the_formsave(form,s) }}
@@ -291,13 +291,20 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
     view h: table _help
     browse s [0,5,150,100] { rows:20, qry_rows:1
       show id_help { data:h.id_help }
-      show [,,70,] { title:'datum', data:h.datum, format:'rs-q*t' }
-      show [,,100,] { title:'název', data:h.name, format:'sq*t' }
+      show [,,140,] { title:'název', expr:"SUBSTRING_INDEX(name,'|',-1)", format:'sq*t' }
       show topic [,,100,] { title:'zkratka', data:h.topic, format:'sq*t' }
-      show [,,40,] { title:'stav', data:h.seen, format:'sq*t' }
+      // volitelné
+      show x_znaku [,,70,] { title:'znaků', expr:"LENGTH(help)", format:'rsq*t' }
+      show x_stav [,,0,] { title:'stav', data:h.seen, format:'sq*t' }
+      show x_datum [,,0,] { title:'datum', data:h.datum, format:'rs-q*t' }
       proc onrowclick() {
         form.key(id_help.get); form.load;
         hlp.set(f_hlp.get)
+      }
+      proc onclick() {
+        x_znaku.width; x_znaku.width(0); x_stav.width(70);
+      | x_stav.width;  x_stav.width(0);  x_datum.width(70);
+      | x_datum.width; x_datum.width(0); x_znaku.width(70);
       }
     }
     // pole
@@ -310,12 +317,12 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
       help:"zřetězení atributů _sys pro kontext nebo 'ezer.cokoliv' pro obecný text" }
     button [topic.r+3,topic.t+2,16,16] { title:"[fa-tree]", style:"padding:0 1px"
       proc onclick() { topic.set(replace(meta.modal,'^[^\.]+\.','')); topic.change;
-      name.set(replace(meta.name.get,'<[^>]+>','','^[^\|]+\|','')); name.change; }}
-    field seen [La+387,66,122,] { data:h.seen, title:'stav:', format:'d' }
+        name.set(replace(meta.name.get,'<[^>]+>','','^[^\|]+\|','')); name.change; }}
+    field seen [La+358,66,150,] { data:h.seen, title:'stav:', format:'d' }
 
     // příkazy
     label c1 [La+0,5,150,30] { css:'ae_parm'}
-    button [c1.l+10,11,,] { title:"[fa-database] Nový" proc onclick() {
+    button [c1.l+10,11,,] { title:"[fa-database] Nový" proc onclick() { hlp.set('');
       form.init(2); kind.change; name.change; topic.change; datum.set(now); datum.change; }}
     button [c1.l+71,11,,] { title:"[fa-trash-o] Vymazat", proc onclick() {
       confirm("Opravdu vymazat help k ",s.topic.get,"?");
@@ -342,13 +349,20 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
     view h: table group._help
     browse s [0,5,150,100] { rows:20, qry_rows:1
       show id_help { data:h.id_help }
-      show [,,70,] { title:'datum', data:h.datum, format:'rs-q*t' }
-      show [,,100,] { title:'název', data:h.name, format:'sq*t' }
+      show [,,140,] { title:'název', expr:"SUBSTRING_INDEX(name,'|',-1)", format:'sq*t' }
       show topic [,,100,] { title:'zkratka', data:h.topic, format:'sq*t' }
-      show [,,40,] { title:'stav', data:h.seen, format:'sq*t' }
+      // volitelné
+      show x_znaku [,,70,] { title:'znaků', expr:"LENGTH(help)", format:'rsq*t' }
+      show x_stav [,,0,] { title:'stav', data:h.seen, format:'sq*t' }
+      show x_datum [,,0,] { title:'datum', data:h.datum, format:'rs-q*t' }
       proc onrowclick() {
         form.key(id_help.get); form.load;
         hlp.set(f_hlp.get)
+      }
+      proc onclick() {
+        x_znaku.width; x_znaku.width(0); x_stav.width(70);
+      | x_stav.width;  x_stav.width(0);  x_datum.width(70);
+      | x_datum.width; x_datum.width(0); x_znaku.width(70);
       }
     }
     // pole
@@ -361,16 +375,16 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
       help:"zřetězení atributů _sys pro kontext nebo 'ezer.cokoliv' pro obecný text" }
     button [topic.r+3,topic.t+2,16,16] { title:"[fa-tree]", style:"padding:0 1px"
       proc onclick() { topic.set(replace(meta.modal,'^[^\.]+\.','')); topic.change;
-      name.set(replace(meta.name.get,'<[^>]+>','','^[^\|]+\|','')); name.change; }}
+        name.set(replace(meta.name.get,'<[^>]+>','','^[^\|]+\|','')); name.change; }}
     field seen [La+387,66,122,] { data:h.seen, title:'stav:', format:'d' }
 
     // příkazy
     label c1 [La+0,5,150,30] { css:'ae_parm'}
-    button [c1.l+10,11,,] { title:"[fa-database] Nový" proc onclick() {
+    button [c1.l+10,11,,] { title:"[fa-database] Nový" proc onclick() { hlp.set('');
       form.init(2); kind.change; name.change; topic.change; datum.set(now); datum.change; }}
     button [c1.l+71,11,,] { title:"[fa-trash-o] Vymazat", proc onclick() {
       confirm("Opravdu vymazat help k ",s.topic.get,"?");
-      _help.delete_record(conc("id_help=",s.id_help.get)); refresh }}
+      group._help.delete_record(conc("id_help=",s.id_help.get)); refresh }}
 
     label c2 [La+300,5,213,30] { css:'ae_parm'}
     button [c2.l+8,11,,] { title:"[fa-save] Ulož" proc onclick() { the_formsave(form,s) }}
@@ -393,13 +407,20 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
     view h: table kernel._help
     browse s [0,5,150,100] { rows:20, qry_rows:1
       show id_help { data:h.id_help }
-      show [,,70,] { title:'datum', data:h.datum, format:'rs-q*t' }
-      show [,,100+41,] { title:'název', data:h.name, format:'sq*t' }
+      show [,,140,] { title:'název', expr:"SUBSTRING_INDEX(name,'|',-1)", format:'sq*t' }
       show topic [,,100,] { title:'zkratka', data:h.topic, format:'sq*t' }
-      //show [,,40,] { title:'stav', data:h.seen, format:'sq*t' }
+      // volitelné
+      show x_znaku [,,70,] { title:'znaků', expr:"LENGTH(help)", format:'rsq*t' }
+      show x_stav [,,0,] { title:'stav', data:h.seen, format:'sq*t' }
+      show x_datum [,,0,] { title:'datum', data:h.datum, format:'rs-q*t' }
       proc onrowclick() {
         form.key(id_help.get); form.load;
         hlp.set(f_hlp.get)
+      }
+      proc onclick() {
+        x_znaku.width; x_znaku.width(0); x_stav.width(70);
+      | x_stav.width;  x_stav.width(0);  x_datum.width(70);
+      | x_datum.width; x_datum.width(0); x_znaku.width(70);
       }
     }
     // pole
@@ -417,7 +438,7 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
 
     // příkazy
     label c1 [La+0,5,150,30] { css:'ae_parm'}
-    button [c1.l+10,11,,] { title:"[fa-database] Nový" proc onclick() {
+    button [c1.l+10,11,,] { title:"[fa-database] Nový" proc onclick() { hlp.set('');
       form.init(2); kind.change; name.change; topic.change; datum.set(now); datum.change; }}
     button [c1.l+71,11,,] { title:"[fa-trash-o] Vymazat", proc onclick() {
       confirm("Opravdu vymazat help k ",s.topic.get,"?");
@@ -434,54 +455,6 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
     // plocha pro zobrazení téma
     label [La+0,69,341,] { title:"Poznámka: prvek &lt;hr> je vkládán jako průhledný s clear=both"  }
     label hlp [La+0,89,500,290] { css:'PanelPopup ContextHelp' }
-  }
-  # ------------------------------------------------------------------------ _hlp_k
-  form x_hlp_k [,,*,500] {
-    var virgin= 1
-    proc start() { virgin.get; s.browse_load("kind='h'"); virgin.set(0) }
-    // seznam témat
-    view h: table kernel._help
-    browse s [0,5,150,100] { rows:20, qry_rows:1
-      show id_help { data:h.id_help }
-      show [,,100,] { title:'název', data:h.name, format:'s+q*t' }
-      show [,,50,] { title:'zkratka', data:h.topic, format:'sq*t' }
-      show [,,40,] { title:'stav', data:h.seen, format:'sq*t' }
-      proc onrowclick() {
-        form.key(id_help.get); form.load;
-        hlp.set(f_hlp.get)
-      }
-    }
-    // pole
-    field kind { data:h.kind, value:'h' }
-    field f_hlp { data:h.help }
-    label [230,11,34,] { title:'název:' }
-    field name [267,7,119,] { data:h.name }
-    label [395,11,74,] { title:'zkratka:' }
-    field topic [440,7,80,] { data:h.topic,
-      help:"zřetězení atributů _sys pro kontext nebo 'ezer.cokoliv' pro obecný text" }
-    label [529,11,27,] { title:'stav:' }
-    field seen [558,7,40,] { data:h.seen }
-    // příkazy
-    label  [605,0,152,30] { css:'ae_parm'}
-    button [609,6,,] { title:"Nový"
-      proc onclick() { form.init(2); kind.change; name.change; topic.change; }
-    }
-    button [648,6,,] { title:"Ulož"
-      proc onclick() { the_formsave(form,s) }
-    }
-    button [686,6,,] { title:"Uprav text"
-      proc onclick() {
-        help_edit.h.txt.set(f_hlp.get);
-        help_edit.modal(50,50);
-        f_hlp.set(help_edit.h.txt.get);
-        f_hlp.change;
-        form.save; form.load; hlp.set(f_hlp.get)
-      }
-    }
-    // plocha pro zobrazení téma
-    label [230,31,413,] { title:"Poznámka: prvek &lt;hr> je vkládán jako průhledný s clear=both"  }
-    label hlp [230,51,500,290] { css:'PanelPopup ContextHelp' }
-    // procedury
   }
   # ================================================================================= help_edit
   panel help_edit [0,0,645,520] { title:' Úprava textu nápovědy', type:'popup', css:'dialog'
@@ -534,10 +507,11 @@ panel meta [0,0,300,300] {type:'popup', _sys:'', title:'Struktura aplikace - men
     button [-1,11,,] { type:'html', title:"[fa-refresh]", proc onclick() { a.app }}
     use a: area a_
     area a_ { title:"<div id='x' class='ae_work' style='overflow:auto;position:absolute;left:3px;top:10px;width:300px;height:300px'></div>"
-      proc app() { this.tree_show(meta_tree,'x'); this.tree_expand(1) }
-      proc tree_onclick(fid,id,dat,com,x,txt,txts) {
+      proc app() { this.tree_show(meta_tree('_sys'),'x'); this.tree_expand(1) }
+      proc tree_onclick(fid,id,dat,com,x,txt,txts) { var fd:text
         //echo("tree_onclick: fid=",fid,", id=",id,", data=",dat,", x=",x,", txt=",txt,", txts=",txts);
-        name.set(txt); panel.close(fid)
+        fd.set(replace(fid,'\.\.','.'));
+        name.set(txt); panel.close(fd)
       }
     }
   }

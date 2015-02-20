@@ -521,13 +521,14 @@ Ezer.Application.implement({
   help_text: function(k) {
     this.ask({cmd:'help_text',key:k},'help_text_',{key:k});
   },
+  // ezer2/help_text vrací: {text,refs,db}
   help_text_: function(y,parm) {
-    Ezer.fce.popup_help(y.text,'HELP: '+y.key.title,y.key,parm.key,y.seen,y.refs);
+    Ezer.fce.popup_help(y.text,'HELP: '+y.key.title,y.key,parm.key,y.seen,y.refs,y.db);
   },
 // --------------------------------------------------------------------------------------- help_save
-// zapíše helptext s daným klíčem
-  help_save: function(k,t) {
-    this.ask({cmd:'help_save',key:k,text:t});
+// zapíše helptext s daným klíčem do db._help
+  help_save: function(k,t,db) {
+    this.ask({cmd:'help_save',key:k,text:t,db:db});
   },
 // ---------------------------------------------------------------------------------------- help_ask
 // zapíše otázku do helptextu s daným klíčem - po skončení předá zpět výsledek

@@ -829,6 +829,8 @@ div.Form>div.ContextHelp {
                   padding:10px 0 10px 10px; color:black; overflow:auto }
 .ContextHelp img{ padding:5px; overflow: auto; }
 .ContextHelp hr { clear:both; color:transparent }
+.ContextHelp div.foot {
+                  position:absolute; bottom:-3px; right:20px; color:grey; }
 div.Help   	{ position: absolute; z-index:2; width:300px; height:150px; right:30px; top:15px;
                   background-color:silver; box-shadow:5px 5px 10px #567; }
 .Help input     { float:right; font-size: 8pt; margin-top:3px; }
@@ -839,6 +841,5 @@ div.Help   	{ position: absolute; z-index:2; width:300px; height:150px; right:30
 div.HelpList    { float:right; background-color:$b2_brow; padding:10px;
                   max-width: 230px; word-wrap:break-word; }
 .HelpList ul    { margin:0; padding:0 10px; }
-
 __EOD;
 ?>

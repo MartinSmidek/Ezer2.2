@@ -343,6 +343,7 @@ Ezer.Area= new Class({
             var adata= JSON.stringify(data, undefined, 2);
             var fid= node.id.split('.');
             var idn= fid[fid.length-1];
+//             var node_id= node.id.split('.');
             this.fire('tree_onclick',[node.id,idn,node.data,ndata,adata,texts,node.text]);
           }
           return false;
@@ -476,16 +477,19 @@ Ezer.fce.json_encode= function (obj) {
 }
 // ================================================================================================= META
 // --------------------------------------------------------------------------------------- meta_tree
-//ff: meta_tree ()
-//      vrátí strom aplikace
-Ezer.fce.meta_tree= function (depth) {
+//ff: meta_tree ([id_type=id])
+//      vrátí strom aplikace, uzly budou označeny podle id (default) nebo podle _sys
+Ezer.fce.meta_tree= function (id_type) {
   var tree;
   function walk(root) {
     var title= (root.options.include ? ' '+root.options.include : '')
              + (root._library        ? ' #' : '');
     var data= {include:root.options.include|'',library:root._library ? '#' : ''};
+    var id= id_type=='_sys'
+          ? (root.options._sys ? (root.options._sys=='*' ? root.id : root.options._sys) : '')
+          : root.id;
     var name= root.options.title ? Ezer.fce.replace_fa(root.options.title) : '';
-    var node= {prop:{id:root.id,text:name,title:title,data:data},down:[]};
+    var node= {prop:{id:id,text:name,title:title,data:data},down:[]};
     if ( root.part ) {
       $each(root.part,function(x) {
         if ( x instanceof Ezer.MenuLeft ) {

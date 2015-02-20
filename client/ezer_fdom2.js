@@ -22,8 +22,7 @@ Ezer.Block.implement({
     if ( this.DOM_Block ) {
       if (on!==false && this.options.enabled) {
         this.DOM_Block.removeClass('jxDisabled');
-        if (this.DOM_Input)
-          this.DOM_Input.disabled= false;
+        if (this.DOM_Input)                               this.DOM_Input.disabled= false;
         if (this.DOM_Button)
           this.DOM_Button.disabled= false;
       }
@@ -3439,7 +3438,7 @@ Ezer.fce.DOM.confirm= function (str,continuation,butts) {
 // -------------------------------------------------------------------------------------- help
 // zobrazení helpu v popup okně s možností editace
 Ezer.obj.DOM.help= null;                                // popup StickyWin
-Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
+Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs,db) {
   // konstrukce elementů pro Help při prvním volání
   if ( !Ezer.obj.DOM.help ) {
     Ezer.obj.DOM.help= {};
@@ -3520,14 +3519,14 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
             ["uložit pod '"+Ezer.obj.DOM.help.ykey.title+"'",function(el) {
               var data= CKEDITOR.instances.editable.getData();
               Ezer.obj.DOM.help.txt.innerHTML= data;
-              Ezer.App.help_save(Ezer.obj.DOM.help.ykey,data);
+              Ezer.App.help_save(Ezer.obj.DOM.help.ykey,data,Ezer.obj.DOM.help.db);
               Ezer.obj.DOM.help.stickywin.hide();
             }],
             Ezer.obj.DOM.help.ykey.sys==Ezer.obj.DOM.help.xkey.sys ? null :
             ["uložit pod '"+Ezer.obj.DOM.help.xkey.title+"'",function(el) {
               var data= window.CKEDITOR.instances.editable.getData();
               Ezer.obj.DOM.help.txt.innerHTML= data;
-              Ezer.App.help_save(Ezer.obj.DOM.help.xkey,data);
+              Ezer.App.help_save(Ezer.obj.DOM.help.xkey,data,Ezer.obj.DOM.help.db);
               Ezer.obj.DOM.help.stickywin.hide();
             }],
             ["vynutit zobrazení",function(el) {
@@ -3552,9 +3551,10 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs) {
   Ezer.obj.DOM.help.html= html;
   Ezer.obj.DOM.help.xkey= xkey;
   Ezer.obj.DOM.help.ykey= ykey;
+  Ezer.obj.DOM.help.db=   db;
   Ezer.obj.DOM.help.cap.setProperty('text',title);
   Ezer.obj.DOM.help.cap.title= (xkey.sys==ykey.sys ? ykey.sys : xkey.sys+"=>"+ykey.sys)+' '+seen;
-  Ezer.obj.DOM.help.txt.innerHTML= refs+html; // načtení HTML helpu
+  Ezer.obj.DOM.help.txt.innerHTML= refs+html+"<div class='foot'>"+db+"</div>"; // načtení HTML helpu
   Ezer.obj.DOM.help.dotaz_butt.setStyles({display:'block'});
   // přidá obsluhu vnořeným elementům <a href='help://....'>
   Ezer.obj.DOM.help.txt.getElements('a').each(function(el) {

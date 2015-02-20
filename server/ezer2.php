@@ -1364,8 +1364,11 @@
   # vrátí y->text z tabulky _help podle klíče a poznamená uživatele do seen
   # vrátí y->refs = html obsahující další odkazy
   case 'help_text':
+//                                                         $x->totrace= 'u';
+//                                                         debug($x);
     global $ezer_db, $ezer_root;
     $db= '?';
+    # projde všechny tabulky _help v pořadí: aplikace, skupina, jádro
     $fetch_help= function($qh) use (&$db) {
       global $ezer_db, $ezer_root;
       $h= null;
@@ -1404,9 +1407,10 @@
     while (count($akey)) {
       $key= implode('.',$akey);
       $tit= implode('|',$atit);
-      $rh= $fetch_help("SELECT id_help,help,seen,name FROM _help WHERE topic='$key'");
+      $rh= $fetch_help("SELECT id_help,help,seen,name FROM _help WHERE kind='h' AND topic='$key'");
       if ( $rh && ($h= mysql_fetch_object($rh)) ) {
-        $y->text= "$h->help<small>$db</small>";
+        $y->text= $h->help;
+//         $y->text= "$h->help<div class='foot'>$db</div>";
         $y->seen= $h->seen;
         $y->key= (object)array('sys'=>$key,'title'=>$h->name?$h->name:$tit);
 //         // poznamená uživatele do seen, pokud tam není
@@ -1419,9 +1423,13 @@
       array_pop($akey);
       array_pop($atit);
     }
+    $y->db= $db;
     // sestavení seznamu odkazů na nadřízené a podřízené položky helpu
     $refs= "'ezer'";
+    $but= "''";
     $key= $x->key->sys;
+    $prefix= "{$x->key->title}|";
+    $lprefix= strlen($prefix);
     $akey= explode('.',$x->key->sys);
     while ( count($akey) ) {
       array_pop($akey);
@@ -1430,21 +1438,35 @@
     }
     $ul= '';
     $nh= 0;
-    $rh= $fetch_help("SELECT topic,name FROM _help WHERE topic LIKE '$key.%' OR topic IN ($refs)");
-    while ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
-      $ref= $h->name ? $h->name : $h->topic;
-      $ul.= "<li><a href='help://{$h->topic}'>$ref</a></li>";
-      $nh++;
+    foreach(array('a'=>'.main.','g'=>'ezer_group','k'=>'ezer_kernel') as $level=>$db) {
+      // vynecháme skupinovou databázi, není-li použita
+      if ( $level=='g' && !isset($_SESSION[$ezer_root]['group_db']) ) continue;
+      ezer_connect($db);
+      // zjistíme existující odkazy a vynecháme již zjištěné
+      $qh= "SELECT topic,name FROM /*$db*/_help WHERE kind='h'
+              AND (topic LIKE '$key.%' OR topic IN ($refs)) AND topic NOT IN ($but)
+            ORDER BY topic";
+      $rh= $fetch_help($qh);
+//                                                           display($qh);
+      while ( $rh && mysql_num_rows($rh) && $h= mysql_fetch_object($rh) ) {
+        $but.= ",'$h->topic'";
+        $ref= $h->name ? $h->name : $h->topic;
+        if ( strpos($ref,$prefix)===0 ) {
+          $ref= substr($ref,$lprefix);
+        }
+        $ref= str_replace("|"," | ",$ref);
+        $ul.= "<li><a href='help://{$h->topic}'>$ref</a></li>";
+        $nh++;
+      }
     }
     $y->refs= $ul ? "<div class='HelpList'>viz též ...<ul>$ul</ul></div>" : '';
-//                                                         $x->totrace= 'u';
-//                                                         debug($x);
 //                                                         display("$key =&gt; $qh =&gt; $nh");
     break;
   # -------------------------------------------------------------------------------------- help_save
   # zapíše text do tabulky _help
   case 'help_save':
     $y->ok= 0;
+    if ( $x->db ) ezer_connect($x->db);
     $text= mysql_real_escape_string($x->text);
     $qh= "SELECT topic FROM _help WHERE topic='{$x->key->sys}'";
     $rh= @mysql_query($qh);
@@ -1452,13 +1474,15 @@
       // help pro topic existuje - vyměň text a title
       $h= mysql_fetch_object($rh);
       $topic= $h->topic; // ? $h->topic : $x->key->title;
-      $qu= "UPDATE _help SET name='{$x->key->title}',help='$text' WHERE topic='$topic'";
+      $qu= "UPDATE _help
+            SET kind='h',name='{$x->key->title}',help='$text' WHERE topic='$topic'";
       $ru= mysql_qry($qu);
       $y->ok= $ru ? 1 : 0;
     }
     elseif ( $rh && mysql_num_rows($rh)==0 ) {
       // help pro topic neexistuje - založ jej
-      $qi= "INSERT INTO _help (topic,name,help) VALUES ('{$x->key->sys}','{$x->key->title}','$text') ";
+      $qi= "INSERT INTO _help (kind,topic,name,help)
+            VALUES ('h','{$x->key->sys}','{$x->key->title}','$text') ";
       $ri= mysql_qry($qi);
       $y->ok= $ri ? 1 : 0;
     }

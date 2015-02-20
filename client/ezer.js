@@ -8613,14 +8613,14 @@ Ezer.fce.echo= function () {
   return str;
 };
 // -------------------------------------------------------------------------------------- help
-//ff: fce.popup_help (html,title[,ykey[,xkey[,seen]]])
+//ff: fce.popup_help (html,title[,ykey[,xkey[,seen,db]]])
 //   zobrazí v systémovém popup menu předané html, pokud jsou předány i klíče, je možná editace
 //   ykey=klíč zobrazeného helpu, xkey=klíč z místa vyvolání (různý pokud nebyl přesný help)
 //   kde klíč je hodnota získaná funkcí self_sys. Poslední parametr se zobrazuje jako title
 //   v nadpisu (ve standardním helpu obsahuje zkratky uživatelů, kteří viděli help)
 //s: funkce
-Ezer.fce.popup_help= function (html,title,ykey,xkey,seen,refs) {
-  Ezer.fce.DOM.help(html,title,ykey,xkey,seen,refs);
+Ezer.fce.popup_help= function (html,title,ykey,xkey,seen,refs,db) {
+  Ezer.fce.DOM.help(html,title,ykey,xkey,seen,refs,db);
   return 1;
 };
 // -------------------------------------------------------------------------------------- set_trace
