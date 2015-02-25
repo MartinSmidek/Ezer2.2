@@ -628,6 +628,7 @@ Ezer.Item.implement({
 Ezer.Panel.implement({
   Implements: [Ezer.Help],
   _DOM_displayed: false,         // true pokud již měl display:block a má upravené rozměry
+  _screen: {width:0,height:0},   // velikost obrazovky na níž byl zobrazen panel
 // ------------------------------------------------------------------------------------ DOM_add1
 //f: Panel-DOM.DOM_add1 ()
   DOM_add1: function() {
@@ -654,14 +655,17 @@ Ezer.Panel.implement({
     this.DOM_Block.setStyle('display','block');
     if ( l!==undefined ) this.DOM_Block.setStyle('left',l);
     if ( t!==undefined ) this.DOM_Block.setStyle('top',t);
-//   this.DOM_Block.setStyles({display:'block'});
-//   if ( !this._DOM_displayed ) {
-//     // při prvním zobrazení upravíme rozměry
-//     Ezer.fce._DOM_size(this,this);
-//     var c= this.DOM_Block.getCoordinates();
-//     this.DOM_Block.setStyles({width:this._w_max-c.left,height:this._h_max-c.top});
-//   }
     if ( !noevent ) {
+      // nejprve provedeme případné onresize, pokud se změnily rozměry a pokud panel má onresize
+      if ( this.part.onresize &&
+           ( this._screen.width!=Ezer.sys.screen.width
+          || this._screen.height!=Ezer.sys.screen.height ) ) {
+        // pokud ano, zapamatujeme si ty nove
+        this._screen.width= Ezer.sys.screen.width;
+        this._screen.height= Ezer.sys.screen.height;
+        this.callProc('onresize',[this._screen.width,this._screen.height]);
+      }
+      // rozhodneme, zda volat onfirstfocus nebo onfocus
       if ( this.virgin ) {
         this.virgin= false;
         Ezer.app.onfirstfocus(this);
@@ -805,9 +809,8 @@ Ezer.PanelPlain.implement({
     Ezer.PanelInTabs_add(this);                 // položka v Tabs
     this.DOM_Block=
       new Element('div',{'class':'Panel',styles:{display:'none'}}).inject($('work'));
-  },
-//   DOM_add2: function() {
-//   },
+  }
+/*  ,
   _show: function(l,t,noevent) {
     this.DOM_Block.setStyles({display:'block',left:l,top:t+Ezer.Shield.top});
     if ( !noevent ) {
@@ -828,7 +831,7 @@ Ezer.PanelPlain.implement({
     this.fire('onblur',[]);
     this.DOM_Block.setStyles({display:'none'});
     return this;
-  }
+  } */
 });
 // ---------------------------------------------------------------------------------- PanelRight-DOM
 // panel vnořený do Tabs společně s MenuLeft

@@ -102,10 +102,11 @@ Ezer.Application= new Class({
     // definice sys.screen width a height
     Ezer.sys.screen= {width:ws.x,height:ws.y};
     // reakce na změnu
-    if ( Ezer.run && Ezer.run.$
-//       && Ezer.browser!='FF'
-    )
-      downto_panels(Ezer.run.$);
+//     if ( Ezer.run && Ezer.run.$ )
+//       downto_panels(Ezer.run.$);
+    if ( Ezer.panel && Ezer.panel.part && Ezer.panel.part.onresize ) {
+      Ezer.panel.callProc('onresize',[ws.x,ws.y]);
+    }
   },
   // ----------------------------------------------------------------------------- DOM_destroy
   DOM_destroy: function() {
