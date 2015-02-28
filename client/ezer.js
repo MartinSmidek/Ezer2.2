@@ -3535,11 +3535,19 @@ Ezer.Elem= new Class({
   set: function (val) {
     this.value= val;
     this._changed= false;
-//     this.empty= false;
     this.DOM_set();              // zobrazení v DOM z this.value
     this.DOM_changed(0);
     return 1;
  },
+// ------------------------------------------------------------------------------------ let
+// fm: Elem.let (val)
+//      změní zobrazenou hodnotu elementu (bez vyvolání onchange(d), bez orámování)
+// a: val - hodnota
+//   let: function (val) {
+//     this.value= val;
+//     this.DOM_set();              // zobrazení v DOM z this.value
+//     return 1;
+//  },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _load
 // interní hodnota uschovávaná na serveru je shodná se zobrazovanou hodnotou
   _load: function (val,key) {
@@ -3800,20 +3808,34 @@ Ezer.Radio= new Class({
     return 1;
   },
 // ------------------------------------------------------------------------------------ set
-//fm: Radio.set (val)
-//a: val - hodnota
-  set: function (val) {
-    this.value= val;
-    this._changed= false;
-    this.DOM_set();              // zobrazení v DOM z this.value
-    this.DOM_changed(0);
-    return 1;
- },
+// fm: Radio.set (val) == Elem.set
+// a: val - hodnota
+//   set: function (val) {
+//     this.value= val;
+//     this._changed= false;
+//     this.DOM_set();              // zobrazení v DOM z this.value
+//     this.DOM_changed(0);
+//     return 1;
+//  },
 // ------------------------------------------------------------------------------------ get
 //fm: Radio.get ()
 //r: val - hodnota
   get: function () {
     return this.value
+ },
+// ------------------------------------------------------------------------------------ enable
+//fm: Radio.enable (enabled)
+//      provede case.enable pro všechny vnořené case,
+//      nelze používat bez parametru
+  enable: function (enabled) {
+    for (var i in this.part) {
+      var part= this.part[i];
+      if ( part instanceof Ezer.Case ) {
+        part.options.enabled= enabled;
+        part.DOM_enabled(enabled);
+      }
+    }
+    return 1;
   }
 });
 // ================================================================================================= Case
@@ -7541,22 +7563,33 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
     y.fire('onload');                           // proveď akci formuláře po naplnění daty
   }
   else if ( typ_x=='o' && typ_y=='f' ) {        // object --> form
-    $each(y.part,function(field,id) {
-      if ( field.key && x[id]!==undefined ) {
-        field.key(x[id],key);
-      }
-      else if ( field.set && x[id]!==undefined ) {
-        field.set(x[id],key);
-      }
-    });
-    $each(y0.part,function(field,id) {          // pro rozšířené use
-      if ( field.key && x[id]!==undefined ) {
-        field.key(x[id],key);
-      }
-      else if ( field.set && x[id]!==undefined ) {
-        field.set(x[id],key);
+    Object.each(x,function(value,id) {
+      if ( y.part[id] instanceof Ezer.Elem ) {
+        var field= y.part[id];
+        if ( field.key ) {
+          field.key(x[id],key);
+        }
+        else if ( field.set ) {
+          field.set(x[id],key);
+        }
       }
     });
+//     $each(y.part,function(field,id) {
+//       if ( field.key && x[id]!==undefined ) {
+//         field.key(x[id],key);
+//       }
+//       else if ( field.set && x[id]!==undefined ) {
+//         field.set(x[id],key);
+//       }
+//     });
+//     $each(y0.part,function(field,id) {          // pro rozšířené use
+//       if ( field.key && x[id]!==undefined ) {
+//         field.key(x[id],key);
+//       }
+//       else if ( field.set && x[id]!==undefined ) {
+//         field.set(x[id],key);
+//       }
+//     });
     y.fire('onload');                           // proveď akci formuláře po naplnění daty
   }
   else if ( typ_x=='f' && typ_y=='o' ) {        // form --> object

@@ -22,7 +22,8 @@ Ezer.Block.implement({
     if ( this.DOM_Block ) {
       if (on!==false && this.options.enabled) {
         this.DOM_Block.removeClass('jxDisabled');
-        if (this.DOM_Input)                               this.DOM_Input.disabled= false;
+        if (this.DOM_Input)
+          this.DOM_Input.disabled= false;
         if (this.DOM_Button)
           this.DOM_Button.disabled= false;
       }
