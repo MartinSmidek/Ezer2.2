@@ -1511,7 +1511,7 @@ Ezer.FieldDate.implement({
   DOM_add: function() {
     this.DOM_Block= new Element('div',{'class':'FieldDate',styles:this.coord()}).adopt(
         this.DOM_Button= this.DOM_icon= Ezer.options.awesome & 1  // varianta s awesome ikonami
-            ? new Element('button',{html:"<i class='fa fa-calendar'></i>",tabindex:-1})
+            ? new Element('button',{'class':'fa', html:"<i class='fa fa-calendar'></i>",tabindex:-1})
             : new Element('img',{align:'right',src:Ezer.paths.images_cc+'/calendar.gif'}),
         this.DOM_Input= new Element('input',{type:'text',value:this.options.title||'',styles:{
           width:(this._w||87)-18-(Ezer.options.awesome&1?2:0),height:this._h||16}})
@@ -1567,7 +1567,7 @@ Ezer.FieldList.implement({
     }).inject(this.owner.DOM_Block);
     this.DOM_Closure= new Element('div',{'class':'SelectClosure'}).inject(this.DOM_Block);
     this.DOM_Button= Ezer.options.awesome & 1  // varianta s awesome ikonami
-      ? new Element('button',{html:"<i class='fa fa-ellipsis-h'></i>",tabindex:-1})
+      ? new Element('button',{'class':'fa', html:"<i class='fa fa-ellipsis-h'></i>",tabindex:-1})
       : new Element('img',{align:'right',src:Ezer.version+'/client/img/field_list.gif'});
     this.DOM_Button.inject(this.DOM_Closure).addEvents({
       click: function() {
@@ -2103,7 +2103,7 @@ Ezer.Select.implement({
       if ( Ezer.options.awesome & 1 ) {
         // varianta s awesome ikonami
         var fa= this.type=='select.auto' ? 'fa-eject fa-flip-vertical' : 'fa-chevron-down';
-        this.DOM_Button= new Element('button',{html:"<i class='fa "+fa+"'></i>",tabindex:-1,
+        this.DOM_Button= new Element('button',{'class':'fa', html:"<i class='fa "+fa+"'></i>",tabindex:-1,
           events:this.skill==2? {
             click: function() {this.DOM_Input.focus();}.bind(this)
         }:{}}).inject(this.DOM_Closure);
@@ -2842,7 +2842,8 @@ Ezer.Browse.implement({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_slider
   DOM_slider: function () {
     var browse= this;
-    this.slider= new (Ezer.platform=='A'?MSlider:Slider)(this.DOM_posuv,this.DOM_handle, {
+    this.slider= new (Ezer.platform=='A' || Ezer.platform=='I'
+                     ? MSlider:Slider)(this.DOM_posuv,this.DOM_handle, {
       snap: false,
       steps: 0,
       last: 0,
@@ -2887,7 +2888,7 @@ Ezer.Browse.implement({
 //         }
 //       }
 //       else
-      if ( Ezer.platform!=='A' )                // MOBILE: focus() zobrazí klávesnici
+      if ( Ezer.platform!=='A' && Ezer.platform!=='I' ) // MOBILE: focus() zobrazí klávesnici
         this.DOM_input.focus();
     }
     return true;

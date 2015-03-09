@@ -242,7 +242,7 @@ Ezer.Application= new Class({
         });
       }
     }
-    // kontextové menu pro Android
+    // kontextové menu pro Android a iPad
     function actual_dim() {
       return ""
         + " window.outerWidth="+window.outerWidth
@@ -251,6 +251,7 @@ Ezer.Application= new Class({
         + " window.innerHeight="+window.innerHeight + "<br>"
         + " HTTP_USER_AGENT="+Ezer.ua + "<br>"
         + " Browser.Platform.android="+Browser.Platform.android + "<br>"
+        + " Browser.Platform.ipad="+Browser.Platform.ipad + "<br>"
         + " Ezer.platform="+Ezer.platform
         + " Ezer.browser="+Ezer.browser
       ;
@@ -260,7 +261,9 @@ Ezer.Application= new Class({
       this.android_menu.addEvents({
         click: function(e) {
           Ezer.fce.contextmenu([
-            [ "<i class='fa fa-compress'></i>&nbsp;&nbsp;&nbsp;přizpůsobit",
+            [ "<i class='fa fa-refresh'></i>&nbsp;&nbsp;&nbsp;obnovit (ctrl-R)",
+              function(el) { location.reload(true); }],
+            [ "-<i class='fa fa-compress'></i>&nbsp;&nbsp;&nbsp;přizpůsobit",
               function(el) { Ezer.App.DOM_layout_mode= 'inner'; Ezer.App.DOM_layout() }],
             [ "<i class='fa fa-expand'></i>&nbsp;&nbsp;&nbsp;maximalizovat",
               function(el) { Ezer.App.DOM_layout_mode= 'outer'; Ezer.App.DOM_layout() }],

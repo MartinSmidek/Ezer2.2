@@ -52,6 +52,11 @@ window.addEvent('load', function() {
   Ezer.app= new Ezer.Application(Ezer.options);
 //   if ( Ezer.app.options.debug ) window.top.dbg.init();
   if ( Ezer.platform=='A' ) Browser.Platform.android= true;     // oprava mootools
+  if ( Ezer.platform=='I' ) {
+    Browser.Platform.ipad= true;                                // oprava mootools
+//     document.ontouchmove= function(e){e.preventDefault();}     // zamezení posunu work
+//     document.addEventListener('touchmove',function(event){event.preventDefault();},false);
+  }
   Ezer.app._mini_debug(Ezer.app.options.mini_debug);
   if ( Ezer.app.options.ondomready ) ondomready();
 });

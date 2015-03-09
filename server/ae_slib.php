@@ -54,15 +54,30 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     preg_match('/MSIE/',$_SERVER['HTTP_USER_AGENT'])?'IE':(
     preg_match('/Opera/',$_SERVER['HTTP_USER_AGENT'])?'OP':(
     preg_match('/Firefox/',$_SERVER['HTTP_USER_AGENT'])?'FF':(
-    preg_match('/Chrome/',$_SERVER['HTTP_USER_AGENT'])?'CH':(
+    preg_match('/Chrome|Safari/',$_SERVER['HTTP_USER_AGENT'])?'CH':(
     '?'))));
   // identifikace platformy prohlížeče: Android => Ezer.client == 'A'
   $ua= $_SERVER['HTTP_USER_AGENT'];
   $platform=          // x11 hlásí Chrome při vzdáleném ladění (chrome://inspect/#devices)
     preg_match('/android|x11/i',$ua)            ? 'A' : (
+    preg_match('/iPad/i',$ua)                   ? 'I' : (
     preg_match('/linux/i',$ua)                  ? 'L' : (
     preg_match('/macintosh|mac os x/i',$ua)     ? 'M' : (
-    preg_match('/windows|win32/i',$ua)          ? 'W' : '?' )));
+    preg_match('/windows|win32/i',$ua)          ? 'W' : '?' ))));
+  // doplnění meta tagů pro mobilní platformy
+  $meta_link= "";
+//                                                 $platform= 'I';
+  if ( $platform=='I' ) {
+    $s= "1.2";
+    $meta_link= <<<__EOD
+  <meta name="viewport" content="user-scalable=1.0,initial-scale=$s,minimum-scale=$s,maximum-scale=$s">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+__EOD;
+//   <meta name="viewport" content="user-scalable=no, initial-scale=1.2, width=device-width" />
+//   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+//   <meta name="apple-mobile-web-app-capable" content="yes" />
+  }
   // interpretace parametrů
   $minify= false;
   $autologin= isset($pars->autologin) ? explode('/',$pars->autologin) : null;
@@ -386,7 +401,7 @@ __EOD;
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
 <head>$html_base
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=9" />
+  <meta http-equiv="X-UA-Compatible" content="IE=9" /> $meta_link
   <link rel="shortcut icon" href="./$ezer_root/img/$favicon" />
   <title>$app_name</title>
   <script type="text/javascript">
@@ -473,7 +488,7 @@ __EOD;
 $dolni= /*$xtrace ? '' :*/ " style='height:0'";
 $dbg_script= isset($_SESSION[$ezer_root]['dbg_script'])
   ? trim($_SESSION[$ezer_root]['dbg_script'])
-  : "set_trace('m',1,'init,set,key'); // selektivní trasování + [shift-]ctrl-Enter";
+  : "set_trace('m',1,'init,set,key');";
 $debugger= isset($js_options->dbg) ? <<<__EOD
     <form action="" method="post" enctype="multipart/form-data" id="form">
       <textarea id="dbg" name='query' class='sqlarea jush-sql' spellcheck='false' wrap='off'
