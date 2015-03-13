@@ -1,5 +1,6 @@
 * text=auto !eol
 /$.ezer -text
+client/android.css -text
 client/app.js -text
 client/appf.css -text
 client/area.js -text
@@ -29,6 +30,7 @@ client/img/select_auto.gif -text
 client/img/submenu_bg.png -text
 client/img/tab_top.png -text
 client/img/tree.png -text
+client/ipad.css -text
 client/lib.js -text
 client/licensed/Mdrag.js -text
 client/licensed/Mslider.js -text

@@ -1,0 +1,35 @@
+html {
+  position:fixed;   height: 100%;
+    width: 100%;}
+
+body {
+  -webkit-tap-highlight-color: transparent; }
+
+#android_menu {
+  position:fixed; z-index:999; top:5px; right:5px; font-size:22px; }
+#appl {
+  right:46px; }
+
+* {
+ /*-webkit-touch-callout: none;*/
+ -webkit-user-select: none; /* Disable selection/copy in UIWebView */    }
+
+button, textarea,
+input[type=text],
+input[type=email],
+input[type=tel],
+input[type=url],
+input[type=search] {
+  /*-webkit-appearance: none;*/
+  -webkit-border-radius: 1px;
+  padding: 1px 0px; margin: 0px;
+}
+
+button {
+  padding: 1px 4px; }
+
+input[type=text], input[type=password] {
+  -webkit-user-select: initial; }
+
+button.fa {
+  -webkit-appearance: none;   -webkit-border-radius: 1px !important;}

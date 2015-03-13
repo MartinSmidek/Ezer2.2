@@ -2560,6 +2560,14 @@ Ezer.Browse.implement({
         ),
         this.DOM_input= new Element('input',{'class':'BrowseFocus',type:'text'})
       );
+      if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
+        // test HAMMER, by default, it only adds horizontal recognizers
+        var mc= new Hammer(this.DOM_table);
+        // listen to events...
+        mc.on("panleft panright tap press", function(ev) {
+            Ezer.fce.echo(ev.type +" gesture detected.");
+        });
+      }
       // doplnění začátku řádků s dotazy
       this.DOM_qry_row= [];
       for (var i= 1; i<=this.options.qry_rows; i++) {
