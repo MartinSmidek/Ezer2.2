@@ -302,6 +302,46 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- _setTrace
   // vytvoření ovládání trasování, hlášení chyb, FAQ
   _setTrace: function() {
+    var touch_now= 0;
+    // menu pro debug!
+    function __menu() {
+      menu= [
+        ['run (ctrl-Enter)',              function(el) { __run() }],
+        ['clear & run (shift-ctrl-Enter)',function(el) { Ezer.fce.clear(); __run() }],
+        ['-výběr kontextu myší',          function(el) {
+          __clear();
+          Ezer.help.dbg= true;
+          Ezer.run.$.helpBlock(1)
+        }],
+        ['kontextem je běžný panel',      function(el) { __clear() }],
+        ["-trace: session",    function(el) { __run("ask('test_session')") }],
+        ["trace: sys",         function(el) { __run("echo(debug(sys))") }],
+        ["trace: database",    function(el) { __run("echo(debug(ask('sql_query','SELECT DATABASE() AS selected FROM DUAL')))") }]];
+      if ( Ezer.options.curr_version!=undefined ) {
+        menu.push(
+        // v případě hlídání verzí
+        ["-alert:  verze",    function(el) { Ezer.app.bar_chat({op:'message?'},true) }],
+        ["test verze",    function(el) { Ezer.app.bar_chat({op:'message?'}) }]
+        )
+      };
+      if ( true ) {
+        menu.push(
+        // spuštění panel meta z ezer2.help.ezer - zobrazí výsledek Ezer.fce.meta_tree (area.js)
+        ['-popup: struktura aplikace',   function(el) {
+          var elem= Ezer.run.$.part[Ezer.root];
+          if ( elem && elem.part && elem.part[Ezer.root] ) elem= elem.part[Ezer.root];
+          if ( elem && elem.part && elem.part.doc ) elem= elem.part.doc;
+          if ( elem && elem.part && elem.part.meta ) elem= elem.part.meta;
+          if ( elem && elem instanceof Ezer.Panel ) {
+            elem.popup();
+          }
+          else {
+            Ezer.fce.alert("pro zobrazení musí být přístupný modul ezer2.help.ezer s cestou $.<i>root</i>.doc Je-li include:onclick, stačí kliknout na Nápověda");
+          }
+        }]);
+      }
+      Ezer.fce.contextmenu(menu,arguments[0],0,1);
+    }
     // provedení skriptu
     function __run(script) {
       if ( script ) {
@@ -336,6 +376,8 @@ Ezer.Application= new Class({
       this._barTrace= new Element('span', {text:'trace:','class':Ezer.to_trace?'ae_switch_on':'',
         title:'zapíná/vypíná trasování',
         events:{
+          touchstart: function(event) { touch_now= Date.now(); },
+          touchend: function(event) { if ( Date.now() - touch_now < 300 ) this.click(event); },
           click: function(event) {
             this._showTrace(1-Ezer.to_trace);
             this.send_status();
@@ -362,8 +404,10 @@ Ezer.Application= new Class({
       if ( Ezer.options.dbg ) {
         // debug - zobrazení debuggeru - zachází se s ním jako s trasováním '$'
         Ezer.is_trace['$']= this.options.ae_trace.indexOf('$')>=0;
-        new Element('span', {id:'dbg_switch', text:'debug!', title:'zobrazí debugger',
+        var debug= new Element('span', {id:'dbg_switch', text:'debug!', title:'zobrazí debugger',
            'class':Ezer.is_trace['$']?'ae_switch_on':'', events:{
+          touchstart: function(event) { touch_now= Date.now(); },
+          touchend: function(event) { if (Date.now()-touch_now<300 ) this.click(event); else __menu(); },
           click: function(event) {
             if ( Ezer.to_trace ) {
               event.target.toggleClass('ae_switch_on');
@@ -379,42 +423,7 @@ Ezer.Application= new Class({
             }
           }.bind(this),
           contextmenu: function(e) {
-            menu= [
-              ['run (ctrl-Enter)',              function(el) { __run() }],
-              ['clear & run (shift-ctrl-Enter)',function(el) { Ezer.fce.clear(); __run() }],
-              ['-výběr kontextu myší',          function(el) {
-                __clear();
-                Ezer.help.dbg= true;
-                Ezer.run.$.helpBlock(1)
-              }],
-              ['kontextem je běžný panel',      function(el) { __clear() }],
-              ["-trace: session",    function(el) { __run("ask('test_session')") }],
-              ["trace: sys",         function(el) { __run("echo(debug(sys))") }],
-              ["trace: database",    function(el) { __run("echo(debug(ask('sql_query','SELECT DATABASE() AS selected FROM DUAL')))") }]];
-            if ( Ezer.options.curr_version!=undefined ) {
-              menu.push(
-              // v případě hlídání verzí
-              ["-alert:  verze",    function(el) { Ezer.app.bar_chat({op:'message?'},true) }],
-              ["test verze",    function(el) { Ezer.app.bar_chat({op:'message?'}) }]
-              )
-            };
-            if ( true ) {
-              menu.push(
-              // spuštění panel meta z ezer2.help.ezer - zobrazí výsledek Ezer.fce.meta_tree (area.js)
-              ['-popup: struktura aplikace',   function(el) {
-                var elem= Ezer.run.$.part[Ezer.root];
-                if ( elem && elem.part && elem.part[Ezer.root] ) elem= elem.part[Ezer.root];
-                if ( elem && elem.part && elem.part.doc ) elem= elem.part.doc;
-                if ( elem && elem.part && elem.part.meta ) elem= elem.part.meta;
-                if ( elem && elem instanceof Ezer.Panel ) {
-                  elem.popup();
-                }
-                else {
-                  Ezer.fce.alert("pro zobrazení musí být přístupný modul ezer2.help.ezer s cestou $.<i>root</i>.doc Je-li include:onclick, stačí kliknout na Nápověda");
-                }
-              }]);
-            }
-            Ezer.fce.contextmenu(menu,arguments[0],0,1);
+            __menu();
             return false;
           }.bind(this)
         }}).inject(this._barRightDom);
@@ -436,9 +445,20 @@ Ezer.Application= new Class({
         });
         $('form').setStyles({display:Ezer.to_trace && Ezer.is_trace['$'] ? 'block' : 'none'});
         bodyLoad('5.1');
+//         // pro dotyková zařízení
+//         if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
+//           var mc= new Hammer(debug);
+//           // press vyvolá contextmenu
+//           mc.on("press", function(e) {
+//             //mc.stop();
+//                                                     Ezer.debug(e,"Hammer: press");
+//           }.bind(this));
+//         }
       }
       // dump
       new Element('span', {text:'dump:',title:'vypíše proměnné zobrazeného panelu', events:{
+        touchstart: function(event) { touch_now= Date.now(); },
+        touchend: function(event) { if ( Date.now() - touch_now < 300 ) this.click(event); },
         click: function(event) {
           if ( Ezer.panel ) {
             Ezer.trace(null,Ezer.fce.debug(Ezer.panel.dump(this.options.ae_dump),
@@ -451,13 +471,32 @@ Ezer.Application= new Class({
       this._barDump('O','zobrazit strukturu objektů');
       // trail - uživatelská stopa
       new Element('span', {text:'trail:',title:'vypíše uživatelskou stopu', events:{
+        touchstart: function(event) { touch_now= Date.now(); },
+        touchend: function(event) { if ( Date.now() - touch_now < 300 ) this.click(event); },
         click: function(event) {
           Ezer.trace(null,Ezer.fce.trail('show'));
         }.bind(this)
       }}).inject(this._barRightDom);
       // obsluha okna s chybami a trasováním
-      $('kuk').addEvent('dblclick',this._clearTrace.bind(this));
-//               .setStyles({display:Ezer.to_trace ? 'block' : 'none'});
+      var kuk= $('kuk');
+      kuk.addEvent('dblclick',this._clearTrace.bind(this));
+
+      // pro dotyková zařízení
+      if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
+        // We create a manager object, which is the same as Hammer(), but without the presetted recognizers.
+        var mc = new Hammer.Manager(kuk);
+        // Tap recognizer with minimal 2 taps
+        mc.add( new Hammer.Tap({ event: 'doubletap', taps: 2 }) );
+        // Single tap recognizer
+        mc.add( new Hammer.Tap({ event: 'singletap' }) );
+        // we want to recognize this simulatenous, so a quadrupletap will be detected even while a tap has been recognized.
+        mc.get('doubletap').recognizeWith('singletap');
+        // we only want to trigger a tap, when we don't have detected a doubletap
+        mc.get('singletap').requireFailure('doubletap');
+        mc.on("singletap doubletap", function(ev) {
+          Ezer.App._clearTrace();
+        });
+      }
       $('status_bar').setStyles({cursor:Ezer.to_trace ? 'ns-resize' : 'default'});
       // ovládání výšky trasovacího panelu
       this.resize= $('dolni').makeResizable({handle:$('status_bar'),modifiers:{x:''},invert:true,
@@ -472,6 +511,8 @@ Ezer.Application= new Class({
       Ezer.is_trace['S']= this.options.ae_trace.indexOf('S')>=0;
       var speed= new Element('span', {text:'speed:','class':Ezer.is_trace['S']?'ae_switch_on':'',
           title:'zobrazí okno s měřením výkonu', events:{
+        touchstart: function(event) { touch_now= Date.now(); },
+        touchend: function(event) { if ( Date.now() - touch_now < 300 ) this.click(event); },
         click: function(event) {
           event.target.toggleClass('ae_switch_on');
           if ( this.options.ae_trace.indexOf('S')>=0 ) {
@@ -491,6 +532,8 @@ Ezer.Application= new Class({
       Ezer.obj.speed.span= new Element('span', {text:Ezer.obj.speed.msg, 'class':'measures',
           styles:{display:Ezer.is_trace['S'] ? 'block' : 'none'},
           title:'SQL, PHP, Ezer udává čas v ms, NET je ms/KB, kliknutí vynuluje čitače', events:{
+        touchstart: function(event) { touch_now= Date.now(); },
+        touchend: function(event) { if ( Date.now() - touch_now < 300 ) this.click(event); },
         click: function(event) {
           Ezer.fce.speed('clear');
           Ezer.fce.speed('show');
@@ -541,26 +584,28 @@ Ezer.Application= new Class({
   // ovládá zobrazení okna trasování - on=1 zapne, on=0 vypne
   _showTrace: function (on) {
     Ezer.to_trace= on ? 1 : 0;
-    this._barTrace[on ? 'addClass':'removeClass']('ae_switch_on');
-    if ( Ezer.to_trace ) {
-      // povolí změnu výšky trasovací oblasti
-      this.resize.attach();
-      $('status_bar').setStyles({cursor:'ns-resize'});
-      // ukáže trasovací oblast v zapamatované výšce
-      $('dolni').setStyle('height',this.theight);
+    if ( this._barTrace ) {
+      this._barTrace[on ? 'addClass':'removeClass']('ae_switch_on');
+      if ( Ezer.to_trace ) {
+        // povolí změnu výšky trasovací oblasti
+        this.resize.attach();
+        $('status_bar').setStyles({cursor:'ns-resize'});
+        // ukáže trasovací oblast v zapamatované výšce
+        $('dolni').setStyle('height',this.theight);
 //       $('trace').setStyle('display','block');
 //       $('form').setStyles({display:$('dbg_switch').hasClass('ae_switch_on') ? 'block' : 'none'});
-    }
-    else {
-      // zakáže změnu výšky trasovací oblasti
-      if ( this.resize ) this.resize.detach();
-      $('status_bar').setStyles({cursor:'default'});
-      // bude vidět jen status-bar
+      }
+      else {
+        // zakáže změnu výšky trasovací oblasti
+        if ( this.resize ) this.resize.detach();
+        $('status_bar').setStyles({cursor:'default'});
+        // bude vidět jen status-bar
 //       $('trace').setStyle('display','none');
 //       this.theight= $('dolni').getStyle('height');
-      $('dolni').setStyle('height',0);
+        $('dolni').setStyle('height',0);
 //       $('kuk').setStyle('display','none');
 //       $('form').setStyle('display','none');
+      }
     }
   },
   // ----------------------------------------------------------------------------- _setTraceOnOff
@@ -594,10 +639,13 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- _barSwitch
   // přidání ovladače trasování k status_bar
   _barSwitch: function (id,title,dump) {
+    var touch_now= 0;
     Ezer.is_trace[id]= this.options.ae_trace.indexOf(id)>=0;
     new Element('span', {text:id, 'class':Ezer.is_trace[id]?'ae_switch_on':'',
       title:title,
       events:{
+        touchstart: function(event) { touch_now= Date.now(); },
+        touchend: function(event) { if ( Date.now() - touch_now < 300 ) this.click(event); },
         click: function(event) {
           this._setTraceOnOff(id,!Ezer.is_trace[id]);
           this.send_status();
@@ -608,10 +656,13 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- _barDump
   // přidání ovladače trasování k status_bar
   _barDump: function (id,title) {
+    var touch_now= 0;
     Ezer.is_dump[id]= this.options.ae_dump.indexOf(id)>=0;
     new Element('span', {text:id, 'class':Ezer.is_dump[id]?'ae_switch_on':'',
       title:title,
       events:{
+        touchstart: function(event) { touch_now= Date.now(); },
+        touchend: function(event) { if ( Date.now() - touch_now < 300 ) this.click(event); },
         click: function(event) {
           event.target.toggleClass('ae_switch_on');
           if ( this.options.ae_dump.indexOf(id)>=0 ) {

@@ -47,6 +47,7 @@ client/licensed/font-awesome/fonts/fontawesome-webfont.ttf -text
 client/licensed/font-awesome/fonts/fontawesome-webfont.woff -text
 client/licensed/font-awesome/fonts/fontawesome-webfont.woff2 -text
 client/licensed/glfx.js -text
+client/licensed/hammer.js -text
 client/licensed/jush/mini_jush.css -text
 client/licensed/jush/mini_jush.js -text
 client/licensed/mootree.js -text

@@ -241,6 +241,16 @@ var ContextMenu = new Class({
     if ( this.options.event ) {
       this.start(this.options.event);                           // show the menu now
     }
+    // pro dotyková zařízení
+    if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
+      this.Hammer= new Hammer(this.focus);
+      // press vyvolá contextmenu
+      this.Hammer.on("press", function(e) {
+//                                                                 Ezer.fce.echo("press");
+        this.Hammer.stop();
+        this.start(e);
+      }.bind(this));
+    }
   },
   // re-initialization
   reinitialize: function(options) {
@@ -253,7 +263,7 @@ var ContextMenu = new Class({
     if ( this.options.event ) {
       this.start(this.options.event);                           // show the menu now
     }
-  },
+ },
   // get things started
   startListener: function() {
     if ( !this.options.own_listener && this.target ) {
@@ -288,10 +298,12 @@ var ContextMenu = new Class({
   start: function(e) {
     this.clear();
     this.options.element= this.target;                      // record this as the trigger
-    if ( e && e.pageX ) {
+    if ( e ) {
+      var x= e.pageX ? e.pageX : ( e.page ? e.page.x : ( e.center ? e.center.x : 0));
+      var y= e.pageY ? e.pageY : ( e.page ? e.page.y : ( e.center ? e.center.y : 0));
       this.menu.setStyles({                                   // position the menu
-        top: (e.pageY + this.options.offsets.y),
-        left: (e.pageX + this.options.offsets.x),
+        top: (y + this.options.offsets.y),
+        left: (x + this.options.offsets.x),
         position: 'absolute',
         'z-index': '20000',
         opacity:1
