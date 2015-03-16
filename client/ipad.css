@@ -11,8 +11,7 @@ body {
   right:46px; }
 
 * {
- /*-webkit-touch-callout: none;*/
- -webkit-user-select: none; /* Disable selection/copy in UIWebView */    }
+ -webkit-user-select: none; }
 
 button, textarea,
 input[type=text],
@@ -20,16 +19,18 @@ input[type=email],
 input[type=tel],
 input[type=url],
 input[type=search] {
-  /*-webkit-appearance: none;*/
   -webkit-border-radius: 1px;
   padding: 1px 0px; margin: 0px;
 }
 
 button {
-  padding: 1px 4px; }
+  padding: 1px 4px; background:url(./img/button_enabled.png) repeat-x; -webkit-border-radius: 8px; }
+
+.BrowseSmart td {
+  height:16px; }
 
 input[type=text], input[type=password] {
   -webkit-user-select: initial; }
 
 button.fa {
-  -webkit-appearance: none;   -webkit-border-radius: 1px !important;}
+  -webkit-appearance: none; -webkit-border-radius: 1px !important;}

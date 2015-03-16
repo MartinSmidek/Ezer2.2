@@ -68,7 +68,7 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   $meta_link= "";
 //                                                 $platform= 'I';
   if ( $platform=='I' ) {
-    $s= "1.2";
+    $s= "1";
     $meta_link= <<<__EOD
   <meta name="viewport" content="user-scalable=1.0,initial-scale=$s,minimum-scale=$s,maximum-scale=$s">
   <meta name="apple-mobile-web-app-capable" content="yes">

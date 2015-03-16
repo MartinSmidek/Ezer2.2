@@ -242,7 +242,7 @@ var ContextMenu = new Class({
       this.start(this.options.event);                           // show the menu now
     }
     // pro dotyková zařízení
-    if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
+    if ( this.focus && (Ezer.platform=='A' || Ezer.platform=='I') ) {
       this.Hammer= new Hammer(this.focus);
       // press vyvolá contextmenu
       this.Hammer.on("press", function(e) {
