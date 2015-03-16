@@ -1926,7 +1926,7 @@ Ezer.Radio.implement({
     var checked= null, found= false;
     for (var ic in this.part) {
       var c= this.part[ic];
-      if ( c instanceof Ezer.Case ) {
+      if ( c instanceof Ezer.Case && c.DOM_Input ) {
         if ( c.DOM_Input.checked )      // zapamatujeme si ten zvolený
           checked= c.DOM_Input;
         if ( this.value==c.options.expr || this.value==c.options.value ) {
