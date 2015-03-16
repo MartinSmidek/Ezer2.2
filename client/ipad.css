@@ -5,6 +5,9 @@ html {
 body {
   -webkit-tap-highlight-color: transparent; }
 
+#horni {
+  position:relative; }
+
 #android_menu {
   position:fixed; z-index:999; top:5px; right:5px; font-size:22px; }
 #appl {

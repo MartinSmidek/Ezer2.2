@@ -15,6 +15,7 @@ Ezer.Application= new Class({
   dialog: null,
   theight:Ezer.options.theight,   // výška trasovací oblasti
   resize:null,     // mootools objekt ovládající resize trasovací oblasti (attach, detach)
+  full_screen:false,
   // ----------------------------------------------------------------------------- DOM_add
   DOM_add: function () {
     this.domParent= $('appl');
@@ -256,21 +257,41 @@ Ezer.Application= new Class({
         + " Ezer.browser="+Ezer.browser
       ;
     }
+    function toggle_full_screen() {
+      if ( document.documentElement.webkitRequestFullscreen ) {
+//       if ( document.fullscreenEnabled  ) {
+        this.full_screen= !this.full_screen;
+        if ( this.full_screen )
+//           document.documentElement.requestFullscreen();
+          document.documentElement.webkitRequestFullscreen();
+        else
+//           document.exitFullscreen();
+          document.webkitExitFullscreen();
+      }
+    }
     this.android_menu= $('android_menu');
     if ( this.android_menu ) {
       this.android_menu.addEvents({
         click: function(e) {
-          Ezer.fce.contextmenu([
-            [ "<i class='fa fa-refresh'></i>&nbsp;&nbsp;&nbsp;obnovit (ctrl-R)",
-              function(el) { location.reload(true); }],
-            [ "-<i class='fa fa-compress'></i>&nbsp;&nbsp;&nbsp;přizpůsobit",
+          Ezer.fce.contextmenu(
+          Ezer.platform=='I'    // iPad
+          ?[
+            [ "<i class='fa fa-eye'></i>&nbsp;&nbsp;&nbsp;rozměry?",
+              function(el) { Ezer.fce.alert(actual_dim()) }],
+            [ "<i class='fa fa-ban'></i>&nbsp;&nbsp;&nbsp;vyčistit",
+              function(el) { Ezer.fce.clear() }]
+          ]
+          :[                    // Android
+            [ "<i class='fa fa-eye'></i>&nbsp;&nbsp;&nbsp;rozměry?",
+              function(el) { Ezer.fce.alert(actual_dim()) }],
+            [ "-<i class='fa fa-arrows-alt'></i>&nbsp;&nbsp;&nbsp;celá obrazovka",
+              function(el) { toggle_full_screen(); }],
+            [ "<i class='fa fa-compress'></i>&nbsp;&nbsp;&nbsp;přizpůsobit",
               function(el) { Ezer.App.DOM_layout_mode= 'inner'; Ezer.App.DOM_layout() }],
             [ "<i class='fa fa-expand'></i>&nbsp;&nbsp;&nbsp;maximalizovat",
               function(el) { Ezer.App.DOM_layout_mode= 'outer'; Ezer.App.DOM_layout() }],
             [ "-<i class='fa fa-ban'></i>&nbsp;&nbsp;&nbsp;vyčistit",
-              function(el) { Ezer.fce.clear() }],
-            [ "<i class='fa fa-eye'></i>&nbsp;&nbsp;&nbsp;rozměry?",
-              function(el) { Ezer.fce.alert(actual_dim()) }]
+              function(el) { Ezer.fce.clear() }]
           ],arguments[0],'android_menu_ul');
           Ezer.obj.contextmenu.DOM.setStyles({
             position:'fixed',left:'initial',right:4,top:16,
