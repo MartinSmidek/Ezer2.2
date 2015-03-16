@@ -14,6 +14,8 @@ client/ezer_fdom2.js -text
 client/ezer_report.js -text
 client/img/$logo.gif -text
 client/img/browse_resize.png -text
+client/img/button_disabled.png -text
+client/img/button_enabled.png -text
 client/img/class.png -text
 client/img/dbg.ico -text
 client/img/doc_form.gif -text
