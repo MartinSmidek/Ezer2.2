@@ -592,7 +592,7 @@ __EOD
 .BrowseSmart .tr-form {
   font-weight:bold; }
 .BrowseSmart .tr-sel {
-  color:$s2_brow !important; }
+  color:$s2_brow !important; font-weight: 800; }
 .BrowseSmart td.BrowseNoClmn {
   padding-left:0; border-left:0; width:0; }
 /* input */
