@@ -593,9 +593,11 @@ __EOD
 .BrowseSmart .tr-form {
   font-weight:bold; }
 .BrowseSmart .tr-sel {
-  color:$s2_brow !important; font-weight: 800; }
+  color:$s2_brow !important; }
 .BrowseSmart td.BrowseNoClmn {
   padding-left:0; border-left:0; width:0; }
+.BrowseSmart .tr-sel td.tr-odd, .BrowseSmart .tr-sel td.tr-even {
+  background-image:url(img/srafa.png); background-repeat:repeat-x;  }
 /* input */
 .BrowseSmart input.td_input {
   height:15px; position:relative; margin:-1px 2px -1px -3px; padding-left:2px;
