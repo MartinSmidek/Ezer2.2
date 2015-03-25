@@ -142,6 +142,7 @@ textarea { resize: none; }
 
 #login  { display:none; margin: 0 auto; width:520px; padding-top:100px; position:relative; z-index:1; }
 #login_1  { float:left; }
+#login_1.login_chngs, #login_2.login_chngs { height:180px; }
 #login_2  { float:right; }
 #login_1, #login_2  { width:250px; border:1px solid $b_group; height:220px; background-color:$b_item; }
 #login_1 div.login_a { padding:15px; }

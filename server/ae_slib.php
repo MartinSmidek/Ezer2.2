@@ -301,6 +301,7 @@ __EOD
   ));
   // PŘIHLAŠOVACÍ DIALOG
   $chngs= "";
+  $css_login= "";
   $kontakt= $pars->contact ? $pars->contact
     : " V případě zjištění problému nebo potřeby konzultace mi prosím:<br/>
        <ul><li>napište na mail&nbsp;<a href='mailto:{$EZER->options->mail}{$EZER->options->mail_subject}'>{$EZER->options->mail}</a></li>"
@@ -324,6 +325,7 @@ __EOD
     $info= "<div class='login_a_msg'>$info</div>";
     break;
   case 'chngs':
+    $css_login= "login_chngs";
     $info= "<div class='login_a_msg'><br>$kontakt</div>";
     $chng= doc_chngs_show('ak',30,$app_name);
     $chngs= "<div id='login_chngs'><h1>Přehled posledních změn aplikace</h1><div>$chng</div></div>";
@@ -523,13 +525,13 @@ $html_header
   <div id='ajax_bar'></div>
 <!-- login -->
   <div id="login" style="display:none">
-    <div id="login_1">
+    <div id="login_1" class="$css_login">
       <h1>Přihlášení ...</h1>
       <div class="login_a">
         $login
       </div>
     </div>
-    <div id="login_2">
+    <div id="login_2" class="$css_login">
       <h1 style='text-align:right'>... informace</h1>
       <div class="login_a">
         $info
