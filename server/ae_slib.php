@@ -707,6 +707,7 @@ function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
     return "<span class='chng_day' title='$a'>$d $w</span>";
   };
   $get_help= function($db='.main.',$level='a',$abbr) use (&$lines,$ezer_db,$days,$header) {
+    if ( $db=='.main.' || isset($ezer_db[$db]) ) {
     ezer_connect($db);
     $qh= "SELECT datum, name, help FROM /*$db*/ _help WHERE kind='v' AND SUBDATE(NOW(),$days)<=datum";
     $rh= mysql_qry($qh);
@@ -719,6 +720,7 @@ function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
       $hdr= $header($h->datum,$n,$abbr);
       $lines[]= $h->datum
               . "<div class='chng'>$hdr<span class='chng_hlp'>$h->help</span></div>";
+    }
     }
   };
   // zhromáždění změn z trojice databází s tabulkou _help
