@@ -2881,7 +2881,9 @@ Ezer.Form= new Class({
       desc= {id:field.id};
       if ( !x.table ) {                         // info o table, pokud již v x není
         x.table= field.table.id + (field.view ? ' AS '+field.view.id : '');
-        x.key_id= field.table.options.key_id||'id_'+field.table.id;
+        if ( !x.key_id ) {
+          x.key_id= field.table.options.key_id||'id_'+field.table.id;
+        }
         x.db= field.table.options.db||'';
       }
       if ( field.view ) {                       // s odkazem přes view
@@ -2954,7 +2956,9 @@ Ezer.Form= new Class({
               x.db= view.value.options.db||'';
               x.table= view.value.id+' AS '+view.id;
               x.view= view.id;
-              x.key_id= view.value.key_id;
+              if ( !x.key_id ) {
+                x.key_id= view.value.key_id;
+              }
             }
           }
         }
@@ -5504,7 +5508,6 @@ Ezer.Browse= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _params+
 // pokud je definován atribut optimize, předá jej beze změny
   _params: function (x,cond,order,having,from,cursor,zapomen_podminku,sql) {
-//                                                   Ezer.trace('*','_params:'+cond+','+order+','+having+','+from+','+cursor+','+zapomen_podminku);
     Ezer.fce.touch('block',this);     // informace do _touch na server
     var to_map= x.cmd=='browse_export';         // pro browse_export doplň pro server info o map_pipe
     x.cond= cond||this.cond||1;

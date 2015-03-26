@@ -451,7 +451,7 @@ div.LabelDrop progress {
 .Edit {
   position:absolute; font-family:Arial,Helvetica,sans-serif; font-size:9pt; z-index:1;
   border:1px solid #aaa; overflow-y:scroll; _overflow:scroll; width:100%; height:100%; }
-.EditHtml {  border:1px dotted green;
+.EditHtml {  /*border:1px dotted green;*/
   position:absolute; }
 button {
   position:absolute; font-size:9pt; white-space:nowrap; z-index:1; padding:1px 4px; }
