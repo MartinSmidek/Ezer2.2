@@ -2560,16 +2560,33 @@ Ezer.Browse.implement({
         ),
         this.DOM_input= new Element('input',{'class':'BrowseFocus',type:'text'})
       );
-//       if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
-//         // test HAMMER, by default, it only adds horizontal recognizers
-//         this.Hammer= new Hammer(this.DOM_table);
-//         // dotykové události a jejich překlad
-//         // pandown+panup->scroll panleft panright tap press->contextmenu
-//         this.Hammer.on("pandown panup scroll", function(e) {
-//           //this.Hammer.stop();
-//           Ezer.fce.echo(e.type +" gesture detected.");
-//         });
-//       }
+      if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
+        // test HAMMER, by default, it only adds horizontal recognizers
+        this.Hammer= new Hammer(this.DOM_tbody);
+        this.Hammer.get('swipe').set({direction:Hammer.DIRECTION_ALL,velocity:0.05});
+        // dotykové události a jejich překlad
+        // pandown+panup->scroll panleft panright tap press->contextmenu
+        this.Hammer.on("swipeleft swiperight swipedown swipeup", function(e) {
+          //this.Hammer.stop();
+          Ezer.fce.echo(e.type +" gesture distance=",e.distance,", velocity=",e.velocity);
+          if ( e.type=='swipeleft' ) {
+            var tr= e.target.tagName=='TD' ? e.target.parentNode : e.target;
+            var i= tr.retrieve('i');
+            if ( i && i <= this.tlen ) {
+              this.DOM_hi_row(this.t+i-1,1,1);
+              this.DOM_riseEvent('keydown_insert');
+            }
+          }
+          else if ( e.type=='swipedown' ) {
+            this.DOM_riseEvent('keydown_page_up');
+            e.stop();
+          }
+          else if ( e.type=='swipeup' ) {
+            this.DOM_riseEvent('keydown_page_down');
+            e.stop();
+          }
+        }.bind(this));
+      }
       // doplnění začátku řádků s dotazy
       this.DOM_qry_row= [];
       for (var i= 1; i<=this.options.qry_rows; i++) {
@@ -2611,6 +2628,30 @@ Ezer.Browse.implement({
       this.DOM_reload.addClass('BrowseReload');
     else
       this.DOM_reload.removeClass('BrowseReload');
+  },
+// ----------------------------------------------------------------------------------- DOM_riseEvent
+//f: Browse-DOM.DOM_riseEvent ()
+//      vyvolá (některou) událost - volá se z obsluhy DOM_addEvents nebo odjinud
+  DOM_riseEvent: function(id,par) {
+    switch(id) {
+    case 'keydown_page_up':
+      this._row_move(Math.max(0,this.r-this.tmax));
+      break;
+    case 'keydown_page_down':
+      this._row_move(Math.min(this.r+this.tmax,this.slen-1));
+      break;
+    case 'keydown_insert':
+      var key= this.keys[this.r-this.b];
+      var ikey= this.keys_sel.indexOf(key);
+      if ( ikey>=0 )
+        this.keys_sel.splice(ikey,1);
+      else
+        this.keys_sel.push(key);
+      this.fire('onchoice');
+      this._css_row(this.tact);
+      this.DOM_hi_row(this.t+this.tact-1);
+      break;
+    }
   },
 // ------------------------------------------------------------------------------------ DOM_addEvents+
 //f: Browse-DOM.DOM_addEvents ()
@@ -2673,21 +2714,13 @@ Ezer.Browse.implement({
           this.DOM_Input_state= 1;
           break;
         case 45:                                                // 'insert':
-          var key= this.keys[this.r-this.b];
-          var ikey= this.keys_sel.indexOf(key);
-          if ( ikey>=0 )
-            this.keys_sel.splice(ikey,1);
-          else
-            this.keys_sel.push(key);
-          this.fire('onchoice');
-          this._css_row(this.tact);
-          this.DOM_hi_row(this.t+this.tact-1);
+          this.DOM_riseEvent('keydown_insert');
           break;
         case 33:                                                // 'page up':
-          this._row_move(Math.max(0,this.r-this.tmax));
+          this.DOM_riseEvent('keydown_page_up');
           break;
         case 34:                                                // 'page down':
-          this._row_move(Math.min(this.r+this.tmax,this.slen-1));
+          this.DOM_riseEvent('keydown_page_down');
           break;
         case 36:                                                // 'home':
           if ( event.control )

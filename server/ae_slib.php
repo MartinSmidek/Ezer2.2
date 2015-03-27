@@ -451,7 +451,7 @@ __EOD;
 # template pro zobrazení zprávy o nepodpoře IE
 $template= <<<__EOD
 $html_header
-<body id="body" class='nogrid'>
+<body id="body">
 <!-- menu a submenu -->
 IE!!!
   <div id='horni' class="MainBar">
@@ -509,7 +509,7 @@ __EOD
  : '';
 $template= <<<__EOD
 $html_header
-<body id="body" class='nogrid' xonload="$('logme').submit();">
+<body id="body">
 <!-- menu a submenu -->
   <div id='horni' class="MainBar">
     <div id="appl" $version>$title_right</div>

@@ -8,8 +8,14 @@ html {
   right:46px; }
 
 * {
- /*-webkit-touch-callout: none;*/
  -webkit-user-select: none; /* Disable selection/copy in UIWebView */    }
+
+/* úpravy browse */
+
+.BrowseSmart table { touch-action:none }
+div.BrowseHandleMi { min-height:25px }
+
+/* úpravy tlačítek */
 
 button, textarea,
 input[type=text],

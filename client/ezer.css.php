@@ -111,6 +111,8 @@ echo <<<__EOD
 
 /* layout */
 
+html,body {
+  background: $b url($path/body_bg.png) repeat-x; }
 body {
   font-family:Arial,Helvetica,sans-serif; padding:0; margin:0; font-size:9pt;
   position:static; overflow:hidden; }
@@ -132,8 +134,6 @@ textarea { resize: none; }
   bottom:0; margin-top:2px; color:$c3_kuk; font-size:8pt;
   width:100%; height:{$h_kuk}px; z-index:998; border-top:1px solid $c_kuk;
   position:absolute; }
-.nogrid {
-  background: $b url($path/body_bg.png) repeat-x; }
 .karta {
   background:$b_group url($path/doc_menu.gif) no-repeat left center; color:$c_group; overflow:hidden;
   font-size:14px; font-weight:bold; margin:2px 0; padding:5px 50px; clear:both; white-space:nowrap; }

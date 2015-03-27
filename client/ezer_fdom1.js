@@ -291,7 +291,9 @@ Ezer.Application= new Class({
             [ "<i class='fa fa-expand'></i>&nbsp;&nbsp;&nbsp;maximalizovat",
               function(el) { Ezer.App.DOM_layout_mode= 'outer'; Ezer.App.DOM_layout() }],
             [ "-<i class='fa fa-ban'></i>&nbsp;&nbsp;&nbsp;vyčistit",
-              function(el) { Ezer.fce.clear() }]
+              function(el) { Ezer.fce.clear() }],
+            [ "-<i class='fa fa-repeat'></i>&nbsp;&nbsp;&nbsp;reload",
+              function(el) { location.reload() }]
           ],arguments[0],'android_menu_ul');
           Ezer.obj.contextmenu.DOM.setStyles({
             position:'fixed',left:'initial',right:4,top:16,

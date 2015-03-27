@@ -9,12 +9,19 @@ body {
   position:relative; }
 
 #android_menu {
-  position:fixed; z-index:999; top:5px; right:5px; font-size:22px; }
+  position:fixed; z-index:999; top:5px; right:5px; font-size:22px; z-index:999; }
 #appl {
   right:46px; }
 
 * {
  -webkit-user-select: none; }
+
+/* úpravy browse */
+
+div.BrowseHandleMi { min-height:25px }
+
+/* úpravy tlačítek */
+
 
 button, textarea,
 input[type=text],
