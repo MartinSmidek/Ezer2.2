@@ -2032,6 +2032,7 @@ Ezer.Chat.implement({
     if ( this.changeable ) {
       elem.addEvents({
         dblclick: function(event) {
+          event.stop();
           $clear(timer);
           if ( !this._changed ) {
             if ( (node= event.target.getParent()) )
@@ -2593,8 +2594,8 @@ Ezer.Browse.implement({
         this.DOM_tbody.adopt(
           this.DOM_qry_row[i]= new Element('tr',{events:{
             dblclick: function(event) {
-              if ( this.enabled ) {
-                event.stop();
+              event.stop();
+              if ( this.enabled && event.target.tagName=="INPUT") {
                 this.init_queries();
               }
             }.bind(this)
@@ -2757,9 +2758,10 @@ Ezer.Browse.implement({
         return false;
       }.bind(this)
     });
-    // dvojklik vyvolá onsubmit
+    // dvojklik na datovém řádku vyvolá onsubmit
     this.DOM_table.addEvents({
       dblclick: function(el) {
+        el.stop();
         if ( this.enabled ) {
           Ezer.fce.touch('block',this,'dblclick');     // informace do _touch na server
           var tr= el.target.tagName=='TD' ? el.target.parentNode : el.target;
@@ -2813,8 +2815,10 @@ Ezer.Browse.implement({
         }}).adopt(
           this.DOM_posuv_up= new Element('div',{'class':'BrowseUp',events:{
             click: function(el) {
-              if ( this.enabled )
-                this._row_move(this.r-this.tmax+1);
+              if ( this.enabled ) {
+//                 this._row_move(this.r-this.tmax+1);     // o stránku
+                this._row_move(this.r-1);               // o řádek
+              }
             }.bind(this)
           }}),
           new Element('div',{'class':'BrowsePosuv',styles:{height:this._posuv_height}}).adopt(
@@ -2826,8 +2830,10 @@ Ezer.Browse.implement({
           ))),
           this.DOM_posuv_dn= new Element('div',{'class':'BrowseDn',events:{
             click: function(el) {
-              if ( this.enabled )
-                this._row_move(this.r+this.tmax-1);
+              if ( this.enabled ) {
+//                 this._row_move(this.r+this.tmax-1);     // o stránku
+                this._row_move(this.r+1);               // o řádek
+              }
             }.bind(this)
           }})
         )
@@ -2839,7 +2845,7 @@ Ezer.Browse.implement({
           if ( this.enabled ) {
             e= new Event(e).stop();
             var ewh= e.wheel>0 ? this.options.wheel : -this.options.wheel;
-            this._row_move(this.r-ewh);
+            this._row_move(this.r-ewh,0,1);
 //             this.focus();
           }
           return false;
@@ -2873,7 +2879,7 @@ Ezer.Browse.implement({
       this.enable(false);
     }
   },
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_slider
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_enabled
 //      změní vzhled na enabled/disabled podle parametru nebo this.options.enabled
   DOM_enabled: function(on) {
     this.enabled= on;
@@ -3251,6 +3257,7 @@ Ezer.Show.implement({
       if ( this._fc('u') && this.skill==2 ) {
         this.DOM_cell[i].addEvents({
           dblclick: function(el) {
+            el.stop();
             var td= el.target, tr= td.getParent(), show= this, browse= this.owner;
             if ( browse.enabled ) {
               var i= tr.retrieve('i');

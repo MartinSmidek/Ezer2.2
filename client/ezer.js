@@ -5283,7 +5283,8 @@ Ezer.Browse= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _row_move+
 // funkce zajistí viditelnost záznamu r (0..slen-1)
 // pokud je noevent=1 a nedojde ke čtení ze serveru nebude vyvolána událost onrowclick
-  _row_move: function (r,noevent) {
+// pokud je scrollLock=1 zůstane běžný řádek nezměněný, pokud je ve viditelné oblasti               ToDo
+  _row_move: function (r,noevent,scrollLock) {
     var b= this.b, blen= this.blen, t= this.t, tlen= this.tlen, slen= this.slen;
     r= Math.min(Math.max(r,0),slen-1);
     if ( r!=this.r ) {
