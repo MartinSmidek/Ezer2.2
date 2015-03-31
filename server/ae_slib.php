@@ -64,6 +64,8 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
     preg_match('/linux/i',$ua)                  ? 'L' : (
     preg_match('/macintosh|mac os x/i',$ua)     ? 'M' : (
     preg_match('/windows|win32/i',$ua)          ? 'W' : '?' ))));
+  $_SESSION['platform']= $platform;
+  $_SESSION['browser']= $browser;
   // doplnění meta tagů pro mobilní platformy
   $meta_link= "";
 //                                                 $platform= 'I';
@@ -709,7 +711,7 @@ function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
   $get_help= function($db='.main.',$level='a',$abbr) use (&$lines,$ezer_db,$days,$header) {
     if ( $db=='.main.' || isset($ezer_db[$db]) ) {
     ezer_connect($db);
-    $qh= "SELECT datum, name, help FROM /*$db*/ _help WHERE kind='v' AND SUBDATE(NOW(),$days)<=datum";
+    $qh= "SELECT datum, version, name, help FROM /*$db*/ _help WHERE kind='v' AND SUBDATE(NOW(),$days)<=datum";
     $rh= mysql_qry($qh);
     while ( $rh && ($h= mysql_fetch_object($rh)) ) {
       $n= $h->name;
@@ -718,7 +720,8 @@ function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
       else
         $n= $level=='k' ? 'Ezer' : ' ';
       $hdr= $header($h->datum,$n,$abbr);
-      $lines[]= $h->datum
+      $version= str_pad($h->version,10,'0',STR_PAD_LEFT);
+      $lines[]= "$h->datum $version"
               . "<div class='chng'>$hdr<span class='chng_hlp'>$h->help</span></div>";
     }
     }
@@ -742,13 +745,12 @@ function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
   $rh= mysql_qry($qh);
   while ( $rh && ($h= mysql_fetch_object($rh)) ) {
     $hdr= $header($h->kdy_skoncil,$h->zkratka);
-    $lines[]= "$h->kdy_skoncil 00:00:00 "
+    $lines[]= "$h->kdy_skoncil 00:00:00 9876543210"
             . "<div class='chng'>$hdr<span class='chng_hlp'>$h->zprava</span></div>";
-//     $lines[]= "$h->kdy_skoncil 00:00:00 $d: $h->zkratka: $h->zprava [d]";
   }
   // redakce
   rsort($lines);
-  foreach($lines as $i=>$line) $lines[$i]= substr($line,19);
+  foreach($lines as $i=>$line) $lines[$i]= substr($line,30);
   $html= implode('<br>',$lines);
   return $html;
 }

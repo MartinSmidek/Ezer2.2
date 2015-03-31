@@ -1119,16 +1119,17 @@
     $_SESSION[$ezer_root]['last_op'].= ' user_login';
     $day= date('Y-m-d');
     $time= date('H:i:s');
-    $ip= $_SERVER['REMOTE_ADDR'];
+    $ip= isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+      ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
     $browser= $_SERVER['HTTP_USER_AGENT'];
     if ( $x->uname ) {
       $size= "{$x->size->body->x}/{$x->size->body->y}|{$x->size->screen->x}/{$x->size->screen->y}";
-      $info= "{$x->uname}|$ip|$size|$browser";
+      $info= "{$x->uname}|$ip|$size|$browser|{$_SESSION['platform']}|{$_SESSION['browser']}";
       if (isset($salt)) {
-				$pword= crypt($x->pword, $salt);
-			} else {
-				$pword= $x->pword;
-			}
+	$pword= crypt($x->pword, $salt);
+      } else {
+	$pword= $x->pword;
+      }
       $where= " WHERE username='{$x->uname}' AND password='{$pword}' ";
       $qry= "SELECT * FROM $ezer_system._user $where";
       $res= mysql_qry($qry,0,0,0,'ezer_system');

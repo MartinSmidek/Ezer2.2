@@ -994,7 +994,7 @@ function sys_day_logins($skip,$day,$sign='=') {
   $max_len= 512;
   $n= 0;
   $and=  $skip ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
-  $html.= '<dl>';
+  $html.= '<br><table>';
   $cond= $sign=='all' ? '1' : "day$sign'$day'";
   $qry= "SELECT id_touch, msg, day, time, user, menu
          FROM _touch WHERE $cond AND msg!='' AND menu IN ('login','acount?','ip?') $and
@@ -1002,14 +1002,31 @@ function sys_day_logins($skip,$day,$sign='=') {
   $res= mysql_qry($qry);
   while ( $res && $t= mysql_fetch_object($res) ) {
     $n++;
-    list($user,$ip,$body,$screen,$browser)= explode('|',$t->msg);
+    $menu= $t->menu;
     $when=  $sign=='=' ? $t->time : "{$t->day} {$t->time}";
+    if ( $menu=='ip?' ) {
+      $typ= 'IP?';
+      $color= '#eee';
+      list($user,$ip,$screen,$browser,$plat,$brow)= explode('|',$t->msg);
+    }
+    elseif ( $menu=='login' ) {
+      $typ= 'login';
+      $color= '#afA';
+      list($user,$ip,$screen1,$screen2,$browser,$plat,$brow)= explode('|',$t->msg);
+      $screen= "$screen1 ($screen2)";
+    }
+    else {
+      $typ= 'error';
+      $color= '#fb6';
+      list($user,$ip,$screen1,$screen2,$browser,$plat,$brow)= explode('|',$t->msg);
+      $screen= "$screen1 ($screen2)";
+    }
     // generování
-    $color= $t->menu=='acount?' ? '#fb6' : '#eee';
-    $html.= "<dt style='background-color:$color'>$when $user $ip $body $screen</dt>
-             <dd>$browser</dd>";
+    $html.= "<tr title='$browser'><td>$typ</td><td>$when</td>
+               <td style='background-color:$color'><b>$user</b></td>
+               <td><b>$ip</b></td><td>$screen</td><td>$plat</td><td>$brow</td></tr>";
   }
-  $html.= '</dl>';
+  $html.= '</table>';
   $result= $n ? "$n přihlášení" : "bez přihlášení";
   return $result.$html;
 }
