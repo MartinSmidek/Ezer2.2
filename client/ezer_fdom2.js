@@ -2158,6 +2158,7 @@ Ezer.Select.implement({
         this.DOM_DropList.setStyle('display','block');
         this.DOM_Block.setStyle('zIndex',999);
         this.DOM_focus();
+        this.fire('onfocus',[]);
         this.value= this._value= this.DOM_Input.value;  // pro změny klávesnicí
       }.bind(this),
       blur: function (event) {
