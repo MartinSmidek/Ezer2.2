@@ -985,8 +985,9 @@ Ezer.Form.implement({
     this.DOM_Block= new Element('div',{'class':'Form',styles:this.coord(),events:{
         click: function(el) {
           if ( !Ezer.design && (this.options.enabled || this.options.enabled===undefined) ) {
-            Ezer.fce.touch('block',this,'click');           // informace do _touch na server
-            this.fire('onclick',[],el);
+            Ezer.Select.DOM_clearDropLists();           // schovej případné rozvinuté selecty
+            Ezer.fce.touch('block',this,'click');       // informace do _touch na server
+            this.fire('onclick',[],el);                 // signál do ezerscriptu
           }
         }.bind(this)
       }
@@ -2084,11 +2085,39 @@ Ezer.Chat.implement({
 //      Select má společné zobrazení a implementuje třídu Drag
 //t: Block-DOM,Elem-DOM
 //s: Block-DOM
+// -------------------------------------------------------------------------- DOM_clearDropLists
+// schová rozvinutý DropList při kliknutí mimo něj
+Ezer.Select.DOM_currMulti= null;                // aktivní multi select
+Ezer.Select.DOM_clearDropLists= function() {
+  if ( Ezer.Select.DOM_currMulti && Ezer.Select.DOM_currMulti._drop_status==2 )
+    Ezer.Select.DOM_currMulti.DOM_drop_hide();
+  Ezer.Select.DOM_currMulti= null;
+};
 Ezer.Select.implement({
   _value: '',                                   // pomocná hodnota iniciovaná při focus
+  _drop_status: 0,                              // 0=skrytý, 1=viditelný, 2=měněný (jen multi)
+  _drop_changed: false,                         // mezi DOM_drop_show a DOM_drop_hide byla změna
+// ------------------------------------------------------------------------------ DOM_drop_show
+// ukázání seznamu
+  DOM_drop_show: function() {
+    this.DOM_DropList.setStyle('display','block');
+    Ezer.Select.DOM_currMulti= this.multi ? this : null;
+    this._drop_status= 1;
+    this._drop_changed= false;
+  },
+// ------------------------------------------------------------------------------ DOM_drop_hide
+// skrytí seznamu a případný signál změny
+  DOM_drop_hide: function(nochange) {
+    this.DOM_DropList.setStyle('display','none');
+    if ( !nochange && (!this.multi || this._drop_status==2) ) {
+      if ( this._drop_changed )
+        this.change();
+    }
+    this._drop_status= 0;
+  },
 // ------------------------------------------------------------------------------------ DOM_add
 //f: Select-DOM.DOM_add ()
-//      zobrazí prvek select
+//      zobrazí prvek select - pokud multi=true dovoluje vybrat více hodnot
 //      pokud atribut par obsahuje noimg:1 pak se nezobrazí obrázek šipky
 //      pokud atribut par.subtype='browse' pak se jedná o select vnořený do Show
   DOM_add: function() {
@@ -2103,7 +2132,10 @@ Ezer.Select.implement({
     if ( img ) {
       if ( Ezer.options.awesome & 1 ) {
         // varianta s awesome ikonami
-        var fa= this.type=='select.auto' ? 'fa-eject fa-flip-vertical' : 'fa-chevron-down';
+        var fa= this.type=='select.auto' ? 'fa-eject fa-flip-vertical' :
+          ( this.multi ? 'fa-backward fa-rotate-270' : 'fa-chevron-down');
+//           ( this.multi ? 'fa-backward fa-rotate-270' : 'fa-play fa-rotate-90');
+//           ( this.multi ? 'fa-angle-double-down' : 'fa-chevron-down');
         this.DOM_Button= new Element('button',{'class':'fa', html:"<i class='fa "+fa+"'></i>",tabindex:-1,
           events:this.skill==2? {
             click: function() {this.DOM_Input.focus();}.bind(this)
@@ -2117,7 +2149,7 @@ Ezer.Select.implement({
           }:{}}).inject(this.DOM_Closure);
       }
     }
-    this.DOM_Input= new Element('input',{type:'text'/*,value:this.options.title||''*/,styles:{
+    this.DOM_Input= new Element('input',{type:'text',styles:{
         width:this._w-(img ? 20 : 0),height:this._h-4}
     }).inject(this.DOM_Closure);
     this.DOM_optStyle(this.DOM_Input,this.options.title,true); // u title ignorovat zarovnání
@@ -2135,6 +2167,20 @@ Ezer.Select.implement({
     else {                         // jinak pod select
       this.DOM_DropList.setStyle('top',this._h+3);
     }
+    if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
+      this.Hammer= new Hammer(this.DOM_DropList);
+      this.Hammer.get('swipe').set({velocity:0.05});
+      // swipeleft=>insert
+      this.Hammer.on("swipeleft", function(e) {
+        Ezer.fce.echo(e.type +" gesture distance=",e.distance,", velocity=",e.velocity);
+        if ( e.type=='swipeleft' ) {
+          var li= e.target.tagName=='LI' ? e.target : none;
+          if ( li ) {
+            li.toggleClass('li-sel');
+          }
+        }
+      }.bind(this));
+    }
     // definice obsluhy událostí
     this._drop_focus= false;
     this.DOM_DropList.addEvents({
@@ -2146,6 +2192,7 @@ Ezer.Select.implement({
       }.bind(this),
       mouseleave: function(event) {
         this._drop_focus= false;
+//         this._drop_focus= this.multi;
       }.bind(this)
     });
     this.DOM_Input.addEvents({
@@ -2155,18 +2202,27 @@ Ezer.Select.implement({
         Ezer.fce.touch('block',this,'focus');   // informace do _touch na server
         event.target.select();
         this.DOM_usedkeys= false;
-        this.DOM_DropList.setStyle('display','block');
+        this.DOM_drop_show();
         this.DOM_Block.setStyle('zIndex',999);
+        if ( this.multi ) {     // multiselect
+          this.DOM_DropList.getElements('li').each(function (li) {
+            if ( this._key.indexOf(li.value) < 0 )
+              li.removeClass('li-sel');
+            else {
+              li.addClass('li-sel');
+//                                                         Ezer.trace('*','li_sel add '+li.innerHTML);
+            }
+          }.bind(this));
+        }
         this.DOM_focus();
         this.fire('onfocus',[]);
         this.value= this._value= this.DOM_Input.value;  // pro změny klávesnicí
       }.bind(this),
       blur: function (event) {
-        if ( !this._drop_focus ) {
+//                                                         Ezer.trace('*','blur');
+        if ( !this.multi || this._drop_status<2 ) {
           this.blur();
-          this.DOM_noneItem();
-          this.DOM_DropList.setStyle('display','none');
-          this.DOM_Block.setStyle('zIndex',2);
+          this.DOM_drop_hide();
           this.DOM_blur();
         }
       }.bind(this),
@@ -2178,14 +2234,24 @@ Ezer.Select.implement({
       }.bind(this),
       keydown: function (event) {
         event.stopPropagation();
-        if (event.key=='enter') event.stop();
+        if (event.key=='enter')
+          event.stop();
+        else if ( event.key=='tab' )
+          this.DOM_drop_hide();
       }.bind(this),
       keyup: function (event) {
-        if (['up','down','enter'].contains(event.key) ) {
+        // up down enter insert
+        if ([38,40,13,45].contains(event.code) ) {
           var li= this.DOM_DropList.getElement('li.selected');
           this.DOM_usedkeys= true;
-          switch (event.key) {
-          case 'up':
+          switch (event.code) {
+          case 45: // 'insert':
+            this._drop_status= 2;
+            li.toggleClass('li-sel');
+//                                               Ezer.trace('*','li_sel toggle '+li.innerHTML);
+            this.DOM_seekItems(true);
+            break;
+          case 38: // 'up':
             if (li && li.getPrevious() && (li.getPrevious().value!=0 /*|| this.options.typ=='map+'*/))
               li= li.removeClass('selected').getPrevious().addClass('selected');
             else if (!li) {
@@ -2193,9 +2259,12 @@ Ezer.Select.implement({
               if (lis && lis.length > 0)
                 li= lis[lis.length-1].addClass('selected');
             }
-            this.DOM_showItem(li);
+            if ( this.multi ) {
+            }
+            else
+              this.DOM_showItem(li);
             break;
-          case 'down':
+          case 40: // 'down':
             if (li && li.getNext() && li.getNext().value!=0 ) {
               li.removeClass('selected');
               li= li.getNext().addClass('selected');
@@ -2204,22 +2273,36 @@ Ezer.Select.implement({
               li= this.DOM_DropList.getElement('li[value!=0]');
               if (li) li.addClass('selected');
             }
-            this.DOM_showItem(li);
-            break;
-          case 'enter':
-            if (li)
-              this.DOM_seekItem(li);
-            else {
-              this.value= '';
-              this._key=  0;
-              this.DOM_noneItem();
+            if ( this.multi ) {
             }
-            this.fire('onchanged');
+            else
+              this.DOM_showItem(li);
+            break;
+          case 13: // 'enter':
+            if ( this.multi ) {
+              this.DOM_drop_hide();
+            }
+            else {
+              if (li)
+                this.DOM_seekItem(li);
+              else {
+                this.value= '';
+                this._key=  0;
+                this.DOM_noneItem();
+              }
+              this.fire('onchanged');
+            }
             break;
           }
         }
-        else if ( event.key=='esc' )
+        else if ( event.key=='tab' ) {
+          if ( this._drop_status>1 )
+            this.DOM_drop_hide();
+        }
+        else if ( event.key=='esc' ) {
+          this.DOM_drop_hide();
           this.DOM_Input.fireEvent('blur');
+        }
         else {
           if ( event.target.value!=this.value ) {
             if ( this instanceof Ezer.SelectAuto )  // při změně klávesnicí zruš klíč
@@ -2264,8 +2347,25 @@ Ezer.Select.implement({
 //      konec select bez zvolené hodnoty
   DOM_noneItem: function (sel) {
     this.DOM_Input.setProperty('value',this.value);
-    this.DOM_DropList.setStyle('display','none');
-    this.DOM_Block.setStyle('zIndex',2);
+    this.DOM_drop_hide(1); // bez change
+  },
+// ----------------------------------------------------------------------------------- DOM_seekItems
+//f: Select-DOM.DOM_seekItems
+//      konec select výběrem hodnot - jen pro multi
+  DOM_seekItems: function (while_changing) { var del='';
+    this._key= [];
+    this.value= '';
+    this.DOM_DropList.getElements('li.li-sel').each(function(li){
+      this._key.push(li.value);
+      this.value+= del+li.get('text');
+      del= ',';
+    }.bind(this));
+    this.DOM_set();
+    this._drop_changed= true;
+    if ( !while_changing ) {
+      this.DOM_drop_hide();
+      this._drop_focus= true;
+    }
   },
 // ------------------------------------------------------------------------------------ DOM_seekItem
 //f: Select-DOM.DOM_seekItem
@@ -2289,9 +2389,8 @@ Ezer.Select.implement({
       this.DOM_set();
       this._key=  val==999998 ? 0 : sel.value;
     }
-    this.DOM_DropList.setStyle('display','none');
-    this.DOM_Block.setStyle('zIndex',2);
-    this.change();
+    this._drop_changed= true;
+    this.DOM_drop_hide();
   },
 // ------------------------------------------------------------------------------------ DOM_set
 //f: Select-DOM.DOM_set
@@ -2322,9 +2421,25 @@ Ezer.Select.implement({
         mouseout: function (event) {
           event.target.removeClass('selected');
         }.bind(this),
-        click: function (event) {
-          this.DOM_seekItem(event.target);
-          this.fire('onchanged');
+        mousedown: function (event) {
+//                                                         Ezer.trace('*','mousedown');
+          if ( this.multi ) {
+            this.DOM_Input.focus();
+            if ( event.control ) {
+              this._drop_status= 2;
+              event.target.toggleClass('li-sel');
+//                                                 Ezer.trace('*','li_sel toggle '+event.target.innerHTML);
+              this.DOM_seekItems(true);
+            }
+            else {
+              this.DOM_seekItems();
+              this.fire('onchanged');
+            }
+          }
+          else {
+            this.DOM_seekItem(event.target);
+            this.fire('onchanged');
+          }
           return false;
         }.bind(this)
       }}).inject(this.DOM_DropList);
@@ -2362,6 +2477,9 @@ Ezer.Select.implement({
         this.DOM_Input.value= this.help;
         this.DOM_Input.removeClass('empty_focus').addClass('empty');
       }
+      if ( this.multi ) {    // schová roletu vyvolanou jen klikem na ikonu bez dalšího doteku
+        this.DOM_seekItems();
+      }
     }
   }
 });
@@ -2396,9 +2514,7 @@ Ezer.SelectAuto.implement({
     if ( this.options.par && this.options.par.save!='key_only') {
       this.DOM_set();
     }
-    this.DOM_DropList.setStyle('display','none');
-    this.DOM_Block.setStyle('zIndex',2);
-    this.change();
+    this.DOM_drop_hide();
   },
 // ------------------------------------------------------------------------------------ DOM_addItems
 //f: SelectAuto-DOM.DOM_addItems
@@ -2563,12 +2679,11 @@ Ezer.Browse.implement({
         this.DOM_input= new Element('input',{'class':'BrowseFocus',type:'text'})
       );
       if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
-        // test HAMMER, by default, it only adds horizontal recognizers
         this.Hammer= new Hammer(this.DOM_tbody);
         this.Hammer.get('swipe').set({direction:Hammer.DIRECTION_ALL,velocity:0.05});
-        // dotykové události a jejich překlad
-        // pandown+panup->scroll panleft panright tap press->contextmenu
-        this.Hammer.on("swipeleft swiperight swipedown swipeup", function(e) {
+        // povolené dotykové události a jejich překlad
+        // swipedown+swipeup=>scroll; swipeleft=>insert; press->contextmenu
+        this.Hammer.on("swipeleft swipedown swipeup", function(e) {
           //this.Hammer.stop();
           Ezer.fce.echo(e.type +" gesture distance=",e.distance,", velocity=",e.velocity);
           if ( e.type=='swipeleft' ) {

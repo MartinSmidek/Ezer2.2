@@ -525,6 +525,8 @@ ul.SelectDrop {
   color:#696; }
 .SelectDrop li.selected {
   background-color:#b2b4bf; }
+.SelectDrop li.li-sel {
+  color:$s2_brow !important; background-image:url(img/srafa.png); background-repeat:repeat-x; }
 .List {
   position:absolute; z-index:1; /*outline:1px dotted #fff;*/ overflow:auto; overflow-x:hidden; }
 .ListRow {

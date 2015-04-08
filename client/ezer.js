@@ -837,9 +837,12 @@ Ezer.Block= new Class({
               case 'panel.right':   part= new Ezer.PanelRight(this,desc,DOM,id,skill); break;
               case 'radio':         part= new Ezer.Radio(this,desc,DOM,id,skill); break;
               case 'select':        part= new Ezer.Select(this,desc,DOM,id,skill); break;
+              case 'select.multi':  part= new Ezer.Select(this,desc,DOM,id,skill,true); break;
               case 'select.auto':   part= new Ezer.SelectAuto(this,desc,DOM,id,skill); break;
               case 'select.map':    part= new Ezer.SelectMap(this,desc,DOM,id,skill); break;
+              case 'select.map+':   part= new Ezer.SelectMap(this,desc,DOM,id,skill,true); break;
               case 'select.map0':   part= new Ezer.SelectMap0(this,desc,DOM,id,skill); break;
+              case 'select.map0+':  part= new Ezer.SelectMap0(this,desc,DOM,id,skill,true); break;
               case 'show':
               case 'show.smart':    part= new Ezer.Show(this,desc,DOM,id,skill); break;
               case 'tabs':          part= new Ezer.Tabs(this,desc,DOM,id,skill); break;
@@ -2195,6 +2198,7 @@ Ezer.Map= new Class({
 //os: Map.order  - pořadí, default ''
     order:'',
 //os: Map.key_id - vybírající položka (klíč), default je první pole tabulky
+//os: Map.db - databáze obsahujíc danou tabulku
     key_id:''
   },
   data: {},
@@ -2204,6 +2208,7 @@ Ezer.Map= new Class({
     var ctx= Ezer.code_name(desc._init,null,this);
     Ezer.assert(ctx && ctx[0].type=='table',desc._init+' je chybné jméno table v map '+this.id);
     this.table= ctx[0];
+    this.db= this.options.db || null;
     if ( !this.options.key_id )
       this.options.key_id= firstPropertyId(this.table.part);
 //                                                 Ezer.trace('L','initialize map '+this.id);
@@ -2220,6 +2225,7 @@ Ezer.Map= new Class({
     var where= this.options.where + (cond ? ' AND '+cond : '');
     var x= {cmd:'map_load',table:this.table.id,where:where,order:this.options.order};
     if ( this.table.options.db ) x.db= this.table.options.db;
+    if ( this.db ) x.db= this.db;
     return x;
   },
   map_load_: function(y) {
@@ -4016,7 +4022,17 @@ Ezer.Select= new Class({
 //  ; 'w' : 'wide' seznam hodnot bude zobrazen v plné šířce
   Extends: Ezer.Elem,
   Items: {},
+  _key: null,                   // klíč - pro multiselect pole klíčů
   _values: 0,
+  multi: false,
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  initialize
+// multi=true pokud je možné volit více hodnot se stisknutým Ctrl (nebo dotykem - šoupáním doleva)
+// metody get a key přijímají a vracejí čárkami oddělený seznam hodnot
+//fm: Select.selects (list[,delimiters=',:'][,values:0)
+  initialize: function(owner,desc,DOM,id,skill,multi) {
+    this.multi= multi || 0;
+    this.parent(owner,desc,DOM,id,skill);
+  },
 // ------------------------------------------------------------------------------------ selects
 //fm: Select.selects (list[,delimiters=',:'][,values:0)
 //a: list - seznam volitelných hodnot pro select ve tvaru: hodnota[:klíč],...
@@ -4039,7 +4055,7 @@ Ezer.Select= new Class({
         this.Items[i]= val;
       }
     },this);
-    this.DOM_addItems();
+    this.init(); // místo pouhého this.DOM_addItems();
     return true;
   },
 // ------------------------------------------------------------------------------------ init
@@ -4049,25 +4065,42 @@ Ezer.Select= new Class({
 //      vymaže seznam hodnot
 //a: init_values : >0 nastaví hodnotu podle atributu value, ==2 označí jako změněné
   init: function (init_values) {
-    this._key= 0;
-//     this.Items= {};
+    this._key= this.multi ? [] : 0;
     this.DOM_addItems();
     this.parent(init_values);
     return true;
   },
 // ------------------------------------------------------------------------------------ key
 //fm: Select.key ([key])
-//      lze použít jako setter nebo getter pro key
+//      lze použít jako setter nebo getter pro key - pro multiselect key je seznam čísel
   key: function (key) {
-    var ret= 1;
+    var ret= 1, del= '';
     if ( key!==undefined ) {
-      // definuj hodnotu klíče
-      this._key= $type(key)=='string' ? (Number(key)==NaN ? key : Number(key))  : key;
       Ezer.assert(this.Items,'nedefinované položky v select',this);
-      this.value= this.Items[this._key];
-//       this.empty= false;
-      if ( this.value===undefined )
+      this._changed= false;
+      this.DOM_changed(0);
+      if ( this.multi ) {       // multi select
+        // oprav hodnotu klíče z čísla na string
+        key= $type(key)=='string' ? key : (key ? key.toString() : '');
+        this._key= [];
         this.value= '';
+        if ( key ) {
+          key.split(',').each(function(k){
+            k= Number(k);
+            this._key.push(k);
+            this.value+= del+this.Items[k];
+            del= ',';
+          }.bind(this));
+        }
+      }
+      else {                    // single select
+        // oprav hodnotu klíče se stringu na číslo
+        this._key= $type(key)=='string' ? (Number(key)==NaN ? key : Number(key))  : key;
+        this.value= this.Items[this._key];
+      }
+      if ( this.value===undefined ) {
+        this.value= '';
+      }
       this.DOM_set();
     }
     else {
@@ -4197,23 +4230,23 @@ Ezer.SelectMap= new Class({
     map_pipe: null
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  initialize
-  initialize: function(owner,desc,context,id,skill) {
-    this.parent(owner,desc,context,id,skill);
+  initialize: function(owner,desc,context,id,skill,multi) {
+    this.parent(owner,desc,context,id,skill,multi);
 //     var nm= this.start_code.code[0].i= this.self();
     var c1= this.start_code.code[0].v= this.owner;
     var c2= this.start_code.code[1].v= this.id;
   },
-  _key: null,
   sel_options: null,
 //   start_code: {level:'select',code:[{o:'o',i:'?'},{o:'m',i:'_options_load'}]},
   start_code: {level:'select',code:[{o:'v',v:'?'},{o:'v',v:'?'},{o:'m',i:'_part',a:1},{o:'m',i:'_options_load'}]},
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _options_load
   _options_load: function() {
+    this.value= '';
+    this._key= this.multi ? [] : 0;
     // vytvoř z mapy seznam možností
     var m= [];
     Ezer.assert(1==Ezer.run_name(this.options.options,this.owner.owner,m)
       ,'options:'+this.options.options+' je chybné jméno map',this);
-//     Ezer.trace('L','_options_load '+this.options.options+' '+(m&&m[1]?m[1].id:'???'));
     this.map_options= m[1];
     this.Items= this instanceof Ezer.SelectMap0 ? {0:''} : {};
     for (var im in m[0]) {
@@ -4297,6 +4330,7 @@ Ezer.SelectMap= new Class({
 //      funkce nevymaže seznam hodnot - jsou stále dány atributem map
 //a: init_values : >0 nastaví hodnotu podle atributu value, ==2 označí jako změněné
   init: function (init_values) {
+    this.value= '';
     if ( init_values ) {
 //       this.empty= false;
       if ( this.owner._option && this.owner._option.x && this.owner._option.x==1
@@ -4304,9 +4338,9 @@ Ezer.SelectMap= new Class({
         this._key= this.fixed_value;
       }
       else {
-        this._key= this.options.value||0;
+        this._key= this.options.value||(this.multi ? '' : 0);
       }
-      this.key(this._key);
+      this.key(this._key);      // pro multi provede normalizaci tj. string->array
       this.DOM_set();
       if ( init_values==2 && this.options.value!==undefined)
         this.change(1);
@@ -4314,8 +4348,7 @@ Ezer.SelectMap= new Class({
         this.DOM_changed(0);
     }
     else {
-      this.value= '';
-      this._key= 0;
+      this._key= this.multi ? [] : 0;
 //       this.empty= true;
       this.DOM_empty(true);
       if ( this._changed ) {
@@ -4338,7 +4371,7 @@ Ezer.SelectMap= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _save
 // interní hodnota uschovávaná na serveru je klíč zobrazené hodnoty
   _save: function () {
-    var vmo= {val:this._key}
+    var vmo= {val: this.multi ? this._key.join(',') : this._key}
     if ( this.original.key ) {
       vmo.old= this.original.value;
     }
@@ -8488,18 +8521,31 @@ Ezer.fce.javascript= function(code,value) {
   return value?value:x;
 }
 // ---------------------------------------------------------------------------------------- function
-//ff: fce.function (par,code,arg)                                                       EXPERIMENTAL
+//ff: fce.function (par1,...,parn,code,arg1,...,argn)
 //      provede Function(par,code)(arg)
 //      Příklad: echo(function('a','a+1',2) zobrazí 3
 //s: funkce
-Ezer.fce['function']= function(par,code,arg) {
-  var x= 0;
+Ezer.fce['function']= function() {
+  function construct(constructor, args) {
+    function F() {
+      return constructor.apply(this, args);
+    }
+    F.prototype = constructor.prototype;
+    return new F();
+  }
+  var x= 0, pars= [], args= [], middle= Math.ceil(arguments.length/2)-1, code= arguments[middle];
+  for (var i= 0; i<middle; i++) {
+    pars.push(arguments[i]);
+    args.push(arguments[i+middle+1]);
+  }
+  pars.push(code);
   try {
-    x= new Function(par,code)(arg);
+    var fce= construct(Function,pars);
+    x= fce.apply(this,args);
   }
   catch (e) {
     var msg= e.message||'?';
-    Ezer.error('chyba '+msg+' ve funkci function pro "'+code+'('+arg+')"');
+    Ezer.error('chyba '+msg+' ve funkci function pro "'+code+'('+args[0]+'...)"');
   }
   return x;
 }
