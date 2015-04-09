@@ -1843,7 +1843,7 @@ Ezer.EditHtml.implement({
 //f: EditHtml-DOM.DOM_empty ()
 //      voláno z this.init
   DOM_empty: function (on) {
-    if ( this.ckeditor ) {
+    if ( this.ckeditor && on ) {
       this.DOM_set();
     }
   },
