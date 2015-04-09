@@ -1,6 +1,6 @@
 // doplnění tříd Ezer o jejich zobrazení v DOM architektuře
 // jména začínající podtržítkem jsou lokální pro DOM-doplnění, nesmí se používat v ezer.js
-// ================================================================================================= Block
+// ================================================================================================> Block
 Ezer.Block.implement({
 // ------------------------------------------------------------------------------------ DOM_destroy
 //f: Block-DOM.DOM_destroy ()
@@ -168,7 +168,7 @@ Ezer.Block.implement({
     return c;
   }
 });
-// ================================================================================================= Menu-DOM
+// ================================================================================================> Menu-DOM
 // zobrazení Menu - pokud je options.type='main' bude to hlavní menu
 // ------------------------------------------------------------------------------------------------- MenuMain-DOM
 //c: MenuMain-DOM ([options])
@@ -245,7 +245,7 @@ Ezer.MenuMain.implement({
     }
   }
 });
-// ================================================================================================= MenuLeft
+// ================================================================================================> MenuLeft
 //c: MenuLeft-DOM ([options])
 //      levostranné menu, obsahuje MenuGroup+ je vnořeno do Tabs
 //s: Block-DOM
@@ -338,7 +338,7 @@ Ezer.MenuLeft.implement({
     }
   }
 });
-// ================================================================================================= MenuGroup
+// ================================================================================================> MenuGroup
 Ezer.MenuGroup.implement({
   Implements: [Ezer.Help],
   _enabled: 1,
@@ -383,7 +383,7 @@ Ezer.MenuGroup.implement({
     }
   }
 });
-// ================================================================================================= MenuContext
+// ================================================================================================> MenuContext
 Ezer.MenuContext.implement({
   DOM_add1: function() {
     this.DOM= new Element('ul',{'class':'ContextMenu'}).inject($('body'));
@@ -407,7 +407,7 @@ Ezer.MenuContext.implement({
     this.ContextMenu.ezer_owner= this;
  }
 });
-// ================================================================================================= Tabs
+// ================================================================================================> Tabs
 //c: Tabs-DOM ([options])
 //      realizace vzhledu Tabs vnořených do Menu typu main
 //s: Block-DOM
@@ -498,7 +498,7 @@ Ezer.Tabs.implement({
     this.owner.DOM_SelectedTabs= this._show();
   }
 });
-// ================================================================================================= Item
+// ================================================================================================> Item
 Ezer.Item.implement({
   Implements: [Ezer.Help],
 // ------------------------------------------------------------------------------------  DOM_add1
@@ -619,7 +619,7 @@ Ezer.Item.implement({
     this._focus();
   }
 });
-// ================================================================================================= Panel
+// ================================================================================================> Panel
 //c: Panel-DOM ()
 //      implementace panelů
 //t: Block-DOM
@@ -767,7 +767,7 @@ Ezer.PanelMain.implement({
 //   DOM_add2: function() {
 //   }
 });
-// ================================================================================================= Panel pod Tabs
+// ================================================================================================> Panel pod Tabs
 // --------------------------------------------------------------------------- fce pro panely v Tabs
 // zobrazí záložku panelu a podle stavu helpu ji označí, pokud je help pro tuto záložku
 // a přihlášeného uživatele vynucený, naplní panel.force_help
@@ -974,7 +974,7 @@ Ezer.PanelFree.implement({
     return this;
   }
 });
-// ================================================================================================= Form, View
+// ================================================================================================> Form, View
 // -------------------------------------------------------------------------------------------- Form
 Ezer.Form.implement({
   Implements: [Ezer.Drag,Ezer.Help],
@@ -997,7 +997,7 @@ Ezer.Form.implement({
   DOM_add2: function() {
   }
 });
-// ================================================================================================= části Form
+// ================================================================================================> části Form
 // ------------------------------------------------------------------------------------------- Label
 Ezer.Label.implement({
   Implements: [Ezer.Drag,Ezer.Help],
@@ -1057,7 +1057,7 @@ Ezer.Label.implement({
     }
   }
 });
-// ======================================================================================= LabelDrop
+// ======================================================================================> LabelDrop
 Ezer.LabelDrop.implement({
   Implements: [Ezer.Drag,Ezer.Help],
   DOM_files: [],
@@ -1224,7 +1224,7 @@ Ezer.LabelDrop.implement({
     return 1;
   }
 });
-// ================================================================================================= Button-DOM
+// ================================================================================================> Button-DOM
 Ezer.Button.implement({
   Implements: [Ezer.Drag,Ezer.Help],
   DOM_add: function() {
@@ -1247,11 +1247,21 @@ Ezer.Button.implement({
       this.DOM_Block.setStyles(this.coord({height:undefined,width:undefined}));
     }
     this.DOM_Block.addEvents({
-        mouseup: function(el) {
-          if ( !Ezer.design ) {
-            Ezer.fce.touch('block',this,'click');     // informace do _touch na server
-            this.fire('onclick',[],el);
-          }
+//         mouseup: function(el) {
+//           el.stopPropagation();
+//           if ( !Ezer.design ) {
+//             Ezer.fce.touch('block',this,'click');     // informace do _touch na server
+//             this.fire('onclick',[],el);
+//           }
+//         }.bind(this)
+        click: function(el) {
+          (function(el){
+            el.stopPropagation();
+            if ( !Ezer.design ) {
+              Ezer.fce.touch('block',this,'click');     // informace do _touch na server
+              this.fire('onclick',[],el);               // zdržení aby se uplatnilo napřed blur
+            }
+          }).delay(100,this,el)
         }.bind(this)
       })
       .inject(owners_block);
@@ -1270,7 +1280,7 @@ Ezer.Button.implement({
     this.value= this.DOM_Input.hasClass('empty') ? '' : this.DOM_Input.value;
   }
 });
-// ================================================================================================= ButtonHtml-DOM
+// ================================================================================================> ButtonHtml-DOM
 Ezer.ButtonHtml.implement({
   Implements: [Ezer.Drag,Ezer.Help],
 // ------------------------------------------------------------------------------------ DOM_enabled
@@ -1288,7 +1298,7 @@ Ezer.ButtonHtml.implement({
   DOM_get: function () {
   }
 });
-// ================================================================================================= Elem-DOM
+// ================================================================================================> Elem-DOM
 //c: Elem-DOM ()
 //      abstraktní třída pro části formuláře mající hodnotu v DOM_Input a podporující události
 //t: Block-DOM
@@ -1471,7 +1481,7 @@ Ezer.Elem.implement({
     if ( this._fc('r') && this.DOM_Input ) this.DOM_Input.setStyle('text-align','right');
   }
 });
-// ================================================================================================= Field-DOM
+// ================================================================================================> Field-DOM
 // ------------------------------------------------------------------------------------------------- Field-DOM
 //c: Field-DOM ()
 //      prvek nesoucí textovou nebo číselnou hodnotu
@@ -1500,7 +1510,7 @@ Ezer.Field.implement({
     this.DOM_optStyle(this.DOM_Block,this.options.title);
   }
 });
-// ================================================================================================= FieldDate-DOM
+// ================================================================================================> FieldDate-DOM
 //c: FieldDate-DOM ()
 //      prvek nesoucí datovou hodnotu
 //t: Block-DOM,Elem-DOM
@@ -1550,7 +1560,7 @@ Ezer.FieldDate.implement({
     }
   }
 });
-// ================================================================================================= FieldList-DOM
+// ================================================================================================> FieldList-DOM
 //c: FieldList-DOM ()
 //      prvek nesoucí datovou hodnotu s volitelným rozbalením obsahu podle oddělovače
 //t: Block-DOM,Elem-DOM
@@ -1691,7 +1701,7 @@ Ezer.FieldList.implement({
     },this);
   }
 });
-// ================================================================================================= Edit-DOM
+// ================================================================================================> Edit-DOM
 //c: Edit-DOM ()
 //      prvek nesoucí dlouhou textovou hodnotu
 //t: Block-DOM,Elem-DOM
@@ -1719,13 +1729,14 @@ Ezer.Edit.implement({
     this.DOM_optStyle(this.DOM_Input,this.options.title,true); // u title ignorovat zarovnání
   }
 });
-// ================================================================================================= EditHtml-DOM
+// ================================================================================================> EditHtml-DOM
 //c: EditHtml-DOM ()
 //      prvek nesoucí dlouhou textovou hodnotu s WYSIVYG editorem
 //t: Block-DOM,Elem-DOM
 //s: Block-DOM
 Ezer.EditHtml.implement({
   ckeditor: null,                               // instance CKeditoru
+  focused: false,
   _value: '',                                   // pomocná hodnota iniciovaná při focus
 // ------------------------------------------------------------------------------------ DOM_add
 //f: EditHtml-DOM.DOM_add ()
@@ -1734,7 +1745,7 @@ Ezer.EditHtml.implement({
   DOM_add: function() {
     if ( window.CKEDITOR ) {
       // v aplikaci je použit CKeditor
-      this.DOM_Block= new Element('div',{'class':'EditHtml',styles:this.coord()}).adopt(
+      this.DOM_outline= this.DOM_Block= new Element('div',{'class':'EditHtml',styles:this.coord()}).adopt(
           this.DOM_Input= new Element('textarea')
         ).inject(this.owner.DOM_Block);
       // --------------------------------- ošetření rozdílu mezi verzemi před startem
@@ -1743,6 +1754,7 @@ Ezer.EditHtml.implement({
         var options= {
           width:this._w, height:this._h-60, resize_enabled:false,
           entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
+//           skin:'moono'
           skin:'kama'
 //           skin:'version3'
         };
@@ -1764,7 +1776,7 @@ Ezer.EditHtml.implement({
             '-','Bold','Italic','Subscript','Superscript',
             '-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock',
             '-','Link','Unlink',
-            '-','OrderedList','UnorderedList',
+            '-','NumberedList', 'BulletedList',
             '-','Source','ShowBlocks','RemoveFormat' ]]});
       this.ckeditor= CKEDITOR.replace(this.DOM_Input,options);
       // ------------------------------------ ošetření rozdílu mezi verzemi po startu
@@ -1774,23 +1786,35 @@ Ezer.EditHtml.implement({
       else {
       // dokončení nastavení editoru verze 3.6.2
       }
-      // ----------------------------------------------- dokončení nastavení po startu
+      // ----------------------------------------------- ošetření focus, blur, change
       this.ckeditor.on('focus', function(ev) {
         this._value= this.ckeditor.getData();
-        if ( Ezer.browser!='CH' )
-          this.DOM_Block.addClass('focus');
+        this.focused= true;
+        this.DOM_outline.addClass(this._changed ? 'changed_focus' : 'focus');
         this.fire('onfocus');
       }.bind(this));
+      this.ckeditor.on('change', function(ev) {
+        if ( this.focused ) {
+          if ( !this._changed ) {
+            this.DOM_outline.removeClass('focus').addClass('changed_focus');
+          }
+          this.DOM_changed(1,this._fc('t'));     // když není format:'t' se zvýrazněním změny
+          this.fire('onchange');
+        }
+      }.bind(this));
       this.ckeditor.on('blur', function(ev) {
-//                                                         Ezer.trace('*','ckeditor:blur');
-        if ( Ezer.browser!='CH' )
-          this.DOM_Block.removeClass('focus');
-        if ( this.ckeditor.checkDirty() && this._value!=this.ckeditor.getData() ) {
-          this.DOM_changed(true);
+        this.focused= false;
+        this.DOM_outline.removeClass('focus').removeClass('changed_focus');
+//         if ( this.ckeditor.checkDirty() && this._value!=this.ckeditor.getData() ) {
+//           this.DOM_changed(true);
+//           this.fire('onchanged');
+//         }
+        if ( this._changed ) {
           this.fire('onchanged');
         }
         this.fire('onblur');
       }.bind(this));
+      // ----------------------------------------------- dokončení nastavení po startu
       CKEDITOR.on('instanceReady', function(ev) {
         var tags= ['div', 'p', 'ol', 'ul', 'li', 'table', 'tr', 'td', 'h1', 'h2', 'h3']; // etc.
         for (var key in tags) {
@@ -1802,7 +1826,10 @@ Ezer.EditHtml.implement({
             breakAfterClose: false
           });
         }
-      });
+        if ( Ezer.browser=='CH' ) {
+          this.DOM_outline= this.DOM_Block.getElement('div.cke_chrome');
+        }
+      }.bind(this));
       this._value= '';
       // oprava výšky DOM_Block podle prohlížeče
       this.DOM_Block.setStyle('height','');
@@ -1824,19 +1851,16 @@ Ezer.EditHtml.implement({
 //f: EditHtml-DOM.DOM_changed (on[,quiet=0))
 //      označení příznaku změny elementu formuláře, pokud je quiet=0
   DOM_changed: function(on,quiet) {
-    var div= Ezer.browser=='CH' && Ezer.options.CKEditor.version[0]!='4'
-      ? this.DOM_Block.getElement('table.cke_editor')
-      : this.DOM_Block;
     // pokud má element zobrazení
-    if ( div && on ) {
+    if ( on ) {
       this._changed= true;
       Ezer.fce.touch('block',this,'changed');     // informace do _touch na server
       if ( !quiet )
-        div.addClass('changed');
-      div.removeClass('empty').removeClass('empty_focus');
+        this.DOM_outline.addClass('changed');
+//       this.DOM_outline.removeClass('empty').removeClass('empty_focus');
     }
-    else if ( div && !quiet )
-      div.removeClass('changed');
+    else if ( !quiet )
+      this.DOM_outline.removeClass('changed');
   },
 // ------------------------------------------------------------------------------------ DOM_set
 //f: EditHtml-DOM.DOM_set ()
@@ -1871,7 +1895,7 @@ Ezer.EditHtml.implement({
     }
   }
 });
-// ================================================================================================= Check-DOM
+// ================================================================================================> Check-DOM
 //c: Check-DOM ()
 //      zaškrtávací políčko
 //t: Block-DOM,Elem-DOM
@@ -1905,7 +1929,7 @@ Ezer.Check.implement({
     this.value= this.DOM_Input.checked ? 1 : 0;
   }
 });
-// ================================================================================================= Radio ...
+// ================================================================================================> Radio ...
 // ------------------------------------------------------------------------------------------------- Radio-DOM
 //c: Radio-DOM ()
 //      seskupení políček volby
@@ -1981,7 +2005,7 @@ Ezer.Case.implement({
     this.DOM_optStyle(this.DOM_Block);
   }
 });
-// ================================================================================================= Chat-DOM
+// ================================================================================================> Chat-DOM
 //c: Chat-DOM
 //      zobrazení elementu chat
 //t: Block-DOM,Elem-DOM
@@ -2080,7 +2104,7 @@ Ezer.Chat.implement({
     }
   }
 });
-// ====================================================================================== Select-DOM
+// =====================================================================================> Select-DOM
 //c: Select-DOM
 //      Select má společné zobrazení a implementuje třídu Drag
 //t: Block-DOM,Elem-DOM
@@ -2483,7 +2507,7 @@ Ezer.Select.implement({
     }
   }
 });
-// ================================================================================== SelectAuto-DOM
+// =================================================================================> SelectAuto-DOM
 //c: SelectAuto-DOM ([options])
 //      výběrový element formuláře definovaný mapou (blok 'select' typ 'map' atribut 'options')
 //t: Block-DOM,Elem-DOM,Select-DOM
@@ -2556,13 +2580,13 @@ Ezer.SelectAuto.implement({
     this.DOM_addItems();
   }
 });
-// ================================================================================================= SelectMap-DOM
+// ================================================================================================> SelectMap-DOM
 //c: SelectMap-DOM ([options])
 //      výběrový element formuláře definovaný mapou (blok 'select' typ 'map' atribut 'options')
 //t: Block-DOM,Elem-DOM,Select-DOM
 //s: Block-DOM
 //-
-// ================================================================================================= List ...
+// ================================================================================================> List ...
 //c: List-DOM
 //      řádkové zobrazení dat
 //t: Block-DOM
@@ -2583,7 +2607,7 @@ Ezer.List.implement({
     this.DOM_Block.getChildren().destroy();
   }
 });
-// ================================================================================================= ListRow
+// ================================================================================================> ListRow
 //c: ListRow-DOM
 //      části v řádkovém zobrazení dat
 //t: Block-DOM
@@ -2600,7 +2624,7 @@ Ezer.ListRow.implement({
     }).inject(this.owner.DOM_Block);
   }
 });
-// ================================================================================================= Browse
+// ================================================================================================> Browse
 //c: Browse-DOM
 //      tabulkové zobrazení dat s mezipamětí
 //t: Block-DOM
@@ -3189,7 +3213,7 @@ Ezer.Browse.implement({
 //     this._set_css_rows();
   }
 });
-// ================================================================================================= Show
+// ================================================================================================> Show
 //c: Show-DOM
 //      řádky tabulkového zobrazení dat
 //t: Block-DOM
@@ -3515,7 +3539,7 @@ Ezer.Show.implement({
       : this.DOM_qry[i].value=='';
   }
 });
-// ================================================================================================= fce
+// ================================================================================================> fce
 // části standardních funkcí závislé na DOM architektuře
 Ezer.fce.DOM= {};
 Ezer.obj.DOM= {};

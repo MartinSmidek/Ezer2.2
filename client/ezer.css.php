@@ -378,6 +378,8 @@ div.PanelPopup div.dragHandle {
   outline:#f88 solid 2px !important; }
 .changed_ok {
   outline:#8f8 solid 2px !important; }
+.changed_focus {
+  outline:#ff3333 dotted 2px !important; }
 .Chat .changed {
   margin:0 2px; outline-style:solid !important; }
 .fixed {

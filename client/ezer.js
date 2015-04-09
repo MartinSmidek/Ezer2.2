@@ -1,7 +1,7 @@
 // Tento modul abstrahuje od konkrétní DOM-reprezentace
 // 'DOM' je vlastnost se kterou se smí pracovat jen jako s celkem
 // (aby v některé implementaci mohla být objektem)
-// ================================================================================================= Dokumentace
+// ================================================================================================> Dokumentace
 // značka c: třída
 // značka f: interní metoda, dvojpísmenné jsou i informací pro kompilátor - funkce volané z Ezer
 //           fm: metoda, ff: funkce, fs: struktura, fx: metoda s voláním ajax
@@ -12,7 +12,7 @@
 // značka a: argumenty
 // značka r: výsledek
 // značka s: sekce v dokumentaci
-// ================================================================================================= Block
+// ================================================================================================> Block
 // ------------------------------------------------------------------------------------------------- Block
 //c: Block ([options])
 //      základní třída
@@ -1240,7 +1240,7 @@ Ezer.Block= new Class({
     return ok;
   }
 });
-// ================================================================================================= Group
+// ================================================================================================> Group
 //c: Group ([options])
 //      obecný blok bez vizualizace, může obsahovat volně vnořené bloky
 //t: Block
@@ -1254,7 +1254,7 @@ Ezer.Group= new Class({
     this.subBlocks(desc,this.DOM_Block);
   }
 });
-// ================================================================================================= Main
+// ================================================================================================> Main
 //c: BlockMain ()
 //      $ kořen aplikace
 //t: Block
@@ -1299,7 +1299,7 @@ Ezer.BlockMain= new Class({
     return true;
   }
 });
-// ================================================================================================= Menu
+// ================================================================================================> Menu
 //c: Menu ([options])
 //      varianty implementace zobrazení Menu
 //t: Block
@@ -1371,7 +1371,7 @@ Ezer.MenuMain= new Class({
     return 1;
   }
 });
-// ================================================================================================= Menu Left
+// ================================================================================================> Menu Left
 //c: MenuLeft ([options])
 //      levostranné menu, obsahuje MenuGroup, je vnořeno do Tabs
 //t: Menu,Block
@@ -1494,7 +1494,7 @@ Ezer.MenuContext= new Class({
     return true;
   }
 });
-// ================================================================================================= Tabs
+// ================================================================================================> Tabs
 //c: Tabs ([options])
 //      Tabs jsou záložky obsahující vzájemně se skrývající panely (lze i bez panelů - logoff)
 //      má varianty podle elementu, ve kterém je obsažen
@@ -1574,7 +1574,7 @@ Ezer.Tabs= new Class({
     return 1;
   }
 });
-// ================================================================================================= Item
+// ================================================================================================> Item
 //c: Item ([options])
 //      Item je vnořitelný do Menu
 //t: Block
@@ -1609,7 +1609,7 @@ Ezer.Item= new Class({
     return 1;
   }
 });
-// ================================================================================================= Panel
+// ================================================================================================> Panel
 // ------------------------------------------------------------------------------------------------- Panel
 //c: Panel
 //      Panel přímo vnořený do Tabs, reaguje na události Tabs (onfocus,onblur)
@@ -1681,7 +1681,7 @@ Ezer.Panel= new Class({
     return 1;
   }
 });
-// ================================================================================================= PanelMain
+// ================================================================================================> PanelMain
 //c: PanelMain
 //      Panel jako hlavní blok aplikace
 //t: Block,Panel
@@ -1689,7 +1689,7 @@ Ezer.Panel= new Class({
 Ezer.PanelMain= new Class({
   Extends: Ezer.Panel
 });
-// ================================================================================================= PanelPlain
+// ================================================================================================> PanelPlain
 //c: PanelPlain
 //      Panel přímo vnořený do Tabs, reaguje na události Tabs (onfocus,onblur),obsahuje MenuLeft
 //t: Block,Panel
@@ -1700,7 +1700,7 @@ Ezer.PanelMain= new Class({
 Ezer.PanelPlain= new Class({
   Extends: Ezer.Panel
 });
-// ================================================================================================= PanelRight
+// ================================================================================================> PanelRight
 //c: PanelRight
 //      Panel přímo vnořený do Tabs, reaguje na události Tabs (onfocus,onblur),obsahuje MenuLeft
 //t: Block,Panel
@@ -1723,7 +1723,7 @@ Ezer.PanelRight= new Class({
     return 1;
   }
 });
-// ================================================================================================= PanelPopup
+// ================================================================================================> PanelPopup
 //c: PanelPopup
 //      pokud je Panel vnořen do Tabs reaguje i na události
 //t: Block
@@ -1769,7 +1769,7 @@ Ezer.PanelPopup= new Class({
 // aliasy
 //fm: PanelPopup.close ([value])
 Ezer.PanelPopup.prototype.close= Ezer.PanelPopup.prototype.hide;
-// ================================================================================================= PanelFree
+// ================================================================================================> PanelFree
 //c: PanelFree
 //      pokud je Panel vnořen do Tabs reaguje i na události
 //t: Block
@@ -1777,7 +1777,7 @@ Ezer.PanelPopup.prototype.close= Ezer.PanelPopup.prototype.hide;
 Ezer.PanelFree= new Class({
   Extends: Ezer.PanelPopup
 });
-// ================================================================================================= Var
+// ================================================================================================> Var
 //c: Var
 //      proměnná si ponechává pouze jméno - ostatní znaky přejímá ze své hodnoty
 //t: Block
@@ -1900,7 +1900,7 @@ Ezer.Var= new Class({
     return v===false ? 0 : v;
   }
 });
-// ================================================================================================= View
+// ================================================================================================> View
 //c: View
 //      proměnná si ponechává pouze jméno - ostatní znaky přejímá ze své hodnoty
 //t: Block
@@ -2110,7 +2110,7 @@ Ezer.View= new Class({
     return y.key;
   }
 });
-// ================================================================================================= Proc
+// ================================================================================================> Proc
 // ------------------------------------------------------------------------------------------------- Proc
 //c: Proc
 //      procedura, obsluha událostí (zatím onstart) může mít uvedenu prioritu
@@ -2131,7 +2131,7 @@ Ezer.Proc= new Class({
     this.code= desc.code;
   }
 });
-// ================================================================================================= Table
+// ================================================================================================> Table
 //c: Table ([options])
 //      MySQL tabulka
 //t: Block
@@ -2183,7 +2183,7 @@ Ezer.Table= new Class({
     return y.ok;
   }
 });
-// ================================================================================================= map
+// ================================================================================================> map
 // ------------------------------------------------------------------------------------------------- Map
 //c: Map ([options])
 //      map m: table t {where: ... order:... key:...}
@@ -2257,7 +2257,7 @@ Ezer.Map= new Class({
     return ret;
   }
 });
-// ================================================================================================= CONST
+// ================================================================================================> CONST
 // ------------------------------------------------------------------------------------------------- const
 //c: Const ()
 //      přeložený blok const
@@ -2297,7 +2297,7 @@ Ezer.Const= new Class({
     return Ezer.Var.prototype.get.apply(this,[part]);
   }
 });
-// ================================================================================================= Form
+// ================================================================================================> Form
 //c: Form ([options])
 //      formulář
 //t: Block
@@ -2972,9 +2972,9 @@ Ezer.Form= new Class({
     }
   }
 });
-// ================================================================================================= části Form
+// ================================================================================================> části Form
 // specifické části formuláře (typicky nenesou hodnotu a události s nimi související)
-// ================================================================================================= Label
+// ================================================================================================> Label
 //c: Label ()
 //      textové návěští
 //t: Block
@@ -3007,7 +3007,7 @@ Ezer.Label= new Class({
     return this.DOM_get();
   }
 });
-// ======================================================================================= LabelDrop
+// ======================================================================================> LabelDrop
 //c: LabelDrop ()
 //      prvek pro kontrolovaný upload souborů na server, kliknutí přeruší přenos
 //t: Block,Label
@@ -3055,7 +3055,7 @@ Ezer.LabelDrop= new Class({
     return lst;
   }
 });
-// ======================================================================================== LabelMap
+// =======================================================================================> LabelMap
 //c: LabelMap ()
 //      prvek pro práci s GoogleMaps a s geo-objekty
 //t: Block,Label
@@ -3356,7 +3356,7 @@ Ezer.LabelMap= new Class({
     return 1;
   }
 });
-// ================================================================================================= Button
+// ================================================================================================> Button
 //c: Button ()
 //      tlačítko
 //t: Button,Block
@@ -3407,7 +3407,7 @@ Ezer.Button= new Class({
     return this.value
   }
 });
-// ================================================================================================= ButtonHtml
+// ================================================================================================> ButtonHtml
 //c: ButtonHtml ()
 //      tlačíto s povolenými html atributy v title,
 //      lze také použít škálovatelné ikony podle http://fortawesome.github.io/Font-Awesome/icons/
@@ -3418,7 +3418,7 @@ Ezer.ButtonHtml= new Class({
   Extends: Ezer.Button
 //os: ButtonHtml.title - název s html tagy a ikonami
 })
-// ================================================================================================= ButtonUpload
+// ================================================================================================> ButtonUpload
 //c: ButtonUpload ()
 //      po stisku se zobrazí popup panel pro upload souborů na server
 //      atribut par má tyto složky:
@@ -3430,7 +3430,7 @@ Ezer.ButtonHtml= new Class({
 //s: Block
 //i: ButtonUpload.onclick - není vyvolán
 //i: ButtonUpload.onload - byl uzavřen dialog pro výběr souborů
-// ================================================================================================= Elem
+// ================================================================================================> Elem
 //c: Elem ()
 //      abstraktní třída pro části formuláře mající hodnotu a podporující události
 //t: Block
@@ -3688,7 +3688,7 @@ Ezer.Elem= new Class({
 //     }
   }
 });
-// ================================================================================================= Field
+// ================================================================================================> Field
 //c: Field ()
 //      vstupní část formuláře
 //t: Block,Elem
@@ -3700,7 +3700,7 @@ Ezer.Field= new Class({
   options: {}
   // metody
 });
-// ================================================================================================= FieldDate
+// ================================================================================================> FieldDate
 //c: FieldDate ()
 //      vstupní část formuláře
 //t: Block,Elem,Field
@@ -3713,7 +3713,7 @@ Ezer.FieldDate= new Class({
   Extends: Ezer.Field,
   options: {}
 });
-// ================================================================================================= FieldDate
+// ================================================================================================> FieldDate
 //c: FieldList ()
 //      vstupní část formuláře - rozbalení obsahu podle oddělovače
 //t: Block,Elem,Field
@@ -3729,7 +3729,7 @@ Ezer.FieldList= new Class({
     this._split= new RegExp(this.options.par ? this.options.par.delim||'[,;]' : '[,;]');
   }
 });
-// ================================================================================================= Edit
+// ================================================================================================> Edit
 //c: Edit ()
 //      vstupní část formuláře
 //t: Block,Elem
@@ -3738,33 +3738,33 @@ Ezer.Edit= new Class({
   Extends: Ezer.Elem,
   options: {}
 });
-// ================================================================================================= EditHtml
+// ================================================================================================> EditHtml
 //c: EditHtml ()
 //      vstupní část formuláře s wysiwyg editorem CKeditor
 //t: Block,Elem,Edit
 //s: Block
 Ezer.EditHtml= new Class({
   Extends: Ezer.Elem,
-  options: {},
+  options: {}
 // ------------------------------------------------------------------------------------ changed
-//fm: EditHtml.changed ()
+// -- fm: EditHtml.changed ()
 //      zjistí zda došlo ke změně obsahu
-// Pozn. U elementu typu EditHtml se netestuje příznak změny (vizuální podobou je obarvení rámečku)
+// -- Pozn. U elementu typu EditHtml se netestuje příznak změny (vizuální podobou je obarvení rámečku)
 //      ale to, zda je současný obsah CKeditor změněný proti načtenému stavu. Pokud tedy byl
 //      po změně takového elementu programově zrušen příznak změny (např. operací plain) bude
 //      jeho hodnota přesto odevzdána k uložení na disk. Důvodem k tomuto chování je asynchronní
 //      časování události blur v CKeditoru.
-  changed: function() {
-    if ( this.ckeditor && Ezer.options.CKEditor.version[0]=='4' ) {
-      return this.ckeditor.checkDirty();
-    }
-    if ( !this._changed && this.ckeditor ) {
-      this._changed= this.original.value!=this.ckeditor.getData();
-    }
-    return this._changed ? 1 : 0;
-  }
+//   changed: function() {
+//     if ( this.ckeditor && Ezer.options.CKEditor.version[0]=='4' ) {
+//       return this.ckeditor.checkDirty();
+//     }
+//     if ( !this._changed && this.ckeditor ) {
+//       this._changed= this.original.value!=this.ckeditor.getData();
+//     }
+//     return this._changed ? 1 : 0;
+//   }
 });
-// ================================================================================================= Check
+// ================================================================================================> Check
 //c: Check ()
 //      zaškrtávací políčko
 //t: Block,Elem
@@ -3790,7 +3790,7 @@ Ezer.Check= new Class({
     return 1;
   }
 });
-// ================================================================================================= Radio
+// ================================================================================================> Radio
 //c: Radio ()
 //      radio buttons
 //t: Block,Elem
@@ -3848,7 +3848,7 @@ Ezer.Radio= new Class({
     return 1;
   }
 });
-// ================================================================================================= Case
+// ================================================================================================> Case
 //c: Case ()
 //      radio button
 //t: Block,Elem
@@ -3858,7 +3858,7 @@ Ezer.Case= new Class({
   options: {}
   // metody
 });
-// ================================================================================================= Chat
+// ================================================================================================> Chat
 //c: Chat ()
 //      přeložený blok chat (element formuláře historie)
 //      řádky lze interaktivně měnit: po dvojkliku s obsluhou onrowclick a funkcí let.
@@ -4009,7 +4009,7 @@ Ezer.Chat= new Class({
     return vmo;
   }
 });
-// ================================================================================================= Select ...
+// ================================================================================================> Select ...
 //c: Select
 //      výběrová položka formuláře
 //      Pozn. metoda form.save použije klíč zobrazené hodnoty
@@ -4137,7 +4137,7 @@ Ezer.Select= new Class({
     this.set(this.fixed_value);
   }
 });
-// ================================================================================================= SelectAuto
+// ================================================================================================> SelectAuto
 //c: SelectAuto
 //      Pozn. metoda form.save použije klíč zobrazené hodnoty nebo zobrazenou hodnotu
 //      v závislosti na hodnotě atributu par.save='value'|'key'|'key_only'. Defaultní je 'value'.
@@ -4216,7 +4216,7 @@ Ezer.SelectAuto= new Class({
     return 1;
   }
 });
-// ================================================================================================= SelectMap
+// ================================================================================================> SelectMap
 //c: SelectMap
 //      Pozn. metoda form.save použije zobrazenou hodnotu
 //t: Block,Elem,Select
@@ -4391,7 +4391,7 @@ Ezer.SelectMap= new Class({
 // aliasy
 //fm: SelectMap.select_key ([key])  (obsolete)
 Ezer.SelectMap.prototype.select_key= Ezer.SelectMap.prototype.key;
-// ================================================================================================= SelectMap0
+// ================================================================================================> SelectMap0
 //c: SelectMap0
 //      výběr s prázdnou hodnotou pro klíč 0
 //t: Block,Elem,Select
@@ -4399,7 +4399,7 @@ Ezer.SelectMap.prototype.select_key= Ezer.SelectMap.prototype.key;
 Ezer.SelectMap0= new Class({
   Extends: Ezer.SelectMap
 });
-// ================================================================================================= List
+// ================================================================================================> List
 //c: List ()
 //      řádkový seznam elementů
 //t: Block,Elem
@@ -4448,7 +4448,7 @@ Ezer.List= new Class({
     return 1;
   }
 });
-// ================================================================================================= ListRow
+// ================================================================================================> ListRow
 //c: ListRow ()
 //      řádek seznamu elementů
 //t: Block
@@ -4463,7 +4463,7 @@ Ezer.ListRow= new Class({
     this.DOM_add();
   }
 });
-// ================================================================================================= Browse
+// ================================================================================================> Browse
 //c: Browse
 //      tabulkové zobrazení dat s mezipamětí - implementace 2
 //t: Block
@@ -5692,7 +5692,7 @@ Ezer.Browse= new Class({
     }
   }
 });
-// ================================================================================================= Show
+// ================================================================================================> Show
 //c: Show
 //      sloupec tabulkového zobrazení dat
 //t: Block,Elem
@@ -6158,7 +6158,7 @@ Ezer.Show= new Class({
     new Ezer.Eval(code,browse,[browse,null,null,null,null,-1],'sort');
   }
 });
-// ================================================================================================= Eval
+// ================================================================================================> Eval
 //c: Eval (code,context,args,id,continuation,no_trow,proc,nvars)
 //      interpret vnitřního kódu
 //a: code - přeložený kód
@@ -7120,7 +7120,7 @@ Ezer.Eval= new Class({
     }
   }
 });
-// ================================================================================================= obecné funkce
+// ================================================================================================> obecné funkce
 // -------------------------------------------------------------------------------------- code_name
 // funkce vrací bezkontextový význam name v code jako pole
 //   name :: ('$'|'#') ( '.' id )*  | ( '.'+ | id ) ( '.' id )*  NEBO [id+]
@@ -7364,7 +7364,7 @@ Ezer.obj_ref= function (name,obj) {
   }
   return ctx;
 }
-// ================================================================================================= str
+// ================================================================================================> str
 // struktury dostávají jako argumenty ne hodnoty ale kód
 Ezer.str= {};
 // -------------------------------------------------------------------------------------- each
@@ -7511,11 +7511,11 @@ Ezer.str.if_= function (that,value) {
   that.stack[++that.top]= value;
   that.eval();
 };
-// ================================================================================================= fce
+// ================================================================================================> fce
 // funkce dostávají jako argumenty hodnoty
 // Ezer.obj= {};                                   // případné hodnoty k funkcím se stavem (trail ap.)
 // Ezer.fce= {};                                // přesunuto do hlavního programu
-// ================================================================================================= fce array
+// ================================================================================================> fce array
 // ------------------------------------------------------------------------------------ array
 //ff: fce.array (value1,value2,...)
 //      zkonstruuje pole [value1,value2,...]
@@ -7535,7 +7535,7 @@ Ezer.fce.array= function () {
 Ezer.fce.array_length= function (a) {
   return a.length;
 }
-// ================================================================================================= fce objektové
+// ================================================================================================> fce objektové
 // ------------------------------------------------------------------------------------ object
 //ff: fce.object (name1,value1,name2,value2,...)
 //      zkonstruuje objekt {name1:value1,name2:value2,...
@@ -7642,7 +7642,7 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
   else Ezer.error('copy_by_name nelze použít pro parametry typu '+typ_x+' a '+typ_y);
   return 1;
 };
-// ================================================================================================= fce user
+// ================================================================================================> fce user
 // -------------------------------------------------------------------------------------- sys
 //ff: fce.sys (id1,id2,...)
 //   část hodnoty systémové proměnné Ezer.sys z PHP, totiž Ezer.sys.id1.id2....
@@ -7773,7 +7773,7 @@ Ezer.fce.contextmenu= function (menu,event,id,up) {
   }
   return 1;
 }
-// ================================================================================================= fce string
+// ================================================================================================> fce string
 // -------------------------------------------------------------------------------------- decode
 //ff: fce.decode (data[,code='base64'])
 //      dekódování řetězce ze zadaného kódování
@@ -7988,7 +7988,7 @@ Ezer.fce.cset= function () {
 Ezer.fce.chr= function (ascii) {
   return String.fromCharCode(ascii);
 }
-// ================================================================================================= fce date+time
+// ================================================================================================> fce date+time
 // -------------------------------------------------------------------------------------- date2sql
 //ff: fce.date2sql (date[,wild=0])
 //      převod českého formátu data na formát MySQL
@@ -8104,7 +8104,7 @@ Ezer.fce.fdate= function (format,datetime) {
   }
   return result;
 }
-// ================================================================================================= fce math
+// ================================================================================================> fce math
 // -------------------------------------------------------------------------------------- is_number
 //ff: fce.is_number (x)
 //   zjištění, zda x je číslo nebo string tvořící číslo
@@ -8283,7 +8283,7 @@ Ezer.fce.castka_slovy= function (castka,platidlo,platidla,platidel,drobnych) {
   }
   return text;
 }
-// ================================================================================================= fce logical
+// ================================================================================================> fce logical
 // -------------------------------------------------------------------------------------- eq
 //ff: fce.eq (x,y1,y2,...)
 //   porovnání hodnoty s posloupností hodnot
@@ -8351,7 +8351,7 @@ Ezer.fce.not= function (x) {
   var ix= typeof(x)=='string' && !isNaN(x) ? parseInt(x,10) : x;
   return ix ? 0 : 1;
 }
-// ================================================================================================= verze 1.3
+// ================================================================================================> verze 1.3
 // -------------------------------------------------------------------------------------- stop
 //ff: fce.stop ()
 //      STARÉ: prázdná operace
@@ -8381,7 +8381,7 @@ Ezer.fce.clipboard= function () {
   clipboard_set(msg);
   return 1;
 }
-// ================================================================================================= fce system
+// ================================================================================================> fce system
 // ------------------------------------------------------------------------------------ href
 //ff: fce.href (path)
 //      přepne aplikaci podle path=m[.s[.l.g.i]][.p]  -- tabs, panel, menu.left, menu.group, menu.item
