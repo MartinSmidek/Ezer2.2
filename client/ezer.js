@@ -3623,7 +3623,8 @@ Ezer.Elem= new Class({
   blur: function () {
 //     if ( this._f('t')==-1 ) { změna 130413g
       this.fire('onblur');     // když není format:'t'
-      if ( this._changed ) this.fire('onchanged');
+      if ( this._changed )
+        this.fire('onchanged');
 //     }
     return true;
   },

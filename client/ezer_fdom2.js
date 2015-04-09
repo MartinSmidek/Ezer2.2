@@ -2244,7 +2244,7 @@ Ezer.Select.implement({
       }.bind(this),
       blur: function (event) {
 //                                                         Ezer.trace('*','blur');
-        if ( !this.multi || this._drop_status<2 ) {
+        if ( !this.multi && this._drop_status==1 ) {
           this.blur();
           this.DOM_drop_hide();
           this.DOM_blur();
