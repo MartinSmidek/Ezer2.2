@@ -6,7 +6,7 @@ proc the_formsave (f,b) {
   b.raise('onrowclick',b.browse_seek(conc(f.id_key,'=',f.key)))
 }
 #   proc get_id() { meta.popup; meta.choose; topic.set(meta.clicked.get) }
-# -------------------------------------------------------------------------------------- Dokumentace
+# =====================================================================================> Dokumentace
 panel apl [,,770,] {type:'right', title:'Dokumentace', _sys:'dok'
   menu m {type:'left'                   // nesmí mít active
     proc onclick(x) {
@@ -24,7 +24,7 @@ panel apl [,,770,] {type:'right', title:'Dokumentace', _sys:'dok'
   | u.fill("Dokumentace není vygenerována")
   }
 }
-# ---------------------------------------------------------------------------------------- Reference
+# =======================================================================================> Reference
 panel ref [,,770,] {type:'right', title:'Reference', _sys:'*', skill:'m'
   menu m {type:'left', active:*
     proc onclick(x) {
@@ -34,7 +34,7 @@ panel ref [,,770,] {type:'right', title:'Reference', _sys:'*', skill:'m'
   use u: form f [0,0,,]
   proc onstart() { m.attach_code(ask('i_doc_menu','reference','','')) }
 }
-# ---------------------------------------------------------------------------------------- Struktura
+# =======================================================================================> Struktura
 panel str [,,770,] {type:'right', title:'Struktura', _sys:'*', skill:'m'
   menu m {type:'left', active:*
     menu stav {title:'stav',type:'group'
@@ -45,7 +45,7 @@ panel str [,,770,] {type:'right', title:'Struktura', _sys:'*', skill:'m'
   }
   use u: form f [0,0,,]
 }
-# --------------------------------------------------------------------------------------- Generování
+# ======================================================================================> Generování
 panel gen [,,770,] {type:'right', title:'Generování', _sys:'*', skill:'m'
   menu m {type:'left', active:*
     menu stav {title:'stav',type:'group'
@@ -100,68 +100,47 @@ panel gen [,,770,] {type:'right', title:'Generování', _sys:'*', skill:'m'
   }
   use u: form f [0,0,,]
 }
-# ================================================================================================== ZMĚNY
+# ============================================================================================> ZMĚNY
 panel nov [,,770,] {type:'right', title:'Přehled změn', _sys:'*'
-  menu m {type:'left', active:m.app.nove
-    menu app {title:'Změny aplikace',type:'group'
-      item test {title:'Test' skill:'m'}
-      item nove {title:'Nové' }
-      item stare {title:'Přehled starších' }
-      item todo {title:'Požadavky na doplnění' }
-      proc onclick(i) { u.fill(ask('doc_todo',i._id,'app')) }
-    }
-    menu eze {title:'Změny jádra systému Ezer2',type:'group', skill:'m'
-      item nove {title:'Nové' }
-      item stare {title:'Přehled starších' }
-      item todo {title:'Požadavky na doplnění' }
-      proc onclick(i) { u.fill(ask('doc_todo',i._id,'sys')) }
-    }
-  }
-  use u: form f [0,0,,]
-}
-# ================================================================================================== KONTEXTOVÝ HELP
-panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
-  use u: form _tit [12,4,,]
-
-  use hlp_a: form _hlp_a [12,35,,] { tag:'ha', format:'n' }
-  use hlp_g: form _hlp_g [12,35,,] { tag:'hg', format:'n' }
-  use hlp_k: form _hlp_k [12,35,,] { tag:'hk', format:'n' }
-
   use msg_a: form _msg_a [12,35,,] { tag:'ma', format:'n' }
   use msg_g: form _msg_g [12,35,,] { tag:'mg', format:'n' }
   use msg_k: form _msg_k [12,35,,] { tag:'mk', format:'n' }
 
-  menu {type:'left', active:*, format:'f'
+  menu m {type:'left', active:m.chngs.month
     proc onstart() {
-      [ sys('options','group_db')     | h.g.enable(0); m.g.enable(0) ];
-      [ sys('options','curr_version') | h.k.enable(0); m.k.enable(0) ];
+      [ sys('options','group_db')     | m.g.enable(0) ];
+      [ sys('options','curr_version') | m.k.enable(0) ];
     }
-    menu h {title:'Editace nápovědy', type:'group'
-      item a {title:'[fa-question] nápověda aplikace',                par:°{tag:'ha',level:'a'} }
-      item g {title:'[fa-question-circle] nápověda skupiny aplikací', par:°{tag:'hg',level:'g'} }
-      item k {title:'[fa-cogs] nápověda jádra Ezer',                  par:°{tag:'hk',level:'k'} }
-      proc onclick(i) {
-        u.fill(replace_fa(conc(i.owner.title,' - ',i.title)));
-        panel.display(2,i.par.tag);
-        panel.call(conc('hlp_',i.par.level,'.start'));
-      }
+    menu chngs {title:'Změny aplikace',type:'group'
+      item month {title:'Přehled změn za měsíc', par:°{days:30} }
+      item year {title:'Přehled změn za rok', par:°{days:365} }
+      item all {title:'Přehled uskutečněných změn', par:°{days:9999} }
+      proc onclick(i) { panel.display(0,'m'); u.fill2(ask('doc_todo2','chngs','','',i.par)) }
     }
-    menu m {title:'Zápis změn', type:'group'
+    menu app {title:'Požadavky na aplikaci',type:'group'
+      item nove {title:'Nově realizované' }
+      item stare {title:'Přehled realizovaných' }
+      item todo {title:'Čekající požadavky' }
+      proc onclick(i) { panel.display(0,'m'); u.fill(ask('doc_todo2',i._id,'app')) }
+    }
+    menu eze {title:'Pořadavky na jádro Ezer',type:'group', skill:'m'
+      item nove {title:'Nově realizované' }
+      item stare {title:'Přehled realizovaných' }
+      item todo {title:'Čekající požadavky' }
+      proc onclick(i) { panel.display(0,'m'); u.fill(ask('doc_todo2',i._id,'sys')) }
+    }
+    menu m {title:'Zápis změn', type:'group', skill:'ah'
       item a {title:'[fa-exclamation] změna aplikace',                par:°{tag:'ma',level:'a'} }
       item g {title:'[fa-exclamation-circle] změna skupiny aplikací', par:°{tag:'mg',level:'g'} }
-      item k {title:'[fa-cog] změna jádra Ezer',                      par:°{tag:'mk',level:'k'} }
+      item k {title:'[fa-cog] změna jádra Ezer', skill:'m',           par:°{tag:'mk',level:'k'} }
       proc onclick(i) {
-        u.fill(replace_fa(conc(i.owner.title,' - ',i.title)));
+        u.tit(conc(i.owner.title,' - ',i.title));
         panel.display(2,i.par.tag);
         panel.call(conc('msg_',i.par.level,'.start'));
       }
     }
   }
-  # ------------------------------------------------------------------------ _tit
-  form _tit [,,*,30] {
-    label head [0,0,*,31] { title:'' }
-    proc fill(h) { [ h; head.set(conc("<div class='karta'>",h,"</div>")) ]; }
-  }
+  use u: form f [12,4,,]
   # ------------------------------------------------------------------------ _msg_a
   form _msg_a [,,*,500] {
     var virgin= 1
@@ -279,6 +258,31 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
       show hlp [,,510+60,] { title:'help', data:h.help, format:'sq*t' }
       proc onrowclick() {
         form.key(id_help.get); form.load;
+      }
+    }
+  }
+}
+# =================================================================================> KONTEXTOVÝ HELP
+panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*', skill:'ah'
+  use u: form _tit [12,4,,]
+
+  use hlp_a: form _hlp_a [12,35,,] { tag:'ha', format:'n' }
+  use hlp_g: form _hlp_g [12,35,,] { tag:'hg', format:'n' }
+  use hlp_k: form _hlp_k [12,35,,] { tag:'hk', format:'n' }
+
+  menu {type:'left', active:*, format:'f'
+    proc onstart() {
+      [ sys('options','group_db')     | h.g.enable(0) ];
+      [ sys('options','curr_version') | h.k.enable(0) ];
+    }
+    menu h {title:'Editace nápovědy', type:'group'
+      item a {title:'[fa-question] nápověda aplikace',                par:°{tag:'ha',level:'a'} }
+      item g {title:'[fa-question-circle] nápověda skupiny aplikací', par:°{tag:'hg',level:'g'} }
+      item k {title:'[fa-cogs] nápověda jádra Ezer',                  par:°{tag:'hk',level:'k'} }
+      proc onclick(i) {
+        u.fill(replace_fa(conc(i.owner.title,' - ',i.title)));
+        panel.display(2,i.par.tag);
+        panel.call(conc('hlp_',i.par.level,'.start'));
       }
     }
   }
@@ -470,11 +474,18 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*'
   }
 }
 # ------------------------------------------------------------------------------------------------ f
-# formulář pro levostranné menu
+# formuláře pro levostranné menu
 form f {
   proc fill(txt) { hresult.set(conc("<div id='Content'>",txt,"</div>")); }
+  proc fill2(txt) { hresult.set(txt); }
+  proc tit(h) { [ h; hresult.set(replace_fa(conc("<div class='karta'>",h,"</div>"))) ]; }
   proc append(txt) { hresult.set(conc(hresult.get,"<div id='Content'>",txt,"</div>")); }
   label hresult [0,0,*,] { title:'--' }
+}
+# ------------------------------------------------------------------------ _tit
+form _tit [,,*,30] {
+  label head [0,0,*,31] { title:'' }
+  proc fill(h) { [ h; head.set(replace_fa(conc("<div class='karta'>",h,"</div>"))) ]; }
 }
 
 table _help {  key_id:'id_help'                     // tabulka _help je v databázi aplikace

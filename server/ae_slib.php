@@ -406,7 +406,8 @@ __EOD;
   }
   // definice povinného začátku a konce HTML stránky
   $html_footer= '';
-  $html_base= $app_root ? "\n  <base href=\"http://".$_SERVER["HTTP_HOST"].'">' : '';
+  //$html_base= $app_root ? "\n  <base href=\"http://".$_SERVER["HTTP_HOST"].'">' : '';
+  $html_base= $app_root ? "\n  <base href=\"http://$app_root\">" : '';
   $html_header= "\xEF\xBB\xBF";    // DOM pro UTF-8
   $html_header.= <<<__EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -645,6 +646,7 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
     $EZER;
   // nastavení verze jádra na 'toto'
   $EZER->version= 'ezer2.2';
+  $ezer_root= $ezer_root ?: $ezer_root0;
   // nastavení databází
   $sada= $ezer_local ? 1 : 0;
 //   $mysql_db= $db[$sada];
@@ -660,7 +662,9 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
   $ezer_html_cp=  'UTF-8';
   $ezer_sylk_cp=  'windows-1250';
   // cesty
-  $ezer_path_root= $path_root[$sada];
+//   $ezer_path_root= $path_root[$sada];
+  $ezer_path_root= $_SERVER['DOCUMENT_ROOT'].$_SESSION[$ezer_root]['app_path'];
+//                                                 echo("<hr>ezer_path_root=$ezer_path_root ($ezer_root)");
   $sess_save_path= "$ezer_path_root/sess";
   $ezer_path_appl= "$ezer_path_root/$ezer_root";
   $ezer_path_libr= "$ezer_path_root/$ezer_root";

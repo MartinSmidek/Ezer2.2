@@ -410,6 +410,44 @@ function pspad_keys(&$res,&$key1,&$key2,&$key3) {
 }
 /** ================================================================================================ NOVINKY */
 # zobrazování Novinek z tabulky _TODO
+# -------------------------------------------------------------------------------------------------- doc_todo2
+# vygeneruje přehled Novinek
+# source = app|sys
+# nic    = text zobrazený při prázdném výsledku
+function doc_todo2($item,$source='app',$nic="<dl class='todo'><dt>V tomto období nebyly změny</dt></dl>",$par=null) {
+  global $ezer_path_todo, $ezer_path_root;
+  $nove= 30;
+  $html= '';
+  $cond= $source=='app' ? "cast!=1 " : "cast=1 ";
+  $order= "kdy_skoncil DESC";
+  switch ( $item ) {
+  case 'chngs':
+    $nove= $par->days;
+    $html.= "<div class='karta'>Změny aplikace za posledních $nove dní</div><br>";
+    $html.= doc_chngs_show('ak',$nove);
+    break;
+  case 'nove':
+    $html.= "<div class='karta'>Vlastnosti systému přidané za posledních $nove dní</div>";
+    $html.= "<i>Věnujte prosím pozornost zejména zvýrazněným řádkům. "
+      . "Zvýrazněné úpravy se týkají téměř všech uživatelů.</i>";
+    $cond.= " AND SUBDATE(NOW(),$nove)<=kdy_skoncil AND kdy_skoncil!='0000-00-00' ";
+    $html.= doc_todo_show($cond,$order);
+    break;
+  case 'stare':
+    $html.= "<div class='karta'>Vlastnosti systému přidané před $nove dny</div>";
+    $cond.= " AND SUBDATE(NOW(),$nove)>kdy_skoncil AND kdy_skoncil!='0000-00-00' ";
+    $html.= doc_todo_show($cond,$order);
+    break;
+  case 'todo':
+    $html.= "<div class='karta'>Opravy, úpravy a doplnění systému k realizaci</div>";
+    $html.= "<i>Požadavky mohou oprávnění uživatelé zapisovat v Systém|Požadavky</i>";
+    $cond.= " AND kdy_skoncil='0000-00-00' ";
+    $order= "kdy_zadal DESC";
+    $html.= doc_todo_show($cond,$order);
+    break;
+  }
+  return $html;
+}
 # -------------------------------------------------------------------------------------------------- doc_todo
 # vygeneruje přehled Novinek
 # source = app|sys
@@ -421,9 +459,6 @@ function doc_todo($item,$source='app',$nic="<dl class='todo'><dt>V tomto období
   $cond= $source=='app' ? "cast!=1 " : "cast=1 ";
   $order= "kdy_skoncil DESC";
   switch ( $item ) {
-  case 'test':
-    $html.= "<h3 class='CTitle'>Změny aplikace za posledních $nove dní</h3>";
-    break;
   case 'nove':
     $html.= "<h3 class='CTitle'>Vlastnosti systému přidané za posledních $nove dní</h3>";
     $html.= "<i>Věnujte prosím pozornost zejména zvýrazněným řádkům. "
@@ -441,7 +476,7 @@ function doc_todo($item,$source='app',$nic="<dl class='todo'><dt>V tomto období
     $order= "kdy_zadal DESC";
     break;
   }
-  $html.= $item=='test' ? doc_chngs_show('ak',$nove) : doc_todo_show($cond,$order);
+  $html.= doc_todo_show($cond,$order);
   $html.= "</div>";
   return $html;
 }
