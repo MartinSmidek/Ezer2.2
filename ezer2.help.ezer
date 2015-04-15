@@ -108,8 +108,8 @@ panel nov [,,770,] {type:'right', title:'Přehled změn', _sys:'*'
 
   menu m {type:'left', active:m.chngs.month
     proc onstart() {
-      [ sys('options','group_db')     | m.g.enable(0) ];
-      [ sys('options','curr_version') | m.k.enable(0) ];
+      [ sys('options','group_db')     | w.g.enable(0) ];
+      [ sys('options','curr_version') | w.k.enable(0) ];
     }
     menu chngs {title:'Změny aplikace',type:'group'
       item month {title:'Přehled změn za měsíc', par:°{days:30} }
@@ -129,7 +129,7 @@ panel nov [,,770,] {type:'right', title:'Přehled změn', _sys:'*'
       item todo {title:'Čekající požadavky' }
       proc onclick(i) { panel.display(0,'m'); u.fill(ask('doc_todo2',i._id,'sys')) }
     }
-    menu m {title:'Zápis změn', type:'group', skill:'ah'
+    menu w {title:'Zápis změn', type:'group', skill:'ah'
       item a {title:'[fa-exclamation] změna aplikace',                par:°{tag:'ma',level:'a'} }
       item g {title:'[fa-exclamation-circle] změna skupiny aplikací', par:°{tag:'mg',level:'g'} }
       item k {title:'[fa-cog] změna jádra Ezer', skill:'m',           par:°{tag:'mk',level:'k'} }
