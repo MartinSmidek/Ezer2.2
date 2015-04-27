@@ -8,6 +8,7 @@
   $chunks= $_SERVER['HTTP_EZER_FILE_CHUNKS'];
   $relpath=$_SERVER['HTTP_EZER_FILE_RELPATH'];
   $path=   $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$relpath;
+  $pname= "$path$name";
 
   $data= file_get_contents("php://input");
   $end= "";
@@ -16,11 +17,14 @@
   $size= 0;
   if ( $chunk==1 ) {
     $_SESSION['upload'][$name]= array();
+    if ( file_exists($pname) ) {
+      $err= "ERROR soubor $name již existuje, lze smazat přes kontextové menu";
+      goto end;
+    }
   }
   // test konce
   if ( count($_SESSION['upload'][$name])==($chunks-1) ) {
     // poskládej a ulož soubor
-    $pname= "$path$name";
     $errmsg1= "ERROR soubor byl přenesen ale nelze zapsat do '$path$name'";
     $errmsg2= "ERROR soubor byl přenesen ale má nulovou délku";
     $f= @fopen($pname,'w');

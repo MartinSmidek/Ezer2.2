@@ -9,74 +9,94 @@ proc the_formsave (f,b) {
 | f.insert; f.load;
   b.raise('onrowclick',b.browse_seek(conc(f.id_key,'=',f.key)))
 }
-# ================================================================================================== ČÍSELNÍKY
+# =================================================================================================> ČÍSELNÍKY
 panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
-  const sys_cis_list = 22
   var druh_cond: text
-  use klice: form keys [20,7,0,467],
-  use klic: form _key [500,13,0,392],
+  use mklice: form meta [5,5,,],
+  use mklic:  form _mkey [660,5,,],
+  use klice:  form keys [5,142,,],
+  use klic:   form _key [660,138,,],
   var novy: text,
   var cis_druh: text,
   var cis_id: number
   proc onstart () {
     druh_cond.set("druh='_meta_'");
     cis_druh.set('_meta_');
-    reload_keys }
+    reload_meta }
+  proc reload_meta () {
+    mklice.lst.browse_load("druh='_meta_'");
+    mklice.lst.raise('onrowclick'); mklice.lst.browse_focus
+  | klic.key_novy;
+  }
   proc reload_keys () {
     klice.lst.browse_load(druh_cond.get);
     klice.lst.raise('onrowclick'); klice.lst.browse_focus
   | klic.key_novy;
   }
-  proc klice.lst.onsubmit () {
-    eq(klice.lst.druh.get,'_meta_');
-    druh_cond.set(conc("druh='",klice.lst.zkratka.get,"'"));
-    cis_druh.set(klice.lst.zkratka.get);
-    cis_id.set(klice.lst.id.get);
-    reload_keys }
-  proc klice.lst.onrowclick () {
-    reload_key }
   proc reload_key () {
     klic.key_load }
-  # ------------------------------------------------------------------------------------------------ keys
-  form keys [0,0,200,200] {
-    button meta [0,1,,] { title:'Číselníky',
-      proc onclick () {
-        druh_cond.set("druh='_meta_'");
-        reload_keys }
+  # ------------------------------------------------------------------------------------------- meta
+  form meta [0,0,200,200] {
+    label [0,0,1060,130] { css:'parm' }
+    view k: table _cis
+    browse lst [5,5,0,54] { rows:4, qry_rows:1, buf_rows:100
+      show id [,,40,] { title:'id_cis', data:k.id_cis, format:'sr' },
+      show poradi [,,20,] { title:'n.', data:k.poradi, format:'s+r' },
+      show druh [,,50,] { title:'druh', data:k.druh, format:'qs' },
+      show data [,,40,] { title:'data', data:k.data, format:'rs' },
+      show zkratka [,,120,] { title:'zkratka', data:k.zkratka, format:'qs' },
+      show hodnota [,,190,] { title:'hodnota', data:k.hodnota, format:'qs' },
+      show popis [,,150,] { title:'popis', data:k.popis, format:'qs' },
+      proc onrowclick() {
+        druh_cond.set(conc("druh='",zkratka.get,"'"));
+        mklic.load(id.get); reload_keys }
     }
+  }
+  # ------------------------------------------------------------------------------------------- keys
+  form keys [0,0,200,200] {
+    label [0,0,1060,403] { css:'work' }
     view k: table _cis,
-    browse lst [2,32,0,54] { rows:sys_cis_list, qry_rows:1, buf_rows:100
+    browse lst [5,5,0,54] { rows:20, qry_rows:1, buf_rows:100
       show id [,,40,] { title:'id_cis', data:k.id_cis, format:'sr' },
       show poradi [,,20,] { title:'n.', data:k.poradi, format:'s+r' },
       show druh [,,70,] { title:'druh', data:k.druh, format:'qs' },
-      show data [,,40,] { title:'data', data:k.data, format:'s' },
-      show zkratka [,,80,] { title:'zkratka', data:k.zkratka, format:'qs' },
-      show hodnota [,,190,] { title:'hodnota', data:k.hodnota, format:'qs' },
+      show data [,,40,] { title:'data', data:k.data, format:'rs' },
+      show zkratka [,,138,] { title:'zkratka', data:k.zkratka, format:'qs' },
+      show hodnota [,,200,] { title:'hodnota', data:k.hodnota, format:'qs' },
+      show ikona   [,,50,] { title:'ikona', data:k.ikona, format:'qs' },
+      show barva   [,,50,] { title:'barva', data:k.barva, format:'qs' },
+      proc onrowclick () {
+        reload_key }
+      proc onsubmit () {
+        eq(druh.get,'_meta_');
+        mklice.lst.browse_seek(conc("zkratka='",zkratka.get,"'"));
+        mklice.lst.raise('onrowclick'); }
     },
   }
-  # ------------------------------------------------------------------------------------------------ key
+  # ------------------------------------------------------------------------------------------- mkey
+  form _mkey [0,0,200,200] {
+    # data
+    view k: table _cis,
+    edit popis [4,17,300,103] { data:k.popis, title:'^dokumentace číselníku', format:'' },
+    button [315,18,,] { title:'Uložit změnu', proc onclick () {
+      form.same; alert('nebyla provedena žádná změna');
+    | the_formsave(form,mklice.lst); }}
+    button [315,48,,] { title:'Meta číselník', proc onclick () {
+      mklice.lst.browse_seek("zkratka='_meta_'") }}
+  }
+  # -------------------------------------------------------------------------------------------- key
   form _key [0,0,200,200] {
     # data
     view k: table _cis,
-    field id [4,25,64,17] { data:k.id_cis, format:'r' },
-    field kdruh [102,25,120,17] { data:k.druh, format:'d' },
-    field kdata [5,67,64,17] { data:k.data, format:'r' },
-    field zkratka [102,67,160,17] { data:k.zkratka },
-    field poradi [294,67,40,17] { data:k.poradi, format:'r' },
-    edit hodnota [4,106,392,95] { data:k.hodnota },
-    edit ikona [4,221,190,95] { data:k.ikona },
-    edit barva [205,221,190,95] { data:k.barva },
-    edit popis [4,335,392,95] { data:k.popis },
-    # popisky
-    label [4,8,50,15] { title:'id_cis', help:'_cis.id_cis' },
-    label [102,8,50,15] { title:'druh', help:'_cis.druh' },
-    label [6,50,50,15] { title:'data', help:'_cis.data' },
-    label [102,50,50,15] { title:'zkratka', help:'_cis.zkratka' },
-    label [4,90,65,15] { title:'hodnota 1', help:'_cis.hodnota' },
-    label [4,205,62,15] { title:'hodnota 2', help:'_cis.ikona' },
-    label [207,205,62,15] { title:'hodnota 3', help:'_cis.barva' },
-    label [294,50,50,15] { title:'pořadí', help:'_cis.poradi' },
-    label [4,320,142,15] { title:'popis (do dokumentace)', help:'_cis.popis' },
+    field id [4,25,64,17] { data:k.id_cis, title:'^id_cis', format:'r' },
+    field kdruh [102,25,120,17] { data:k.druh, title:'^druh', format:'d' },
+    field kdata [5,60,64,17] { data:k.data, title:'^data', format:'r' },
+    field zkratka [102,60,160,17] { data:k.zkratka, title:'^zkratka' },
+    field poradi [294,60,40,17] { data:k.poradi, title:'^pořadí', format:'r' },
+    edit hodnota [4,96,392,74] { data:k.hodnota, title:'^hodnota 1' },
+    edit ikona [4,192,190,74] { data:k.ikona, title:'^hodnota 2 (ikona)'  },
+    edit barva [205,192,190,74] { data:k.barva, title:'^hodnota 3 (barva)'  },
+    edit popis [4,285,392,77] { data:k.popis, title:'^popis (do dokumentace)' },
     # procedury
     proc key_novy () {
       var count: number
@@ -101,14 +121,17 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
     }
     # události
     proc onsubmit () { key_uloz }
-    button save [11,435,,] { type:'submit',_sys:'ulo', title:'Uložit', proc onclick () { key_uloz } },
-    button cancel [101,435,,] { title:'Zpět', proc onclick () { key_load } },
-    button create [182,435,,] { title:'Nový', proc onclick () { key_novy } },
-    button delete [262,435,,] { title:'Smazat', proc onclick () { key_smaz } },
+    # operace
+    label [4,370,103,30] { css:'parm' }
+    button save [13,376,,] { type:'submit',_sys:'ulo', title:'Uložit', proc onclick () { key_uloz } },
+    button cancel [64,376,,] { title:'Zpět', proc onclick () { key_load } },
+    label [285,370,114,30] { css:'parm' }
+    button create [294,376,,] { title:'Nový', proc onclick () { key_novy } },
+    button delete [340,376,,] { title:'Smazat', proc onclick () { key_smaz } },
   }
 }
 
-# ================================================================================================== AKTIVITY
+# =================================================================================================> AKTIVITY
 panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a;aa|aa'
   menu left { type:'left', format:'f'
     menu a { title:'Aktivní uživatelé',type:'group'
@@ -190,7 +213,7 @@ panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a;aa|aa'
   proc onstart() { skip.set(0) }
   proc onfirstfocus() { left.a.d.click }
 }
-# ================================================================================================== UŽIVATELÉ
+# =================================================================================================> UŽIVATELÉ
 panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
 
   const sys_users_list = 22
@@ -393,7 +416,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     label watch_ref [590,11,250,15]
   }
 }
-# ================================================================================================== POŽADAVKY
+# =================================================================================================> POŽADAVKY
 # v {root}.ini je možné mít řádky
 #   $EZER->todo->cond_browse= "{skill}:{SQL cond};..."; // např. "p:data IN (2,3)";
 #   $EZER->todo->cond_select= "{skill}:{SQL cond};..."; // např. "data IN (2,3)";
@@ -675,7 +698,7 @@ panel needs [,,770,] {type:'right', title:'Požadavky', _sys:'poz', skill:'sp'
     }
   }
 }
-# ================================================================================================== MAPY,TABULKY
+# =================================================================================================> MAPY,TABULKY
 
 table _todo { key_id:'id_todo'
   number id_todo      { key:'primary' }

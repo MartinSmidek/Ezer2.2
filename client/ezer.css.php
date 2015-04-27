@@ -109,6 +109,22 @@ echo <<<__EOD
 
 .none   { display:none; }
 
+.parm {
+  background-color:$b_parm; border:1px solid #f5f5f5; z-index:0;
+  border-radius:5px; }
+
+/* rámečky formulářů */
+
+.info        {
+  background-color:#f5f5f5; border:1px solid #f5f5f5; z-index:-1;
+  border-radius:5px; }
+.work        {
+  background-color:$b_work; z-index:0;
+  border-radius:5px; }
+.parm        {
+  background-color:$b_parm; border:1px solid #f5f5f5; z-index:0;
+  border-radius:5px; }
+
 /* layout */
 
 html,body {

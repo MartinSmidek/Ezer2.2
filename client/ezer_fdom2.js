@@ -1136,6 +1136,7 @@ Ezer.LabelDrop.implement({
     ).inject(this.DOM_BlockRows);
     if ( td3w )
       tr.adopt(f.td3= new Element('td',{width:60}));
+    f.newname= '';
     this.DOM_files.push(f);
   },
 // ------------------------------------------------------- LabelDrop.DOM_addFile_Disk
@@ -1260,7 +1261,7 @@ Ezer.LabelDrop.implement({
 // konec vkládání a případný upload
   DOM_upload: function(f,do_upload) {
     if ( do_upload ) {
-      f.name= do_upload;
+      f.newname= do_upload==1 ? '' : do_upload;
       // upload rozdělený na části s referováním do <progrress>
       f.td2.innerHTML= "";
       var bar= new Element('progress',{max:100,value:0,title:"kliknutí přeruší přenos",events:{
@@ -1289,7 +1290,7 @@ Ezer.LabelDrop.implement({
     var data= f.data.slice((n-1)*CHUNK,n*CHUNK);
     var xhr = new XMLHttpRequest();
     xhr.open('POST', Ezer.version+'/server/file_send.php', true);
-    xhr.setRequestHeader("EZER-FILE-NAME", encodeURIComponent(f.name));
+    xhr.setRequestHeader("EZER-FILE-NAME", encodeURIComponent(f.newname ? f.newname : f.name));
     xhr.setRequestHeader("EZER-FILE-CHUNK", n);
     xhr.setRequestHeader("EZER-FILE-CHUNKS", max);
     xhr.setRequestHeader("EZER-FILE-RELPATH", this.folder);
