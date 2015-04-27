@@ -3017,41 +3017,50 @@ Ezer.Label= new Class({
 Ezer.LabelDrop= new Class({
   Extends:Ezer.Label,
 //os: LabelDrop.title - text zobrazovaný v záhlaví DropBoxu
-  options: {
-  },
-  path: '/',
+  options: {},
+  cloud: null,          // null nebo 'GoogleDisk'
+  folder: '/',          // relativní cesta na disku vzhledem ke kořenu aplikace nebo složka cloudu
 // ------------------------------------------------------------------------------- LabelDrop.init
-//fm: LabelDrop.init (relpath)
+//fm: LabelDrop.init (folder[,cloud=null])
 // inicializace oblasti pro drop souborů, definice cesty pro soubory
 // (začínající jménem a končící lomítkem a relativní k $ezer_root)
-  init: function (relpath) {
-    this.relpath= relpath;
+// NEBO definice sloužky a cloudu (zatím jen GoogleDisk)
+  init: function (folder,cloud) {
+    this.cloud= cloud||null;
+    this.folder= folder;
     this.DOM_init();
     return 1;
   },
 // -------------------------------------------------------------------------------- LabelDrop.set
 //fm: LabelDrop.set (lst)
 // do oblasti zapíše jména souborů podle parametru
-//a: lst - seznam jmen souborů (ve složce docs) oddělených čárkou, za jménem souboru může
-// následovat po dvojtečce status (např. délka)
+// pokud LabelDrop přijímá soubory na disku (viz init), lst je seznam jejich jmen oddělených čárkou,
+// za jménem souboru může následovat po dvojtečce status (např. délka);
+// pokud LableDrop přijímá soubory na Google Disk, pak lst je pole interních representací dokumentů
+//a: lst - seznam jmen souborů
   set: function (lst) {
-    if ( lst ) {
+    if ( lst && !this.cloud ) {
       lst.split(',').each(function(lst_i) {
         var alst_i= lst_i.split(':');
         this.DOM_addFile({name:alst_i[0],status:alst_i[1]||'ok'});
       }.bind(this));
     }
+    else if ( lst && this.cloud=='GoogleDisk' ) {
+      for (f of lst) {
+        this.DOM_addFile_Disk(f);
+      }
+    }
     return 1;
   },
 // -------------------------------------------------------------------------------- LabelDrop.get
 //fm: LabelDrop.get ()
-// vrátí seznam souborů oddělených čárkou
+// vrátí seznam souborů oddělených čárkou (po dvojtečce je vždy status)
   get: function () {
-    var lst= '', del= '';
-    this.DOM_files.each(function(f){
-      lst+= del+f.name+':'+f.status;
+    var lst= '', del= '', f;
+    for (f of this.DOM_files) {
+      lst+= del+(this.cloud=='GoogleDisk' ? f.title+':'+(f.fileSize||'doc') : f.name+':'+f.status);
       del= ',';
-    });
+    };
     return lst;
   }
 });
