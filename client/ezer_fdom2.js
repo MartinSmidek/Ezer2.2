@@ -1148,7 +1148,8 @@ Ezer.LabelDrop.implement({
     var td1w= this._w - (td2w + td3w + (td3w?16:14) + 16);
     var tr= new Element('tr').adopt(
       f.td1= new Element('td',{width:td1w,html:this.DOM_href_Disk(f)}),
-      f.td2= new Element('td',{width:td2w,align:'right',html:f.fileSize||'doc'})
+      f.td2= new Element('td',{width:td2w,align:'right',html:f.fileSize||(
+        f.mimeType=='application/vnd.google-apps.folder' ? 'složka' : 'dokument')})
     ).inject(this.DOM_BlockRows);
     if ( td3w )
       tr.adopt(f.td3= new Element('td',{width:60}));
@@ -1172,7 +1173,9 @@ Ezer.LabelDrop.implement({
 // přidá odkaz na soubor na Google Disk s kontextovým menu, pokud je přítomna procedura onmenu
   DOM_href_Disk: function(f) {
     var fileId, href, m= '';
-    href= f.fileSize ? f.webContentLink : f.exportLinks['application/pdf'];
+    href= f.fileSize ? f.webContentLink : (
+      f.exportLinks && f.exportLinks['application/pdf'] ? f.exportLinks['application/pdf'] : null);
+    href= href ? " href='"+href+"'" : '';
     fileId= f.selfLink.split('/');
     fileId= fileId[fileId.length-1];
     if ( this.part && (obj= this.part['onmenu']) ) {
@@ -1183,7 +1186,7 @@ Ezer.LabelDrop.implement({
 //         + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all','',''])}]"
       + "],arguments[0])};return false;\"";
     }
-    return "<a target='docs' href='"+href+"'"+m+">"+f.title+"</a>";
+    return "<a target='docs'"+href+m+">"+f.title+"</a>";
   },
 // -------------------------------------------------------- LabelDrop.DOM_ondrop_Disk
 // zavolá proc ondrop, pokud existuje - vrátí-li 0 bude upload zrušen,

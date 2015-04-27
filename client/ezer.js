@@ -3054,7 +3054,7 @@ Ezer.LabelDrop= new Class({
   },
 // -------------------------------------------------------------------------------- LabelDrop.get
 //fm: LabelDrop.get ()
-// vrátí seznam souborů oddělených čárkou (po dvojtečce je vždy status)
+// vrátí seznam jmen souborů oddělených čárkou (po dvojtečce je vždy status)
   get: function () {
     var lst= '', del= '', f;
     for (f of this.DOM_files) {
@@ -3062,6 +3062,102 @@ Ezer.LabelDrop= new Class({
       del= ',';
     };
     return lst;
+  },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  GD_files_list
+// viz https://developers.google.com/drive/web/search-parameters
+  GD_files_list: function (query,callback) {
+    var retrievePageOfFiles= function(request, result) {
+      request.execute(function(resp) {
+        if ( resp.error ) {
+          Ezer.fce.warning("Disk Google není přístupný: "+resp.message);
+          callback(null);
+        }
+        result= result.concat(resp.items);
+        var nextPageToken= resp.nextPageToken;
+        if (nextPageToken) {
+          request= gapi.client.drive.files.list({
+            pageToken: nextPageToken
+          });
+          retrievePageOfFiles(request, result);
+        } else {
+          callback(result);
+        }
+      });
+    };
+    gapi.client.load('drive', 'v2', function() {
+      var initialRequest= gapi.client.drive.files.list({q: query});
+      retrievePageOfFiles(initialRequest, []);
+    });
+  },
+// ------------------------------------------------------------------------------ LabelDrop.lsdir
+//fi: LabelDrop.lsdir ()
+// zobrazí obsah složky
+  continuation: null,   // bod pokračování pro fx
+  lsdir: function () {
+    if ( this.cloud=='GoogleDisk' ) {
+      google_authorize();
+      this.DOM_init();
+      this.GD_files_list("'"+TutorialFolder+"' in parents and trashed=false",this._lsdir.bind(this));
+      return this;
+    }
+    else
+      return null;
+  },
+  _lsdir: function (xs) {
+    xs.sort(function(a,b){ return a.title>b.title ? 1 : a.title<b.title ? -1 : 0; });
+    this.set(xs);
+    this.continuation.stack[++this.continuation.top]= 1;
+    this.continuation.eval.apply(this.continuation,[0,1]);
+    this.continuation= null;
+    // v případě úspěchu vrátíme 1
+    return 1;
+  },
+// ------------------------------------------------------------------------------ LabelDrop.isdir
+//fi: LabelDrop.isdir (name)
+// pokud v kořenu definovaném init existuje takto pojmenovaná složka vrátí jeji FileId (pro GD)
+// nebo 1 - pokud neexistuje, vrátí 0
+  isdir: function (name) {
+    if ( this.cloud=='GoogleDisk' ) {
+      google_authorize();
+      this.GD_files_list("title='"+name+"' and '"+TutorialFolder
+        +"' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
+        this._isdir.bind(this));
+      return this;
+    }
+    else
+      return null;
+  },
+  _isdir: function (xs) {
+    this.continuation.stack[++this.continuation.top]= xs.length>0 ? xs[0].id : 0;
+    this.continuation.eval.apply(this.continuation,[0,1]);
+    this.continuation= null;
+    // v případě úspěchu vrátíme 1
+    return 1;
+  },
+// ------------------------------------------------------------------------------ LabelDrop.mkdir
+//fi: LabelDrop.mkdir (name)
+// v kořenu definovaném init vytvoří takto pojmenovanou složku a vrátí její FileId resp. 1
+  mkdir: function (name) {
+    if ( this.cloud=='GoogleDisk' ) {
+      google_authorize();
+      var request= gapi.client.drive.files.insert({
+        resource: {
+          title: name,
+          parents: [{id:TutorialFolder}],
+          mimeType: 'application/vnd.google-apps.folder'
+      }});
+      request.execute(this._mkdir.bind(this));
+      return this;
+    }
+    else
+      return null;
+  },
+  _mkdir: function (resp) {
+    this.continuation.stack[++this.continuation.top]= resp.id;
+    this.continuation.eval.apply(this.continuation,[0,1]);
+    this.continuation= null;
+    // v případě úspěchu vrátíme 1
+    return 1;
   }
 });
 // =======================================================================================> LabelMap
@@ -6749,6 +6845,11 @@ Ezer.Eval= new Class({
                 this.simple= false;
                 if ( Ezer.options.to_speed ) this.speed(eval_start);
                 return;
+              }
+              else {
+                // pokud ne, vrať 0 jako výsledek
+                this.stack[++this.top]= 0;
+                break;
               }
               break;
             // přerušení: stav se uloží do context.continuation ... není metoda ale funkce
