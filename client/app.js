@@ -92,6 +92,61 @@ Element.implement({
   }
 });
 Clientcide.setAssetLocation(Ezer.paths.images_cc);
+// ================================================================================================> Google
+// propojení s API Google Disk, v {root}.php musí být definováno
+//   $options= (object)array('Google' => "{CLIENT_ID:'...'}",...)
+// a připojen skript: https://apis.google.com/js/client.js?onload=Ezer.Google.ApiLoaded
+  // Called when authorization server replies. @param {Object} authResult Authorization result.
+Ezer.Google= {
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  authorize(d)
+  authorized: null,
+  scope:'https://www.googleapis.com/auth/drive',
+  authorize: function () {
+    var ok= 0;
+    if ( !this.authorized || this.authorized.expires_at<(Date.now()/1000|0) ) {
+      var config= {
+        client_id:Ezer.options.Google.CLIENT_ID,
+        scope:this.scope, immediate:false
+      };
+      gapi.auth.authorize(config, function(authResult) {
+        console.log('login complete');
+        console.log(gapi.auth.getToken());
+        Ezer.Google.authorized= authResult && !authResult.error ? authResult : 0;
+      });
+    }
+    return this.authorized ? "uživatel autorizován" : "uživatel neautorizován";
+  },
+  // Called when the client library is loaded to start the auth flow.
+  ApiLoaded: function () {
+    window.setTimeout(Ezer.Google.authorize, 1);
+  },
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  files_list
+// viz https://developers.google.com/drive/web/search-parameters
+  files_list: function (query,callback) {
+    var retrievePageOfFiles= function(request, result) {
+      request.execute(function(resp) {
+        if ( resp.error ) {
+          Ezer.fce.warning("Disk Google není přístupný: "+resp.message);
+          callback(null);
+        }
+        result= result.concat(resp.items);
+        var nextPageToken= resp.nextPageToken;
+        if (nextPageToken) {
+          request= gapi.client.drive.files.list({
+            pageToken: nextPageToken
+          });
+          retrievePageOfFiles(request, result);
+        } else {
+          callback(result);
+        }
+      });
+    };
+    gapi.client.load('drive', 'v2', function() {
+      var initialRequest= gapi.client.drive.files.list({q: query});
+      retrievePageOfFiles(initialRequest, []);
+    });
+  }
+};
 // ================================================================================================= Application
 //c: Application ([options])
 //      základní třída aplikace

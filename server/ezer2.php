@@ -1529,6 +1529,39 @@
       $y->mail= $sent ? 'ok' : 'fail';
     }
     break;
+  # ================================================================================================ LabelDrop
+  # funkce pro spolupráci s metodami LabelDrop pro soubory na serveru
+  # ------------------------------------------------------------------------------------ lsdir
+  # vrátí seznam souborů ze složky x.folder ve tvaru pole objektů {title:jméno,filesize:délka}
+  case 'lsdir':
+    $y->files= array();
+    $dir= stripslashes($x->folder);
+    if (is_dir($dir)) {
+      if ($dh= opendir($dir)) {
+        while (($file= readdir($dh)) !== false) {
+          if ( is_file("$dir/$file") ) {
+            $y->files[]= (object)array('title'=>$file,'filesize'=>filesize("$dir/$file"));
+          }
+        }
+        closedir($dh);
+      }
+    }
+    break;
+  # ------------------------------------------------------------------------------------ isdir
+  # vrátí 1 pokud x.folder je složka, jinak vrátí 0
+  case 'isdir':
+    $dir= stripslashes($x->folder);
+    $y->ok= is_dir($dir) ? 1 : 0;
+    break;
+  # ------------------------------------------------------------------------------------ mkdir
+  # pokud složka folder/subfolder existuje vrátí ji, jinak subfolder vytvoří a vrátí jej, 0 při chybě
+  case 'mkdir':
+    $dir= stripslashes($x->folder.$x->subfolder);
+    if ( is_dir($dir) )
+      $y->folder= $dir;
+    else
+      $y->folder= mkdir($dir) ? $dir : 0;
+    break;
   # ================================================================================================ CODE
   # překlad předaného ezercriptu a jeho zapamatování v SESSION
   # ------------------------------------------------------------------------------------ dbg_compile
@@ -2076,7 +2109,7 @@ function array2object(array $array) {
   }
   return $object;
 }
-# ================================================================================================== upload
+# =================================================================================================> UPLOAD
 # -------------------------------------------------------------------------------------------------- upload_ymd
 function upload_ymd($tmp_name,$name,$par) {
   global $EZER;

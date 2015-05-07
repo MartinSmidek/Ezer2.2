@@ -1007,7 +1007,7 @@ Ezer.Block= new Class({
           Ezer.error('LOAD: server vrátil prázdný kód pro '+this.parm.name,'C');
         else {
           if ( y.trace ) Ezer.trace('u',y.trace);
-          this[then](y);
+          this[then].bind(this)(y);
         }
       }.bind(this),
       onFailure: function(xhr) {
@@ -3018,8 +3018,8 @@ Ezer.LabelDrop= new Class({
   Extends:Ezer.Label,
 //os: LabelDrop.title - text zobrazovaný v záhlaví DropBoxu
   options: {},
-  cloud: null,          // null nebo 'GoogleDisk'
-  folder: '/',          // relativní cesta na disku vzhledem ke kořenu aplikace nebo složka cloudu
+  cloud: null,       // 'GoogleDisk' nebo null tzn. souborový systém na serveru
+  folder: '/',       // relativní cesta na disku vzhledem ke kořenu aplikace nebo ID složky cloudu
 // ------------------------------------------------------------------------------- LabelDrop.init
 //fm: LabelDrop.init (folder[,cloud=null])
 // inicializace oblasti pro drop souborů, definice cesty pro soubory
@@ -3033,21 +3033,25 @@ Ezer.LabelDrop= new Class({
   },
 // -------------------------------------------------------------------------------- LabelDrop.set
 //fm: LabelDrop.set (lst)
-// do oblasti zapíše jména souborů podle parametru
-// pokud LabelDrop přijímá soubory na disku (viz init), lst je seznam jejich jmen oddělených čárkou,
+// do oblasti přidá jména souborů podle parametru
+// lst může být string ve formě seznamu jmen oddělených čárkou,
 // za jménem souboru může následovat po dvojtečce status (např. délka);
-// pokud LableDrop přijímá soubory na Google Disk, pak lst je pole interních representací dokumentů
+// nebo pole objektů obsahujících složky title a filesize
+// např. pole interních representací dokumentů Google Disk
 //a: lst - seznam jmen souborů
   set: function (lst) {
-    if ( lst && !this.cloud ) {
+    if ( lst && typeof(lst)=='string' ) {
       lst.split(',').each(function(lst_i) {
         var alst_i= lst_i.split(':');
         this.DOM_addFile({name:alst_i[0],status:alst_i[1]||'ok'});
       }.bind(this));
     }
-    else if ( lst && this.cloud=='GoogleDisk' ) {
+    else if ( lst && $type(lst)=='array' ) {
       for (f of lst) {
-        this.DOM_addFile_Disk(f);
+        if ( this.cloud=='GoogleDisk' )
+          this.DOM_addFile_Disk(f);
+        else
+          this.DOM_addFile({name:f.title,status:f.filesize});
       }
     }
     return 1;
@@ -3063,101 +3067,102 @@ Ezer.LabelDrop= new Class({
     };
     return lst;
   },
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  GD_files_list
-// viz https://developers.google.com/drive/web/search-parameters
-  GD_files_list: function (query,callback) {
-    var retrievePageOfFiles= function(request, result) {
-      request.execute(function(resp) {
-        if ( resp.error ) {
-          Ezer.fce.warning("Disk Google není přístupný: "+resp.message);
-          callback(null);
-        }
-        result= result.concat(resp.items);
-        var nextPageToken= resp.nextPageToken;
-        if (nextPageToken) {
-          request= gapi.client.drive.files.list({
-            pageToken: nextPageToken
-          });
-          retrievePageOfFiles(request, result);
-        } else {
-          callback(result);
-        }
-      });
-    };
-    gapi.client.load('drive', 'v2', function() {
-      var initialRequest= gapi.client.drive.files.list({q: query});
-      retrievePageOfFiles(initialRequest, []);
-    });
-  },
 // ------------------------------------------------------------------------------ LabelDrop.lsdir
 //fi: LabelDrop.lsdir ()
 // zobrazí obsah složky
   continuation: null,   // bod pokračování pro fx
   lsdir: function () {
+    this.DOM_init();
     if ( this.cloud=='GoogleDisk' ) {
-      google_authorize();
-      this.DOM_init();
-      this.GD_files_list("'"+TutorialFolder+"' in parents and trashed=false",this._lsdir.bind(this));
+      Ezer.Google.authorize();
+      if ( Ezer.Google.authorized ) {
+        Ezer.Google.files_list(
+          "'"+this.folder+"' in parents and trashed=false",this._lsdir.bind(this));
+        return this;
+      }
+      else
+        return null;
+    }
+    else { // složka na serveru
+      this.ask({cmd:'lsdir',folder:this.folder},'_lsdir');
       return this;
     }
-    else
-      return null;
   },
   _lsdir: function (xs) {
+    if ( !this.cloud ) {
+      xs= xs.files;
+    }
     xs.sort(function(a,b){ return a.title>b.title ? 1 : a.title<b.title ? -1 : 0; });
     this.set(xs);
     this.continuation.stack[++this.continuation.top]= 1;
     this.continuation.eval.apply(this.continuation,[0,1]);
-    this.continuation= null;
-    // v případě úspěchu vrátíme 1
-    return 1;
   },
 // ------------------------------------------------------------------------------ LabelDrop.isdir
 //fi: LabelDrop.isdir (name)
 // pokud v kořenu definovaném init existuje takto pojmenovaná složka vrátí jeji FileId (pro GD)
-// nebo 1 - pokud neexistuje, vrátí 0
+// nebo 1; pokud neexistuje vrátí 0
   isdir: function (name) {
     if ( this.cloud=='GoogleDisk' ) {
-      google_authorize();
-      this.GD_files_list("title='"+name+"' and '"+TutorialFolder
-        +"' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
-        this._isdir.bind(this));
+      Ezer.Google.authorize();
+      if ( Ezer.Google.authorized ) {
+        Ezer.Google.files_list("title='"+name+"' and '"+this.folder
+          +"' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
+          this._isdir.bind(this));
+        return this;
+      }
+      else
+        return null;
+    }
+    else { // složka na serveru
+      this.ask({cmd:'isdir',folder:this.folder+name},'_isdir');
       return this;
     }
-    else
-      return null;
   },
   _isdir: function (xs) {
-    this.continuation.stack[++this.continuation.top]= xs.length>0 ? xs[0].id : 0;
+    this.continuation.stack[++this.continuation.top]=
+      !this.cloud ? xs.ok : (xs.length>0 ? xs[0].id : 0);
     this.continuation.eval.apply(this.continuation,[0,1]);
-    this.continuation= null;
-    // v případě úspěchu vrátíme 1
-    return 1;
   },
 // ------------------------------------------------------------------------------ LabelDrop.mkdir
 //fi: LabelDrop.mkdir (name)
 // v kořenu definovaném init vytvoří takto pojmenovanou složku a vrátí její FileId resp. 1
   mkdir: function (name) {
     if ( this.cloud=='GoogleDisk' ) {
-      google_authorize();
+      Ezer.Google.authorize();
+      if ( Ezer.Google.authorized ) {
+        this._name= name;
+        Ezer.Google.files_list("title='"+name+"' and '"+this.folder
+          +"' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
+          this._is_mkdir.bind(this));
+        return this;
+      }
+      else
+        return null;
+    }
+    else { // složka na serveru
+      this.ask({cmd:'mkdir',folder:this.folder,subfolder:name},'_mkdir');
+      return this;
+    }
+  },
+  _is_mkdir: function (xs) {    // jen pro GoogleDisk - po zjištění, zda name existuje
+    if ( xs.length>0 ) {        // složka už existuje
+      this._mkdir(xs[0]);
+    }
+    else {                      // neexistuje
       var request= gapi.client.drive.files.insert({
         resource: {
-          title: name,
-          parents: [{id:TutorialFolder}],
+          title: this._name,
+          parents: [{id:this.folder}],
           mimeType: 'application/vnd.google-apps.folder'
       }});
       request.execute(this._mkdir.bind(this));
-      return this;
     }
-    else
-      return null;
   },
   _mkdir: function (resp) {
-    this.continuation.stack[++this.continuation.top]= resp.id;
+    var folder= this.cloud=='GoogleDisk' ? resp.id : resp.folder;
+    this.continuation.stack[++this.continuation.top]= folder;
+    this.init(folder,this.cloud);       // přepnutí na nově vytvořenou složku
     this.continuation.eval.apply(this.continuation,[0,1]);
-    this.continuation= null;
-    // v případě úspěchu vrátíme 1
-    return 1;
   }
 });
 // =======================================================================================> LabelMap
@@ -4134,7 +4139,6 @@ Ezer.Select= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  initialize
 // multi=true pokud je možné volit více hodnot se stisknutým Ctrl (nebo dotykem - šoupáním doleva)
 // metody get a key přijímají a vracejí čárkami oddělený seznam hodnot
-//fm: Select.selects (list[,delimiters=',:'][,values:0)
   initialize: function(owner,desc,DOM,id,skill,multi) {
     this.multi= multi || 0;
     this.parent(owner,desc,DOM,id,skill);
