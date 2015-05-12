@@ -99,9 +99,10 @@ Clientcide.setAssetLocation(Ezer.paths.images_cc);
   // Called when authorization server replies. @param {Object} authResult Authorization result.
 Ezer.Google= {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  authorize(d)
+// požádá o přihlášení do Google Disk
   authorized: null,
   scope:'https://www.googleapis.com/auth/drive',
-  authorize: function () {
+  authorize: function (caller) {
     var ok= 0;
     if ( !this.authorized || this.authorized.expires_at<(Date.now()/1000|0) ) {
       var config= {
@@ -112,9 +113,12 @@ Ezer.Google= {
         console.log('login complete');
         console.log(gapi.auth.getToken());
         Ezer.Google.authorized= authResult && !authResult.error ? authResult : 0;
+        if ( caller && caller instanceof Ezer.Block ) {
+          caller.callProc('onautorize',[Ezer.Google.authorized ? 1 : 0]);
+        }
       });
     }
-    return this.authorized ? "uživatel autorizován" : "uživatel neautorizován";
+    return this.authorized ? "přístup na Google Disk povolen" : "žádost se vyřizuje";
   },
   // Called when the client library is loaded to start the auth flow.
   ApiLoaded: function () {

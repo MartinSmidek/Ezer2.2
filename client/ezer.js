@@ -1412,10 +1412,11 @@ Ezer.MenuLeft= new Class({
     return 1;
   },
 // ------------------------------------------------------------------------------------ click
-//fm: MenuLeft.click ([stav=0])
+//fm: MenuLeft.click ([stav=0,quiet=0])
 //      změní stav minimalizovatelného menu (format:'f'), u jiného typu se ignoruje;
-//      je-li zadán stav, zajistí pro 2 minimalizaci nebo pro 1 plnou viditelnost menu
-  click: function (stav) {
+//      je-li zadán stav=2 minimalizuje menu, je-li stav=1 zobrazí menu v plné šíři;
+//      pro quiet=1 nevolá onresize
+  click: function (stav,quiet) {
     this.DOM_click(stav,quiet);
     return 1;
   },
@@ -3018,15 +3019,15 @@ Ezer.LabelDrop= new Class({
   Extends:Ezer.Label,
 //os: LabelDrop.title - text zobrazovaný v záhlaví DropBoxu
   options: {},
-  cloud: null,       // 'GoogleDisk' nebo null tzn. souborový systém na serveru
-  folder: '/',       // relativní cesta na disku vzhledem ke kořenu aplikace nebo ID složky cloudu
+  cloud: null,       // S: pro souborový systém na serveru nebo G: pro Google Disk
+  folder: '/',       // relativní cesta na disku vzhledem k 'files/{root}' nebo ID složky cloudu
 // ------------------------------------------------------------------------------- LabelDrop.init
-//fm: LabelDrop.init (folder[,cloud=null])
+//fm: LabelDrop.init (folder[,cloud=S:])
 // inicializace oblasti pro drop souborů, definice cesty pro soubory
 // (začínající jménem a končící lomítkem a relativní k $ezer_root)
-// NEBO definice sloužky a cloudu (zatím jen GoogleDisk)
+// NEBO definice sloužky a cloudu (zatím jen S: pro server/files/{root} a G: pro Google Disk)
   init: function (folder,cloud) {
-    this.cloud= cloud||null;
+    this.cloud= cloud||'S:';
     this.folder= folder;
     this.DOM_init();
     return 1;
@@ -3048,10 +3049,12 @@ Ezer.LabelDrop= new Class({
     }
     else if ( lst && $type(lst)=='array' ) {
       for (f of lst) {
-        if ( this.cloud=='GoogleDisk' )
+        if ( this.cloud=='G:' )
           this.DOM_addFile_Disk(f);
-        else
+        else if ( this.cloud=='S:' )
           this.DOM_addFile({name:f.title,status:f.filesize});
+        else
+          Ezer.error("'"+this.cloud+"' není podporovaný cloud pro upload")
       }
     }
     return 1;
@@ -3062,18 +3065,18 @@ Ezer.LabelDrop= new Class({
   get: function () {
     var lst= '', del= '', f;
     for (f of this.DOM_files) {
-      lst+= del+(this.cloud=='GoogleDisk' ? f.title+':'+(f.fileSize||'doc') : f.name+':'+f.status);
+      lst+= del+(this.cloud=='G:' ? f.title+':'+(f.fileSize||'doc') : f.name+':'+f.status);
       del= ',';
     };
     return lst;
   },
 // ------------------------------------------------------------------------------ LabelDrop.lsdir
-//fi: LabelDrop.lsdir ()
-// zobrazí obsah složky
+//fi: LabelDrop.lsdir ([subdir=''])
+// zobrazí obsah složky, pro server může být dán parametr=jméno podsložky pro interaktivní změnu
   continuation: null,   // bod pokračování pro fx
-  lsdir: function () {
+  lsdir: function (subdir) {
     this.DOM_init();
-    if ( this.cloud=='GoogleDisk' ) {
+    if ( this.cloud=='G:' ) {
       Ezer.Google.authorize();
       if ( Ezer.Google.authorized ) {
         Ezer.Google.files_list(
@@ -3084,12 +3087,14 @@ Ezer.LabelDrop= new Class({
         return null;
     }
     else { // složka na serveru
-      this.ask({cmd:'lsdir',folder:this.folder},'_lsdir');
+      if ( subdir )
+        this.folder+= this.folder + (this.folder.substr(-1)=='/' ? '' : '/') + subdir;
+      this.ask({cmd:'lsdir',base:Ezer.options.path_files,folder:this.folder},'_lsdir');
       return this;
     }
   },
   _lsdir: function (xs) {
-    if ( !this.cloud ) {
+    if ( this.cloud=='S:' ) {
       xs= xs.files;
     }
     xs.sort(function(a,b){ return a.title>b.title ? 1 : a.title<b.title ? -1 : 0; });
@@ -3102,7 +3107,7 @@ Ezer.LabelDrop= new Class({
 // pokud v kořenu definovaném init existuje takto pojmenovaná složka vrátí jeji FileId (pro GD)
 // nebo 1; pokud neexistuje vrátí 0
   isdir: function (name) {
-    if ( this.cloud=='GoogleDisk' ) {
+    if ( this.cloud=='G:' ) {
       Ezer.Google.authorize();
       if ( Ezer.Google.authorized ) {
         Ezer.Google.files_list("title='"+name+"' and '"+this.folder
@@ -3114,20 +3119,20 @@ Ezer.LabelDrop= new Class({
         return null;
     }
     else { // složka na serveru
-      this.ask({cmd:'isdir',folder:this.folder+name},'_isdir');
+      this.ask({cmd:'isdir',base:Ezer.options.path_files,folder:this.folder+name},'_isdir');
       return this;
     }
   },
   _isdir: function (xs) {
     this.continuation.stack[++this.continuation.top]=
-      !this.cloud ? xs.ok : (xs.length>0 ? xs[0].id : 0);
+      this.cloud=='S:' ? xs.ok : (xs.length>0 ? xs[0].id : 0);
     this.continuation.eval.apply(this.continuation,[0,1]);
   },
 // ------------------------------------------------------------------------------ LabelDrop.mkdir
 //fi: LabelDrop.mkdir (name)
 // v kořenu definovaném init vytvoří takto pojmenovanou složku a vrátí její FileId resp. 1
   mkdir: function (name) {
-    if ( this.cloud=='GoogleDisk' ) {
+    if ( this.cloud=='G:' ) {
       Ezer.Google.authorize();
       if ( Ezer.Google.authorized ) {
         this._name= name;
@@ -3140,11 +3145,11 @@ Ezer.LabelDrop= new Class({
         return null;
     }
     else { // složka na serveru
-      this.ask({cmd:'mkdir',folder:this.folder,subfolder:name},'_mkdir');
+      this.ask({cmd:'mkdir',base:Ezer.options.path_files,folder:this.folder,subfolder:name},'_mkdir');
       return this;
     }
   },
-  _is_mkdir: function (xs) {    // jen pro GoogleDisk - po zjištění, zda name existuje
+  _is_mkdir: function (xs) {    // jen pro Google Disk - po zjištění, zda name existuje
     if ( xs.length>0 ) {        // složka už existuje
       this._mkdir(xs[0]);
     }
@@ -3159,7 +3164,7 @@ Ezer.LabelDrop= new Class({
     }
   },
   _mkdir: function (resp) {
-    var folder= this.cloud=='GoogleDisk' ? resp.id : resp.folder;
+    var folder= this.cloud=='G:' ? resp.id : resp.folder;
     this.continuation.stack[++this.continuation.top]= folder;
     this.init(folder,this.cloud);       // přepnutí na nově vytvořenou složku
     this.continuation.eval.apply(this.continuation,[0,1]);

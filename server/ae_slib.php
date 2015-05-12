@@ -21,6 +21,7 @@
 #     skin
 #     login_interval       -- povolená nečinnost v minutách (default 2 hodiny)
 #     tabu_db              -- databáze, se kterou se nesmí pracovat (např. "ostrá")
+#     path_files           -- absolutní cesta do složky files/{root}
 #   $js                 -- seznam skriptů
 #   $css                -- seznam stylů
 #   $pars: object       -- položky parametrizující aplikaci
@@ -157,6 +158,8 @@ __EOD;
     'path_docs'         => "'$ezer_path_docs'",  // složka pro upload skrze LabelDrop
     'theight'           => $theight
   );
+  if ( isset($options->path_files) )
+    $_SESSION[$ezer_root]['path_files']= $options->path_files;
   if ( isset($options->group_db) )
     $_SESSION[$ezer_root]['group_db']= strtr($options->group_db,array('"'=>'',"'"=>''));
   //  pokud je definováno $options->curr_version a dostupná db ezer_kernel přečte verzi jádra
@@ -725,8 +728,9 @@ function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
         $n= $level=='k' ? 'Ezer' : ' ';
       $hdr= $header($h->datum,$n,$abbr);
       $version= str_pad($h->version,10,'0',STR_PAD_LEFT);
+      $tit= addslashes($h->help);
       $lines[]= "$h->datum $version"
-              . "<div class='chng'>$hdr<span class='chng_hlp'>$h->help</span></div>";
+              . "<div class='chng'>$hdr<span class='chng_hlp' title='$tit'>$h->help</span></div>";
     }
     }
   };

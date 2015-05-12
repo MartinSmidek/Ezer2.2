@@ -284,16 +284,19 @@ Ezer.MenuLeft.implement({
     }
   },
 // ------------------------------------------------------------------------------------ DOM_excite
-//f: MenuLeft-DOM.DOM_click ([stav=0])
+//f: MenuLeft-DOM.DOM_click ([stav=0,quiet=0])
 //   změna stavu minimalizovatelného menu, pro stav=1 na plné, 2 na stažené, 0 na opak
-  DOM_click: function (stav) {
+//   pro quiet=1 nevolá onresize
+  DOM_click: function (stav,quiet) {
     if ( this.awesome && (!stav || stav!=this.awesome) ) {
+      this.awesome= !stav ? (this.awesome==1 ? 2 : 1) : (stav==1 ? 1 : 2);
       this.DOM_awesome.toggleClass('fa-caret-square-o-right').toggleClass('fa-caret-square-o-left');
-      this.owner.DOM_Block.setStyle('left',this.owner._folded ? 30 : 210);
+      this.owner.DOM_Block.setStyle('left',this.owner._folded ? 210 : 30);
+      this.DOM_Block.setStyle('width',this.owner._folded ? 210 : 30);
       this.owner._folded= !this.owner._folded;
-      this.awesome= this.awesome==1 ? 2 : 1;
-      Ezer.app.DOM_layout();
-      this.callProc('onresize',[this.awesome==1?210:30]);       // volání onresize(šíře)
+//       Ezer.app.DOM_layout();
+      if ( !quiet )
+        this.callProc('onresize',[this.awesome==1?210:30]);       // volání onresize(šíře)
     }
   },
 // ------------------------------------------------------------------------------------ DOM_excite
@@ -1085,7 +1088,7 @@ Ezer.LabelDrop.implement({
             this.DOM_addFile(f);
             var r= new FileReader();
             r.Ezer= {file:f,folder:this.folder,bind:this};
-            if ( this.cloud=='GoogleDisk' ) { // ----------------- Google Disk
+            if ( this.cloud=='G:' ) { // ------------------------- Google Disk
               f.td2.innerHTML= "načítání";
               r.readAsBinaryString(f);
               r.onload= function(e) {
@@ -1095,7 +1098,7 @@ Ezer.LabelDrop.implement({
                 this.Ezer.bind.DOM_ondrop_Disk(tf);
               }
             }
-            else { // -------------------------------------------- server disk
+            else if ( this.cloud=='S:' ) { // -------------------- server disk
               r.onload= function(e) {
                 var tf= this.Ezer.file;
                 tf.data= new Blob([e.target.result],{type:tf.type});
@@ -1104,6 +1107,8 @@ Ezer.LabelDrop.implement({
               }
               r.readAsArrayBuffer(f);
             }
+            else
+              Ezer.error("'"+this.cloud+"' není podporovaný cloud pro upload")
           };
         }.bind(this)
       }})
@@ -1159,14 +1164,22 @@ Ezer.LabelDrop.implement({
 // přidá odkaz na soubor s případným kontextovým menu, pokud je přítomna procedura onmenu
   DOM_href: function(fname) {
     var href= fname, m= '';
-    if ( this.part && (obj= this.part['onmenu']) ) {
+    if ( fname[0]=='[' ) {
+      m= " onclick=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
+      + "obj=obj[0].value||obj[0]; obj.lsdir('"+Ezer.fce.replace(fname,'\\[','',']','')+"');}\"";
+      href= "<a style='cursor:pointer' "+m+">"+fname+"</a>";
+    }
+    else if ( this.part && (obj= this.part['onmenu']) ) {
       m= " oncontextmenu=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
       + "obj=obj[0].value||obj[0];Ezer.fce.contextmenu(["
-        + "['vyjmout',function(el){obj.callProc('onmenu',['remove','"+fname+"'])}],"
-        + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all',''])}]"
+        + "['vyjmout',function(el){obj.callProc('onmenu',['remove','"+fname+"',''])}],"
+        + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all','',''])}]"
       + "],arguments[0])};return false;\"";
+      href= "<a target='docs' href='"
+          + Ezer.version+"/server/file_send.php?me="
+          + this.folder + (this.folder.substr(-1)=='/' ? '' : '/') + fname
+          + "&root=" + Ezer.root +"'"+m+">" + fname + "</a>";
     }
-    href= "<a target='docs' href='"+this.folder+fname+"'"+m+">"+fname+"</a>";
     return href;
   },
 // ------------------------------------------------------- LabelDrop.DOM_href_Disk
@@ -1296,7 +1309,8 @@ Ezer.LabelDrop.implement({
     xhr.setRequestHeader("EZER-FILE-NAME", encodeURIComponent(f.newname ? f.newname : f.name));
     xhr.setRequestHeader("EZER-FILE-CHUNK", n);
     xhr.setRequestHeader("EZER-FILE-CHUNKS", max);
-    xhr.setRequestHeader("EZER-FILE-RELPATH", this.folder);
+    //xhr.setRequestHeader("EZER-FILE-RELPATH", this.folder);
+    xhr.setRequestHeader("EZER-FILE-ABSPATH", Ezer.options.path_files+this.folder);
     xhr.onload = function(e) {
       if (e.target.status == 200) {
         // vraci pole:name|chunk/chunks|path|strlen
@@ -1310,13 +1324,12 @@ Ezer.LabelDrop.implement({
         else {
           if ( bar ) bar.value= 100;
           // záměna jména souboru za vrácené, obohacení o odkaz a délku
-          f.status= resp[5] ? "error" : resp[3];
+          f.status= resp[5] ? "error" : resp[6] ? "warning" : resp[3];
           f.td2.innerHTML= f.status;
           f.td1.innerHTML= this.DOM_href(resp[0]);
           // kontrola korektnosti
-          if ( resp[5] ) {
-            Ezer.error(resp[5],'S',this);
-          }
+          if ( resp[5] ) Ezer.error(resp[5],'S',this);
+          else if ( resp[6] ) Ezer.fce.warning(resp[6]);
           else if ( this.part && (obj= this.part['onload']) ) {
             // zavolání funkce onload ex-li s kopií f
             var ff= {name:resp[0], folder:this.folder, size:f.size, status:f.status};

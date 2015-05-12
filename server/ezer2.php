@@ -1530,17 +1530,20 @@
     }
     break;
   # ================================================================================================ LabelDrop
-  # funkce pro spolupráci s metodami LabelDrop pro soubory na serveru
+  # funkce pro spolupráci s metodami LabelDrop pro soubory na serveru - viz též drop_unlink (nížeji)
   # ------------------------------------------------------------------------------------ lsdir
-  # vrátí seznam souborů ze složky x.folder ve tvaru pole objektů {title:jméno,filesize:délka}
+  # vrátí seznam souborů ze složky x.base+x.folder ve tvaru pole objektů {title:jméno,filesize:délka}
   case 'lsdir':
     $y->files= array();
-    $dir= stripslashes($x->folder);
+    $dir= cz2ascii(stripslashes($x->base.$x->folder));
     if (is_dir($dir)) {
       if ($dh= opendir($dir)) {
         while (($file= readdir($dh)) !== false) {
           if ( is_file("$dir/$file") ) {
             $y->files[]= (object)array('title'=>$file,'filesize'=>filesize("$dir/$file"));
+          }
+          elseif ( is_dir("$dir/$file") && $file!='.' && $file!='..') {
+            $y->files[]= (object)array('title'=>"[$file]",'filesize'=>' ');
           }
         }
         closedir($dh);
@@ -1548,19 +1551,21 @@
     }
     break;
   # ------------------------------------------------------------------------------------ isdir
-  # vrátí 1 pokud x.folder je složka, jinak vrátí 0
+  # vrátí 1 pokud x.base+x.folder je složka, jinak vrátí 0
   case 'isdir':
-    $dir= stripslashes($x->folder);
+    $dir= cz2ascii(stripslashes($x->base.$x->folder));
     $y->ok= is_dir($dir) ? 1 : 0;
     break;
   # ------------------------------------------------------------------------------------ mkdir
-  # pokud složka folder/subfolder existuje vrátí ji, jinak subfolder vytvoří a vrátí jej, 0 při chybě
+  # pokud složka x.base+folder/subfolder existuje vrátí ji,
+  # jinak subfolder vytvoří a vrátí jej, 0 při chybě
+  # -- jméno souboru je transformováno
   case 'mkdir':
-    $dir= stripslashes($x->folder.$x->subfolder);
+    $dir= cz2ascii(stripslashes($x->base.$x->folder.$x->subfolder));
     if ( is_dir($dir) )
-      $y->folder= $dir;
+      $y->folder= cz2ascii($x->folder.$x->subfolder);
     else
-      $y->folder= mkdir($dir) ? $dir : 0;
+      $y->folder= mkdir($dir) ? cz2ascii($x->folder.$x->subfolder) : 0;
     break;
   # ================================================================================================ CODE
   # překlad předaného ezercriptu a jeho zapamatování v SESSION
@@ -2281,22 +2286,49 @@ function load_files($x,$y) {
   }
   $y->rows= $i;
 }
+# =================================================================================================> FILES
+# funkce pro LabelDrop - mazání souborů
+# -------------------------------------------------------------------------------------------------- drop_unlink
+# pokud $file=* budou smazány všechny soubory v dané složce, funkce vrací počet smazaných souborů
+function drop_unlink($folder,$file) {
+  global $ezer_root;
+  $path_files= trim($_SESSION[$ezer_root]['path_files'],"'/");
+  $deleted= 0;
+  if ( $file=='*' ) {
+    // smazání všech souborů složky
+    $path= trim(str_replace('//','/',"$path_files/$folder")," /");
+    if ($handle= opendir($path)) {
+      while (false !== ($file= readdir($handle))) {
+        if (is_file("$path/$file")) {
+          $deleted+= @unlink("$path/$file") ? 1 : 0;
+        }
+      }
+      closedir($handle);
+    }
+  }
+  else {
+    // smazání jednoho souboru
+    $path= str_replace('//','/',"$path_files/$folder/$file");
+    $deleted= unlink($path) ? 1 : 0;
+  }
+  return $deleted;
+}
 # -------------------------------------------------------------------------------------------------- cz2ascii
-# transformace textu s diakritikou na prosté ASCII bez mezer
-function cz2ascii($x) {
+# transformace textu s diakritikou na prosté ASCII bez mezer (znaky $but jsou ponechány)
+function cz2ascii($x,$but='') {
   $tab= array(
     'ä'=>'a', 'Ä'=>'A', 'á'=>'a', 'Á'=>'A', 'č'=>'c', 'Č'=>'C', 'ć'=>'c', 'Ć'=>'C', 'ď'=>'d',
     'Ď'=>'D', 'ě'=>'e', 'Ě'=>'E', 'é'=>'e', 'É'=>'E', 'ë'=>'e', 'Ë'=>'E', 'í'=>'i', 'Í'=>'I',
     'ľ'=>'l', 'Ľ'=>'L', 'ń'=>'n', 'Ń'=>'N', 'ň'=>'n', 'Ň'=>'N', 'ó'=>'o', 'Ó'=>'O', 'ö'=>'o',
     'Ö'=>'O', 'ř'=>'r', 'Ř'=>'R', 'ŕ'=>'r', 'Ŕ'=>'R', 'š'=>'s', 'Š'=>'S', 'ś'=>'s', 'Ś'=>'S',
     'ť'=>'t', 'Ť'=>'T', 'ú'=>'u', 'Ú'=>'U', 'ů'=>'u', 'Ů'=>'U', 'ü'=>'u', 'Ü'=>'U', 'ý'=>'y',
-    'Ý'=>'Y', 'ž'=>'z', 'Ž'=>'Z', 'ź'=>'z', 'Ź'=>'Z', ' '=>'_'
+    'Ý'=>'Y', 'ž'=>'z', 'Ž'=>'Z', 'ź'=>'z', 'Ź'=>'Z' //, ' '=>'_'
   );
   $y= strtr($x,$tab);
   $z= '';
   for ($i= 0; $i<mb_strlen($y); $i++) {
     $ch= mb_substr($y,$i,1);
-    $z.= ( ord($ch)<33 || ord($ch)>126 ) ? '_' : $ch;
+    $z.= strpos($but,$ch)===false && ( ord($ch)<33 || ord($ch)>126 ) ? '_' : $ch;
   }
   return $z;
 }
