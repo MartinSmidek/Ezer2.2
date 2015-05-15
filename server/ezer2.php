@@ -2327,6 +2327,25 @@ function drop_unlink($folder,$file) {
   }
   return $deleted;
 }
+# -------------------------------------------------------------------------------------------------- drop_find
+# najde jméno prvního souboru vyhovující dané masce
+function drop_find($folder,$mask) {     // trace();
+  global $ezer_root;
+  $path_files= trim($_SESSION[$ezer_root]['path_files'],"'/");
+  $found= '';
+  // projdi soubory složky
+  $path= trim(str_replace('//','/',"$path_files/$folder")," /");
+//                                                         display($path);
+  if ( $dh= opendir($path) ) {
+    while ( ($file= readdir($dh)) !== false ) {
+      if ( is_file("$path/$file") && preg_match("/$mask/",$file) ) {
+        $found= $file;
+      }
+    }
+    closedir($dh);
+  }
+  return $found;
+}
 # -------------------------------------------------------------------------------------------------- cz2ascii
 # transformace textu s diakritikou na prosté ASCII bez mezer (znaky $but jsou ponechány)
 function cz2ascii($x,$but='') {
