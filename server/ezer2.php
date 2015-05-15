@@ -1539,11 +1539,24 @@
     if (is_dir($dir)) {
       if ($dh= opendir($dir)) {
         while (($file= readdir($dh)) !== false) {
-          if ( is_file("$dir/$file") ) {
-            $y->files[]= (object)array('title'=>$file,'filesize'=>filesize("$dir/$file"));
+          if ( is_dir("$dir/$file") && $file!='.' && $file!='..') {
+            $y->files[]= (object)array('name'=>$file,'title'=>"[$file]",'size'=>' ');
           }
-          elseif ( is_dir("$dir/$file") && $file!='.' && $file!='..') {
-            $y->files[]= (object)array('title'=>"[$file]",'filesize'=>' ');
+          else {
+            if ( $x->mask ) {
+              if ( preg_match("/{$x->mask}/",$file,$m) ) {
+                if ( isset($m[1]) ) {
+                  $y->files[]= (object)array('name'=>$file,'title'=>$m[1],'size'=>filesize("$dir/$file"));
+                }
+                else {
+                  $y->files[]= (object)array('name'=>$file,'title'=>$file,'size'=>filesize("$dir/$file"));
+                }
+              }
+              else continue;
+            }
+            else {
+              $y->files[]= (object)array('name'=>$file,'title'=>$file,'size'=>filesize("$dir/$file"));
+            }
           }
         }
         closedir($dh);
@@ -2305,11 +2318,12 @@ function drop_unlink($folder,$file) {
       }
       closedir($handle);
     }
+    $deleted= "bylo smazáno $deleted souborů";
   }
   else {
     // smazání jednoho souboru
     $path= str_replace('//','/',"$path_files/$folder/$file");
-    $deleted= unlink($path) ? 1 : 0;
+    $deleted= unlink($path) ? "soubor $file byl smazán" : "odstranění souboru se nepovedlo";
   }
   return $deleted;
 }

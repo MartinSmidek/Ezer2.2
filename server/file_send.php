@@ -1,9 +1,10 @@
 <?php # (c) 2008 Martin Smidek <martin@smidek.eu>
 error_reporting(E_ALL & ~E_NOTICE);
 session_start();
-if ( isset($_GET['me']) ) {
+if ( isset($_GET['name']) ) {
   # --------------------------------------------------------------------------------------- download
-  $filename= $_GET['me'];
+  $filename= $_GET['name'];
+  $title= isset($_GET['title']) ? $_GET['title'] : $filename;
   // test přihlášení
   $er= 0;
   $ezer_root= isset($_GET['root']) ? $_GET['root'] : null;
@@ -24,13 +25,26 @@ if ( isset($_GET['me']) ) {
   if ( !file_exists($file)) {
     $er= "soubor není dostupny"; goto err;
   };
+  // zjištění typu
+  $f= pathinfo($file);
+  $fext= strtolower($f['extension']);
   // poslání souboru
   header('Content-Description: File Transfer');
-  header('Content-Type: application/octet-stream');
-  header('Content-Disposition: attachment; filename='.basename($file));
-  header('Expires: 0');
-  header('Cache-Control: must-revalidate');
-  header('Pragma: public');
+  switch ($fext) {
+  case 'pdf': header('Content-Type: application/pdf');
+              header("Content-Disposition: inline; filename=\"$title\";");
+              header('Content-Transfer-Encoding: binary');
+              break;
+  case 'png': header('Content-Type: image/png');
+              header("Content-Disposition: inline; filename=\"$title\";");
+              break;
+  default:    header('Content-Type: application/octet-stream');
+              header("Content-Disposition: attachment; filename=$title");
+              break;
+  }
+//   header('Expires: 0');
+//   header('Cache-Control: must-revalidate');
+//   header('Pragma: public');
   header('Content-Length: ' . filesize($file));
   readfile($file);
 //   echo($file);

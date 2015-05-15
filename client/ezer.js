@@ -3021,14 +3021,18 @@ Ezer.LabelDrop= new Class({
   options: {},
   cloud: null,       // S: pro souborový systém na serveru nebo G: pro Google Disk
   folder: '/',       // relativní cesta na disku vzhledem k 'files/{root}' nebo ID složky cloudu
+  mask: '',          // regulární výraz pro omezení jmen souborů (pro preg_match)
 // ------------------------------------------------------------------------------- LabelDrop.init
-//fm: LabelDrop.init (folder[,cloud=S:])
+//fm: LabelDrop.init (folder[,cloud=S:[,mask='']])
 // inicializace oblasti pro drop souborů, definice cesty pro soubory
 // (začínající jménem a končící lomítkem a relativní k $ezer_root)
 // NEBO definice sloužky a cloudu (zatím jen S: pro server/files/{root} a G: pro Google Disk)
-  init: function (folder,cloud) {
+// nepovinná maska se používá pro výběr a zobrazení v lsdir - pokud je ve výrazu skupina (),
+// použije se v lsdir pro zobrazení souboru
+  init: function (folder,cloud,mask) {
     this.cloud= cloud||'S:';
     this.folder= folder;
+    this.mask= mask||'';
     this.DOM_init();
     return 1;
   },
@@ -3052,7 +3056,7 @@ Ezer.LabelDrop= new Class({
         if ( this.cloud=='G:' )
           this.DOM_addFile_Disk(f);
         else if ( this.cloud=='S:' )
-          this.DOM_addFile({name:f.title,status:f.filesize});
+          this.DOM_addFile({name:f.name,title:f.title,status:f.size});
         else
           Ezer.error("'"+this.cloud+"' není podporovaný cloud pro upload")
       }
@@ -3071,7 +3075,7 @@ Ezer.LabelDrop= new Class({
     return lst;
   },
 // ------------------------------------------------------------------------------ LabelDrop.lsdir
-//fi: LabelDrop.lsdir ([subdir=''])
+//fi: LabelDrop.lsdir ([subdir='',mask=''])
 // zobrazí obsah složky, pro server může být dán parametr=jméno podsložky pro interaktivní změnu
   continuation: null,   // bod pokračování pro fx
   lsdir: function (subdir) {
@@ -3089,7 +3093,7 @@ Ezer.LabelDrop= new Class({
     else { // složka na serveru
       if ( subdir )
         this.folder+= this.folder + (this.folder.substr(-1)=='/' ? '' : '/') + subdir;
-      this.ask({cmd:'lsdir',base:Ezer.options.path_files,folder:this.folder},'_lsdir');
+      this.ask({cmd:'lsdir',base:Ezer.options.path_files,folder:this.folder,mask:this.mask},'_lsdir');
       return this;
     }
   },

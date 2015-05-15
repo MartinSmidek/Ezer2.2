@@ -293,7 +293,7 @@ i.efa { width:30px; margin-left:-30px; }
   color:#ccc; font-style:italic; }
 .ContextMenu li a.disabled:hover {
   background-color:#eee; }
-.ContextFocus {
+.ContextFocus { /* viz taky LabelDrop */
   background-color:#ffa !important; }
 #clipboard {
   width:150px; height:15px; cursor:default; position:relative; z-index:1; }
@@ -450,8 +450,10 @@ div.LabelDrop tr > td {
   overflow:hidden; text-overflow:ellipsis; }
 div.LabelDrop progress {
   width:100%; }
-.LabelDrop td, .LabelDrop a {
+div.LabelDrop td, div.LabelDrop a {
   color:$fc_item }
+div.LabelDrop .ContextFocus {
+  background-color:$b_kuk !important; color:$c2_kuk; }
 
 .Field {
   position:absolute; height:16px !important; width:100%; border:1px solid #aaa; z-index:1; }
