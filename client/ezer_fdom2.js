@@ -1162,28 +1162,30 @@ Ezer.LabelDrop.implement({
   },
 // ------------------------------------------------------- LabelDrop.DOM_href
 // přidá odkaz na soubor s případným kontextovým menu, pokud je přítomna procedura onmenu
+// f.name je vždy definováno, f.title jen pokud bylo vytvořeno pomocí this.mask v lsdir
   DOM_href: function(f) {
-    var fname= f.name, m= '';
-    var href= f.title||f.name; // default
-    if ( fname[0]=='[' ) {
+    var m, href, title= f.title||f.name;
+    if ( f.name[0]=='[' ) {
       // pokud je to složka
       m= " onclick=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
-      + "obj=obj[0].value||obj[0]; obj.lsdir('"+Ezer.fce.replace(fname,'\\[','',']','')+"');}\"";
-      href= "<a style='cursor:pointer' "+m+">"+fname+"</a>";
+      + "obj=obj[0].value||obj[0]; obj.lsdir('"+Ezer.fce.replace(f.name,'\\[','',']','')+"');}\"";
+      href= "<a style='cursor:pointer' "+m+">"+f.name+"</a>";
     }
     else if ( this.part && (obj= this.part['onmenu']) ) {
       var ref= Ezer.version + "/server/file_send.php?name="
-          + this.folder + (this.folder.substr(-1)=='/' ? '' : '/') + fname
+          + this.folder + (this.folder.substr(-1)=='/' ? '' : '/') + f.name
           + ( f.title ? "&title=" + f.title : '' )
           + "&root=" + Ezer.root;
       // pokud existuje script onmenu
       m= " oncontextmenu=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
       + "obj=obj[0].value||obj[0];Ezer.fce.contextmenu(["
-        + "['zobrazit',function(el){obj.callProc('onmenu',['viewer','"+f.title+"','"+ref+"'])}],"
-        + "['vyjmout', function(el){obj.callProc('onmenu',['remove','"+fname+"',''])}],"
+        + "['zobrazit',function(el){obj.callProc('onmenu',['viewer','"+title+"','"+ref+"'])}],"
+        + "['vyjmout', function(el){obj.callProc('onmenu',['remove','"+title+"','"+f.name+"'])}],"
       + "],arguments[0])};return false;\"";
-      //href= "<a target='docs' href='" + ref + "'" + m + ">" + href + "</a>";
-      href= "<a style='cursor:pointer' " + m + ">" + href + "</a>";
+      href= "<a style='cursor:pointer' " + m + ">" + title + "</a>";
+    }
+    else {
+      href= title;
     }
     return href;
   },
