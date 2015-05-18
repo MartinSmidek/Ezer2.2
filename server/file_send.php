@@ -24,7 +24,7 @@ if ( isset($_GET['name']) ) {
   };
   $file= str_replace('//','/',"$path_files/$filename");
   if ( !file_exists($file)) {
-    $er= "soubor '$file' není dostupny"; goto err;
+    $er= "soubor '$file' neni dostupny"; goto err;
   };
   // zjištění typu
   $f= pathinfo($file);
@@ -59,7 +59,9 @@ else {
   $name=   utf2ascii(urldecode($name));
   $chunk=  $_SERVER['HTTP_EZER_FILE_CHUNK'];
   $chunks= $_SERVER['HTTP_EZER_FILE_CHUNKS'];
-  $path=   $_SERVER['HTTP_EZER_FILE_ABSPATH'];
+  $path=   isset($_SERVER['HTTP_EZER_FILE_RELPATH'])
+         ? $_SERVER['DOCUMENT_ROOT'].'/'.$_SERVER['HTTP_EZER_FILE_RELPATH']  // S:
+         : $_SERVER['HTTP_EZER_FILE_ABSPATH'];                                               // H:
   $pname= stripslashes("$path/$name");
 
   $data= file_get_contents("php://input");
@@ -78,7 +80,7 @@ else {
   // test konce
   if ( count($_SESSION['upload'][$name])==($chunks-1) ) {
     // poskládej a ulož soubor
-    $errmsg1= "ERROR soubor $name byl přenesen ale nelze zapsat do složky na serveru";
+    $errmsg1= "ERROR soubor $name byl přenesen ale nelze zapsat do složky '$path' na serveru";
     $errmsg2= "ERROR soubor $name byl přenesen ale má nulovou délku";
     $f= @fopen($pname,'w');
     if ( !$f ) { $err= $errmsg1; goto end; }

@@ -1162,31 +1162,47 @@ Ezer.LabelDrop.implement({
   },
 // ------------------------------------------------------- LabelDrop.DOM_href
 // přidá odkaz na soubor s případným kontextovým menu, pokud je přítomna procedura onmenu
-// f.name je vždy definováno, f.title jen pokud bylo vytvořeno pomocí this.mask v lsdir
+// pro S: je f.name vždy definováno, f.title je vynecháno
+// pro H: je f.name vždy definováno, f.title jen pokud bylo vytvořeno pomocí this.mask v lsdir
   DOM_href: function(f) {
-    var m, href, title= f.title||f.name;
-    if ( f.name[0]=='[' ) {
-      // pokud je to složka
-      m= " onclick=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
-      + "obj=obj[0].value||obj[0]; obj.lsdir('"+Ezer.fce.replace(f.name,'\\[','',']','')+"');}\"";
-      href= "<a style='cursor:pointer' "+m+">"+f.name+"</a>";
+    var m, href;
+    if ( this.cloud=='S:' ) {   // úložiště   viditelné protokolem http: ./docs/{root}
+      // kontextové menu, pokud je přítomna procedura onremove
+      var m= '';
+      if ( this.part && (obj= this.part['onmenu']) ) {
+        m= " oncontextmenu=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
+        + "obj=obj[0].value||obj[0];Ezer.fce.contextmenu(["
+          + "['vyjmout',function(el){obj.callProc('onmenu',['remove','"+f.name+"'])}],"
+          + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all',''])}]"
+        + "],arguments[0])};return false;\"";
+      }
+      href= "<a target='docs' href='"+this.folder+f.name+"'"+m+">"+f.name+"</a>";
     }
-    else if ( this.part && (obj= this.part['onmenu']) ) {
-      var ref= Ezer.version + "/server/file_send.php?name="
-          + this.folder + (this.folder.substr(-1)=='/' ? '' : '/') + f.name
-//           + ( f.title ? "&title=" + f.title : '' )
-          + "&title=" + title
-          + "&root=" + Ezer.root;
-      // pokud existuje script onmenu
-      m= " oncontextmenu=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
-      + "obj=obj[0].value||obj[0];Ezer.fce.contextmenu(["
-        + "['stáhnout',function(el){obj.callProc('onmenu',['viewer','"+title+"','"+ref+"'])}],"
-        + "['vyjmout', function(el){obj.callProc('onmenu',['remove','"+title+"','"+f.name+"'])}],"
-      + "],arguments[0])};return false;\"";
-      href= "<a style='cursor:pointer' " + m + ">" + title + "</a>";
-    }
-    else {
-      href= title;
+    if ( this.cloud=='H:' ) {   // úložiště neviditelné protokolem http: ../files/{root}
+      if ( f.name[0]=='[' ) {
+        // pokud je to složka
+        m= " onclick=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
+        + "obj=obj[0].value||obj[0]; obj.lsdir('"+Ezer.fce.replace(f.name,'\\[','',']','')+"');}\"";
+        href= "<a style='cursor:pointer' "+m+">"+f.name+"</a>";
+      }
+      else if ( this.part && (obj= this.part['onmenu']) ) {
+        var title= f.title||f.name;
+        var ref= Ezer.version + "/server/file_send.php?name="
+            + this.folder + (this.folder.substr(-1)=='/' ? '' : '/') + f.name
+  //           + ( f.title ? "&title=" + f.title : '' )
+            + "&title=" + title
+            + "&root=" + Ezer.root;
+        // pokud existuje script onmenu
+        m= " oncontextmenu=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
+        + "obj=obj[0].value||obj[0];Ezer.fce.contextmenu(["
+          + "['stáhnout',function(el){obj.callProc('onmenu',['viewer','"+title+"','"+ref+"'])}],"
+          + "['vyjmout', function(el){obj.callProc('onmenu',['remove','"+title+"','"+f.name+"'])}],"
+        + "],arguments[0])};return false;\"";
+        href= "<a style='cursor:pointer' " + m + ">" + title + "</a>";
+      }
+      else {
+        href= title;
+      }
     }
     return href;
   },
@@ -1316,8 +1332,10 @@ Ezer.LabelDrop.implement({
     xhr.setRequestHeader("EZER-FILE-NAME", encodeURIComponent(f.newname ? f.newname : f.name));
     xhr.setRequestHeader("EZER-FILE-CHUNK", n);
     xhr.setRequestHeader("EZER-FILE-CHUNKS", max);
-    //xhr.setRequestHeader("EZER-FILE-RELPATH", this.folder);
-    xhr.setRequestHeader("EZER-FILE-ABSPATH", Ezer.options.path_files+this.folder);
+    if ( this.cloud=='S:' )             // S: relativní cesta pro http
+      xhr.setRequestHeader("EZER-FILE-RELPATH", this.folder);
+    else                                // H: absolutní
+      xhr.setRequestHeader("EZER-FILE-ABSPATH", Ezer.options.path_files+this.folder);
     xhr.onload = function(e) {
       if (e.target.status == 200) {
         // vraci pole:name|chunk/chunks|path|strlen

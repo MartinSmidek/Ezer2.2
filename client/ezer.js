@@ -3019,18 +3019,19 @@ Ezer.LabelDrop= new Class({
   Extends:Ezer.Label,
 //os: LabelDrop.title - text zobrazovaný v záhlaví DropBoxu
   options: {},
-  cloud: null,       // S: pro souborový systém na serveru nebo G: pro Google Disk
+  cloud: null,       // S:,H: pro souborový systém na serveru nebo G: pro Google Disk
   folder: '/',       // relativní cesta na disku vzhledem k 'files/{root}' nebo ID složky cloudu
   mask: '',          // regulární výraz pro omezení jmen souborů (pro preg_match)
 // ------------------------------------------------------------------------------- LabelDrop.init
 //fm: LabelDrop.init (folder[,cloud=S:[,mask='']])
 // inicializace oblasti pro drop souborů, definice cesty pro soubory
 // (začínající jménem a končící lomítkem a relativní k $ezer_root)
-// NEBO definice sloužky a cloudu (zatím jen S: pro server/files/{root} a G: pro Google Disk)
+// NEBO definice sloužky a cloudu (zatím jen S: pro docs/{root}, H: pro ../files/{root} na serveru
+// a G: pro Google Disk)
 // nepovinná maska se používá pro výběr a zobrazení v lsdir - pokud je ve výrazu skupina (),
 // použije se v lsdir pro zobrazení souboru
   init: function (folder,cloud,mask) {
-    this.cloud= cloud||'S:';
+    this.cloud= cloud||'S:';            // S: je pro soubory viditelné přes http
     this.folder= folder;
     this.mask= mask||'';
     this.DOM_init();
@@ -3055,7 +3056,7 @@ Ezer.LabelDrop= new Class({
       for (f of lst) {
         if ( this.cloud=='G:' )
           this.DOM_addFile_Disk(f);
-        else if ( this.cloud=='S:' )
+        else if ( this.cloud=='S:' || this.cloud=='H:' )
           this.DOM_addFile({name:f.name,title:f.title,status:f.size});
         else
           Ezer.error("'"+this.cloud+"' není podporovaný cloud pro upload")
@@ -3098,7 +3099,7 @@ Ezer.LabelDrop= new Class({
     }
   },
   _lsdir: function (xs) {
-    if ( this.cloud=='S:' ) {
+    if ( this.cloud=='S:' || this.cloud=='H:' ) {
       xs= xs.files;
     }
     xs.sort(function(a,b){ return a.title>b.title ? 1 : a.title<b.title ? -1 : 0; });
@@ -3129,7 +3130,7 @@ Ezer.LabelDrop= new Class({
   },
   _isdir: function (xs) {
     this.continuation.stack[++this.continuation.top]=
-      this.cloud=='S:' ? xs.ok : (xs.length>0 ? xs[0].id : 0);
+      this.cloud=='S:' || this.cloud=='H:' ? xs.ok : (xs.length>0 ? xs[0].id : 0);
     this.continuation.eval.apply(this.continuation,[0,1]);
   },
 // ------------------------------------------------------------------------------ LabelDrop.mkdir

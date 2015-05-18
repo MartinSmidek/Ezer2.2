@@ -1539,7 +1539,10 @@
     if (is_dir($dir)) {
       if ($dh= opendir($dir)) {
         while (($file= readdir($dh)) !== false) {
-          if ( is_dir("$dir/$file") && $file!='.' && $file!='..') {
+          if ( $file=='.' || $file=='..') {
+            continue;
+          }
+          if ( is_dir("$dir/$file") ) {
             $y->files[]= (object)array('name'=>$file,'title'=>"[$file]",'size'=>' ');
           }
           else {
