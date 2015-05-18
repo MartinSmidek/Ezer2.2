@@ -9,7 +9,7 @@ if ( isset($_GET['name']) ) {
   $er= 0;
   $ezer_root= isset($_GET['root']) ? $_GET['root'] : null;
   if ( !$ezer_root ) {
-    $er= "soubory lze stahnout jen z prostredi Answeru"; goto err;
+    $er= "soubory lze stahnout jen z prostredi Ezeru"; goto err;
   }
   $user_id= isset($_SESSION[$ezer_root]) && isset($_SESSION[$ezer_root]['user_id'])
           ? $_SESSION[$ezer_root]['user_id'] : 0;
@@ -17,13 +17,14 @@ if ( isset($_GET['name']) ) {
     $er= "uzivatel neni prihlasen"; goto err;
   }
   // zjištění cesty a existence souboru
-  $path_files= trim($_SESSION[$ezer_root]['path_files'],"'/");
+  $path_files= trim($_SESSION[$ezer_root]['path_files']," '");
+  $path_files= rtrim($path_files,"/");
   if ( !file_exists($path_files)) {
-    $er= "cesta k souboru není dostupna"; goto err;
+    $er= "cesta '$path_files' ke slozce neni dostupna"; goto err;
   };
   $file= str_replace('//','/',"$path_files/$filename");
   if ( !file_exists($file)) {
-    $er= "soubor není dostupny"; goto err;
+    $er= "soubor '$file' není dostupny"; goto err;
   };
   // zjištění typu
   $f= pathinfo($file);

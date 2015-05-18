@@ -2305,11 +2305,12 @@ function load_files($x,$y) {
 # pokud $file=* budou smazány všechny soubory v dané složce, funkce vrací počet smazaných souborů
 function drop_unlink($folder,$file) {
   global $ezer_root;
-  $path_files= trim($_SESSION[$ezer_root]['path_files'],"'/");
+  $path_files= trim($_SESSION[$ezer_root]['path_files'],"' ");
+  $path_files= rtrim($path_files,"/");
   $deleted= 0;
   if ( $file=='*' ) {
     // smazání všech souborů složky
-    $path= trim(str_replace('//','/',"$path_files/$folder")," /");
+    $path= rtrim(str_replace('//','/',"$path_files/$folder"),"/");
     if ($handle= opendir($path)) {
       while (false !== ($file= readdir($handle))) {
         if (is_file("$path/$file")) {
@@ -2331,13 +2332,14 @@ function drop_unlink($folder,$file) {
 # najde jméno prvního souboru vyhovující dané masce
 function drop_find($folder,$mask) {     // trace();
   global $ezer_root;
-  $path_files= trim($_SESSION[$ezer_root]['path_files'],"'/");
+  $path_files= trim($_SESSION[$ezer_root]['path_files'],"' ");
   $found= '';
   // projdi soubory složky
-  $path= trim(str_replace('//','/',"$path_files/$folder")," /");
-//                                                         display($path);
+  $path= str_replace('//','/',"$path_files/$folder");
+  $path= rtrim($path,"/");
   if ( $dh= opendir($path) ) {
     while ( ($file= readdir($dh)) !== false ) {
+//                                                         display("$ezer_root,$path/$file");
       if ( is_file("$path/$file") && preg_match("/$mask/",$file) ) {
         $found= $file;
       }
