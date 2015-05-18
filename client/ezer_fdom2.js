@@ -1332,7 +1332,7 @@ Ezer.LabelDrop.implement({
           // záměna jména souboru za vrácené, obohacení o odkaz a délku
           f.status= resp[5] ? "error" : resp[6] ? "warning" : resp[3];
           f.td2.innerHTML= f.status;
-          f.td1.innerHTML= this.DOM_href(resp[0]);
+          f.td1.innerHTML= this.DOM_href({name:resp[0]});
           // kontrola korektnosti
           if ( resp[5] ) Ezer.error(resp[5],'S',this);
           else if ( resp[6] ) Ezer.fce.warning(resp[6]);
