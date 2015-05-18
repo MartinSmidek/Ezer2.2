@@ -1174,12 +1174,13 @@ Ezer.LabelDrop.implement({
     else if ( this.part && (obj= this.part['onmenu']) ) {
       var ref= Ezer.version + "/server/file_send.php?name="
           + this.folder + (this.folder.substr(-1)=='/' ? '' : '/') + f.name
-          + ( f.title ? "&title=" + f.title : '' )
+//           + ( f.title ? "&title=" + f.title : '' )
+          + "&title=" + title
           + "&root=" + Ezer.root;
       // pokud existuje script onmenu
       m= " oncontextmenu=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
       + "obj=obj[0].value||obj[0];Ezer.fce.contextmenu(["
-        + "['zobrazit',function(el){obj.callProc('onmenu',['viewer','"+title+"','"+ref+"'])}],"
+        + "['stáhnout',function(el){obj.callProc('onmenu',['viewer','"+title+"','"+ref+"'])}],"
         + "['vyjmout', function(el){obj.callProc('onmenu',['remove','"+title+"','"+f.name+"'])}],"
       + "],arguments[0])};return false;\"";
       href= "<a style='cursor:pointer' " + m + ">" + title + "</a>";
