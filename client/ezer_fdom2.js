@@ -1088,7 +1088,7 @@ Ezer.LabelDrop.implement({
             this.DOM_addFile(f);
             var r= new FileReader();
             r.Ezer= {file:f,folder:this.folder,bind:this};
-            if ( this.cloud=='G:' ) { // ------------------------- Google Disk
+            if ( this.cloud=='G:' ) { // ----------------------------- Google Disk
               f.td2.innerHTML= "načítání";
               r.readAsBinaryString(f);
               r.onload= function(e) {
@@ -1098,7 +1098,7 @@ Ezer.LabelDrop.implement({
                 this.Ezer.bind.DOM_ondrop_Disk(tf);
               }
             }
-            else if ( this.cloud=='S:' ) { // -------------------- server disk
+            else if ( this.cloud=='S:' || this.cloud=='H:' ) { // ---- server file system
               r.onload= function(e) {
                 var tf= this.Ezer.file;
                 tf.data= new Blob([e.target.result],{type:tf.type});
