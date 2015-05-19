@@ -485,6 +485,9 @@ Ezer.Application.implement({
       codes.map.extend(codes.select.extend(codes.onstart)).push({o:'v',v:'ok'});
       this.start_code_seq(top,codes.map,'start_href_modify');
     }
+    else {
+      this.start_href_modify();
+    }
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  start_code_seq
 // top je kořenný blok, code je kód, end je this.funkce volaná na závěr

@@ -122,6 +122,13 @@ Ezer.Application= new Class({
     $('login').setStyle('display','block');
     if ( uname ) $('username').value= uname;
     if ( pword ) $('password').value= pword;
+    // odmítnutí přihlásit se
+    if ( $('login_no') && Ezer.options.web!=undefined ) {
+      $('login_no').addEvent('click',function(){
+        document.location.href= Ezer.options.web;
+      });
+    }
+    // přihlášení
     if ( $('login_on') ) {
       var bw= {body:$('body').getSize(),screen:{x:screen.width,y:screen.height}};
       $('login_on').addEvent('click',function(){

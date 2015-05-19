@@ -2502,7 +2502,7 @@ function mysql_qry($qry,$pocet=null,$err=null,$to_throw=false,$db='') {
   $qry_del= "\n: ";
   if ( $msg ) {
     if ( $to_throw ) throw new Exception($err ? "$err$abbr" : $msg);
-    else $y->error.= $msg;
+    else $y->error= (isset($y->error) ? $y->error : '').$msg;
   }
 end:
   return $res;
