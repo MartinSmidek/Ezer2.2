@@ -661,7 +661,7 @@ Ezer.Panel.implement({
     if ( t!==undefined ) this.DOM_Block.setStyle('top',t);
     if ( !noevent ) {
       // nejprve provedeme případné onresize, pokud se změnily rozměry a pokud panel má onresize
-      if ( this.part.onresize &&
+      if ( this.part && this.part.onresize &&
            ( this._screen.width!=Ezer.sys.screen.width
           || this._screen.height!=Ezer.sys.screen.height ) ) {
         // pokud ano, zapamatujeme si ty nove
@@ -2252,9 +2252,9 @@ Ezer.Chat.implement({
 //      Select má společné zobrazení a implementuje třídu Drag
 //t: Block-DOM,Elem-DOM
 //s: Block-DOM
+Ezer.Select.DOM_currMulti= null;                // aktivní multi select
 // -------------------------------------------------------------------------- DOM_clearDropLists
 // schová rozvinutý DropList při kliknutí mimo něj
-Ezer.Select.DOM_currMulti= null;                // aktivní multi select
 Ezer.Select.DOM_clearDropLists= function() {
   if ( Ezer.Select.DOM_currMulti && Ezer.Select.DOM_currMulti._drop_status==2 )
     Ezer.Select.DOM_currMulti.DOM_drop_hide();
@@ -2275,7 +2275,8 @@ Ezer.Select.implement({
 // ------------------------------------------------------------------------------ DOM_drop_hide
 // skrytí seznamu a případný signál změny
   DOM_drop_hide: function(nochange) {
-    this.DOM_DropList.setStyle('display','none');
+  this.DOM_Block.setStyle('zIndex',1);
+  this.DOM_DropList.setStyle('display','none');
     if ( !nochange && (!this.multi || this._drop_status==2) ) {
       if ( this._drop_changed )
         this.change();
