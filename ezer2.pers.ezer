@@ -1,4 +1,4 @@
-#pragma library
+#pragma library,test
 
 # Systém Ezer2 - panel osobního nastavení
 # (c) 2010-2011 Martin Šmídek <martin@smidek.eu>

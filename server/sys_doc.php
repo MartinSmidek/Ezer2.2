@@ -2,8 +2,9 @@
 /** ================================================================================================ CALLGRAPH */
 # -------------------------------------------------------------------------------------------------- doc_ezer
 # seznam Ezer modulů
-function doc_ezer() {
+function doc_ezer() { trace();
   global $ezer_root, $ezer_php;
+//                                                 display("$ezer_root, $ezer_php"); return;
   $html= "<div class='CSection CMenu'>";
   $html.= "<h3 class='CTitle'>Komentovaný seznam Ezer modulů aplikace '$ezer_root'</h3>";
   $html.= "

@@ -6,7 +6,7 @@
 # probere zdrojový text
 #a:     typ - (show=ukázat | ezerscript=generovat popis jazyka | ezerscript=generovat třídy js | application=popis aplikace)
 #       fnames - seznam jmen zdrojových textů v adresáři podle typu
-function i_doc($typ,$fnames='') {
+function i_doc($typ,$fnames='') {   trace();
   global $i_doc_info, $i_doc_class, $i_doc_id, $i_doc_t, $i_doc_ref, $i_doc_err, $i_doc_n, $i_doc_file;
   $i_doc_info= array(); $i_doc_class= $i_doc_id= $i_doc_ref= $i_doc_err= ''; $i_doc_n= 0;
 //                                                 display("i_doc($typ,$fnames)");
@@ -255,8 +255,8 @@ function wiki2html ($wiki) {
 # $fnameslist je maska souborů s dokumentací aplikace ve wiki formátu
 # tyto soubory jsou uloženy vzhledem k cestě $ezer_path_root
 # soubor todo.wiki přitom přeskakuje - ten se zobrazuje zpravidla v sekci Novinky
-function i_doc_app($fnameslist,$chapter,$to_save=true) {
-                                                display("i_doc_app($fnameslist,$chapter,$to_save)");
+function i_doc_app($fnameslist,$chapter,$to_save=true) { trace();
+//                                                 display("i_doc_app($fnameslist,$chapter,$to_save)");
   global $i_doc_info, $i_doc_class, $i_doc_id, $i_doc_ref, $i_doc_err, $i_doc_n, $i_doc_file;
   global $i_doc_text, $form, $map, $ezer_path_root,$ezer_path_serv;
   require_once("$ezer_path_serv/licensed/class_WikiParser.php");
@@ -298,7 +298,7 @@ function i_doc_app($fnameslist,$chapter,$to_save=true) {
     $text= i_doc_wiky('try');
   else {
     $fnames= i_glob("$ezer_path_root/$fnameslist");
-                                                debug($fnames,"'$ezer_path_root/$fnameslist'");
+//                                                 debug($fnames,"'$ezer_path_root/$fnameslist'");
     $text= '';
     foreach ( $fnames as $fname ) /*if ( substr($fname,-10)!='/todo.wiki' )*/ {
       $text.= "<h3>modul $fname</h3>";

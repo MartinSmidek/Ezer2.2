@@ -68,7 +68,8 @@ function sys_user_record($id_user=0) {  trace();
     $html.= row('křestní jméno',$u->forename);
     $html.= row('příjmení',$u->surname);
     $html.= row('zkratka',$u->abbr);
-    $html.= row('oprávnění',$u->skills);
+    $skills= sys_user_skills_format($id_user);
+    $html.= row('oprávnění',$skills);
     $html.= row('vyřizuje',$opt->vyrizuje);
     $html.= row('telefon',$opt->telefon);
     $html.= row('potvrzuje',$opt->potvrzuje);
@@ -177,6 +178,19 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
   else
     $err.= "Během práce došlo zřejmě k automatickému odhlášení, přihlašte se prosím znovu a opravu opakujte.";
   return "$html<br><br>$err";
+}
+# --------------------------------------------------------------------------- sys_user_skills_format
+# vrátí seznam schopností s poznámkou v title
+function sys_user_skills_format($id_user=0) {  trace();
+  global $ezer_system;
+  $skills= select('skills',"$ezer_system._user","id_user='$id_user'");
+  $xs= "";
+  foreach (explode(' ',$skills) as $skill) {
+    $ts= select('skill_desc',"$ezer_system._skill","skill_abbr='$skill'");
+    $title= $ts ? " title='$ts'" : '';
+    $xs.= " <span style='background-color:lightgrey;cursor:help;padding:0px 3px'$title>$skill</span> &nbsp; ";
+  }
+  return $xs;
 }
 # --------------------------------------------------------------------------------- sys_user_skilled
 # vrátí seznam id_user nositelů daného skill
