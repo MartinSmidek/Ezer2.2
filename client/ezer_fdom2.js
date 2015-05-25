@@ -2967,6 +2967,10 @@ Ezer.Browse.implement({
             if ( i && i <= this.tlen ) {
               this.DOM_focus();
               this.DOM_hi_row(this.t+i-1,0,0,el.control);
+              if ( el.control ) {
+//                                                         Ezer.trace('T','browse row ctrl click '+i);
+                this.DOM_riseEvent('keydown_insert');
+              }
 //               this.fire('onrowclick',[this.keys[i-1]],el);
             }
           }

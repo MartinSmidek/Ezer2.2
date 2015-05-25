@@ -35,7 +35,7 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
   }
   proc reload_key () {
     klic.key_load }
-  # ---------------------------------------------------------------------------------------- _mklice
+  # -------------------------------------------------------------------------------------==>_mklice
   form _mklice [0,0,200,200] {
     label [0,0,1060,130] { css:'parm' }
     view k: table _cis
@@ -52,7 +52,7 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
         mklic.load(id.get); reload_keys }
     }
   }
-  # ----------------------------------------------------------------------------------------- _klice
+  # --------------------------------------------------------------------------------------==>_klice
   form _klice [0,0,200,200] {
     label [0,0,1060,403] { css:'work' }
     view k: table _cis,
@@ -74,7 +74,7 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
         mklice.lst.raise('onrowclick'); }
     }
   }
-  # ----------------------------------------------------------------------------------------- _mklic
+  # --------------------------------------------------------------------------------------==>_mklic
   form _mklic [0,0,200,200] {
     # data
     view k: table _cis,
@@ -85,7 +85,7 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
     button [315,48,,] { title:'Meta číselník', proc onclick () {
       mklice.lst.browse_seek("zkratka='_meta_'") }}
   }
-  # ------------------------------------------------------------------------------------------ _klic
+  # ---------------------------------------------------------------------------------------==>_klic
   form _klic [0,0,200,200] {
     # data
     view k: table _cis,
@@ -228,10 +228,10 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   var new_skill: text,
   var sel: text,
 
-  use uzivatele: form users [20,7,,],
-  use uzivatel: form user [440+180,7,,],
-  use cmd: form butt [146,sys_users_cmd,,],
-  use dskill: form desc_skills [440+180,127,,]
+  use uzivatele: form users [10,7,,],
+  use uzivatel: form user [430+180,7,,],
+  use cmd: form butt [22,sys_users_cmd,,],
+  use dskill: form desc_skills [430+182,127,,]
 
   proc onstart () {
     last_par.set(see.all.actives.par);
@@ -265,7 +265,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     cmd.enable(1,last_par.get('on'));
     cmd.enable(0,last_par.get('off'));
   }
-  # ------------------------------------------------------------------- menu
+  # ----------------------------------------------------------------==>menu
   menu see { type:'left', active:*, format:'f-'
     menu all { title:'přehled',type:'group'
       item actives { title:'[fa-user-plus] aktivní uživatelé', par:°{on:'h',off:'u',cond:"LEFT(deleted,1)!='H'"}}
@@ -277,11 +277,11 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
       refresh;
     }
   }
-  # ------------------------------------------------------------------- uživatelé
-  form users [0,0,200,400] {
-    view u: table _user,
+  # ----------------------------------------------------------------==>uživatelé
+  form users [,,587,470] { css:'ae_work'
+    view u: table _user
     label [6,3,89,15] { title:'<h1>Uživatelé</h1>' }
-    browse lst [4,35,0,54] { rows:sys_users_list, qry_rows:1, buf_rows:100
+    browse lst [4,37,0,54] { rows:sys_users_list, qry_rows:1, buf_rows:100
       show user [,,20,] { title:'č.', help:'jednoznačné číslo uživatele',
         data:u.id_user, format:'rsq=' }
       show zkratka [,,35,] { title:'značka', help:'jednoznačná třípísmenná zkratka',
@@ -306,40 +306,34 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
       }
     }
   }
-  # ------------------------------------------------------------------- user
-  form user [,,200,200] {
+  # ----------------------------------------------------------------==>user
+  form user [,,433,471] { css:'ae_work'
     view u: table _user,
-    label [2,3,89,15] { title:'<h1>Uživatel</h1>' }
-    field skills [2,46,146,17] { data:u.skills, format:'n' }
-    field username [2,45,69,18] { data:u.username }
-    field password [82,45,72,19] { data:u.password, format:'p' }
-    field znacka [166,45,34,18] { data:u.abbr }
-    field prijmeni [2,89,152,18] { data:u.surname }
-    field jmeno [165,89,117,18] { data:u.forename }
-    field access [218,45,63,70] { tag:'ac', data:u.access }
-    edit ips [295,44,127,64] { tag:'ip', data:u.ips }
+    label [5,6,89,15] { title:'<h1>Uživatel</h1>' }
+    field skills [2,46,146,] { data:u.skills, format:'n' }
+    field username [5,48,69,] { data:u.username, title:'^username' }
+    field password [85,48,72,] { data:u.password, title:'^heslo', format:'p' }
+    field znacka [169,48,34,] { data:u.abbr, title:'^zkratka' }
+    field prijmeni [5,92,152,] { data:u.surname, title:'^příjmení' }
+    field jmeno [168,92,117,] { data:u.forename, title:'^jméno' }
+    field access [221,48,63,] { tag:'ac', data:u.access, title:'^přístup k' }
+    edit ips [298,47,127,64] { tag:'ip', data:u.ips, title:'^povolené IP adresy' }
     field login { data:u.login }
     field kdo { data:u.zmena_kdo }
     field kdy { data:u.zmena_kdy }
-    label [2,27,50,15] { title:'username' }
-    label [83,27,50,15] { title:'heslo' }
-    label [166,27,40,15] { title:'zkratka' }
-    label [166,71,50,15] { title:'jméno' }
-    label [2,71,50,15] { title:'příjmení' }
-    label [218,27,53,15] { tag:'ac', title:'přístup k' }
-    label [295,27,130,15] { tag:'ip', title:'povolené IP adresy' }
     proc onchanged() { cmd.get.enable(1,'c') }
   }
-  # ------------------------------------------------------------------- desc_skills
+  # ----------------------------------------------------------------==>desc_skills
   form desc_skills [,,320,200] {
-    label [2,0,100,15] { title:'oprávnění' }
+    label [2,3,100,15] { title:'oprávnění' }
     label missing [60,0,360,15]
-    browse seznam [2,17,180,198] { rows:sys_users_skills, qry_rows:1, buf_rows:100
+    browse seznam [2,20,180,198] { rows:sys_users_skills, qry_rows:1, buf_rows:100
       show id { data:_skill.id_skill }
       show abb [,,50,] { data:_skill.skill_abbr, title:'kód', format:'utsq*', skill:'a|m'
         proc onsubmit() { this.save } }
       show dsc [,,345,] { data:_skill.skill_desc, title:'popis oprávnění', format:'uts+q$', skill:'a|m'
         proc onsubmit() { this.save } }
+      # ----------------------------------------------==> kontext.menu
       menu { type:'context'
         item { title:'odeberat všechna oprávnění'
           proc onclick() { seznam.selected("clear") } }
@@ -372,6 +366,8 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
           } }
         item { title:'-zobrazit user.options'
           proc onclick() { alert(ask('sys_user_options',uzivatele.lst.user.get)) } }
+        item { title:'-zobrazit historii změn'
+          proc onclick() { Track.back_show('_user',uzivatele.lst.user.get) } }
       }
       proc onchoice() {
         // pokud je přihlášený administrátor, zablokujeme mu možnost změnit si oprávnění
@@ -384,18 +380,36 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
       }
     }
   }
-  # ------------------------------------------------------------------- butt
+  # ----------------------------------------------------------------==>butt
   form butt [,,852,39] {
-  label  [0,2,136,30] { css:'ae_parm', skill:'yaa+;faa+;caa+' }
-    button zpet_clena [10,8,,] { tag:'c', type:'html', title:'[fa-undo] Zpět'
+    # --------------------------------==> úpravy uživatelů
+    label  [0,6,561,30] { css:'ae_parm' }
+    button zrus_clena [11,12,,] { tag:'h', type:'html', title:'[fa-plug fa-rotate-180 fa-red] Skrýt'
+      proc onclick() { confirm("Opravdu znemožnit přihlášení uživateli ",uzivatel.username.get,'?');
+        alert(ask('sys_user_hide',uzivatele.lst.user.get,1)); refresh
+    }}
+    button obnov_clena [71,12,,] { tag:'u', type:'html', title:'[fa-plug] Obnovit'
+      proc onclick() { confirm("Opravdu obnovit uživatele ",uzivatel.username.get,'?');
+        alert(ask('sys_user_hide',uzivatele.lst.user.get,0)); refresh
+    }}
+    button watch_key [195,12,,] { title:'Vygenerovat klíč', format:'n'
+      proc onclick() {
+        confirm("Vygenerování nového klíče znemožní přístup současným uživatelům. Pokračovat?");
+        watch_ref.set(ask('sys_watch_key'))
+      }
+    }
+    label watch_ref [316,15,250,15]
+    # --------------------------------==> změny uživatele
+    label  [636,6,292,30] { css:'ae_parm' }
+    button uloz_clena [649,12,,] { tag:'c', type:'html', title:'[fa-save] Uložit'
+      proc onclick () { u_uloz
+    } }
+    button zpet_clena [715,12,,] { tag:'c', type:'html', title:'[fa-undo] Zpět'
       proc onclick () {
         uzivatel.key; uzivatel.load;
         cmd.get.enable(0,'c');
     } }
-    button uloz_clena [72,8,,] { tag:'c', type:'html', title:'[fa-save] Uložit'
-      proc onclick () { u_uloz
-    } }
-    button vytvor_clena [146,8,,] { type:'html', title:'[fa-heart] Vytvořit'
+    button vytvor_clena [851,12,,] { type:'html', title:'[fa-heart] Vytvořit'
       proc onclick () {
         cmd.get.enable(0,'c');
         dskill.seznam.selected('clear');
@@ -403,21 +417,6 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
         uzivatel.kdy.set(now);
         uzivatel.znacka.enable(1);
     } }
-    button zrus_clena [219,8,,] { tag:'h', type:'html', title:'[fa-plug fa-rotate-180 fa-red] Skrýt'
-      proc onclick() { confirm("Opravdu znemožnit přihlášení uživateli ",uzivatel.username.get,'?');
-        alert(ask('sys_user_hide',uzivatele.lst.user.get,1)); refresh
-    }}
-    button obnov_clena [279,8,,] { tag:'u', type:'html', title:'[fa-plug] Obnovit'
-      proc onclick() { confirm("Opravdu obnovit uživatele ",uzivatel.username.get,'?');
-        alert(ask('sys_user_hide',uzivatele.lst.user.get,0)); refresh
-    }}
-    button watch_key [477,8,,] { title:'Vygenerovat klíč', format:'n'
-      proc onclick() {
-        confirm("Vygenerování nového klíče znemožní přístup současným uživatelům. Pokračovat?");
-        watch_ref.set(ask('sys_watch_key'))
-      }
-    }
-    label watch_ref [590,11,250,15]
   }
 }
 # =================================================================================================> POŽADAVKY
@@ -478,7 +477,7 @@ panel needs [,,770,] {type:'right', title:'Požadavky', _sys:'poz', skill:'sp'
    }
   }
   use u: form pozadavek [12,4,,],
-  # ------------------------------------------------------------------------------------------------ pozadavek
+  # ---------------------------------------------------------------------------------------------==>pozadavek
   # editace_požadavku
   form pozadavek [,,740,565] {   //565 770
     const T= 330
@@ -702,8 +701,33 @@ panel needs [,,770,] {type:'right', title:'Požadavky', _sys:'poz', skill:'sp'
     }
   }
 }
+# =================================================================================================> POPUPS
+# -----------------------------------------------------------------------------------------------==> Track
+# přehled provedených změn
+panel Track [,,540,276] { title:'Historie oprav', type:'popup', css:'dialog'
+  use back: form _back [0,16,,] { tabindex:20 },
+  proc back_show(kde,klic) {
+    panel.popup(0,1);
+    back.list.browse_load(
+      conc("(kde='",kde,"' AND klic=",klic,")"),"kdy DESC");
+    back.list.raise('onrowclick')
+  }
+  # ----------------------------------------------------------==> _back
+  # id_track,kdy,kdo,kde,klic,zmena:fld,op,val,old
+  form _back [,,255,250] {
+    browse list [0,0,150,100] { rows:12,
+      show kdy [,,90,] { title:'kdy', data:_track.kdy, sql_pipe:'sql_time1' },
+      show kdn [,,30,] { title:'kdn', data:_track.kdo },
+      show op [,,12,] { title:'?', data:_track.op },
+      show fld [,,60,] { title:'položka', data:_track.fld },
+      show old [,,200,] { title:'původní hodnota', data:_track.old, format:'t' },
+      show val [,,120,] { title:'změněná hodnota', data:_track.val, format:'t' },
+      show id_track [,,0,] { data:_track.id_track },
+    },
+    label [0,250,545,] { title:'ÚDAJE: i=vložení (insert), u=úprava, <br>ZÁZNAM: x=smazano, o=obnoveno' }
+  }
+}
 # =================================================================================================> MAPY,TABULKY
-
 table _todo { key_id:'id_todo'
   number id_todo      { key:'primary' }
   number typ          { help:"_cis:s_todo_typ (1:oprava,2:úprava,3:vlastnost)" }
@@ -750,7 +774,6 @@ table _cis { key_id:'id_cis'
   text barva,
   text ikona
 }
-
 table _user { key_id:'id_user', db:'ezer_system'
   number id_user
   text deleted,
@@ -772,9 +795,19 @@ table _user { key_id:'id_user', db:'ezer_system'
   number zmena_kdo,
   date zmena_kdy {  }
 }
-
 table _skill { key_id:'id_skill', db:'ezer_system'
   number id_skill
   text skill_abbr
   text skill_desc
+}
+table _track { key_id:'id_track'
+  number id_track { key:'primary' }
+  date kdy { help:'datum změny' }
+  text kdo { help:'pachatel' }
+  text kde { help:'tabulka' }
+  number klic { help:'klíč' }
+  text fld { help:'položka' }
+  text op { help:'operace' }
+  text old { help:'původní hodnota' }
+  text val { help:'původní hodnota' }
 }
