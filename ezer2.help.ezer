@@ -270,7 +270,7 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*', skill:'ah
   use hlp_g: form _hlp_g [12,35,,] { tag:'hg', format:'n' }
   use hlp_k: form _hlp_k [12,35,,] { tag:'hk', format:'n' }
 
-  menu {type:'left', active:*, format:'f'
+  menu {type:'left', active:*, format:'f-'
     proc onstart() {
       [ sys('options','group_db')     | h.g.enable(0) ];
       [ sys('options','curr_version') | h.k.enable(0) ];
@@ -286,7 +286,7 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*', skill:'ah
       }
     }
   }
-  # ------------------------------------------------------------------------ _hlp_a
+  # ---------------------------------------------------------------------==> pro aplikaci
   form _hlp_a [,,*,500] {
     var virgin= 1
     proc start() { virgin.get; refresh; virgin.set(0) }
@@ -303,7 +303,7 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*', skill:'ah
       show x_datum [,,0,] { title:'datum', data:h.datum, format:'rs-q*t' }
       proc onrowclick() {
         form.key(id_help.get); form.load;
-        hlp.set(f_hlp.get)
+        hlp.set(replace_fa(f_hlp.get))
       }
       proc onclick() {
         x_znaku.width; x_znaku.width(0); x_stav.width(70);
@@ -344,7 +344,7 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*', skill:'ah
     label [La+0,69,341,] { title:"Poznámka: prvek &lt;hr> je vkládán jako průhledný s clear=both"  }
     label hlp [La+0,89,500,290] { css:'PanelPopup ContextHelp' }
   }
-  # ------------------------------------------------------------------------ _hlp_g
+  # ---------------------------------------------------------------------==> pro skupinu
   form _hlp_g [,,*,500] {
     var virgin= 1
     proc start() { virgin.get; refresh; virgin.set(0) }
@@ -361,7 +361,7 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*', skill:'ah
       show x_datum [,,0,] { title:'datum', data:h.datum, format:'rs-q*t' }
       proc onrowclick() {
         form.key(id_help.get); form.load;
-        hlp.set(f_hlp.get)
+        hlp.set(replace_fa(f_hlp.get))
       }
       proc onclick() {
         x_znaku.width; x_znaku.width(0); x_stav.width(70);
@@ -402,7 +402,7 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*', skill:'ah
     label [La+0,69,341,] { title:"Poznámka: prvek &lt;hr> je vkládán jako průhledný s clear=both"  }
     label hlp [La+0,89,500,290] { css:'PanelPopup ContextHelp' }
   }
-  # ------------------------------------------------------------------------ _hlp_k
+  # ---------------------------------------------------------------------==> pro jádro
   form _hlp_k [,,*,500] {
     var virgin= 1
     proc start() { virgin.get; refresh; virgin.set(0) }
@@ -419,7 +419,7 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*', skill:'ah
       show x_datum [,,0,] { title:'datum', data:h.datum, format:'rs-q*t' }
       proc onrowclick() {
         form.key(id_help.get); form.load;
-        hlp.set(f_hlp.get)
+        hlp.set(replace_fa(f_hlp.get))
       }
       proc onclick() {
         x_znaku.width; x_znaku.width(0); x_stav.width(70);
@@ -460,14 +460,14 @@ panel faq [,,770,] {type:'right', title:'Tvorba nápovědy', _sys:'*', skill:'ah
     label [La+0,69,341,] { title:"Poznámka: prvek &lt;hr> je vkládán jako průhledný s clear=both"  }
     label hlp [La+0,89,500,290] { css:'PanelPopup ContextHelp' }
   }
-  # ================================================================================= help_edit
+  # ================================================================================> help_edit
   panel help_edit [0,0,645,520] { title:' Úprava textu nápovědy', type:'popup', css:'dialog'
     use h: form _hlp [0,0,,],
-    # ------------------------------------------------------------------------ _hlp
+    # -------------------------------------------------------------------==> _hlp
     form _hlp [10,10,600,460] {
-      button  [540,9,,] { title:'Uložit', help:'ukončit editor a uložit změny'
+      button  [540,9,,] { title:'[fa-save] Uložit', help:'ukončit editor a uložit změny'
         proc onclick() {panel.hide(1); }}
-      button  [600,9,,] { title:'Zpět', help:'ukončit editor bez uložení změn'
+      button  [600,9,,] { title:'Zpět', help:'[fa-undo] ukončit editor bez uložení změn'
         proc onclick() { panel.hide(0); }}
       edit txt [0,40,655,480] {type:'html', par:°{toolbar:'EzerMail'} },
     }

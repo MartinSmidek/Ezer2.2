@@ -3891,13 +3891,14 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs,db) {
   }
   // zobrazení Helpu podle zadaných parametrů
   Ezer.obj.DOM.help.stickywin.attach(false);
-  Ezer.obj.DOM.help.html= html;
+  Ezer.obj.DOM.help.html= Ezer.fce.replace_fa(html);
   Ezer.obj.DOM.help.xkey= xkey;
   Ezer.obj.DOM.help.ykey= ykey;
   Ezer.obj.DOM.help.db=   db;
   Ezer.obj.DOM.help.cap.setProperty('text',title);
   Ezer.obj.DOM.help.cap.title= (xkey.sys==ykey.sys ? ykey.sys : xkey.sys+"=>"+ykey.sys)+' '+seen;
-  Ezer.obj.DOM.help.txt.innerHTML= refs+html+"<div class='foot'>"+db+"</div>"; // načtení HTML helpu
+  Ezer.obj.DOM.help.txt.innerHTML= refs+Ezer.obj.DOM.help.html
+    +"<div class='foot'>"+db+"</div>"; // načtení HTML helpu
   Ezer.obj.DOM.help.dotaz_butt.setStyles({display:'block'});
   // přidá obsluhu vnořeným elementům <a href='help://....'>
   Ezer.obj.DOM.help.txt.getElements('a').each(function(el) {
