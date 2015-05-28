@@ -801,6 +801,13 @@ function sys_activity($k,$to_skip=0,$den=0) {
   $html.= "</div>";
   return $html;
 }
+# -------------------------------------------------------------------------------- sys_sign_obsolete
+# označí určitá menu '-' na začátku, pokud je modul považován za OBSOLETE
+# např: NOE v.1 má moduly psané celé uppercase
+function sys_sign_obsolete($module,$menu) {
+  $old= $module==strtoupper($module);
+  return $old ? '-'.$menu : $menu;
+}
 # ---------------------------------------------------------------------------------- sys_day_modules
 # vygeneruje podrobný přehled aktivity modulů pro daný den
 function sys_day_modules($skip,$day,$short=false) {
@@ -818,6 +825,7 @@ function sys_day_modules($skip,$day,$short=false) {
     $hours[$hour]= true;
     $module= $row['module'];
     $menu= $row['menu'];
+    $menu= sys_sign_obsolete($module,$menu);
     $ip= $row['msg'];
     if ( $short ) {
       $ids= explode('.',$menu);
@@ -828,6 +836,7 @@ function sys_day_modules($skip,$day,$short=false) {
     if ( strpos($touch[$menu][$hour][0],$user)==false )
       $touch[$menu][$hour][0].= $user=="---" ? " $ip" : " $user";
   }
+  ksort($touch);
   $html= sys_table($touch,$hours,'module','#dce7f4');
   return $html;
 }
@@ -848,6 +857,7 @@ function sys_days_modules($skip,$day,$ndays,$short=false) {
     $days[$day]= true;
     $module= $row['module'];
     $menu= $row['menu'];
+    $menu= sys_sign_obsolete($module,$menu);
     if ( $short ) {
       $ids= explode('.',$menu);
       $menu= $ids[0];
@@ -860,6 +870,7 @@ function sys_days_modules($skip,$day,$ndays,$short=false) {
       $touch[$menu][$day][0].= " $user";
   }
 //                                                 debug($touch,'$touch');
+  ksort($touch);
   $html= sys_days_table($touch,$days,'module','#dce7f4');
   return $html;
 }
@@ -881,6 +892,7 @@ function sys_day_users($skip,$day,$short=false) {  trace();
     $hours[$hour]= true;
     $module= $row['module'];
     $menu= $row['menu'];
+    $menu= sys_sign_obsolete($module,$menu);
     if ( $short==1 ) {
       $ids= explode('.',$menu);
       $menu= $ids[0];
@@ -920,6 +932,7 @@ function sys_days_users($skip,$day,$ndays,$short=false) {
     $days[$day]= true;
     $module= $row['module'];
     $menu= $row['menu'];
+    $menu= sys_sign_obsolete($module,$menu);
     if ( $short==1 ) {
       $ids= explode('.',$menu);
       $menu= $ids[0];
@@ -1173,7 +1186,10 @@ function sys_table($touch,$hours,$type,$color,$config_colors=false) { #trace();
         case 'speed':
         case 'user':
           if ( $activity[$h] ) {
-            $act= implode(' ',array_keys($activity[$h]['touch']));
+            $act= '';
+            foreach(array_keys($activity[$h]['touch']) as $a) {
+              $act.= $a[0]=='-' ? "<span style='color:white'>".substr($a,1)."</span> " : "$a ";
+            }
             $hit= array_sum($activity[$h]['touch']);
             $tit= '';
             foreach ($activity[$h]['touch'] as $menu => $menu_hit ) {
@@ -1254,7 +1270,10 @@ function sys_days_table($touch,$days,$type,$color,$config_colors=false) { #trace
       case 'speed':
       case 'user':
         if ( $activity[$h] ) {
-          $act= implode(' ',array_keys($activity[$h]['touch']));
+          $act= '';
+          foreach(array_keys($activity[$h]['touch']) as $a) {
+            $act.= $a[0]=='-' ? "<span style='color:white'>".substr($a,1)."</span> " : "$a ";
+          }
           $hit= array_sum($activity[$h]['touch']);
           $tit= '';
           foreach ($activity[$h]['touch'] as $menu => $menu_hit ) {
