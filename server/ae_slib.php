@@ -1127,10 +1127,11 @@ function simple_glob($mask) {
 # -------------------------------------------------------------------------------------------------- map_cis
 # zjištění hodnot číselníku a vrácení jako překladového pole
 #   array (data => $val, ...)
-function map_cis($druh,$val='zkratka',$order='poradi') {
+function map_cis($druh,$val='zkratka',$order='poradi',$db='') {
   global $mysql_db;
+  $db= $db?:$mysql_db;
   $cis= array();
-  $qry= "SELECT * FROM $mysql_db._cis WHERE druh='$druh' ORDER BY $order";
+  $qry= "SELECT * FROM $db._cis WHERE druh='$druh' ORDER BY $order";
   $res= mysql_qry($qry);
   while ( $res && $row= mysql_fetch_assoc($res) ) {
     $cis[$row['data']]= $row[$val];

@@ -2341,9 +2341,9 @@ function drop_find($folder,$mask) {     // trace();
   // projdi soubory složky
   $path= str_replace('//','/',"$path_files/$folder");
   $path= rtrim($path,"/");
+//                                                         $found= "???$ezer_root,$path/$file";
   if ( $dh= opendir($path) ) {
     while ( ($file= readdir($dh)) !== false ) {
-//                                                         display("$ezer_root,$path/$file");
       if ( is_file("$path/$file") && preg_match("/$mask/",$file) ) {
         $found= $file;
       }
