@@ -1429,7 +1429,12 @@ Ezer.ButtonHtml.implement({
 // ------------------------------------------------------------------------------------ DOM_enabled
 // zobrazí this.value v DOM
   DOM_enabled: function (on) {
-    this.DOM_Block.setProperty('disabled',on ? '' : 'disabled');
+    if ( !on ) {
+      this.DOM_Block.setProperty('disabled','disabled');
+    }
+    else if ( this.skill!=1 ) {
+      this.DOM_Block.setProperty('disabled','');
+    }
   },
 // ------------------------------------------------------------------------------------ DOM_set
 // zobrazí this.value v DOM
