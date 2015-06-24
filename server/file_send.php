@@ -35,14 +35,18 @@ if ( isset($_GET['name']) ) {
   case 'pdf':
               header('Content-Type:application/pdf');
 //               header('Content-Type:application/x-google-chrome-pdf');
-              header("Content-Disposition:inline;filename=\"$title\";");
+              header("Content-Disposition: inline; filename=\"$title\";");
               header('Content-Transfer-Encoding:binary');
               break;
   case 'png': header('Content-Type:image/png');
-              header("Content-Disposition:inline; filename=\"$title\";");
+              header("Content-Disposition: inline; filename=\"$title\";");
+              break;
+  case 'jpe':
+  case 'jpg': header('Content-Type:image/jpeg');
+              header("Content-Disposition: inline; filename=\"$title\";");
               break;
   default:    header('Content-Type: application/octet-stream');
-              header("Content-Disposition:attachment; filename=$title");
+              header("Content-Disposition: attachment; filename=\"$title\";");
               break;
   }
 //   header('Expires: 0');
@@ -50,7 +54,7 @@ if ( isset($_GET['name']) ) {
 //   header('Pragma: public');
   header('Content-Length:' . filesize($file));
   readfile($file);
-//   echo($fext);
+//   echo("$fext*$title");
   exit;
 err:
   echo("soubor '$filename' nelze zobrazit: $er");
