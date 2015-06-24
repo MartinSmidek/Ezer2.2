@@ -2326,6 +2326,8 @@ Ezer.Select.implement({
         width:this._w-(img ? 20 : 0),height:this._h-4}
     }).inject(this.DOM_Closure);
     this.DOM_optStyle(this.DOM_Input,this.options.title,true); // u title ignorovat zarovnání
+    if ( this.options.help )
+      this.DOM_Closure.set('title',this.options.help);
 //o: Select-DOM.DOM_DropList - obal pro jednotlivé Items (options)
     var dl_w= this.options.par && this.options.par.subtype=='keys' && this.options.par.width
       ? this.options.par.width : this._w-1;
