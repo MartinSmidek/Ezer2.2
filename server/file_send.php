@@ -28,27 +28,29 @@ if ( isset($_GET['name']) ) {
   };
   // zjištění typu
   $f= pathinfo($file);
-  $fext= strtolower($f['extension']);
+  $fext= substr(strtolower($f['extension']),0,3);
   // poslání souboru
-  header('Content-Description: File Transfer');
+//   header('Content-Description:File Transfer');
   switch ($fext) {
-  case 'pdf': header('Content-Type: application/pdf');
-              header("Content-Disposition: inline; filename=\"$title\";");
-              header('Content-Transfer-Encoding: binary');
+  case 'pdf':
+              header('Content-Type:application/pdf');
+//               header('Content-Type:application/x-google-chrome-pdf');
+              header("Content-Disposition:inline;filename=\"$title\";");
+              header('Content-Transfer-Encoding:binary');
               break;
-  case 'png': header('Content-Type: image/png');
-              header("Content-Disposition: inline; filename=\"$title\";");
+  case 'png': header('Content-Type:image/png');
+              header("Content-Disposition:inline; filename=\"$title\";");
               break;
   default:    header('Content-Type: application/octet-stream');
-              header("Content-Disposition: attachment; filename=$title");
+              header("Content-Disposition:attachment; filename=$title");
               break;
   }
 //   header('Expires: 0');
 //   header('Cache-Control: must-revalidate');
 //   header('Pragma: public');
-  header('Content-Length: ' . filesize($file));
+  header('Content-Length:' . filesize($file));
   readfile($file);
-//   echo($file);
+//   echo($fext);
   exit;
 err:
   echo("soubor '$filename' nelze zobrazit: $er");
