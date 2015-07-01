@@ -1365,23 +1365,31 @@ function narozeni2roky($time,$now=0) {
 function roku_k($dat,$kdatu='') {
   if ( $kdatu=='' ) $kdatu= date('Y-m-d');
   $roku= '';
-  $k= str2date($kdatu,$kd,$km,$ky);
-  $d= str2date($dat,$dd,$dm,$dy);
-  if ( $d && $k ) {
+//   $k= str2date($kdatu,$kd,$km,$ky);
+//   $d= str2date($dat,$dd,$dm,$dy);
+//   // přibližně
+//   if ( $d && $k ) {
+//     $roku= ($km<$dm || ($km==$dm && $kd<$dd)) ? $ky-$dy-1 : $ky-$dy;
+//   }
+  // přesně
+  if ( $dat && $kdatu ) {
+    $kd= substr($kdatu,8,2); $dd= substr($dat,8,2);
+    $km= substr($kdatu,5,2); $dm= substr($dat,5,2);
+    $ky= substr($kdatu,0,4); $dy= substr($dat,0,4);
     $roku= ($km<$dm || ($km==$dm && $kd<$dd)) ? $ky-$dy-1 : $ky-$dy;
   }
   return $roku;
 };
-function str2date($s,&$d,&$m,&$y) {
-  list($d,$m,$y)= explode('.',$s);        // formát d.m.Y
-  if ( $y )
-    $d= mktime(0,0,0,$m,$d,$y);
-  else {
-    list($y,$m,$d)= explode('-',$s);      // sql-formát Y-m-d
-    $d= $y ? mktime(0,0,0,$m,$d,$y) : 0;
-  }
-  return $d;
-}
+// function str2date($s,&$d,&$m,&$y) {
+//   list($d,$m,$y)= explode('.',$s);        // formát d.m.Y
+//   if ( $y )
+//     $d= mktime(0,0,0,$m,$d,$y);
+//   else {
+//     list($y,$m,$d)= explode('-',$s);      // sql-formát Y-m-d
+//     $d= $y ? mktime(0,0,0,$m,$d,$y) : 0;
+//   }
+//   return $d;
+// }
 /** ================================================================================================ AJAX - filtry */
 // v této sekci jsou oboustranné filtry pro transformaci mezi sql/user podobou dat
 # -------------------------------------------------------------------------------------------------- sql_week
