@@ -480,27 +480,29 @@ Ezer.Block= new Class({
 //   tags - regulární výraz popisující vyhovující tagy (např. 'f.|g')
   enable: function(enabled,tags) {
     var ok= 1;
-    enabled= enabled=="0" ? 0 : enabled;
     if ( enabled===undefined ) {
       ok= this.options.enabled;
 //       var block= this instanceof Ezer.Var && this.value ? this.value : this;
 //       ok= block && block.DOM_enabled();
     }
-    else if ( tags ) {
-      var re= new RegExp(tags);
-      // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
-      var block= this instanceof Ezer.Var && this.value ? this.value : this;
-      for(var i in block.part) {
-        var part= block.part[i];
-        if ( part.DOM_Block && part.options.tag && re.test(part.options.tag) ) {
-          part.options.enabled= enabled;
-          part.DOM_enabled(enabled);
+    else {
+      enabled= enabled=="0" ? 0 : enabled;
+      if ( tags ) {
+        var re= new RegExp(tags);
+        // proveď změnu enable pro podbloky s atributem tag vyhovujícím dotazu
+        var block= this instanceof Ezer.Var && this.value ? this.value : this;
+        for(var i in block.part) {
+          var part= block.part[i];
+          if ( part.DOM_Block && part.options.tag && re.test(part.options.tag) ) {
+            part.options.enabled= enabled;
+            part.DOM_enabled(enabled);
+          }
         }
       }
-    }
-    else if ( this.DOM_Block ) {
-      this.options.enabled= enabled;
-      this.DOM_enabled(enabled);
+      else if ( this.DOM_Block ) {
+        this.options.enabled= enabled;
+        this.DOM_enabled(enabled);
+      }
     }
     return ok;
   },
@@ -536,28 +538,30 @@ Ezer.Block= new Class({
       }
     }
     var ok= 1;
-    on= on=="0"||on===null ? 0 : on;
     if ( on===undefined ) {
       var block= this instanceof Ezer.Var && this.value ? this.value.DOM_Block : this.DOM_Block;
       ok= block && block.getStyle('display')=='block' ? 1 : 0;
     }
-    else if ( tags ) {
-      var re= new RegExp(tags);
-      // proveď změnu display pro podbloky s atributem tag vyhovujícím dotazu
-      displ(this.part);
-      if ( this instanceof Ezer.Var && this.value && this.value.part )
-        displ(this.value.part);
-    }
-    else if ( this instanceof Ezer.Var ) {
-      if ( this.value && this.value.DOM_Block ) {
-        this.value.DOM_Block.setStyles({display:on ? 'block' : 'none'});
+    else {
+      on= on=="0"||on===null ? 0 : on;
+      if ( tags ) {
+        var re= new RegExp(tags);
+        // proveď změnu display pro podbloky s atributem tag vyhovujícím dotazu
+        displ(this.part);
+        if ( this instanceof Ezer.Var && this.value && this.value.part )
+          displ(this.value.part);
       }
-    }
-    else if ( this instanceof Ezer.MenuGroup ) {
-      this.DOM.setStyles({display:on ? 'block' : 'none'});
-    }
-    else if ( this.DOM_Block ) {
-      this.DOM_Block.setStyles({display:on ? 'block' : 'none'});
+      else if ( this instanceof Ezer.Var ) {
+        if ( this.value && this.value.DOM_Block ) {
+          this.value.DOM_Block.setStyles({display:on ? 'block' : 'none'});
+        }
+      }
+      else if ( this instanceof Ezer.MenuGroup ) {
+        this.DOM.setStyles({display:on ? 'block' : 'none'});
+      }
+      else if ( this.DOM_Block ) {
+        this.DOM_Block.setStyles({display:on ? 'block' : 'none'});
+      }
     }
     return ok;
   },
@@ -2338,6 +2342,17 @@ Ezer.Form= new Class({
       }
     }
     return list;
+  },
+// ------------------------------------------------------------------------------------ changed
+//fm: Form.changed ([on])
+//      nastaví příznak změny formuláře podle 'on' nebo jej zjistí, nevyvolává událost onchanged
+  changed: function(on) {
+    var ok= 1;
+    if ( on==undefined )
+      ok= this._changed ? 1 : 0;
+    else
+      this._changed= on;
+    return ok;
   },
 // ------------------------------------------------------------------------------------ init
 //fm: Form.init ([init_values=0])
