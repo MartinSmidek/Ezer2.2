@@ -476,8 +476,8 @@ IE!!!
       <div class="login_a">
         Tuto aplikaci je možné používat v jakémkoliv prohlížeči respektujícím mezinárodní
         standardy - například
-        <a href='http://https://www.google.com/intl/cs/chrome/browser/'>Chrome</a>,
-        <a href='http://http://www.mozilla.org/cs/firefox/new/'>FireFox</a>,
+        <a href='https://www.google.com/intl/cs/chrome/browser/'>Chrome</a>,
+        <a href='http://www.mozilla.org/cs/firefox/new/'>FireFox</a>,
         <a href='http://www.opera.com'>Opera</a> nebo
         <a href='http://www.apple.com/safari'>Safari</a>.
         <br><br><br><br>
