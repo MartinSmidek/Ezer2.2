@@ -567,9 +567,9 @@ Ezer.Block= new Class({
   },
 //------------------------------------------------------------------------------------- set_css
 //fm: Block.set_css (id1,id2[,tags])
-//      objektu v kontextu je id1 přidáno jako css-třída a id2 je ubráno (id1, id2 mohou být prázdné)
-//      pokud je uveden seznam tags, provede se pro přímé podbloky s atributem
-//      tag vyhovujícím regulárnímu dotazu v tags
+//      objektu v kontextu je id2 je ubráno a id1 přidáno jako css-třída (id1, id2 mohou být prázdné
+//      nebo seznam jmen oddělených mezerou). Pokud je uveden seznam tags (oddělovač je čárka),
+//      provede se pro přímé podbloky s atributem tag vyhovujícím regulárnímu dotazu v tags
 //a: id1 - přidávané třídy
 //   od2 - ubírané třídy
 //   tags - regulární výraz popisující vyhovující tagy (např. 'f.|g')
@@ -581,16 +581,16 @@ Ezer.Block= new Class({
       for(var i in parts) {
         var part= parts[i];
         if ( part.DOM_Block && part.options.tag && re.test(part.options.tag) ) {
-          if ( id1 ) id1.split(' ').each(function(id){part.DOM_Block.addClass(id)});
           if ( id2 ) id2.split(' ').each(function(id){part.DOM_Block.removeClass(id)});
+          if ( id1 ) id1.split(' ').each(function(id){part.DOM_Block.addClass(id)});
         }
       }
     }
     else {
       var dom= this instanceof Ezer.Var && this.value ? this.value.DOM_Block : this.DOM_Block;
       if ( dom ) {
-        if ( id1 ) id1.split(' ').each(function(id){dom.addClass(id)}.bind(this));
         if ( id2 ) id2.split(' ').each(function(id){dom.removeClass(id)}.bind(this));
+        if ( id1 ) id1.split(' ').each(function(id){dom.addClass(id)}.bind(this));
       }
     }
     return 1;
@@ -1132,7 +1132,7 @@ Ezer.Block= new Class({
 //   false   - pokud je obsluha fire asynchronní fce (došlo k volání serveru nebo jinému přerušení)
 //   true    - pokud obsluha neexistuje
 //   num|str - hodnota volané funkce
-// onchanged se dědí z položky do jejího formuláře, pokud není format:'T'
+// onchanged se dědí z položky do jejího formuláře, pokud její formát neobsahuje 'T'
   fire: function(event_name,args,el) {
     // trasování události ovlivněné fcí set_trace
     function trace_event (event_type,id,event_name,fce) {
@@ -4158,6 +4158,8 @@ Ezer.Select= new Class({
 //  ; 'w' : 'wide' seznam hodnot bude zobrazen v plné šířce
   Extends: Ezer.Elem,
   Items: {},
+  Css: null,                    // css pro daný klíč (lze definovat jen fcí selects)
+  lastCss: '',                  // aktuální nastavené css (jen je-li definované Css)
   _key: null,                   // klíč - pro multiselect pole klíčů
   _values: 0,
   multi: false,
@@ -4170,12 +4172,13 @@ Ezer.Select= new Class({
   },
 // ------------------------------------------------------------------------------------ selects
 //fm: Select.selects (list[,delimiters=',:'][,values:0)
-//a: list - seznam volitelných hodnot pro select ve tvaru: hodnota[:klíč],...
+//a: list - seznam volitelných hodnot pro select ve tvaru: hodnota[:klíč:css],...
 //   delimiters - řetězec definující 2 znaky použité jako oddělovače
 //   values - 1:funkce key,_save,_load bude vracet/číst místo klíče hodnotu
   selects: function(list,delimiters,values) {
     this._values= values?1:0;
     this.Items= {};
+    this.Css= {};               // lastCss necháme kvůli jeho odstranění
     var del1= ',', del2= ':';
     if ( delimiters ) {
       del1= delimiters[0]||',';
@@ -4183,7 +4186,11 @@ Ezer.Select= new Class({
     }
     list.split(del1).each(function(val,i) {
       var desc= val.split(del2);
-      if ( desc.length==2 ) {
+      if ( desc.length==3 ) {
+        this.Items[desc[1]]= desc[0];
+        this.Css[desc[1]]= desc[2];
+      }
+      else if ( desc.length==2 ) {
         this.Items[desc[1]]= desc[0];
       }
       else {

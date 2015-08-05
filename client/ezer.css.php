@@ -481,7 +481,7 @@ button::-moz-focus-inner { border:0; padding:0; }
   font-family:FontAwesome,sans-serif !important; }
 button i.fa-red, a i.fa-red  { color:red }
 button:disabled i.fa-red { color:grey }
-.Button {
+input.Button {
   position:absolute; font-size:9pt; z-index:1; text-align:center; $button }
 .ButtonSubmit {
   position:absolute; font-size:9pt; text-decoration:underline; z-index:1;

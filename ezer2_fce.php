@@ -69,7 +69,8 @@ function sys_user_record($id_user=0) {  trace();
     $html.= row('příjmení',$u->surname);
     $html.= row('zkratka',$u->abbr);
     $skills= sys_user_skills_format($id_user);
-    $html.= row('oprávnění',$skills);
+    $html.= row('funkční oprávnění',$skills);
+    $html.= row('datová oprávnění',$u->access);
     $html.= row('vyřizuje',$opt->vyrizuje);
     $html.= row('telefon',$opt->telefon);
     $html.= row('potvrzuje',$opt->potvrzuje);
@@ -137,12 +138,13 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
       $res= mysql_qry($qry,0,0,0,'ezer_system');
       if ( $res ) {
         $u= mysql_fetch_object($res);
-        $options= $json->decode($u->options);
+        $options= $json->decode($u->options) ?: (object)array();
         switch ($typ) {
         case 'opt':   // zápis do _user.options
           $options->$fld= $val;
           break;
         case 'oop':   // zápis do _user.options.options
+          if ( !isset($options->options) ) $options->options= (object)array();
           $options->options->$fld= $val;
           break;
         }
@@ -554,9 +556,9 @@ function sys_ezer() {
 # zobrazí options daného uživatele
 function sys_user_options($id_user) {
   list($user,$options)= select("username,options","_user","id_user=$id_user");
-                                                display($options);
+//                                                 display($options);
   $obj= json_decode($options);
-                                                debug($obj);
+//                                                 debug($obj);
   $html= "<div class='dbg'>".debugx($obj,'$user')."</div>";
   return $html;
 }
@@ -568,6 +570,19 @@ function sys_user_unique($id_user,$username,$abbr) {
   $msg.= $x ? " uživatelské jméno '$username' již používá $x" : '';
   $x= select1("CONCAT(forename,' ',surname)","_user","id_user!=$id_user AND abbr='$abbr'");
   $msg.= $x ? " zkratku '$abbr' již používá $x" : '';
+  return $msg;
+}
+# ---------------------------------------------------------------------------------- sys_user_access
+# zkontroluje, zda jsou korektní položky org,access vůči sobě a vůči watch_access
+function sys_user_access($watch_access,$org,$access) {
+  global $EZER;
+  $msg= '';
+  $orgs= array(1,2,4,8,16,32,64,128,256,512,1024);
+  if ( !in_array($org,$orgs) ) $msg.= " org musí být mocnina 2; ";
+  if ( $org>$watch_access ) $msg.= " org musí být menší než $watch_access; ";
+  if ( $access>$watch_access ) $msg.= " přístup musí být menší nebo roven $watch_access; ";
+  if ( !($org&$access) ) $msg.= " org musí být přístupné; ";
+  if ( !($access&$watch_access) ) $msg.= " přístup musí být podmnožina $watch_access; ";
   return $msg;
 }
 # ------------------------------------------------------------------------------------ sys_user_hide
@@ -1317,7 +1332,7 @@ function abbr2user($abbr) {
 function sys_todo_notify($type,$id_todo,$chng) { trace();
   global $EZER, $ezer_root;
   $todo= sql_query("SELECT * FROM _todo WHERE id_todo=$id_todo");
-                                                        debug($chng,"sys_todo_notify($type,$id_todo)");
+//                                                         debug($chng,"sys_todo_notify($type,$id_todo)");
   $email= $type=='new' ? $EZER->options->mail : $todo->email;
   // poslat nový nebo chce-li se při každé změně nebo při změně stavu
   $poslat= $type=='new' || $todo->email_kdyz==1 || $chng->stav && $todo->stav!=$chng->stav;

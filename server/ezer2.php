@@ -1144,6 +1144,7 @@
         $USER->id_user= $u->id_user;
         $USER->abbr= $u->abbr;
         $USER->skills= $u->skills;
+        $USER->org= $u->org;
         $USER->access= $u->access;
         $USER->username= $u->username;
         $USER->forename= $u->forename;
@@ -1195,6 +1196,7 @@
         $USER= (object)array();
         $USER->id_user= $u->id_user;
         $USER->abbr= $u->abbr;
+        $USER->org= $u->org;
         $USER->skills= $u->skills;
         $USER->access= $u->access;
         $USER->username= $u->username;

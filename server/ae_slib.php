@@ -411,7 +411,8 @@ __EOD;
   $html_footer= '';
   //$html_base= $app_root ? "\n  <base href=\"http://".$_SERVER["HTTP_HOST"].'">' : '';
   $html_base= $app_root ? "\n  <base href=\"http://$app_root\">" : '';
-  $html_header= "\xEF\xBB\xBF";    // DOM pro UTF-8
+  $html_header= '';
+//   $html_header.= "\xEF\xBB\xBF";    // DOM pro UTF-8
   $html_header.= <<<__EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
@@ -515,7 +516,7 @@ __EOD
  : '';
 $template= <<<__EOD
 $html_header
-<body id="body">
+<body id="body" x=1>
 <!-- menu a submenu -->
   <div id='horni' class="MainBar">
     <div id="appl" $version>$title_right</div>
@@ -625,6 +626,7 @@ __EOD;
     break;
   }
   echo $template;
+//   echo nl2br(htmlentities($template));
 }
 # -------------------------------------------------------------------------------------------------- root_inc
 # skeleton hlavní konfigurace aplikace

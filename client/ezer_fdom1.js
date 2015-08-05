@@ -772,7 +772,9 @@ Ezer.Application= new Class({
   // zobrazování času a stavu v ae_bar.time
   bar_clock_show: function (zbyva) {
     var abbr= Ezer.sys.user
-      ? "<span title='id="+Ezer.sys.user.id_user+' / '+Ezer.sys.user.skills+"'>"
+      ? "<span title='id="+Ezer.sys.user.id_user
+        +', data='+Ezer.sys.user.org+'/'+Ezer.sys.user.access
+        +', funkce='+Ezer.sys.user.skills+"'>"
         +(Ezer.sys.user.abbr||'---')+(Ezer.sys.user.note||'')+'</span>'
       : '';
     var hm= ae_time();

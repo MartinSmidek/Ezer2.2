@@ -1527,7 +1527,7 @@ Ezer.Elem.implement({
         this.DOM_Input.value= this.help;
         this.DOM_Input.removeClass('empty_focus').addClass('empty');
       }
-      if ( this._changed ) {
+      if ( this._changed && this.DOM_Input.value!=this.value ) {
         this.fire('onchanged');
       }
     }
@@ -2253,7 +2253,7 @@ Ezer.Chat.implement({
   }
 });
 // =====================================================================================> Select-DOM
-//c: Select-DOM
+//c: Select-DOM ()
 //      Select má společné zobrazení a implementuje třídu Drag
 //t: Block-DOM,Elem-DOM
 //s: Block-DOM
@@ -2564,8 +2564,20 @@ Ezer.Select.implement({
       this.DOM_set();
       this._key=  val==999998 ? 0 : sel.value;
     }
+    this.DOM_setCss();
     this._drop_changed= true;
     this.DOM_drop_hide();
+  },
+// ------------------------------------------------------------------------------------ DOM_setCss
+// upraví CSS podle klíče - jen v součinnosti s fcí selects
+  DOM_setCss: function () {
+    if ( this.Css ) {
+      this.DOM_Input.removeClass(this.lastCss);
+      if ( this.Css[this._key] ) {
+        this.lastCss= this.Css[this._key];
+        this.DOM_Input.addClass(this.lastCss);
+      }
+    }
   },
 // ------------------------------------------------------------------------------------ DOM_set
 //f: Select-DOM.DOM_set
@@ -2576,15 +2588,17 @@ Ezer.Select.implement({
     var spec= this._f(':');
     if ( value==0 && spec=='e' ) value= '';
     this.DOM_Input.setProperty('value',value).removeClass('empty');
+    this.DOM_setCss();
   },
 // ------------------------------------------------------------------------------------ DOM_addItems
 //f: Select-DOM.DOM_addItems
 //      zobrazí hodnoty z this.Items
   DOM_addItems: function() {
-    var create= function(item,key) {
+    var create= function(item,key,css) {
 //                                                         Ezer.trace('*',key+':'+item);
       var name= this.options.par && this.options.par.subtype=='info' ? item.name : item;
-      var li= new Element('li',{'class':'',name:name,events:{
+      var css= this.Css && this.Css[key] ? this.Css[key] : '';
+      var li= new Element('li',{'class':css,name:name,events:{
         mouseover: function (event) {
           if (this.DOM_usedkeys) {
             this.DOM_DropList.getElements('li.selected').each(function (el) {
@@ -3705,8 +3719,9 @@ Ezer.fce.DOM.warning_timer1= null;
 Ezer.fce.DOM.warning_timer2= null;
 Ezer.fce.DOM.warning= function (str) {
   if ( !str ) {
-    if ( Ezer.App.mooWarn )
-      Ezer.App.mooWarn.slideOut();
+    if ( Ezer.App.mooWarn ) {
+      Ezer.fce.DOM.warning_(1);
+    }
   }
   else {
     if ( !Ezer.App.mooWarn )
@@ -3726,8 +3741,10 @@ Ezer.fce.DOM.warning= function (str) {
   }
 };
 // konec hlášky
-Ezer.fce.DOM.warning_= function () {
-  if ( Ezer.fce.DOM.warning_status==1 ) {
+Ezer.fce.DOM.warning_= function (even) {
+  if ( Ezer.fce.DOM.warning_status==1 || even ) {
+    $clear(Ezer.fce.DOM.warning_timer1);
+    $clear(Ezer.fce.DOM.warning_timer2);
     Ezer.App.mooWarn.element.set('html','');
     Ezer.App.mooWarn.slideOut();
     Ezer.fce.DOM.warning_status= 0;

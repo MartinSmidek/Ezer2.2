@@ -237,27 +237,37 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     last_par.set(see.all.actives.par);
     sel.set('use');
     refresh;
+    uzivatel.get.display(sys('options','watch_access'),'ac');
     uzivatel.get.display(sys('options','watch_ip'),'ip');
     cmd.watch_key.display(sys('options','watch_key'));
   }
-  proc u_uloz () { var msg:text
+  # ==> ... uložení uživatele s kontrolou
+  proc u_uloz () {
     uzivatel.same;
   | uzivatel.kdo.set(sys('user','id_user')); uzivatel.kdo.change; uzivatel.kdy.set(now_sql(1));
     uzivatel.kdy.change;
     uzivatel.key;
-    { msg.set(ask('sys_user_unique',uzivatel.key,uzivatel.username.get,uzivatel.znacka.get));
-      msg; alert(msg)
+    { u_test(uzivatel.key)
     | uzivatel.save; uzivatel.load;
       uzivatele.lst.browse_seek;
       cmd.get.enable(0,'c');
     }
   | not(uzivatel.key);
-    { msg.set(ask('sys_user_unique',0,uzivatel.username.get,uzivatel.znacka.get));
-      msg; alert(msg)
+    { u_test(0)
     | uzivatel.insert; novy.set(uzivatel.key); uzivatel.load;
       uzivatele.lst.browse_load; uzivatele.lst.raise('onrowclick',novy.get);
       cmd.get.enable(0,'c');
     }
+  }
+  # test položek před uložením
+  var msg:text
+  proc u_test(id) {
+    sys('options','watch_access');
+    msg.set(ask('sys_user_access',sys('options','watch_access'),uzivatel.org.get,uzivatel.access.get));
+    msg.get; alert(msg.get); return(1)
+  | msg.set(ask('sys_user_unique',id,uzivatel.username.get,uzivatel.znacka.get));
+    msg.get; alert(msg.get); return(1)
+  | return(0)
   }
   # obnovení seznamu uživatelů
   proc refresh() {
@@ -265,7 +275,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     cmd.enable(1,last_par.get('on'));
     cmd.enable(0,last_par.get('off'));
   }
-  # ----------------------------------------------------------------==>menu
+  # ----------------------------------------------------------------==> ... menu
   menu see { type:'left', active:*, format:'f-'
     menu all { title:'přehled',type:'group'
       item actives { title:'[fa-user-plus] aktivní uživatelé', par:°{on:'h',off:'u',cond:"LEFT(deleted,1)!='H'"}}
@@ -277,7 +287,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
       refresh;
     }
   }
-  # ----------------------------------------------------------------==>uživatelé
+  # ----------------------------------------------------------------==> ... uživatelé
   form users [,,587,470] { css:'ae_work'
     view u: table _user
     label [6,3,89,15] { title:'<h1>Uživatelé</h1>' }
@@ -290,9 +300,15 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
         data:u.username, format:'sq*' }
       show prijmeni [,,70,] { title:'příjmení', data:u.surname, format:'s+q*' }
       show jmeno [,,70,] { title:'jméno', data:u.forename, format:'sq*' }
-      show skills [,,280,] { title:'oprávnění', help:'seznam kódů oprávnění',
+      show org [,,0,] { title:'org.', data:u.org, format:'rtsq*' }
+      show access [,,0,] { title:'přístup', data:u.access, format:'rtsq*' }
+      show skills [,,280,] { title:'oprávnění', help:'seznam kódů funkčních oprávnění',
         data:u.skills, format:'utsq*'
         proc onsubmit() { this.save } }
+      proc onclick () {
+        access.width; org.width(0); access.width(0); skills.width(280)
+      | org.width(19); access.width(29); skills.width(230)
+      }
       proc onrowclick () {
         new_skill.set('');
         cmd.get.enable(0,'c');
@@ -306,7 +322,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
       }
     }
   }
-  # ----------------------------------------------------------------==>user
+  # ----------------------------------------------------------------==> ... user
   form user [,,433,471] { css:'ae_work'
     view u: table _user,
     label [5,6,89,15] { title:'<h1>Uživatel</h1>' }
@@ -316,14 +332,15 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     field znacka [169,48,34,] { data:u.abbr, title:'^zkratka' }
     field prijmeni [5,92,152,] { data:u.surname, title:'^příjmení' }
     field jmeno [168,92,117,] { data:u.forename, title:'^jméno' }
-    field access [221,48,63,] { tag:'ac', data:u.access, title:'^přístup k' }
+    field org [216,48,21,] { tag:'ac', data:u.org, format:'r', title:'^org.' }
+    field access [239,48,45,] { tag:'ac', data:u.access, title:'^přístup k' }
     edit ips [298,47,127,64] { tag:'ip', data:u.ips, title:'^povolené IP adresy' }
     field login { data:u.login }
     field kdo { data:u.zmena_kdo }
     field kdy { data:u.zmena_kdy }
     proc onchanged() { cmd.get.enable(1,'c') }
   }
-  # ----------------------------------------------------------------==>desc_skills
+  # ----------------------------------------------------------------==> ... desc_skills
   form desc_skills [,,320,200] {
     label [2,3,100,15] { title:'oprávnění' }
     label missing [60,0,360,15]
@@ -333,7 +350,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
         proc onsubmit() { this.save } }
       show dsc [,,345,] { data:_skill.skill_desc, title:'popis oprávnění', format:'uts+q$', skill:'a|m'
         proc onsubmit() { this.save } }
-      # ----------------------------------------------==> kontext.menu
+      # ----------------------------------------------==> ... kontext.menu
       menu { type:'context'
         item { title:'odeberat všechna oprávnění'
           proc onclick() { seznam.selected("clear") } }
@@ -370,19 +387,20 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
           proc onclick() { Track.back_show('_user',uzivatele.lst.user.get) } }
       }
       proc onchoice() {
-        // pokud je přihlášený administrátor, zablokujeme mu možnost změnit si oprávnění
-        eq(uzivatele.lst.user.get,sys('user','id_user'));
-        contains(uzivatele.lst.user.get,sys('ezer','options','admins'));
-        warning('Administrátor si nemůže měnit svoje práva');
-      | uzivatel.skills.set(ask('sys_ids2skills',this.selected('get')));
+#         // pokud je přihlášený administrátor, zablokujeme mu možnost změnit si oprávnění
+#         eq(uzivatele.lst.user.get,sys('user','id_user'));
+#         contains(uzivatele.lst.user.get,sys('ezer','options','admins'));
+#         warning('Administrátor si nemůže měnit svoje práva');
+#       |
+        uzivatel.skills.set(ask('sys_ids2skills',this.selected('get')));
         uzivatel.skills.change;
         cmd.get.enable(1,'c');
       }
     }
   }
-  # ----------------------------------------------------------------==>butt
+  # ----------------------------------------------------------------==> ... cmd
   form butt [,,852,39] {
-    # --------------------------------==> úpravy uživatelů
+    # -------------------------------- úpravy uživatelů
     label  [0,6,561,30] { css:'ae_parm' }
     button zrus_clena [11,12,,] { tag:'h', type:'html', title:'[fa-plug fa-rotate-180 fa-red] Skrýt'
       proc onclick() { confirm("Opravdu znemožnit přihlášení uživateli ",uzivatel.username.get,'?');
@@ -399,7 +417,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
       }
     }
     label watch_ref [316,15,250,15]
-    # --------------------------------==> změny uživatele
+    # -------------------------------- změny uživatele
     label  [636,6,292,30] { css:'ae_parm' }
     button uloz_clena [649,12,,] { tag:'c', type:'html', title:'[fa-save] Uložit'
       proc onclick () { u_uloz
@@ -779,7 +797,8 @@ table _user { key_id:'id_user', db:'ezer_system'
   text deleted,
   text abbr,
   text skills  { help:'seznam procedurálních oprávnění' }
-  text access  { help:'seznam datových oprávnění' }
+  text org     { help:'příslušnost k organizaci' } // 2**n
+  text access  { help:'povolený přístup k datům organizací' }  // součet povolených org
   text ips     { help:'čárkami oddělený seznam IP adres ze kterých se uživatel smí přihlásit' }
   text options { help:'privátní nastavení|ve formátu JSON' }
   text username,
