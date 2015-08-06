@@ -7748,8 +7748,8 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
   }
   else if ( typ_x=='o' && typ_y=='f' ) {        // object --> form
     Object.each(x,function(value,id) {
-      if ( y.part[id] instanceof Ezer.Elem ) {
-        var field= y.part[id];
+      var field= y.part[id];
+      if ( field ) { // instanceof Ezer.Elem ) {
         if ( field.key ) {
           field.key(x[id],key);
         }
