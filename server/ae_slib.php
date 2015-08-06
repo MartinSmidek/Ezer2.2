@@ -712,28 +712,30 @@ function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
   global $ezer_db, $ezer_root;
   list($grp_name)= preg_split("/[\s-_]/",$app_name);
   $lines= array();
-  $header= function($d,$w,$a='') {
-    $d= substr($d,8,2).'.'.substr($d,5,2).'.'.substr($d,0,4);
+  $s2u= function($d) { return substr($d,8,2).'.'.substr($d,5,2).'.'.substr($d,0,4); };
+  $header= function($d,$w,$a='') use ($s2u) {
+    $d= $s2u($d);
     $w= trim($w);
     return "<span class='chng_day' title='$a'>$d $w</span>";
   };
   $get_help= function($db='.main.',$level='a',$abbr) use (&$lines,$ezer_db,$days,$header) {
     if ( $db=='.main.' || isset($ezer_db[$db]) ) {
-    ezer_connect($db);
-    $qh= "SELECT datum, version, name, help FROM /*$db*/ _help WHERE kind='v' AND SUBDATE(NOW(),$days)<=datum";
-    $rh= mysql_qry($qh);
-    while ( $rh && ($h= mysql_fetch_object($rh)) ) {
-      $n= $h->name;
-      if ( $n )
-        list($n)= array_reverse(explode('|',$h->name));
-      else
-        $n= $level=='k' ? 'Ezer' : ' ';
-      $hdr= $header($h->datum,$n,$abbr);
-      $version= str_pad($h->version,10,'0',STR_PAD_LEFT);
-      $tit= addslashes($h->help);
-      $lines[]= "$h->datum $version"
-              . "<div class='chng'>$hdr<span class='chng_hlp' title='$tit'>$h->help</span></div>";
-    }
+      ezer_connect($db);
+      $qh= "SELECT datum, version, name, help FROM /*$db*/ _help
+            WHERE kind='v' AND SUBDATE(NOW(),$days)<=datum";
+      $rh= mysql_qry($qh);
+      while ( $rh && ($h= mysql_fetch_object($rh)) ) {
+        $n= $h->name;
+        if ( $n )
+          list($n)= array_reverse(explode('|',$h->name));
+        else
+          $n= $level=='k' ? 'Ezer' : ' ';
+        $hdr= $header($h->datum,$n,"oprava $abbr");
+        $version= str_pad($h->version,10,'0',STR_PAD_LEFT);
+        $tit= addslashes($h->help);
+        $lines[]= "$h->datum $version"
+                . "<div class='chng'>$hdr<span class='chng_hlp' title='$tit'>$h->help</span></div>";
+      }
     }
   };
   // zhromáždění změn z trojice databází s tabulkou _help
@@ -750,13 +752,17 @@ function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();
   $cond= strstr($type,'a')===false ? "cast=1" : "1";
   $cond.= strstr($type,'k')===false ? " OR cast!=1" : "";
   ezer_connect('.main.');
-  $qh= "SELECT kdy_skoncil, zprava, zkratka FROM _todo JOIN _cis ON druh='s_todo_cast' AND data=cast
+  $qh= "SELECT kdy_skoncil, zprava, zkratka, abbr AS kdo, kdy_zadal FROM _todo
+        JOIN _cis ON druh='s_todo_cast' AND data=cast
+        LEFT JOIN _user ON id_user=kdo_zadal
         WHERE kdy_skoncil!='0000-00-00' AND SUBDATE(NOW(),$days)<=kdy_skoncil AND ($cond)";
   $rh= mysql_qry($qh);
   while ( $rh && ($h= mysql_fetch_object($rh)) ) {
-    $hdr= $header($h->kdy_skoncil,$h->zkratka);
+    $who= "požadavek {$h->kdo} ".$s2u($h->kdy_zadal);
+    $hdr= $header($h->kdy_skoncil,$h->zkratka,$who);
+    $tit= addslashes($h->zprava);
     $lines[]= "$h->kdy_skoncil 00:00:00 9876543210"
-            . "<div class='chng'>$hdr<span class='chng_hlp'>$h->zprava</span></div>";
+            . "<div class='chng'>$hdr<span class='chng_hlp' title='$tit'>$h->zprava</span></div>";
   }
   // redakce
   rsort($lines);
