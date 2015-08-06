@@ -3771,8 +3771,8 @@ Ezer.fce.DOM.error= function (str,nonl) {
 // podobu alertu lze modifikovat pomoví nepovinných částí options
 // options = {heading:hlavička, width:šířka}
 Ezer.fce.DOM.alert= function (str,continuation,options) {
-  var win= null, width= options&&options.width||350;
-  heading= options&&options.heading||'Upozornění';
+  var win= null, width= options && options.width||350,
+      heading= options && options.heading||'Upozornění';
   if ( continuation ) {
     win= new StickyWin.Alert(heading,str,{hideOnClick:false,closeOnEsc:true,
       uiOptions:{closeButton:false,width:width,
@@ -3790,14 +3790,16 @@ Ezer.fce.DOM.alert= function (str,continuation,options) {
 };
 // -------------------------------------------------------------------------------------- confirm
 // default butts={Ano:1,Ne:0}
-Ezer.fce.DOM.confirm= function (str,continuation,butts) {
+Ezer.fce.DOM.confirm= function (str,continuation,butts,options) {
   butts= butts || {Ano:1,Ne:0};
-  var buttons= [];
+  var win= null, width= options && options.width||350,
+      heading= options && options.heading||'Dotaz',
+      buttons= [];
   Object.each(butts,function(value,title){
     buttons.push({text:title,onClick:function(){continuation(value)}});
   });
-  var win= new StickyWin.Alert('Dotaz',str,{hideOnClick:false,closeOnEsc:true,
-    uiOptions:{closeButton:false,width:350,buttons:buttons},
+  win= new StickyWin.Alert(heading,str,{hideOnClick:false,closeOnEsc:true,
+    uiOptions:{closeButton:false,width:width,buttons:buttons},
     maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
   });
   return win;

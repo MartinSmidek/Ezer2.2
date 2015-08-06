@@ -833,11 +833,14 @@ Ezer.Application= new Class({
              yav= y.a_version ? y.a_version.toInt() : 0,
              ygv= y.g_version ? y.g_version.toInt() :0, ykv= y.k_version ? y.k_version.toInt() : 0;
           if ( ykv > cv || yav > cv || (ygv && ygv > cv) ) {
-            var msg= "Použijte prosím <b>Ctrl-R</b> pro obnovu stavu programu. "
-              + "<br>Na serveru byly provedeny následující změny:<hr>"+y.help;
-            Ezer.fce.DOM.alert(msg,false,{
-              heading:"<span style='color:orange;text-align:center;display:block'>Upozornění systému</span>",
-              width:500});
+            var msg= "Na serveru byly provedeny programové změny, obnovte prosím okno prohlížeče"
+              + "<br>pomocí tlačítka (nebo co nejdříve stiskem Ctrl-R), aby vám mohly sloužit.<hr>"
+              + y.help;
+            Ezer.fce.DOM.confirm(msg,
+              function(x){ if (x) document.location.reload(true); },{
+                'Obnov nyní (doporučeno)':1,'Provedu za chvíli ...':0},{heading:
+                "<span style='color:orange;text-align:center;display:block'>Upozornění systému</span>",
+                width:520});
           }
         }
         if ( y.log_out )
