@@ -453,7 +453,8 @@ Ezer.Application= new Class({
             }
           }.bind(this),
           contextmenu: function(e) {
-            __menu();
+            e.preventDefault();
+            __menu(e);
             return false;
           }.bind(this)
         }}).inject(this._barRightDom);
