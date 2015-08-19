@@ -10,7 +10,7 @@ function doc_ezer() { trace();
   $html.= "
     <i>Seznam <b style='color:blue'>Ezer-modulů</b> aplikace se seznamem PHP-funkcí, volaných
     prostřednictvím <b>ask</b>, <b>make</b> a použitých v atributu <b>sql_pipe</b>, uspořádaným
-    podle <b>PHP modulů</b>. Standardní funkce obsažené v seznamu \$ezer_php_libr v $ezer_root.inc
+    podle <b style='color:blueviolet'>PHP modulů</b>. <b style='color:green'>Standardní</b> funkce obsažené v seznamu \$ezer_php_libr v $ezer_root.inc
     a knihovní funkce PHP jsou uvedeny zvlášť.
     Nedefinované funkce jsou označeny <span style='color:red'>červeně</span>.
     </i>";
@@ -38,13 +38,13 @@ function doc_ezer() { trace();
         // funkce definované v některém modulu
         $lst= array();
         foreach($php as $i=>$f) {
-          if ( isset($fces[$f]) ) {
+          if ( isset($fces[strtolower($f)]) ) {
             $lst[]= $f;
             unset($php[$i]);
           }
         }
         if ( count($lst) ) {
-          $html.= "<dd><b>$mod</b>: ".implode(', ',$lst)."</dd>";
+          $html.= "<dd><b style='color:blueviolet'>$mod</b>: ".implode(', ',$lst)."</dd>";
         }
       }
       // standardní funkce
@@ -56,7 +56,7 @@ function doc_ezer() { trace();
         }
       }
       if ( count($lst) ) {
-        $html.= "<dd><b>standardní</b>: ".implode(', ',$lst)."</dd>";
+        $html.= "<dd><b style='color:green'>standardní</b>: ".implode(', ',$lst)."</dd>";
       }
       // nedefinované funkce
       if ( count($php) ) {

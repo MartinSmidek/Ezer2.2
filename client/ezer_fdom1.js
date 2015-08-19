@@ -774,6 +774,7 @@ Ezer.Application= new Class({
   bar_clock_show: function (zbyva) {
     var abbr= Ezer.sys.user
       ? "<span title='id="+Ezer.sys.user.id_user
+        +', start='+Ezer.options.start_datetime
         +', data='+Ezer.sys.user.org+'/'+Ezer.sys.user.access
         +', funkce='+Ezer.sys.user.skills+"'>"
         +(Ezer.sys.user.abbr||'---')+(Ezer.sys.user.note||'')+'</span>'
