@@ -229,9 +229,9 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   var sel: text,
 
   use uzivatele: form users [10,7,,],
-  use uzivatel: form user [430+180,7,,],
+  use uzivatel: form user [430+180,7,,]
   use cmd: form butt [22,sys_users_cmd,,],
-  use dskill: form desc_skills [430+182,127,,]
+  use dskill: form desc_skills [430+180,127,,]
 
   proc onstart () {
     last_par.set(see.all.actives.par);
@@ -240,6 +240,9 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     uzivatel.get.display(sys('options','watch_access'),'ac');
     uzivatel.get.display(sys('options','watch_ip'),'ip');
     cmd.watch_key.display(sys('options','watch_key'));
+  }
+  proc onfirstfocus() {
+    watch_css;
   }
   # ==> ... uložení uživatele s kontrolou
   proc u_uloz () {
@@ -263,17 +266,30 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   var msg:text
   proc u_test(id) {
     sys('options','watch_access');
-    msg.set(ask('sys_user_access',sys('options','watch_access'),uzivatel.org.get,uzivatel.access.get));
+    msg.set(ask('sys_user_access',sys('options','watch_access'),uzivatel.org.key,uzivatel.access.key));
     msg.get; alert(msg.get); return(1)
   | msg.set(ask('sys_user_unique',id,uzivatel.username.get,uzivatel.znacka.get));
     msg.get; alert(msg.get); return(1)
-  | return(0)
+  | // testy prošly - uprav změny pro uložení
+    [ uzivatel.access.changed; uzivatel.access.set(uzivatel.access.key); uzivatel.access.change ];
+    [ uzivatel.org.changed; uzivatel.org.set(uzivatel.org.key); uzivatel.org.change ];
+    return(0)
   }
   # obnovení seznamu uživatelů
   proc refresh() {
     uzivatele.lst.browse_load(last_par.get('cond'));
     cmd.enable(1,last_par.get('on'));
     cmd.enable(0,last_par.get('off'));
+    watch_css;
+  }
+  # kompozice obarvení z Ezer.options.watch_access_opt.css (je-li)
+  proc watch_css() { var opt:object
+    sys('options','watch_access_opt');
+    opt.set(ask('sys_user_watch_css',sys('options','watch_access_opt')));
+    uzivatele.lst.zkratka.set_attrib('css_cell',replace(opt.css_cell,'@','org'));
+    uzivatele.lst.username.set_attrib('css_cell',replace(opt.css_cell,'@','access'));
+    uzivatel.org.selects(opt.sel_org);
+    uzivatel.access.selects(opt.sel_access);
   }
   # ----------------------------------------------------------------==> ... menu
   menu see { type:'left', active:*, format:'f-'
@@ -292,11 +308,11 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     view u: table _user
     label [6,3,89,15] { title:'<h1>Uživatelé</h1>' }
     browse lst [4,37,0,54] { rows:sys_users_list, qry_rows:1, buf_rows:100
-      show user [,,20,] { title:'č.', help:'jednoznačné číslo uživatele',
+      show user [,,27,] { title:'č.', help:'jednoznačné číslo uživatele',
         data:u.id_user, format:'rsq=' }
       show zkratka [,,35,] { title:'značka', help:'jednoznačná třípísmenná zkratka',
-        data:u.abbr, format:'sq*' }
-      show username [,,70,] { title:'uživatel', help:'jednoznačné přihlašovací jméno',
+        data:u.abbr, format:'sq*', css_cell:'' }
+      show username [,,63,] { title:'uživatel', help:'jednoznačné přihlašovací jméno',
         data:u.username, format:'sq*' }
       show prijmeni [,,70,] { title:'příjmení', data:u.surname, format:'s+q*' }
       show jmeno [,,70,] { title:'jméno', data:u.forename, format:'sq*' }
@@ -313,6 +329,8 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
         new_skill.set('');
         cmd.get.enable(0,'c');
         uzivatel.load(user.get);
+        uzivatel.org.key(org.get);
+        uzivatel.access.key(access.get);
         uzivatel.znacka.enable(0);
         // zobrazení v seznamu vlastností jako vybraných
         dskill.missing.set(ask('sys_skills_test',uzivatel.skills.get));
@@ -323,17 +341,17 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     }
   }
   # ----------------------------------------------------------------==> ... user
-  form user [,,433,471] { css:'ae_work'
+  form user [,,433,125] { css:'ae_work', style:"z-index:2"
     view u: table _user,
     label [5,6,89,15] { title:'<h1>Uživatel</h1>' }
     field skills [2,46,146,] { data:u.skills, format:'n' }
-    field username [5,48,69,] { data:u.username, title:'^username' }
-    field password [85,48,72,] { data:u.password, title:'^heslo', format:'p' }
-    field znacka [169,48,34,] { data:u.abbr, title:'^zkratka' }
+    field username [5,48,60,] { data:u.username, title:'^username' }
+    field password [74,48,42,] { data:u.password, title:'^heslo', format:'p' }
+    field znacka [124,48,34,] { data:u.abbr, title:'^zkratka' }
     field prijmeni [5,92,152,] { data:u.surname, title:'^příjmení' }
     field jmeno [168,92,117,] { data:u.forename, title:'^jméno' }
-    field org [216,48,21,] { tag:'ac', data:u.org, format:'r', title:'^org.' }
-    field access [239,48,45,] { tag:'ac', data:u.access, title:'^přístup k' }
+    select org [168,48,66,] { tag:'ac', data:u.org, format:'w', title:'^organizace' }
+    select access [242,48,44,] { tag:'ac', data:u.access, format:'w', title:'^přístup k' }
     edit ips [298,47,127,64] { tag:'ip', data:u.ips, title:'^povolené IP adresy' }
     field login { data:u.login }
     field kdo { data:u.zmena_kdo }
@@ -341,9 +359,9 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     proc onchanged() { cmd.get.enable(1,'c') }
   }
   # ----------------------------------------------------------------==> ... desc_skills
-  form desc_skills [,,320,200] {
+  form desc_skills [,,433,200] { css:'ae_work'
     label [2,3,100,15] { title:'oprávnění' }
-    label missing [60,0,360,15]
+    label missing [60,3,360,15]
     browse seznam [2,20,180,198] { rows:sys_users_skills, qry_rows:1, buf_rows:100
       show id { data:_skill.id_skill }
       show abb [,,50,] { data:_skill.skill_abbr, title:'kód', format:'utsq*', skill:'a|m'

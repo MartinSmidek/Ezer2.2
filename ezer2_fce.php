@@ -1,5 +1,5 @@
 <?php # (c) 2007-2009 Martin Smidek <martin@smidek.eu>
-/** ================================================================================================ SVN */
+/** ===========================================================================================> SVN */
 # -------------------------------------------------------------------------------------- sys_svn_cmd
 # provedení SVN příkazu na serveru, par.cmd je nepovinná relativní složka, par.cmd příkaz
 function sys_svn_cmd($par) {
@@ -31,12 +31,12 @@ function sys_svn_cmd($par) {
   }
   return $html;
 }
-/** ================================================================================================ HELP */
+/** ==========================================================================================> HELP */
 # funkce pro údržbu systému nápovědy v tabulkách _help
 # ---------------------------------------------------------------------------------- sys_help
 function sys_help($id_user=0) {  trace();
 }
-/** ================================================================================================ NASTAVENÍ */
+/** =====================================================================================> NASTAVENÍ */
 # ---------------------------------------------------------------------------------- sys_user_record
 # přehled osobních údajů
 function sys_user_record($id_user=0) {  trace();
@@ -301,7 +301,7 @@ function sys_user_skills($file='') {
     $result= "Nebyly nalezeny inkonsistence";
   return $result;
 }
-# ================================================================================================== backup
+/** ========================================================================================> BACKUP */
 # v globálním nastavení musí být definováno
 #   $path_backup     -- složka záloh databází
 #   $ezer_mysql_path -- cesta k utilitě mysql
@@ -531,7 +531,7 @@ function sys_backup_delete($dir) { trace();
   }
   if ( !$ok ) fce_warning("sys_backup_delete: nelze smazat starou zálohu v $dir");
 }
-/** ================================================================================================ UŽIVATELÉ */
+/** =====================================================================================> UŽIVATELÉ */
 # -------------------------------------------------------------------------------------- sys_session
 # vygeneruje tabulku běžného $_SESSION
 function sys_session() {
@@ -577,12 +577,12 @@ function sys_user_unique($id_user,$username,$abbr) {
 function sys_user_access($watch_access,$org,$access) {
   global $EZER;
   $msg= '';
-  $orgs= array(1,2,4,8,16,32,64,128,256,512,1024);
-  if ( !in_array($org,$orgs) ) $msg.= " org musí být mocnina 2; ";
+  $orgs= array(0,1,2,4,8,16,32,64,128,256,512,1024);
+  if ( !in_array($org,$orgs) ) $msg.= " org musí být mocnina 2 nebo 0; ";
   if ( $org>$watch_access ) $msg.= " org musí být menší než $watch_access; ";
   if ( $access>$watch_access ) $msg.= " přístup musí být menší nebo roven $watch_access; ";
-  if ( !($org&$access) ) $msg.= " org musí být přístupné; ";
-  if ( !($access&$watch_access) ) $msg.= " přístup musí být podmnožina $watch_access; ";
+  if ( $org && !($org&$access) ) $msg.= " org musí být přístupné; ";
+  if ( $access && !($access&$watch_access) ) $msg.= " přístup musí být podmnožina $watch_access; ";
   return $msg;
 }
 # ------------------------------------------------------------------------------------ sys_user_hide
@@ -602,6 +602,26 @@ function sys_user_hide($id_user,$to_hide) {
     break;
   }
   return $html;
+}
+# ------------------------------------------------------------------------------- sys_user_watch_css
+# vrátí objekt obsahující informace pro práci s předaným Ezer.options.watch_access_opt
+# ret.css_cell = *,0:,... za * je třeba dosadit jméno show
+# ret.selects = select ve tvaru: hodnota[:klíč:css]
+function sys_user_watch_css($opt) {
+  $ret= (object)array('css_cell'=>'','sel_org'=>'','sel_access'=>'');
+  $orgs= array(0,1,2,4,8,16,32,64,128,256,512,1024);
+  if ( $opt->css ) {
+    $ret->css_cell= '@,0:';
+    $ret->sel_org= "-:0:";
+    $ret->sel_access= "-:0:";
+    foreach($opt->css as $i=>$css) {
+      $ret->css_cell.= ",$i:$css";
+      $ret->sel_access.= ",{$opt->abbr->$i}:$i:$css";
+      if ( in_array($i,$orgs) )
+        $ret->sel_org.= ",{$opt->name->$i}:$i:$css";
+      }
+  }
+  return $ret;
 }
 # ---------------------------------------------------------------------------------- sys_skills_test
 # vrátí seznam zkratek oprávnění, které nejsou popsány v tabulce _skill
@@ -663,7 +683,7 @@ function sys_watch_key() {
     : "Klíč se nepovedlo vygenerovat";
   return $html;
 }
-/** ================================================================================================ AKTIVITY */
+/** ======================================================================================> AKTIVITY */
 # ------------------------------------------------------------------------------------- sys_activity
 # vygeneruje přehled aktivit podle menu
 # pokud ... tak vynechá uživatele, jejichž zkratky jsou v seznamu $EZER->activity->skip
@@ -1318,7 +1338,7 @@ function sys_days_table($touch,$days,$type,$color,$config_colors=false) { #trace
   $tab= "<div class='systable'>$tab</div>";
   return $tab;
 }
-/** ================================================================================================ POŽADAVKY */
+/** =====================================================================================> POŽADAVKY */
 # ---------------------------------------------------------------------------------------- abbr2user
 # zjištění uživatele podle jeho zkratky
 function abbr2user($abbr) {

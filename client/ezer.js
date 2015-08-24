@@ -2302,7 +2302,7 @@ Ezer.Const= new Class({
     return Ezer.Var.prototype.get.apply(this,[part]);
   }
 });
-// ================================================================================================> Form
+// ===========================================================================================> Form
 //c: Form ([options])
 //      formulář
 //t: Block
@@ -2988,9 +2988,9 @@ Ezer.Form= new Class({
     }
   }
 });
-// ================================================================================================> části Form
+// =====================================================================================> části Form
 // specifické části formuláře (typicky nenesou hodnotu a události s nimi související)
-// ================================================================================================> Label
+// ==========================================================================================> Label
 //c: Label ()
 //      textové návěští
 //t: Block
@@ -3008,8 +3008,9 @@ Ezer.Label= new Class({
 //  ; 'r' : 'right' zarovnávat doprava
   initialize: function(owner,desc,DOM,id,skill) {
     this.parent(owner,desc,DOM,id,skill);
-    this.DOM_add();
+    this.DOM_add1();
     this.subBlocks(desc,this.DOM_Block);
+    this.DOM_add2();
   },
 // ------------------------------------------------------------------------------------ set
 //fm: Label.set (val)
@@ -5947,6 +5948,22 @@ Ezer.Show= new Class({
       this.owner.buf[this.owner.t+ti-1][this.id]= '';
       this.DOM_set(ti);
     }
+    return 1;
+  },
+// ------------------------------------------------------------------------------------ set_attrib
+//fm: Show.set_attrib (name,val)       nedokumentováno, může být změněno
+//      pokud name='css_cell' změní tento atribut a aplikuje jej
+//a: name - 'rows'
+//   val - nová hodnota
+  set_attrib: function(name,val) {
+    if ( name=='css_cell' ) {
+      var browse= this.owner;
+      // změň atribut
+      this.parent(name,val);
+      browse._css_def(this,browse,'css_cell');
+    }
+    else
+      this.parent(name,val);
     return 1;
   },
 // ------------------------------------------------------------------------------------ set+

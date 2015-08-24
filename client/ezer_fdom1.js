@@ -772,10 +772,15 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- bar_clock_show
   // zobrazování času a stavu v ae_bar.time
   bar_clock_show: function (zbyva) {
+    var org= Ezer.sys.user.org, access= Ezer.sys.user.access;
+    if ( Ezer.options.watch_access_opt && Ezer.options.watch_access_opt.abbr ) {
+      org= Ezer.options.watch_access_opt.abbr[org];
+      access= Ezer.options.watch_access_opt.abbr[access];
+    }
     var abbr= Ezer.sys.user
       ? "<span title='id="+Ezer.sys.user.id_user
         +', start='+Ezer.options.start_datetime
-        +', data='+Ezer.sys.user.org+'/'+Ezer.sys.user.access
+        +', data='+org+'/'+access
         +', funkce='+Ezer.sys.user.skills+"'>"
         +(Ezer.sys.user.abbr||'---')+(Ezer.sys.user.note||'')+'</span>'
       : '';
