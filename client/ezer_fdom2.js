@@ -795,8 +795,8 @@ Ezer.PanelInTabs_add= function(panel) {
     }).inject(panel.owner._tabsDom)
   ));
   // zvýraznění nadpisu, pokud právě k němu existuje _help
-  var key= panel.self_sys().sys;
-  if ( panel.options._sys && Ezer.sys.ezer.help_keys.contains(key,',') ) {
+  var key= panel.self_sys(1).sys;
+  if ( key && Ezer.sys.ezer.help_keys.contains(key,',') ) {
     a.innerHTML+= "<sub> ?</sub>";
     // posouzení, zda má být help navíc vnucen při firstfocus
     if ( Ezer.sys.ezer.help_keys.contains('*'+key,',') ) {
