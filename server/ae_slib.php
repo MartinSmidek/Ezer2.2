@@ -2348,7 +2348,7 @@ function ezer_connect ($db0='.main.',$even=false,$initial=0) {
     }
   }
   // vlastní připojení, pokud nebylo ustanoveno
-  $db_name= isset($ezer_db[$db][5]) ? $ezer_db[$db][5] : $db;
+  $db_name= (isset($ezer_db[$db][5]) && $ezer_db[$db][5]!='') ? $ezer_db[$db][5] : $db;
 //                                 echo("<br>{$_GET['database']} :: $db0 ~ $db ~ $db_name");
   if ( !$ezer_db[$db][0] || $even ) {
     $ezer_db[$db][0]= @mysql_pconnect($ezer_db[$db][1],$ezer_db[$db][2],$ezer_db[$db][3]);

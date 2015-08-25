@@ -1900,7 +1900,7 @@ function help_keys() {
   $_keys= function($db='.main.') use ($ezer_db,&$keys) {
     if ( $db=='.main.' || isset($ezer_db[$db]) ) {
       // zjištění seznamu klíčů z $db
-      ezer_connect($db);
+      ezer_connect($db,1);
       $qh= "SELECT topic FROM _help WHERE kind='h' ";
       $rh= mysql_query($qh);
       while ( $rh && ($h= mysql_fetch_object($rh)) ) {
@@ -2344,7 +2344,7 @@ function drop_find($folder,$mask) {     // trace();
   $path= str_replace('//','/',"$path_files/$folder");
   $path= rtrim($path,"/");
 //                                                         $found= "???$ezer_root,$path/$file";
-  if ( $dh= opendir($path) ) {
+  if ( file_exists($path) && $dh= opendir($path) ) {
     while ( ($file= readdir($dh)) !== false ) {
       if ( is_file("$path/$file") && preg_match("/$mask/",$file) ) {
         $found= $file;
