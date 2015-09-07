@@ -1034,6 +1034,14 @@ function debugx(&$gt,$label=false,$html=0,$depth=64,$length=64,$win1250=0,$getty
   }
   return $x;
 }
+# ---------------------------------------------------------------------------------------------- PHP
+# ASK test PHP kódu
+# Příklad: echo(ask('PHP','global $USER;display("ok");debug($USER);return $USER->options->email;'));
+# (používat výhradně pro účely ladění v debugeru! - eval nevrací paměť - viz informace na webu)
+function PHP($expr) {
+  $fce= eval($expr);
+  return $fce;
+}
 /*** =============================================================================================== MySQL */
 # -------------------------------------------------------------------------------------------------- select
 # navrácení hodnoty jednoduchého dotazu
@@ -1089,6 +1097,7 @@ function select_object($expr,$table,$cond=1,$db='.main.') {
 # provedení MySQL dotazu
 function query($qry,$db='.main.') {
   $res= mysql_qry($qry,0,0,0,$db);
+  if ( !$res ) fce_error(wu("chyba funkce query:$qry/".mysql_error()));
   return $res;
 }
 # -------------------------------------------------------------------------------------------------- sql_query
@@ -2447,7 +2456,7 @@ function mysql_err($qry) {
   $y->ok= 'ko';
   $y->error.= $msg;
 }
-# -------------------------------------------------------------------------------------------------- mysql_qry
+# ---------------------------------------------------------------------------------------- mysql_qry
 # provedení dotazu a textu v $y->qry="..." a případně doplnění $y->err
 #   $qry      -- SQL dotaz
 #   $pocet    -- pokud je uvedeno, testuje se a při nedodržení se ohlásí chyba

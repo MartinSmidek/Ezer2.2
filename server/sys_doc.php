@@ -1,6 +1,6 @@
 <?php # (c) 2007-2009 Martin Smidek <martin@smidek.eu>
-/** ================================================================================================ CALLGRAPH */
-# -------------------------------------------------------------------------------------------------- doc_ezer
+/** =====================================================================================> CALLGRAPH */
+# ----------------------------------------------------------------------------------------- doc_ezer
 # seznam Ezer modulů
 function doc_ezer() { trace();
   global $ezer_root, $ezer_php;
@@ -10,16 +10,14 @@ function doc_ezer() { trace();
   $html.= "
     <i>Seznam <b style='color:blue'>Ezer-modulů</b> aplikace se seznamem PHP-funkcí, volaných
     prostřednictvím <b>ask</b>, <b>make</b> a použitých v atributu <b>sql_pipe</b>, uspořádaným
-    podle <b style='color:blueviolet'>PHP modulů</b>. <b style='color:green'>Standardní</b> funkce obsažené v seznamu \$ezer_php_libr v $ezer_root.inc
+    podle <b style='color:blueviolet'>PHP modulů</b>. <b style='color:green'>Standardní</b>
+    funkce obsažené v seznamu \$ezer_php_libr v $ezer_root.inc
     a knihovní funkce PHP jsou uvedeny zvlášť.
     Nedefinované funkce jsou označeny <span style='color:red'>červeně</span>.
     </i>";
   $ezers= doc_ezer_list();
-//                                                 debug($ezers,'ezers');
   $fce= get_defined_functions();                // seznam dostupných funkcí 'user','internal'
-//                                                 debug($fce,'php funkce');
   $cg= doc_php_cg(implode(',',$ezer_php));
-//                                                 debug($cg,'CG');
   $kap= '';
   $html.= "<dl>";
   foreach($ezers as $ezer=>$desc) {
@@ -77,7 +75,7 @@ function doc_ezer() { trace();
   $html.= "</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- doc_php
+# ------------------------------------------------------------------------------------------ doc_php
 # seznam PHP modulů s označením nepoužitých
 function doc_php() {
   global $ezer_root, $ezer_php;
@@ -86,18 +84,20 @@ function doc_php() {
   $html.= "
     <i>Seznam ezer-modulů aplikace se seznamem php-funkcí.
     Číslo před jménem funkce označuje hloubku volání vzhledem k Ezerskriptu.
-    Jména funkcí jsou označena jako <b style='color:red'>nepoužitá</b> resp. jako
-    volaná <b style='color:limegreen'>přímo </b> z Ezerscriptu.
+    Jména funkcí jsou označena jako zcela <b style='color:red'>nepoužitá</b>
+    resp. jako <b style='color:black'>nepoužitá</b> z Ezerscriptu
+    resp. jako volaná <b style='color:limegreen'>přímo </b> resp. <b style='color:blue'>nepřímo </b>
+    z Ezerscriptu.
     Jméno funkce je následováno seznamem volaných funkcí
     (standardní funkce obsažené v seznamu \$ezer_php_libr v $ezer_root.inc jsou vynechány).
     </i>";
   $ezers= doc_ezer_list();
   $cg= doc_php_cg(implode(',',$ezer_php));
-//                                                 debug($cg,'CG');
-//                                                 debug($cg->calls['ck/ck.dop.jed.php'],'CG ck.dop.jed.php');
   // $used obsahuje volané funkce: $fce => $n kde $n je vzdálenost od ezer-skriptu
   // 1 znamená přímo volané z ezer-skriptu
   $used= array();
+  $top= array(); // přímo volané z ezerscriptu
+  $flow= array(); // volané z ezerscriptu (transitivní obal)
   foreach($cg->called as $php=>$desc) {
     $used[$php]= 0;
   }
@@ -105,7 +105,7 @@ function doc_php() {
     $info= $desc->info;
     if ( ($phps= $info->php) ) {
       foreach ($phps as $php ) {
-        $used[$php]= 1;
+        $used[$php]= $top[$php]= $flow[$php]= 1;
       }
     }
   }
@@ -115,8 +115,12 @@ function doc_php() {
     $zmena= false;
     foreach($cg->calls as $fname=>$fces) {
       foreach($fces as $fce=>$calls) {
-        if ( $calls && $used[$fce]>0 ) {
+        if ( count($calls) ) {
           foreach($calls as $call) {
+            if ( !$flow[$call] && $flow[$fce] ) {
+              $flow[$call]= $flow[$fce]+1;
+              $zmena= true;
+            }
             if ( !$used[$call] ) {
               $used[$call]= $used[$fce]+1;
               $zmena= true;
@@ -126,15 +130,16 @@ function doc_php() {
       }
     }
   }
-//                                                 debug($used,'used');
   // zpráva
   $html.= "<dl>";
   foreach($cg->calls as $php=>$desc) {
     $html.= "<dt><h3>$php</h3></dt>";
     foreach($desc as $fce=>$calls) {
       if ( $fce=='?' ? count($calls) : true ) {
-        $u= $used[$fce];
-        $clr= $u==0 ? "style='color:red'" : ($u==1 ? "style='color:limegreen'" : '');
+        $u= $used[$fce]; $f= $flow[$fce]; $t= $top[$fce];
+        $clr= $u==0 ? "style='color:red'" : (
+              $t==1 ? "style='color:limegreen'" : (
+              $f    ? "style='color:blue'" : ''));
         $html.= "<dd style='text-indent:-10px'>$u <b $clr>$fce</b>: ".implode(', ',$calls)."</dd>";
       }
     }
@@ -143,7 +148,7 @@ function doc_php() {
   $html.= "</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- doc_called
+# --------------------------------------------------------------------------------------- doc_called
 # called graph PHP modulů
 function doc_called() {
   global $ezer_root, $ezer_php;
@@ -174,7 +179,7 @@ function doc_called() {
   $html.= "</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- doc_ezer_list
+# ------------------------------------------------------------------------------------ doc_ezer_list
 # seznam Ezer modulů s informací o aktuálnost
 function doc_ezer_list() {
   global $ezer_path_appl, $ezer_path_code, $ezer_ezer, $ezer_path_root;
@@ -208,7 +213,7 @@ function doc_ezer_list() {
 //                                                         debug($files,'ezer files');
   return $files;
 }
-# -------------------------------------------------------------------------------------------------- doc_ezer_state
+# ----------------------------------------------------------------------------------- doc_ezer_state
 # zjištění stavu souboru
 function doc_ezer_state ($fname,&$files) { trace();
   global $ezer_path_root;
@@ -226,7 +231,7 @@ function doc_ezer_state ($fname,&$files) { trace();
     $files[$name]->info= $code->info;
   }
 }
-# -------------------------------------------------------------------------------------------------- doc_php_cg
+# --------------------------------------------------------------------------------------- doc_php_cg
 # test CG
 function doc_php_cg ($fnames) {
   global $ezer_path_root, $ezer_php_libr;
@@ -243,13 +248,12 @@ function doc_php_cg ($fnames) {
         $y[$i]= $x;
       }
     }
-    debug($y,$fname);
+//     debug($y,$fname);
   }
   // seznam funkcí vynechaných ze seznamu volaných - odvozený z $ezer_php_libr
   $omi= array();
   foreach($ezer_php_libr as $fname) {
     $ts= token_get_all(file_get_contents("$ezer_path_root/ezer2.2/$fname"));
-//                                                         token_debug($ts,$fname);
     for ($i= 0; $i<count($ts); $i++) {
       // vynechání mezer
       if ( is_array($ts[$i]) && in_array($ts[$i][0],array(T_WHITESPACE,T_COMMENT,T_VARIABLE)) )
@@ -261,7 +265,6 @@ function doc_php_cg ($fnames) {
       }
     }
   }
-//                                                         debug($omi,'omitted');
   // seznam dostupných funkcí
   $fce_lst= get_defined_functions();   // pozor! převádí jména na lowercase
   $usr= $fce_lst['user'];
@@ -300,13 +303,11 @@ function doc_php_cg ($fnames) {
       }
     }
   }
-//                                                 debug($phps,'CG');
-//                                                 debug($fce,'fce');
   $html.= "<div class='dbg'>".debugx($phps,'CG')."</div>";
   return (object)array('calls'=>$phps,'called'=>$fce,'html'=>$html);
 }
-/** ================================================================================================ PSPAD */
-# -------------------------------------------------------------------------------------------------- pspad_gen
+/** =========================================================================================> PSPAD */
+# ---------------------------------------------------------------------------------------- pspad_gen
 # vygeneruje definici syntaxe pro Ezer pro PSPad
 function pspad_gen() {
   global $ezer_path_pspad;
@@ -375,7 +376,7 @@ ask=";
   $html.= nl2br($ini)."</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- pspad_keys
+# --------------------------------------------------------------------------------------- pspad_keys
 # vygeneruje definici syntaxe pro Ezer pro PSPad
 function pspad_keys(&$res,&$key1,&$key2,&$key3) {
   global $ezer_path_serv;
@@ -409,9 +410,9 @@ function pspad_keys(&$res,&$key1,&$key2,&$key3) {
     }
   }
 }
-/** ================================================================================================ NOVINKY */
+/** =======================================================================================> NOVINKY */
 # zobrazování Novinek z tabulky _TODO
-# -------------------------------------------------------------------------------------------------- doc_todo2
+# ---------------------------------------------------------------------------------------- doc_todo2
 # vygeneruje přehled Novinek
 # source = app|sys
 # nic    = text zobrazený při prázdném výsledku
@@ -449,7 +450,7 @@ function doc_todo2($item,$source='app',$nic="<dl class='todo'><dt>V tomto obdob�
   }
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- doc_todo
+# ----------------------------------------------------------------------------------------- doc_todo
 # vygeneruje přehled Novinek
 # source = app|sys
 # nic    = text zobrazený při prázdném výsledku
@@ -481,7 +482,7 @@ function doc_todo($item,$source='app',$nic="<dl class='todo'><dt>V tomto období
   $html.= "</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- doc_todo_show
+# ------------------------------------------------------------------------------------ doc_todo_show
 # zobrazí přehled Novinek resp. Požadavků pro běžného uživatele
 #   cond = podmínka
 # stav požadavku se zjistí z položky stav a kombinace datumů (stejně jako v ezer2.syst.ezer)
@@ -547,7 +548,7 @@ function doc_todo_show($cond,$order="kdy_skoncil DESC") { trace();
   $html= $tab ? "<dl class='todo'>$tab</dl>" : $nic;
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- map_user
+# ----------------------------------------------------------------------------------------- map_user
 # zjištění zkratek uživatelů a vrácení jako překladového pole
 #   array (id => abbr, ...)
 function map_user() {
@@ -560,8 +561,8 @@ function map_user() {
   }
   return $users;
 }
-/** ================================================================================================ TODO */
-# -------------------------------------------------------------------------------------------------- doc_todo
+/** ==========================================================================================> TODO */
+# ----------------------------------------------------------------------------------------- doc_todo
 # vygeneruje přehled aktivit podle menu
 function doc_todo1($item,$source='app',$nic="<dl class='todo'><dt>V tomto období nebyly změny</dt></dl>") {
   global $ezer_path_todo, $ezer_path_root;
@@ -597,7 +598,7 @@ function doc_todo1($item,$source='app',$nic="<dl class='todo'><dt>V tomto obdob�
   $html.= "</div>";
   return $html;
 }
-# -------------------------------------------------------------------------------------------------- doc_todo_show1
+# ----------------------------------------------------------------------------------- doc_todo_show1
 # vygeneruje přehled aktivit podle menu
 function doc_todo_show1($ods,$dos,$odt=0,$dot=99999,$path,$nic='') { trace();
   $file= @file_get_contents("$path/todo.wiki");
@@ -667,9 +668,9 @@ function doc_todo_show1($ods,$dos,$odt=0,$dot=99999,$path,$nic='') { trace();
   $html= $tab ? "<dl class='todo'>$tab</dl>" : $nic;
   return $html;
 }
-/** ================================================================================================ HELP */
+/** ==========================================================================================> HELP */
 # zobrazování položek kontextového helpu _HELP
-# -------------------------------------------------------------------------------------------------- doc_todo
+# ----------------------------------------------------------------------------------------- doc_todo
 # vygeneruje přehled _help
 function doc_help($cond='all') {
   $html.= "";

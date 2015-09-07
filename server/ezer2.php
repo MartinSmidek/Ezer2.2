@@ -1651,7 +1651,7 @@
     end:
       return $obj;
     }
-    # -------------------------------------------------------------------------------- přidá kontext
+    # ---------------------------------------------------------------- přidá kontext, jde-li zjistit
     function context_push($id,$obj) { //trace();
       # obohatí kontext
       global $context, $includes;
@@ -1678,7 +1678,7 @@
       $obj= dbg_find_obj($x->context->self);
 //                                                 debug($context,"context",(object)array('depth'=>4));
 //                                                 debug($obj,"obj",(object)array('depth'=>3));
-      if ( !$obj ) { $err= "nelze určit kontext překladu"; goto end_dbg; }
+      if ( !$obj ) { $err= "Warning: nelze určit kontext překladu"; $obj= (object)array(); }
       $ok= get_ezer($top,$obj,true);
       if ( $ok ) {
         $block= $obj->part->_dbg_;
@@ -1698,6 +1698,7 @@
     $y->ret->code= $cd;
     $y->ret->err= $err;
     $y->ret->errors= $errors;
+    $y->ret->warnings= "???";
     $y->ret->trace= $log.$trace;
     break;
   # ------------------------------------------------------------------------------------- load_code2
