@@ -108,8 +108,8 @@ panel nov [,,770,] {type:'right', title:'Přehled změn', _sys:'*'
 
   menu m {type:'left', active:m.chngs.month
     proc onstart() {
-      [ sys('options','group_db')     | w.g.enable(0) ];
-      [ sys('options','curr_version') | w.k.enable(0) ];
+      [ sys('options','group_db')     | has_skill('ah'); w.g.enable(0) ];
+      [ sys('options','curr_version') | has_skill('ah'); w.k.enable(0) ];
     }
     menu chngs {title:'Změny aplikace',type:'group'
       item month {title:'Přehled změn za měsíc', par:°{days:30} }

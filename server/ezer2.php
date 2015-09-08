@@ -1531,7 +1531,7 @@
       $y->mail= $sent ? 'ok' : 'fail';
     }
     break;
-  # ================================================================================================ LabelDrop
+  # ====================================================================================== LabelDrop
   # funkce pro spolupráci s metodami LabelDrop pro soubory na serveru - viz též drop_unlink (nížeji)
   # ------------------------------------------------------------------------------------ lsdir
   # vrátí seznam souborů ze složky x.base+x.folder ve tvaru pole objektů {title:jméno,filesize:délka}
@@ -2306,13 +2306,13 @@ function load_files($x,$y) {
   }
   $y->rows= $i;
 }
-# =================================================================================================> FILES
+# ===========================================================================================> FILES
 # funkce pro LabelDrop - mazání souborů
-# -------------------------------------------------------------------------------------------------- drop_unlink
+# -------------------------------------------------------------------------------------- drop_unlink
 # pokud $file=* budou smazány všechny soubory v dané složce, funkce vrací počet smazaných souborů
-function drop_unlink($folder,$file) {
+function drop_unlink($folder,$file,$cloud='S:') {
   global $ezer_root;
-  $path_files= trim($_SESSION[$ezer_root]['path_files'],"' ");
+  $path_files= trim($_SESSION[$ezer_root][$cloud=='S:' ? 'path_files_s' :  'path_files_h'],"' ");
   $path_files= rtrim($path_files,"/");
   $deleted= 0;
   if ( $file=='*' ) {
@@ -2335,11 +2335,11 @@ function drop_unlink($folder,$file) {
   }
   return $deleted;
 }
-# -------------------------------------------------------------------------------------------------- drop_find
+# ---------------------------------------------------------------------------------------- drop_find
 # najde jméno prvního souboru vyhovující dané masce
-function drop_find($folder,$mask) {     // trace();
+function drop_find($folder,$mask,$cloud='S:') {     // trace();
   global $ezer_root;
-  $path_files= trim($_SESSION[$ezer_root]['path_files'],"' ");
+  $path_files= trim($_SESSION[$ezer_root][$cloud=='S:' ? 'path_files_s' :  'path_files_h'],"' ");
   $found= '';
   // projdi soubory složky
   $path= str_replace('//','/',"$path_files/$folder");
@@ -2355,7 +2355,7 @@ function drop_find($folder,$mask) {     // trace();
   }
   return $found;
 }
-# -------------------------------------------------------------------------------------------------- cz2ascii
+# ----------------------------------------------------------------------------------------- cz2ascii
 # transformace textu s diakritikou na prosté ASCII bez mezer (znaky $but jsou ponechány)
 function cz2ascii($x,$but='') {
   $tab= array(

@@ -3107,10 +3107,11 @@ Ezer.LabelDrop= new Class({
       else
         return null;
     }
-    else { // složka na serveru
+    else { // složka S neho H na serveru
+      var path_files= this.cloud=='S:' ? Ezer.options.path_files_s : Ezer.options.path_files_h;
       if ( subdir )
         this.folder+= this.folder + (this.folder.substr(-1)=='/' ? '' : '/') + subdir;
-      this.ask({cmd:'lsdir',base:Ezer.options.path_files,folder:this.folder,mask:this.mask},'_lsdir');
+      this.ask({cmd:'lsdir',base:path_files,folder:this.folder,mask:this.mask},'_lsdir');
       return this;
     }
   },
@@ -3139,8 +3140,9 @@ Ezer.LabelDrop= new Class({
       else
         return null;
     }
-    else { // složka na serveru
-      this.ask({cmd:'isdir',base:Ezer.options.path_files,folder:this.folder+name},'_isdir');
+    else { // složka S nebo H na serveru
+      var path_files= this.cloud=='S:' ? Ezer.options.path_files_s : Ezer.options.path_files_h;
+      this.ask({cmd:'isdir',base:path_files,folder:this.folder+name},'_isdir');
       return this;
     }
   },
@@ -3165,8 +3167,9 @@ Ezer.LabelDrop= new Class({
       else
         return null;
     }
-    else { // složka na serveru
-      this.ask({cmd:'mkdir',base:Ezer.options.path_files,folder:this.folder,subfolder:name},'_mkdir');
+    else { // složka S nebo H na serveru
+      var path_files= this.cloud=='S:' ? Ezer.options.path_files_s : Ezer.options.path_files_h;
+      this.ask({cmd:'mkdir',base:path_files,folder:this.folder,subfolder:name},'_mkdir');
       return this;
     }
   },

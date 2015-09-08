@@ -156,11 +156,13 @@ __EOD;
     'status_bar'        => $ezer_template=='menu' ? 'true' : 'false',
     'to_speed'          => 1,
     'to_trace'          => $ezer_template=='menu' ? 'true' : 'false',
-    'path_docs'         => "'$ezer_path_docs'",  // složka pro upload skrze LabelDrop
+    'path_docs'         => "'$ezer_path_docs'",  // složka pro upload skrze LabelDrop      OBSOLETE!
     'theight'           => $theight
   );
-  if ( isset($options->path_files) )
-    $_SESSION[$ezer_root]['path_files']= $options->path_files;
+  if ( isset($options->path_files_h) )
+    $_SESSION[$ezer_root]['path_files_h']= $options->path_files_h;
+  if ( isset($options->path_files_s) )
+    $_SESSION[$ezer_root]['path_files_s']= $options->path_files_s;
   if ( isset($options->group_db) )
     $_SESSION[$ezer_root]['group_db']= strtr($options->group_db,array('"'=>'',"'"=>''));
   //  pokud je definováno $options->curr_version a dostupná db ezer_kernel přečte verzi jádra

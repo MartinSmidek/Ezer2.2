@@ -1177,7 +1177,7 @@ Ezer.LabelDrop.implement({
 // pro H: je f.name vždy definováno, f.title jen pokud bylo vytvořeno pomocí this.mask v lsdir
   DOM_href: function(f) {
     var m, href;
-    if ( this.cloud=='S:' ) {   // úložiště   viditelné protokolem http: ./docs/{root}
+    if ( this.cloud=='S:' ) {   // úložiště viditelné protokolem http: ./docs/{root}
       // kontextové menu, pokud je přítomna procedura onremove
       var m= '';
       if ( this.part && (obj= this.part['onmenu']) ) {
@@ -1187,7 +1187,8 @@ Ezer.LabelDrop.implement({
           + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all',''])}]"
         + "],arguments[0])};return false;\"";
       }
-      href= "<a target='docs' href='"+this.folder+f.name+"'"+m+">"+f.name+"</a>";
+      href= "<a target='docs' href='"+Ezer.options.path_files_href+this.folder+f.name+"'"+m+">"
+        + f.name+"</a>";
     }
     if ( this.cloud=='H:' ) {   // úložiště neviditelné protokolem http: ../files/{root}
       if ( f.name[0]=='[' ) {
@@ -1343,10 +1344,13 @@ Ezer.LabelDrop.implement({
     xhr.setRequestHeader("EZER-FILE-NAME", encodeURIComponent(f.newname ? f.newname : f.name));
     xhr.setRequestHeader("EZER-FILE-CHUNK", n);
     xhr.setRequestHeader("EZER-FILE-CHUNKS", max);
-    if ( this.cloud=='S:' )             // S: relativní cesta pro http
-      xhr.setRequestHeader("EZER-FILE-RELPATH", this.folder);
-    else                                // H: absolutní
-      xhr.setRequestHeader("EZER-FILE-ABSPATH", Ezer.options.path_files+this.folder);
+//     if ( this.cloud=='S:' )             // S: relativní cesta pro http
+//       xhr.setRequestHeader("EZER-FILE-RELPATH", this.folder);
+//     else                                // H: absolutní
+//       xhr.setRequestHeader("EZER-FILE-ABSPATH", Ezer.options.path_files+this.folder);
+    xhr.setRequestHeader("EZER-FILE-ABSPATH", this.cloud=='S:'
+      ? Ezer.options.path_files_s+this.folder
+      : Ezer.options.path_files_h+this.folder);
     xhr.onload = function(e) {
       if (e.target.status == 200) {
         // vraci pole:name|chunk/chunks|path|strlen
