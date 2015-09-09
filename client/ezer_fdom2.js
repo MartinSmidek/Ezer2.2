@@ -1183,8 +1183,8 @@ Ezer.LabelDrop.implement({
       if ( this.part && (obj= this.part['onmenu']) ) {
         m= " oncontextmenu=\"var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
         + "obj=obj[0].value||obj[0];Ezer.fce.contextmenu(["
-          + "['vyjmout',function(el){obj.callProc('onmenu',['remove','"+f.name+"'])}],"
-          + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all',''])}]"
+          + "['vyjmout',function(el){obj.callProc('onmenu',['remove','"+f.name+"',''])}],"
+          + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all','',''])}]"
         + "],arguments[0])};return false;\"";
       }
       href= "<a target='docs' href='"+Ezer.options.path_files_href+this.folder+f.name+"'"+m+">"
