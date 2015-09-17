@@ -7721,14 +7721,16 @@ Ezer.fce.object= function () {
 //      Pokud se kopíruje do form, je třeba touto operací naplnit form.key (použije se při definici
 //      originality hodnoty, pokud to není žádoucí, je třeba form.key definovat jako 0)
 //      Pokud je první parametr string oddělující pomocí '|' dvojice jméno:hodnota.
-//      Hodnoty zkopírované do formuláře jsou nastaventy jako originální a
+//      Hodnoty zkopírované do formuláře jsou nastaventy jako originální
+//      (musí být ovšem definován klíč formuláře) a
 //      po ukončení kopírování nastane událost onload na formulář.
 // Pozn.: implementovány jsou tyto kombinace parametrů: fb, bf, of, fo, sf.
 //s: funkce
 Ezer.fce.copy_by_name= function (x,y,delimiters) {
-  var x0= x, y0= y, key= y instanceof Ezer.Form ? y._key : 0;
+  var x0= x, y0= y;
   if ( x.type=='var' ) x= x.value;
   if ( y.type=='var' ) y= y.value;
+  var key= y instanceof Ezer.Form ? y._key : 0;
   var typ_x= x instanceof Ezer.Browse ? 'b' : x instanceof Ezer.Form ? 'f' :
     typeof(x)=='string' ? 's' : typeof(x)=='object' ? 'o' : '?';
   var typ_y= y instanceof Ezer.Browse ? 'b' : y instanceof Ezer.Form ? 'f' :
