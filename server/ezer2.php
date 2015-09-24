@@ -1549,13 +1549,29 @@
           }
           else {
             if ( $x->mask ) {
-              if ( preg_match("/{$x->mask}/",$file,$m) ) {
-                if ( isset($m[1]) ) {
-                  $y->files[]= (object)array('name'=>$file,'title'=>$m[1],'size'=>filesize("$dir/$file"));
+              if ( preg_match("/^{$x->mask}\^?\$/",$file,$m) ) {
+                $obj= (object)array();
+                if ( substr($file,-1,1)=='^' ) {
+                  // becka: fa/pobyt/mrop_2015_-_becka_jan.pdf_16109
+                  $files= substr($x->base,0,strrpos($x->base,'/'));
+                  $files= substr($files,0,strrpos($files,'/'));
+                  $file2= trim(file_get_contents("$dir$file"));
+                  $path= "$files/$file2";
+                  if ( file_exists($path) ) {
+                    $title= (isset($m[1]) ? $m[1] : substr($file,0,-1)).'*';
+                    $size= filesize($path);
+                    $obj->ref= 1;
+                  }
+                  else continue;
                 }
                 else {
-                  $y->files[]= (object)array('name'=>$file,'title'=>$file,'size'=>filesize("$dir/$file"));
+                  $title= isset($m[1]) ? $m[1] : $file;
+                  $size= filesize("$dir/$file");
                 }
+                $obj->name=  $file;
+                $obj->title= $title;
+                $obj->size=  $size;
+                $y->files[]= $obj;
               }
               else continue;
             }
@@ -2337,7 +2353,9 @@ function drop_unlink($folder,$file,$cloud='S:') {
 }
 # ---------------------------------------------------------------------------------------- drop_find
 # najde jméno prvního souboru vyhovující dané masce
-function drop_find($folder,$mask,$cloud='S:') {     // trace();
+# k masce je přidána detekce případného koncového '^' znamenajícího,
+# že soubor obsahuje odkaz na skutečný soubor
+function drop_find($folder,$mask,$cloud='S:') {     //trace();
   global $ezer_root;
   $path_files= trim($_SESSION[$ezer_root][$cloud=='S:' ? 'path_files_s' :  'path_files_h'],"' ");
   $found= '';
@@ -2347,7 +2365,7 @@ function drop_find($folder,$mask,$cloud='S:') {     // trace();
 //                                                         $found= "???$ezer_root,$path/$file";
   if ( file_exists($path) && $dh= opendir($path) ) {
     while ( ($file= readdir($dh)) !== false ) {
-      if ( is_file("$path/$file") && preg_match("/$mask/",$file) ) {
+      if ( is_file("$path/$file") && preg_match("/^$mask\^?\$/",$file) ) {
         $found= $file;
       }
     }

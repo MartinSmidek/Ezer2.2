@@ -5188,11 +5188,18 @@ Ezer.Browse= new Class({
 // ------------------------------------------------------------------------------------ browse_row+
 //fx: Browse.browse_row ([row=active|1])
 //      přečte aktivní řádek browse a obnoví jeho zobrazení, nevyvolá onrowclick
-  browse_row: function(row) {
+  browse_row: function() {
     // vytvoř parametry dotazu
-    Ezer.assert(this._source=='load',"browse_row lze pouzit jen po browse_load");
-    var x= this._params({cmd:'browse_load'},null,null,null,this.r,1,0);
-    x.rows= 1;
+    if ( this._source=='ask' ) {
+      var x= this._params({cmd:'browse_load',subcmd:'browse_row'},null,null,null,this.r,1,0);
+      x.oldkey= this.keys[this.t+this.tact-1-this.b];
+      x.rows= 1;
+    }
+    else {
+      Ezer.assert(this._source=='load',"browse_row lze pouzit jen po browse_load");
+      var x= this._params({cmd:'browse_load'},null,null,null,this.r,1,0);
+      x.rows= 1;
+    }
     return x;
   },
   // x - {table:..,cond:...,order:...}
@@ -5600,11 +5607,14 @@ Ezer.Browse= new Class({
 // atributy css_rows a css_cell určují styl řádku resp. buňky
 // -- funkce definuje atributy css, css_clmn objektu me (browse nebo clmn)
   _css_def: function (me,browse,opt) {
-    if ( css= me.options[opt] ) {
-      var as, aas, is, iv;
-      as= css.split(',');
+    var css= me.options[opt];
+    var as, aas, is, iv;
+    me.css_default= null;
+    me.css= {};
+    me.css_clmn= null;                       // css_clmn = sloupec určující barvu
+    if ( css ) {
       // nalezení sloupce podle jména v css[0]
-      me.css_clmn= null;                       // css_clmn = sloupec určující barvu
+      as= css.split(',');
       for (var ic in browse.part) {            // projdi zobrazené sloupce
         if ( browse.part[ic].skill && as[0]==browse.part[ic].id ) {
           me.css_clmn= browse.part[ic];
@@ -5615,7 +5625,6 @@ Ezer.Browse= new Class({
         Ezer.error('browse '+browse.owner.id+'.'+browse.id+'.css nemá jako první člen jméno sloupce');
         return false;
       }
-      me.css_default= null;
       for (is= 1; is<as.length; is++) {
         aas= as[is].split(':');
         if ( aas.length>1 ) {
@@ -8053,7 +8062,9 @@ Ezer.fce.sort= function (list,del,comp) {
 //   i - index
 //s: funkce
 Ezer.fce.split= function (x,del,i) {
-  Ezer.assert(typeof(x)=='string','split: první parametr musí být řetězec');
+  if ( typeof(x)!='string' && x.toString() )
+    x= x.toString();
+  Ezer.assert(typeof(x)=='string','split: první parametr musí být převeditelný na řetězec');
   var y= x.split(del,i+1);
   return y[i];
 }

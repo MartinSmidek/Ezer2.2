@@ -16,9 +16,9 @@ if ( isset($_GET['name']) ) {
   if ( !$user_id ) {
     $er= "uzivatel neni prihlasen"; goto err;
   }
-  // zjištění cesty a existence souboru uloženého do úložiště H
   $path_files= trim($_SESSION[$ezer_root]['path_files_h']," '");
   $path_files= rtrim($path_files,"/");
+  // zjištění cesty a existence souboru uloženého do úložiště H
   if ( !file_exists($path_files)) {
     $er= "cesta '$path_files' ke slozce neni dostupna"; goto err;
   };
@@ -26,6 +26,13 @@ if ( isset($_GET['name']) ) {
   if ( !file_exists($file)) {
     $er= "soubor '$file' neni dostupny"; goto err;
   };
+  // zjištění, zda $file je odkaz tzn. title končí na *
+  if ( substr($title,-1,1)=='*' ) {
+    $file2= trim(file_get_contents($file));
+    $dir2= substr($path_files,0,strrpos($path_files,'/'));
+    // náhrada cesty k souboru podle odkazu
+    $file= "$dir2/$file2";
+  }
   // zjištění typu
   $f= pathinfo($file);
   $fext= substr(strtolower($f['extension']),0,3);
