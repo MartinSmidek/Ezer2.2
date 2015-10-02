@@ -4287,6 +4287,7 @@ Ezer.Select= new Class({
 //c: SelectAuto
 //      Pozn. metoda form.save použije klíč zobrazené hodnoty nebo zobrazenou hodnotu
 //      v závislosti na hodnotě atributu par.save='value'|'key'|'key_only'. Defaultní je 'value'.
+//      ZMĚNA 151002: po Enter při nenalezeném vzoru vrací napsanou hodnotu a klíč 0
 //t: Block,Elem,Select
 //s: Block
 //i: SelectAuto.onfocus - položka má focus

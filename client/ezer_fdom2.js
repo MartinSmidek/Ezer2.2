@@ -2479,7 +2479,7 @@ Ezer.Select.implement({
               if (li)
                 this.DOM_seekItem(li);
               else {
-                this.value= '';
+                this.value= this._value;
                 this._key=  0;
                 this.DOM_noneItem();
               }
