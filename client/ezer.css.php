@@ -593,7 +593,8 @@ __EOD
   border-left:1px solid $b_brow; border-bottom:1px solid $b_brow;  }
 .BrowseSmart td.BrowseQry {
   padding:0; padding:0 !important;
-  border-left:1px solid $b_brow; border-bottom:1px solid $b_brow;  }
+  border-left:1px solid $b_brow; border-bottom:1px solid $b_brow;
+  vertical-align:top; }
 .BrowseSmart .BrowseQry input {
   background-color:$b8_brow; border:0; padding:0px; width:100%; height:16px; font:inherit;
   line-height:14px; margin:-1px 0; }
@@ -602,7 +603,7 @@ __EOD
   /*height:17px !important;*/ }
 .BrowseSmart td {
   height:{$browse_td_h}px; white-space:nowrap; overflow:hidden;
-  vertical-align:top; cursor:default; padding:0 2px; /*line-height:14px;*/
+  vertical-align:bottom; cursor:default; padding:0 2px; /*line-height:14px;*/
   border-left:1px solid $b_brow; border-bottom:1px solid $b_brow;  }
 .BrowseSmart td.tag0 {
   background-color:$b7_brow; padding:0; }

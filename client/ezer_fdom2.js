@@ -2348,17 +2348,23 @@ Ezer.Select.implement({
       ? this.options.par.width : this._w-1;
     this.DOM_DropList= new Element('ul',{'class':'SelectDrop',styles:{
         display:'none'}}).inject(this.DOM_Block);
-    if ( !this._fc('w') ) {        // pokud je format:'w' bude seznam v neomezené šířce
-      this.DOM_DropList.setStyle('width',dl_w);
+    if ( this.options.par && this.options.par.subtype && this.options.par.subtype=='browse' ) {
+      // select jako výběr v rámci browse
+      this.DOM_DropList.setStyles({'min-width':dl_w,top:16});
     }
     else {
-      this.DOM_DropList.setStyle('min-width',dl_w);
-    }
-    if ( this._fc('u') ) {         // pokud je format:'u' budout options nad select
-      this.DOM_DropList.setStyle('bottom',this._h);
-    }
-    else {                         // jinak pod select
-      this.DOM_DropList.setStyle('top',this._h+3);
+      if ( !this._fc('w') ) {        // pokud je format:'w' bude seznam v neomezené šířce
+        this.DOM_DropList.setStyle('width',dl_w);
+      }
+      else {
+        this.DOM_DropList.setStyle('min-width',dl_w);
+      }
+      if ( this._fc('u') ) {         // pokud je format:'u' budout options nad select
+        this.DOM_DropList.setStyle('bottom',this._h);
+      }
+      else {                         // jinak pod select
+        this.DOM_DropList.setStyle('top',this._h+3);
+      }
     }
     if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
       this.Hammer= new Hammer(this.DOM_DropList);
@@ -3514,7 +3520,7 @@ Ezer.Show.implement({
             // vytvoření procedury onchange
             var code= [{o:'t'},{o:'m',i:'_owner'},{o:'m',i:'_owner'},{o:'x',i:'browse_load'}];
             var sel_desc= {type:'select.map0',options:{_w:this._w,par:{noimg:1,subtype:'browse'},
-                format:'t',map_pipe:this.options.map_pipe,options:this.options.map_pipe,
+                format:'wt',map_pipe:this.options.map_pipe,options:this.options.map_pipe,
                 help:'výběr z číselníkových hodnot'},
               part:{onchange:{type:'proc',par:{},code:code}}};
             var sel_owner= {DOM_Block:td,_option:{}};

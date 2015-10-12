@@ -306,8 +306,9 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   # ----------------------------------------------------------------==> ... uživatelé
   form users [,,587,470] { css:'ae_work'
     view u: table _user
+    view t: table _track { join_type:'NONE', join:"ON abbr=kdo" }
     label [6,3,89,15] { title:'<h1>Uživatelé</h1>' }
-    browse lst [4,37,0,54] { rows:sys_users_list, qry_rows:1, buf_rows:100
+    browse lst [4,37,0,54] { rows:sys_users_list, qry_rows:1, buf_rows:100, group_by:'abbr'
       show user [,,27,] { title:'č.', help:'jednoznačné číslo uživatele',
         data:u.id_user, format:'rsq=' }
       show zkratka [,,35,] { title:'značka', help:'jednoznačná třípísmenná zkratka',
@@ -321,9 +322,33 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
       show skills [,,280,] { title:'oprávnění', help:'seznam kódů funkčních oprávnění',
         data:u.skills, format:'utsq*'
         proc onsubmit() { this.save } }
+      show r0 [,,0,] { title:'letos',   expr:"0", format:'rtsq*' }
+      show r1 [,,0,] { title:'loni',    expr:"0", format:'rtsq*' }
+      show r2 [,,0,] { title:'předloni',expr:"0", format:'rtsq*' }
+      show rn [,,0,] { title:'dřív',    expr:"0", format:'rtsq*' }
+      proc track(on) { on;
+        t.set_attrib('join_type','LEFT');
+        r0.set_attrib('expr',"SUM(IF(YEAR(t.kdy)=YEAR(NOW()),1,0))");
+        r1.set_attrib('expr',"SUM(IF(YEAR(t.kdy)=YEAR(NOW())-1,1,0))");
+        r2.set_attrib('expr',"SUM(IF(YEAR(t.kdy)=YEAR(NOW())-2,1,0))");
+        rn.set_attrib('expr',"SUM(IF(YEAR(t.kdy)<YEAR(NOW())-2,1,0))");
+        show_track; refresh
+      | t.set_attrib('join_type','NONE');
+        r0.set_attrib('expr',"0"); r1.set_attrib('expr',"0");
+        r2.set_attrib('expr',"0"); rn.set_attrib('expr',"0")
+      }
       proc onclick () {
-        access.width; org.width(0); access.width(0); skills.width(280)
-      | org.width(19); access.width(29); skills.width(230)
+        r0.width; // po rocích zobraz organizaci
+        r0.width(0); r1.width(0); r2.width(0); rn.width(0);
+        org.width(19); access.width(29); skills.width(230)
+      | org.width; // po organizaci zobraz skill
+        org.width(0); access.width(0); skills.width(280)
+      | // po skill zobraz roky
+        show_track
+      }
+      proc show_track() {
+        r0.width(70); r1.width(69); r2.width(69); rn.width(69);
+        skills.width(0); org.width(0); access.width(0)
       }
       proc onrowclick () {
         new_skill.set('');
@@ -370,8 +395,10 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
         proc onsubmit() { this.save } }
       # ----------------------------------------------==> ... kontext.menu
       menu { type:'context'
-        item { title:'odeberat všechna oprávnění'
-          proc onclick() { seznam.selected("clear") } }
+        item { title:'zobrazit roční aktivitu'
+          proc onclick() { uzivatele.lst.track(1) } }
+        item { title:'odebrat všechna oprávnění'
+          proc onclick() { seznam.selected("clear"); cmd.enable(1,'c'); } }
         item { title:'-přidat nový řádek', skill:'m|m'
           proc onclick() {
             eq(sel.get,'ignore');
