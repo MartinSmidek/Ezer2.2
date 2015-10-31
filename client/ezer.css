@@ -1,64 +1,9 @@
-<?php # (c) 2010 Martin Smidek <martin@smidek.eu>
-header("Content-type: text/css");
-session_start();
-$skin= $_SESSION['skin'] ? $_SESSION['skin'] : 'default';
-# pokud je v root-adresáři aplikace složka skins se souborem colors.php
-# musí v něm být obsažen příkaz global spřístupňující změněné barvy a cestu k obrázkům
-global $skin, $path, $c, $b, $ab, $c_appl, $ezer_root,
-  $c_menu, $b_menu, $c_main, $b_main,
-  $c_group, $b_group, $s_group, $c_item, $b_item, $bd_item, $fb_item, $fc_item, $s_item, $s2_item,
-  $b_brow, $b2_brow, $b3_brow, $b4_brow, $b5_brow, $b6_brow, $c_brow, $s1_brow, $s2_brow,
-  $c_kuk, $c2_kuk, $b_kuk, $s_kuk, $b_doc_modul, $b_doc_menu, $b_doc_form;
-# c_=color, b_=background-color, a?_=aktivní, f?_=focus, s_=speciál
-# ------------------------------------------------------------------- default barvy podle Office2007
-  $path= "./skins/default";                       // cesta k background-image
-  $bila= '#ffffff'; $cerna= '#000000'; $seda= '#4d4d4d'; $zelena= '#2c8931'; // základní barvy
-  // prvky
-  $c= '#333'; $b= '#6f93c3'; $ab= $bila;
-  $c_appl= $bila;
-  $c_menu= 'navy'; $b_menu= $seda;
-  $c_main= $cerna; $b_main= $bila;
-  $c_group= $bila; $b_group= '#7389ae'; $s_group= '#5e708e';
-  $c_item= '#333'; $b_item= '#cde'; $bd_item= '#ccc'; $fb_item= '#3e4043'; $fc_item= '#faec8f';
-    $s_item= '#9ab'; $s2_item= '#303234';
-  $b_brow= '#ccc'; $b2_brow= '#f2f8ff'; $b3_brow= '#E5E5E6'; $b4_brow= '#d1e4ff';
-    $b5_brow= '#f0f0f0'; $b6_brow= '#f2f8ff'; $b7_brow= '#d1e4ff'; $b8_brow= '#d1e4ff';
-    $c_brow= '#777'; $s1_brow= '#6593cf'; $s2_brow= '#d30';
-  $c_kuk= 'navy'; $c2_kuk= $c_kuk; $b_kuk= '#fb6'; $s_kuk= '#FBC84F';
-  $b_warn= $s_kuk; $c_warn= '#000000';
-  $b_doc_modul= '#c17878'; $b_doc_menu= '#7389ae'; $b_doc_form= '#80a2cf';
-  $w_right= 720;        // šířka panel.right
-  $h_kuk= $_SESSION['trace_height']?$_SESSION['trace_height']:240;
-
-if ( file_exists("../../skins/colors.php") ) {
-  require_once("../../skins/colors.php");
-}
-
-$browser=
-  preg_match('/MSIE/',$_SERVER['HTTP_USER_AGENT'])?'IE':(
-  preg_match('/Opera/',$_SERVER['HTTP_USER_AGENT'])?'OP':(
-  preg_match('/Firefox/',$_SERVER['HTTP_USER_AGENT'])?'FF':(
-  preg_match('/Chrome/',$_SERVER['HTTP_USER_AGENT'])?'CH':(
-  '?'))));
-
-$browse_td_h= 15;
-$button=     'padding:2px 5px 0 5px;';
-switch ($browser) {
-case 'IE':
-  $button= 'padding:2px 3px 0 3px;';
-  break;
-case 'OP':
-  $button= 'padding:2px 4px 0 4px;';
-  $browse_td_h= 17;
-  break;
-case 'FF':
-  $button= 'padding:0;';
-  break;
-case 'CH':
-  $browse_td_h= 16;
-  break;
-}
-echo <<<__EOD
+<br />
+<b>Notice</b>:  Undefined variable: c3_kuk in <b>C:\Apache\htdocs\ezer\www-ys2\ezer2.2\client\ezer.css.php</b> on line <b>166</b><br />
+<br />
+<b>Notice</b>:  Undefined variable: oranzova in <b>C:\Apache\htdocs\ezer\www-ys2\ezer2.2\client\ezer.css.php</b> on line <b>216</b><br />
+<br />
+<b>Notice</b>:  Undefined variable: oranzova in <b>C:\Apache\htdocs\ezer\www-ys2\ezer2.2\client\ezer.css.php</b> on line <b>222</b><br />
 
 /* endora */
 
@@ -66,6 +11,17 @@ echo <<<__EOD
   position:absolute; left:245px; font-size:5pt; color:silver; }
 .grss a {
   color:silver; text-decoration:none; }
+
+/* osvědčené styly */
+.page_on {
+  cursor:default; background-color:#93b3de; z-index:0; border-radius:5px; text-align:center; }
+.page_off {
+  cursor:default; background-color:#d1e4ff; z-index:0; border-radius:5px; text-align:center; }
+
+.ae_work {
+  background-color:#93b3de; z-index:0; border-radius:5px; }
+.ae_parm        {
+  background-color:#ffeed6; border:1px solid #f5f5f5; z-index:0; border-radius:5px; }
 
 /* styly pro drag */
 
@@ -79,13 +35,13 @@ echo <<<__EOD
   outline-color:#f00 !important; }
 
 .drop_envelope {
-  background-color:$b_work; border:2px dashed white; }
+  background-color:#93b3de; border:2px dashed white; }
 .drop_area {
   outline:2px dashed #fff; outline-radius:5px;  }
 .drop_area_hover {
-  background-color:$b_parm; cursor:move; }
+  background-color:#ffeed6; cursor:move; }
 .drop_area_run {
-  background:url($path/ajax_wait.gif) no-repeat center center;
+  background:url(./skins/default/ajax_wait.gif) no-repeat center center;
   color:transparent !important; cursor:wait; }
 
 /* obecné barvy a hodnoty pro atributy css */
@@ -105,12 +61,12 @@ echo <<<__EOD
 .green_text { color:#0f0 !important; }
 .blue_text  { color:#00f !important; }
 
-.selected { color:$s2_brow !important; font-weight:bold; }
+.selected { color:#d30 !important; font-weight:bold; }
 
 .none   { display:none; }
 
 .parm {
-  background-color:$b_parm; border:1px solid #f5f5f5; z-index:0;
+  background-color:#ffeed6; border:1px solid #f5f5f5; z-index:0;
   border-radius:5px; }
 
 /* rámečky formulářů */
@@ -119,16 +75,16 @@ echo <<<__EOD
   background-color:#f5f5f5; border:1px solid #f5f5f5; z-index:-1;
   border-radius:5px; }
 .work        {
-  background-color:$b_work; z-index:0;
+  background-color:#93b3de; z-index:0;
   border-radius:5px; }
 .parm        {
-  background-color:$b_parm; border:1px solid #f5f5f5; z-index:0;
+  background-color:#ffeed6; border:1px solid #f5f5f5; z-index:0;
   border-radius:5px; }
 
 /* layout */
 
 html,body {
-  background: $b url($path/body_bg.png) repeat-x; }
+  background: #6f93c3 url(./skins/default/body_bg.png) repeat-x; }
 body {
   font-family:Arial,Helvetica,sans-serif; padding:0; margin:0; font-size:9pt;
   position:static; overflow:hidden; }
@@ -147,11 +103,11 @@ textarea { resize: none; }
 #work {
   /*overflow:auto;*/ position:relative; }
 #dolni {
-  bottom:0; margin-top:2px; color:$c3_kuk; font-size:8pt;
-  width:100%; height:{$h_kuk}px; z-index:998; border-top:1px solid $c_kuk;
+  bottom:0; margin-top:2px; color:; font-size:8pt;
+  width:100%; height:240px; z-index:998; border-top:1px solid navy;
   position:absolute; }
 .karta {
-  background:$b_group url($path/doc_menu.gif) no-repeat left center; color:$c_group; overflow:hidden;
+  background:#7389ae url(./skins/default/doc_menu.gif) no-repeat left center; color:#ffffff; overflow:hidden;
   font-size:14px; font-weight:bold; margin:2px 0; padding:5px 50px; clear:both; white-space:nowrap; }
 
 /* login */
@@ -160,22 +116,22 @@ textarea { resize: none; }
 #login_1  { float:left; }
 #login_1.login_chngs, #login_2.login_chngs { height:180px; }
 #login_2  { float:right; }
-#login_1, #login_2  { width:250px; border:1px solid $b_group; height:220px; background-color:$b_item; }
+#login_1, #login_2  { width:250px; border:1px solid #7389ae; height:220px; background-color:#cde; }
 #login_1 div.login_a { padding:15px; }
 #login_2 div.login_a { padding:5px; height:180px; overflow-y:auto; }
 #login_2 div.login_a_msg { padding:5px; }
-#login_2 div.login_notify { padding:5px; background-color:$b_kuk; color:$c2_kuk; }
+#login_2 div.login_notify { padding:5px; background-color:#fb6; color:navy; }
 #login form { margin:0; padding:0;  }
 #login span { margin:0; padding:0;  }
 #login input { margin:2px 0 10px; padding:0 2px; width:auto; overflow:visible;}
-#login h1 { background-color:$b_group; color:#FFFFFF; font-size:9pt; margin:0; padding:2px 5px;}
+#login h1 { background-color:#7389ae; color:#FFFFFF; font-size:9pt; margin:0; padding:2px 5px;}
 #login_on { text-decoration:underline; position:absolute; }
 #login_no { position:absolute; left:110px; }
 #watch_key   { padding:5px !important; }
-#login_chngs { margin-top:193px; border:1px solid $b_group; height:180px; background-color:$b_item; }
+#login_chngs { margin-top:193px; border:1px solid #7389ae; height:180px; background-color:#cde; }
 #login_chngs > div { padding:10px 5px; overflow-x:auto; height:141px; }
 #login_chngs span { padding:1px 5px; }
-#login_chngs span.chng_day { color:$b_group; font-weight:bold; }
+#login_chngs span.chng_day { color:#7389ae; font-weight:bold; }
 #login_chngs div.chng { margin:-5px 0px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* úpravy Clintcide a Mootools */
@@ -190,50 +146,50 @@ textarea { resize: none; }
   position:absolute; z-index:0; margin-top:-10px; cursor:pointer;
   color:#FFAD39; font-size:20pt; font-weight:bold; }
 #appl {
-  color:$c_appl; font-size:20pt; font-weight:bold; position:absolute; right:6px; top:1px; }
+  color:#ffffff; font-size:20pt; font-weight:bold; position:absolute; right:6px; top:1px; }
 .MainBar {
   margin:0;/*10px 0 0 0;*/ padding:0;  }
 .MainBar a {
   text-decoration:none; color:navy; white-space:nowrap; cursor:pointer; }
 .MainBar a:hover {
-  color:$oranzova;  }
+  color:;  }
 .MainBar .Active a:hover {
-  color:$oranzova !important; }
+  color: !important; }
 .MainBar li {
   border:medium none; float:left; list-style-type:none; }
 ul.MainMenu {
   position:relative; top:1px; z-index:1; height:24px; margin:0 0 0 80px; padding:0; overflow:hidden;}
 .MainMenu a {
-  padding:3px 10px 1px 10px; display:block; color:$c_menu; margin:0 0 0 6px; height:20px; }
+  padding:3px 10px 1px 10px; display:block; color:navy; margin:0 0 0 6px; height:20px; }
 .MainMenu li { _width:0; _height:23px;
  }
 .MainMenu li.Active {
-  background:url($path/menu_on3.png) right top no-repeat; padding:0 6px 0 0; min-height:25px; }
+  background:url(./skins/default/menu_on3.png) right top no-repeat; padding:0 6px 0 0; min-height:25px; }
 .MainMenu .Active div {
-  background:url($path/menu_on1.png) left top no-repeat; min-height:25px; }
+  background:url(./skins/default/menu_on1.png) left top no-repeat; min-height:25px; }
 .MainMenu .Pasive a:hover {
-  background-image:url($path/menu_of2_hover.png); color:$c_main; }
+  background-image:url(./skins/default/menu_of2_hover.png); color:#000000; }
 .MainMenu .Active a {
-  background-image:url($path/menu_on2.png); }
+  background-image:url(./skins/default/menu_on2.png); }
 .MainMenu .Active a:hover {
-  background:transparent url($path/menu_of3_hover.png) repeat-x scroll 0 0 !important; }
+  background:transparent url(./skins/default/menu_of3_hover.png) repeat-x scroll 0 0 !important; }
 .MainMenu .Pasive a {
-  color:$b_menu; }
+  color:#4d4d4d; }
 
 ul.MainTabs {
   position:relative; height:30px; margin:0; padding:0; padding-top:2px; overflow:hidden;
-  background:transparent url($path/submenu_bg.png) repeat-x scroll center top; }
+  background:transparent url(./skins/default/submenu_bg.png) repeat-x scroll center top; }
 .MainTabs li {
   margin:0; padding:0; height:100%; display:block; }
 .MainTabs a {
   display:block; padding:7px; margin:0; }
 .MainTabs a {
-  color:$c_menu !important; }
+  color:navy !important; }
 .MainTabs .Active a {
-  background:transparent url($path/menu_on_hover.png) repeat-x scroll 0 0 !important;
-  color:$c_menu; }
+  background:transparent url(./skins/default/menu_on_hover.png) repeat-x scroll 0 0 !important;
+  color:navy; }
 .MainTabs a:hover {
-  background:transparent url($path/menu_off_hover.png) repeat-x scroll 0 0 !important;  }
+  background:transparent url(./skins/default/menu_off_hover.png) repeat-x scroll 0 0 !important;  }
 .MainTabs span { }
 li#_help a {
   color:#ef7f13 !important; font-weight:bold !important; }
@@ -249,8 +205,8 @@ li#_help a {
 .MGroup {
   font-weight:bold; font-size: 11px; padding: 0 0 5px; text-transform: uppercase; text-decoration: none;}
 .MGroup a {
-  padding:6px 10px; text-decoration:none; display:block; background-color:$b_group; color:$c_group;
-  text-align:right; border-right:4px solid $s_group;
+  padding:6px 10px; text-decoration:none; display:block; background-color:#7389ae; color:#ffffff;
+  text-align:right; border-right:4px solid #5e708e;
   cursor:pointer; font-weight:bold; _width:186px;
   white-space:nowrap; }
 .MGroupContent i {
@@ -258,24 +214,24 @@ li#_help a {
 .MGroupContent {
   font-size: 11px; padding-top: 5px; font-weight: normal; text-transform:none; }
 .MSelected, .MFile a, .MIndex a, .MFile span {
-  display: block; padding: 4px 4px 4px 30px; margin: 2px 0; background-color:$b_item; color:$c_item;
+  display: block; padding: 4px 4px 4px 30px; margin: 2px 0; background-color:#cde; color:#333;
   text-decoration: none; text-align: left; _width:172px;
-  border-right: 4px solid $s_item; font-weight: bold; }
+  border-right: 4px solid #9ab; font-weight: bold; }
 .MFile span {
-  background-color:$bd_item; }
+  background-color:#ccc; }
 .disabled div.MFile a:hover {
   background-color:transparent !important; color:inherit; }
 .MFile a:hover, .MFile a:active, .MIndex a:hover, .MIndex a:active {
-  background-color:$fb_item; color:$fc_item; border-right: 4px solid $s2_item; }
+  background-color:#3e4043; color:#faec8f; border-right: 4px solid #303234; }
 .MSelected {
-  background-color:$ab !important; color:$c !important; /*text-shadow:none;*/
-  border-right:4px solid $ab !important;}
+  background-color:#ffffff !important; color:#333 !important; /*text-shadow:none;*/
+  border-right:4px solid #ffffff !important;}
 
 .Accordion :first-child MGroup { margin-left:20px; }
 .Accordion div.awesome {
   position:absolute; top:0px; color:white; font-size:15px; margin:4px; }
 i.efa { width:30px; margin-left:-30px; }
-  
+
 /* context menu */
 
 .ContextMenu   {
@@ -334,7 +290,7 @@ div.systable {
 .Panel {
   position:absolute; }
 .PanelRight {
-  position:absolute; left:210px; top:0; background-color:#fff; width:{$w_right}px; height:100%;
+  position:absolute; left:210px; top:0; background-color:#fff; width:720px; height:100%;
   overflow-x:hidden; overflow-y:auto; }
 .inAccordion {
   left:210px; top:0; background-color:#fff; width:720px; /*height:2000px;*/ }
@@ -343,48 +299,48 @@ div.systable {
 div.PanelPopup div.body{
   font-size:11px; line-height: 13px;}
 div.PanelPopup div.top_ul {
-  background:url($path/clientcide/stickyWinHTML/full.png) top left no-repeat; _background:url($path/clientcide/stickyWinHTML/full.gif) top left no-repeat;
+  background:url(./skins/default/clientcide/stickyWinHTML/full.png) top left no-repeat; _background:url(./skins/default/clientcide/stickyWinHTML/full.gif) top left no-repeat;
   height:26px; width:15px; float:left}
 div.PanelPopup div.top_ur {
   position:relative; left:0px !important; left:-4px; height:26px;
-  background:url($path/clientcide/stickyWinHTML/full.png) top right !important; _background:url($path/clientcide/stickyWinHTML/full.gif) top right !important;
+  background:url(./skins/default/clientcide/stickyWinHTML/full.png) top right !important; _background:url(./skins/default/clientcide/stickyWinHTML/full.gif) top right !important;
   margin:0px 0px 0px 15px !important; margin-right:-4px; padding:0px}
 div.PanelPopup h1.caption {
   clear: none !important; margin:0px !important; overflow: hidden; padding:0 !important;
   font-weight:bold; color:#555; font-size:14px !important; position:relative; top:8px !important;
   left:5px !important; float: left; height: 19px !important;}
 div.PanelPopup div.middle, div.PanelPopup div.closeBody {
-  background:url($path/clientcide/stickyWinHTML/body.png) top left repeat-y; _background:url($path/clientcide/stickyWinHTML/body.gif) top left repeat-y;
+  background:url(./skins/default/clientcide/stickyWinHTML/body.png) top left repeat-y; _background:url(./skins/default/clientcide/stickyWinHTML/body.gif) top left repeat-y;
   margin:0px 20px 0px 0px !important;
   margin-bottom: -3px; position: relative; top: 0px !important; top: -3px;}
 div.PanelPopup div.body {
-  background:url($path/clientcide/stickyWinHTML/body.png) top right repeat-y; _background:url($path/clientcide/stickyWinHTML/body.gif) top right repeat-y;
+  background:url(./skins/default/clientcide/stickyWinHTML/body.png) top right repeat-y; _background:url(./skins/default/clientcide/stickyWinHTML/body.gif) top right repeat-y;
   padding:8px 30px 8px 0px !important; margin-left:5px !important; position:relative; right:-20px !important;}
 div.PanelPopup div.bottom {
   clear:both }
 div.PanelPopup div.bottom_ll {
-  background:url($path/clientcide/stickyWinHTML/full.png) bottom left no-repeat; _background:url($path/clientcide/stickyWinHTML/full.gif) bottom left no-repeat;
+  background:url(./skins/default/clientcide/stickyWinHTML/full.png) bottom left no-repeat; _background:url(./skins/default/clientcide/stickyWinHTML/full.gif) bottom left no-repeat;
   width:15px; height:15px; float:left}
 div.PanelPopup div.bottom_lr {
-  background:url($path/clientcide/stickyWinHTML/full.png) bottom right; _background:url($path/clientcide/stickyWinHTML/full.gif) bottom right;
+  background:url(./skins/default/clientcide/stickyWinHTML/full.png) bottom right; _background:url(./skins/default/clientcide/stickyWinHTML/full.gif) bottom right;
   position:relative; left:0px !important; left:-4px; margin:0px 0px 0px 15px !important; margin-right:-4px; height:15px}
 div.PanelPopup div.closeButtons {
-  background:url($path/clientcide/stickyWinHTML/body.png) top right repeat-y; _background:url($path/clientcide/stickyWinHTML/body.gif) top right repeat-y;
+  background:url(./skins/default/clientcide/stickyWinHTML/body.png) top right repeat-y; _background:url(./skins/default/clientcide/stickyWinHTML/body.gif) top right repeat-y;
   text-align: center; padding: 0px 30px 8px 0px; margin-left:5px; position:relative; right:-20px}
 /*
 div.PanelPopup a.button:hover {
-  background:url($path/clientcide/stickyWinHTML/big_button_over.gif) repeat-x}
+  background:url(./skins/default/clientcide/stickyWinHTML/big_button_over.gif) repeat-x}
 div.PanelPopup a.button {
-  background:url($path/clientcide/stickyWinHTML/big_button.gif) repeat-x; margin: 2px 8px 2px 8px;
+  background:url(./skins/default/clientcide/stickyWinHTML/big_button.gif) repeat-x; margin: 2px 8px 2px 8px;
   padding: 2px 12px; cursor:pointer; border: 1px solid #999 !important; text-decoration:none;
   color: #000 !important;}
 */
 div.PanelPopup div.closeButton {
-  width:13px; height:13px; background:url($path/clientcide/stickyWinHTML/closebtn.gif) no-repeat;
+  width:13px; height:13px; background:url(./skins/default/clientcide/stickyWinHTML/closebtn.gif) no-repeat;
   position: absolute; right: 0px; margin:10px 15px 0px 0px !important; cursor:pointer;top:0px}
 div.PanelPopup div.dragHandle {
   width:11px; height:22px; position:relative; top:5px; left:-3px; cursor: move;
-  background:url($path/clientcide/stickyWinHTML/drag_corner.gif); float: left;}
+  background:url(./skins/default/clientcide/stickyWinHTML/drag_corner.gif); float: left;}
 
 /* klávesnice a změny */
 
@@ -424,11 +380,11 @@ input.changed:focus, textarea.changed:focus {
 .Label h1 {
   font-size:12pt; margin:0; padding:0 }
 .Label a {
-  color:$c_kuk /*!important;*/ }
+  color:navy /*!important;*/ }
 .Label a:hover, .href:hover {
-  background-color:$b_kuk !important; }
+  background-color:#fb6 !important; }
 .href {
-  text-decoration:underline; color:$c_kuk; cursor:pointer; }
+  text-decoration:underline; color:navy; cursor:pointer; }
 
 div.Element {
   position:absolute; }
@@ -437,9 +393,9 @@ div.Element .Label, div.Select .Label {
 
 div.LabelDrop {
   position:absolute; z-index:1; border:1px dashed #fff;
-  outline:3px solid $b_doc_form; background-color:$b_doc_form; }
+  outline:3px solid #80a2cf; background-color:#80a2cf; }
 div.LabelDropHover {
-  border:3px dashed #fff; outline:1px solid $b_doc_form; }
+  border:3px dashed #fff; outline:1px solid #80a2cf; }
 div.LabelDrop > div {
   color:#fff; padding:0 5px; }
 div.LabelDrop > div + div {
@@ -451,9 +407,9 @@ div.LabelDrop tr > td {
 div.LabelDrop progress {
   width:100%; }
 div.LabelDrop td, div.LabelDrop a {
-  color:$fc_item }
+  color:#faec8f }
 div.LabelDrop .ContextFocus {
-  background-color:$b_kuk !important; color:$c2_kuk; }
+  background-color:#fb6 !important; color:navy; }
 
 .Field {
   position:absolute; height:16px !important; width:100%; border:1px solid #aaa; z-index:1; }
@@ -482,23 +438,14 @@ button::-moz-focus-inner { border:0; padding:0; }
 button i.fa-red, a i.fa-red  { color:red }
 button:disabled i.fa-red { color:grey }
 input.Button {
-  position:absolute; font-size:9pt; z-index:1; text-align:center; $button }
+  position:absolute; font-size:9pt; z-index:1; text-align:center; padding:2px 5px 0 5px; }
 .ButtonSubmit {
   position:absolute; font-size:9pt; text-decoration:underline; z-index:1;
-  $button; text-align:center; }
+  padding:2px 5px 0 5px;; text-align:center; }
 .Check {
   position:absolute; display:block; z-index:1; }
 .Check input {
-  /*vertical-align:bottom;*/ position:relative; top:2px; }
-__EOD
-.(($browser=='OP')?"
-label.Check {
-  margin-top:3px; }
-.Check input {
-  top:-1px; }
-":'').
-<<<__EOD
-.Radio {
+  /*vertical-align:bottom;*/ position:relative; top:2px; }.Radio {
   position:absolute; display:block; /*border:1px solid #aaa;*/ z-index:1; }
 .Case {
   position:absolute; }
@@ -546,7 +493,7 @@ ul.SelectDrop {
 .SelectDrop li.selected {
   background-color:#b2b4bf; }
 .SelectDrop li.li-sel {
-  color:$s2_brow !important; background-image:url(img/srafa.png); background-repeat:repeat-x; }
+  color:#d30 !important; background-image:url(img/srafa.png); background-repeat:repeat-x; }
 .List {
   position:absolute; z-index:1; /*outline:1px dotted #fff;*/ overflow:auto; overflow-x:hidden; }
 .ListRow {
@@ -559,64 +506,57 @@ ul.SelectDrop {
 .BrowseSmart table {
   border-spacing:0px;
   z-index:2; position:absolute; empty-cells:show; padding:0; width:0;
-  margin:0; table-layout:fixed; border-collapse:separate; background-color:$b_brow;
-  font-size:9pt; border:1px solid $s1_brow; overflow:hidden; }
+  margin:0; table-layout:fixed; border-collapse:separate; background-color:#ccc;
+  font-size:9pt; border:1px solid #6593cf; overflow:hidden; }
 .BrowseSmart input.BrowseFocus  {
   width:10px; padding:0; margin:0; height:10px; border:0; outline:0px !important; }
 /* hlavička */
 .BrowseSmart td.th {
-  background:url($path/browse_header.png) repeat-x center -1px;
-  color:$c_brow; font-size:9pt; font-weight:bold; vertical-align:middle; cursor:default;
+  background:url(./skins/default/browse_header.png) repeat-x center -1px;
+  color:#777; font-size:9pt; font-weight:bold; vertical-align:middle; cursor:default;
   height:17px; line-height:12px; text-align:left; overflow:hidden; padding:0; text-indent:5px; }
 .BrowseSmart td.ShowSort:hover {
-  background:transparent url($path/browse_sort_hover.png) repeat-x scroll 0 -1px !important;  }
+  background:transparent url(./skins/default/browse_sort_hover.png) repeat-x scroll 0 -1px !important;  }
 .BrowseSmart td.th span {
   display:block; margin-left:5px; margin-right:5px; overflow:hidden; }
 .BrowseSmart td img.sort {
   position:absolute; }
 td.BrowseNoClmn img.sort {
-  display:none; }
-__EOD
-.(($browser=='FF'||$browser=='IE')?"
-.BrowseSmart td img.sort {
-  margin-left:-5px; }
-":'').
-<<<__EOD
-.BrowseSmart td img.resize {
+  display:none; }.BrowseSmart td img.resize {
   float:right !important; padding:0; cursor: w-resize; z-index:200;
   margin-bottom:-10px; height:10px; width:5px; }
 .BrowseSmart.disabled td {
   color:#545454; }
 /* dotazy */
 .BrowseSmart td.BrowseNoQry {
-  padding:0; background-color:$b6_brow;
-  border-left:1px solid $b_brow; border-bottom:1px solid $b_brow;  }
+  padding:0; background-color:#f2f8ff;
+  border-left:1px solid #ccc; border-bottom:1px solid #ccc;  }
 .BrowseSmart td.BrowseQry {
   padding:0; padding:0 !important;
-  border-left:1px solid $b_brow; border-bottom:1px solid $b_brow;
+  border-left:1px solid #ccc; border-bottom:1px solid #ccc;
   vertical-align:top; }
 .BrowseSmart .BrowseQry input {
-  background-color:$b8_brow; border:0; padding:0px; width:100%; height:16px; font:inherit;
+  background-color:#effdf1; border:0; padding:0px; width:100%; height:16px; font:inherit;
   line-height:14px; margin:-1px 0; }
 /* řádky */
 .BrowseSmart tr {
   /*height:17px !important;*/ }
 .BrowseSmart td {
-  height:{$browse_td_h}px; white-space:nowrap; overflow:hidden;
+  height:16px; white-space:nowrap; overflow:hidden;
   vertical-align:bottom; cursor:default; padding:0 2px; /*line-height:14px;*/
-  border-left:1px solid $b_brow; border-bottom:1px solid $b_brow;  }
+  border-left:1px solid #ccc; border-bottom:1px solid #ccc;  }
 .BrowseSmart td.tag0 {
-  background-color:$b7_brow; padding:0; }
+  background-color:#d1e4ff; padding:0; }
 .BrowseSmart td.tag1 {
-  background-image:url($path/browse_mark2.gif); width:10px; }
+  background-image:url(./skins/default/browse_mark2.gif); width:10px; }
 .BrowseSmart td.tr-even {
-  background-color:$b2_brow; }
+  background-color:#f2f8ff; }
 .BrowseSmart td.tr-odd {
-  background-color:$b4_brow; }
+  background-color:#d1e4ff; }
 .BrowseSmart .tr-form {
   font-weight:bold; }
 .BrowseSmart .tr-sel {
-  color:$s2_brow !important; }
+  color:#d30 !important; }
 .BrowseSmart td.BrowseNoClmn {
   padding-left:0; border-left:0; width:0; }
 .BrowseSmart .tr-sel td.tr-odd, .BrowseSmart .tr-sel td.tr-even {
@@ -627,40 +567,40 @@ __EOD
   outline:2px dotted yellow; border:0px; font:inherit; background-color:#ffffaa}
 /* reload */
 .BrowseSmart td.BrowseReload {
-  background:url($path/browse_reload.png) no-repeat !important; cursor:pointer !important;
+  background:url(./skins/default/browse_reload.png) no-repeat !important; cursor:pointer !important;
   padding:0; width:8px; }
 /* posuvník */
 .BrowseSmart td.BrowseSet {
-  background:url($path/browse_set.png) no-repeat !important; cursor:pointer !important;
+  background:url(./skins/default/browse_set.png) no-repeat !important; cursor:pointer !important;
   padding:0; width:16px; }
 .BrowseSmart div.BrowsePosuv {
-  z-index:1; width:16px; background-color:$b5_brow; }
+  z-index:1; width:16px; background-color:#f0f0f0; }
 .BrowseSmart td.BrowsePosuv {
   padding:0px !important; }
 .BrowseSmart .BrowseUp, .BrowseSmart .BrowseDn, .BrowseSmart .BrowseHandle {
   height: 16px; width: 15px;
-  background-color:$b5_brow; background-repeat:no-repeat; background-position:center; }
-.BrowseSmart .BrowseUp       { background-image:url($path/browse_pgup0.png); }
-.BrowseSmart .BrowseUp.act   { background-image:url($path/browse_pgup.png); }
-.BrowseSmart .BrowseUp.act:hover { background-image:url($path/browse_pgup_act.png); }
-.BrowseSmart .BrowseDn       { background-image:url($path/browse_pgdn0.png); }
-.BrowseSmart .BrowseDn.act   { background-image:url($path/browse_pgdn.png); }
-.BrowseSmart .BrowseDn.act:hover { background-image:url($path/browse_pgdn_act.png); }
+  background-color:#f0f0f0; background-repeat:no-repeat; background-position:center; }
+.BrowseSmart .BrowseUp       { background-image:url(./skins/default/browse_pgup0.png); }
+.BrowseSmart .BrowseUp.act   { background-image:url(./skins/default/browse_pgup.png); }
+.BrowseSmart .BrowseUp.act:hover { background-image:url(./skins/default/browse_pgup_act.png); }
+.BrowseSmart .BrowseDn       { background-image:url(./skins/default/browse_pgdn0.png); }
+.BrowseSmart .BrowseDn.act   { background-image:url(./skins/default/browse_pgdn.png); }
+.BrowseSmart .BrowseDn.act:hover { background-image:url(./skins/default/browse_pgdn_act.png); }
 .BrowseSmart .BrowseHandleUp   {
-  background-image:url($path/browse_handle_up.png); height:6px;
+  background-image:url(./skins/default/browse_handle_up.png); height:6px;
   background-position: 1px top; background-repeat: no-repeat; }
 .BrowseSmart .BrowseHandleMi   {
-  background-image:url($path/browse_handle_mi.png); height:100%;
+  background-image:url(./skins/default/browse_handle_mi.png); height:100%;
   background-position: 1px center; background-repeat: repeat-y; }
 .BrowseSmart .BrowseHandleMi:hover {
-  background-image:url($path/browse_handle_act_mi.png); }
+  background-image:url(./skins/default/browse_handle_act_mi.png); }
 .BrowseSmart .BrowseHandleDn   {
-  background-image:url($path/browse_handle_dn.png); height:6px; bottom:0px;
+  background-image:url(./skins/default/browse_handle_dn.png); height:6px; bottom:0px;
   background-position: 1px bottom; background-repeat: no-repeat; }
-.BrowseSmart div.BrowseHandle:hover { background-image:url($path/browse_handle_act.png); }
+.BrowseSmart div.BrowseHandle:hover { background-image:url(./skins/default/browse_handle_act.png); }
 /* patička */
 .BrowseSmart th {
-  background:url($path/browse_header.png) repeat-x center center; color:$c_brow; font-size:8pt;
+  background:url(./skins/default/browse_header.png) repeat-x center center; color:#777; font-size:8pt;
   height:14px; text-align:left; border:0; white-space:nowrap; overflow:hidden; cursor:default; }
 
 /* patička */
@@ -672,16 +612,16 @@ __EOD
   right:0; }
 #status_right span.measures {
   position:absolute; top:-15px; right:0;
-  background-color:$b_kuk; color:$c2_kuk;  }
+  background-color:#fb6; color:navy;  }
 #status_bar {
-  background:#eee url($path/foot_bg.png) repeat-x; color:$c2_kuk; position:absolute;
+  background:#eee url(./skins/default/foot_bg.png) repeat-x; color:navy; position:absolute;
   height:15px; top:-16px; width:100%; padding:1px 0 0; }
 #status_bar span {
   padding:1px 4px; margin:0 2px; }
 hr.cleaner {
   clear:both; display:none; }
 #dolni a {
-  text-decoration:none; color:$c_kuk; }
+  text-decoration:none; color:navy; }
 #dolni pre {
   font-family:Consolas; }
 #dolni .line {
@@ -708,7 +648,7 @@ hr.cleaner {
 div.chng {
     width:100%; }
 span.chng_day {
-    background-color:$b_item; color:$c_item;padding:1px 5px; }
+    background-color:#cde; color:#333;padding:1px 5px; }
 span.chng_hlp {
     padding:1px 5px; }
 
@@ -733,10 +673,10 @@ span.chng_hlp {
 .dbg {
   margin:0; overflow-y:auto; font-size:8pt; line-height:13px; }
 #warning {
-  background-color:$b_warn; color:$c_warn; opacity:.8; font-weight:bold;
+  background-color:#FBC84F; color:#000000; opacity:.8; font-weight:bold;
   padding:15px; cursor:default; display:none; }
 #kuk_err, #error {
-  background-color:$s_kuk; height:75px; }
+  background-color:#FBC84F; height:75px; }
 #kuk table, .dbg table {
   border-collapse:collapse; margin:1px 0;}
 #kuk td, .dbg td {
@@ -750,15 +690,15 @@ span.chng_hlp {
 .dbg table.dbg_object {
   background-color:#ffffaa; }
 .ae_switch_on {
-  background-color:$b_kuk; color:$c2_kuk;  }
+  background-color:#fb6; color:navy;  }
 .ae_switch_sel {
-  background-color:$b_kuk; color:$c_kuk;  }
+  background-color:#fb6; color:navy;  }
 #kuk div.trace {
   margin-left:70px; color:#000; padding:0; white-space:pre-wrap; }
 #kuk div.trace_hide {
   margin-left:70px; color:#777; height:13px; overflow:hidden; white-space:pre-line; }
 #kuk span.trace_on {
-  background:url($path/tree.png) no-repeat 55px -104px; color:#777;
+  background:url(./skins/default/tree.png) no-repeat 55px -104px; color:#777;
   width:69px; margin:0; padding:0; float:left; left:0; }
 #kuk span.trace_click {
   background-color:#ddd; }
@@ -783,7 +723,7 @@ span.chng_hlp {
                   /*text-shadow: 2px 2px 1px #679956;*/ }
 .CTitle,.STitle { white-space:nowrap; }
 .CClass .CTitle, .CSection .CTitle, .CModule .CTitle
-         	{ background-color:$b_doc_modul; padding: 5px 10px; background-repeat: no-repeat;
+         	{ background-color:#c17878; padding: 5px 10px; background-repeat: no-repeat;
                   background-position: center left; color: #fff; /*text-shadow: 2px 2px 1px #935b5c;*/ }
 .CSection .CTitle
          	{ background-color: #ddd; color: #666; /*text-shadow: none;*/}
@@ -791,7 +731,7 @@ span.chng_hlp {
          	{ background: #ccc; padding: 3px 10px; font-size: 18px; text-transform: uppercase;
                   font-size: 15px;}
 .CProperty .CTitle, .CFunction .CTitle, .CMenu .CTitle, .CForm .CTitle, #Content h1
-         	{ color: #fff; background-color:$b_doc_menu; padding: 6px 10px;
+         	{ color: #fff; background-color:#7389ae; padding: 6px 10px;
                    background-repeat: no-repeat; background-position: center left;
                    /*text-shadow: 2px 2px 1px #5e708e;*/ }
 .CMenu .CTitle, #Content h1
@@ -806,7 +746,7 @@ span.chng_hlp {
          	{ padding-left: 40px; background-image: url(img/doc_module.gif);}
 .CForm .CTitle
          	{ padding-left: 40px; background-image: url(img/doc_form.gif);
-                  background-color:$b_doc_form ; }
+                  background-color:#80a2cf ; }
 #Content pre    { font: 12px "Monaco", "Courier New", Monospace; background: #f5f5f5;
                   border: 1px solid #ddd; padding: 10px 15px; color: #444; margin-left: 30px;
                   overflow: auto !important; overflow: scroll; line-height: 1.5;}
@@ -851,7 +791,7 @@ h4.CHeading, .STitle
 /*help*/
 
 div.Form>div.ContextHelp {
-                  background:url($path/clientcide/stickyWinHTML/body.png) scroll center bottom repeat-y;
+                  background:url(./skins/default/clientcide/stickyWinHTML/body.png) scroll center bottom repeat-y;
                   padding:10px 0 10px 10px; color:black; overflow:auto }
 .ContextHelp img{ padding:5px; overflow: auto; }
 .ContextHelp hr { clear:both; color:transparent }
@@ -864,8 +804,6 @@ div.Help   	{ position: absolute; z-index:2; width:300px; height:150px; right:30
                   border: 3px solid silver; height: 17px; padding-top: 3px; }
 .Help textarea  { position:absolute; width:294px; height:120px; top:23px;
                   font-family:Arial,Helvetica,sans-serif; font-size:9pt }
-div.HelpList    { float:right; background-color:$b2_brow; padding:10px;
+div.HelpList    { float:right; background-color:#f2f8ff; padding:10px;
                   max-width: 230px; word-wrap:break-word; }
 .HelpList ul    { margin:0; padding:0 10px; }
-__EOD;
-?>

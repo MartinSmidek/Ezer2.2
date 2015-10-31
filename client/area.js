@@ -1,5 +1,5 @@
-// Tento modul doplňuje ezer.js o Ezer.Area
-// ================================================================================================= Dokumentace
+// Tento modul doplňuje ezer.js o Ezer.Area a o funkce debuggeru
+// ====================================================================================> Dokumentace
 // značka c: třída
 // značka f: interní metoda, dvojpísmenné jsou i informací pro kompilátor - funkce volané z Ezer
 //           fm: metoda, ff: funkce, fs: struktura, fx: metoda s voláním ajax
@@ -10,8 +10,8 @@
 // značka a: argumenty
 // značka r: výsledek
 // značka s: sekce v dokumentaci
-// ================================================================================================= Block
-// ------------------------------------------------------------------------------------------------- Block
+// ==========================================================================================> Block
+// ------------------------------------------------------------------------------------------- Block
 //c: Area ([options])
 //      základní třída
 //s: Block
@@ -183,7 +183,7 @@ Ezer.Area= new Class({
     }
     return 1;
   },
-// ================================================================================================= AREA TREE
+// ======================================================================================> AREA TREE
 // ------------------------------------------------------------------------------------ tree_expand
 //fm: Area.tree_expand (n)
 //      zobrazí n úrovní stromu, tree_expand(0) jej svine
@@ -344,6 +344,10 @@ Ezer.Area= new Class({
             var fid= node.id.split('.');
             var idn= fid[fid.length-1];
 //             var node_id= node.id.split('.');
+            if ( node.data.pos ) {
+              Ezer.sys.dbg= {app:node.data.pos.app,file:node.data.pos.file,
+                start:node.data.pos.start,start_lc:node.data.pos.lc||''};
+            }
             this.fire('tree_onclick',[node.id,idn,node.data,ndata,adata,texts,node.text]);
           }
           return false;
@@ -368,7 +372,7 @@ Ezer.Area= new Class({
     return 1;
   }
 });
-// ================================================================================================= STRUKTURY
+// ======================================================================================> STRUKTURY
 // --------------------------------------------------------------------------------------- new_area
 //fs: str.new_area (name,parent[,par])
 //      vytvoření instance area podle name, obsahujícím buďto string s úplným jménem area
@@ -437,7 +441,7 @@ Ezer.str.new_area= function() {
   that.stack[++that.top]= ezer_area;
   that.eval();
 }
-// ================================================================================================= FCE
+// ============================================================================================> FCE
 // ---------------------------------------------------------------------------------------- url_get
 //ff: fce.url_get ([get])
 //   vrátí aktuální url z window.history, pokud je definován parametr get
@@ -475,7 +479,7 @@ Ezer.fce.json_decode= function (string) {
 Ezer.fce.json_encode= function (obj) {
   return JSON.encode(obj);
 }
-// ================================================================================================= META
+// ===========================================================================================> META
 // --------------------------------------------------------------------------------------- meta_tree
 //ff: meta_tree ([id_type=id])
 //      vrátí strom aplikace, uzly budou označeny podle id (default) nebo podle _sys
@@ -484,12 +488,19 @@ Ezer.fce.meta_tree= function (id_type) {
   function walk(root) {
     var title= (root.options.include ? ' '+root.options.include : '')
              + (root._library        ? ' #' : '');
-    var data= {include:root.options.include|'',library:root._library ? '#' : ''};
+    var data= {include:root.options.include|'',library:root._library ? '#' : '',pos:null};
     var id= id_type=='_sys'
           ? (root.options._sys ? (root.options._sys=='*' ? root.id : root.options._sys) : '')
           : root.id;
     var name= root.options.title ? Ezer.fce.replace_fa(root.options.title) : '';
     var node= {prop:{id:id,text:name,title:title,data:data},down:[]};
+    // zjištění zdrojového textu do data.pos
+    var pos= root.app_file();
+    node.prop.data.pos= {app:pos.app,file:pos.file,start:root.self()};
+    if ( root.desc && root.desc._lc ) {
+      node.prop.data.pos.lc= root.desc._lc;
+    }
+    // projdeme podstrom
     if ( root.part ) {
       $each(root.part,function(x) {
         if ( x instanceof Ezer.MenuLeft ) {
@@ -509,4 +520,75 @@ Ezer.fce.meta_tree= function (id_type) {
   }
   tree= walk(Ezer.run.$).down[0];
   return tree;
+}
+// =======================================================================================> DEBUGGER
+// funkce debuggeru
+// -------------------------------------------------------------------------------- dbg_onclick_line
+function dbg_onclick_line(line) {
+  var found= null;
+  if ( Ezer.sys.dbg ) {
+    var walk = function(o,ln) {
+      if ( o.part ) for (var i in o.part) {
+        if ( found ) break;
+        var oo= o.part[i];
+        if ( oo.desc && oo.desc._lc && oo.type=='proc' && oo.desc._lc.contains(ln) ) {
+          found= {id:i,block:oo};
+          break;
+        }
+        found= walk(oo,ln);
+        if ( !found && oo instanceof Ezer.Var && oo._of=='form' && oo.value ) {
+          found= walk(oo.value,ln);
+        }
+      }
+      return found;
+    };
+    var dbg= Ezer.sys.dbg;
+    dbg.line= line;
+    // nalezení Ezer.Block podle dbg.start
+    var ctx= [], known;
+    known= Ezer.run_name(dbg.start,null,ctx);
+    if ( known ) for (var i=ctx.length-1; i>=0; i--) {
+      var o= ctx[i];
+      if ( o.desc._file==dbg.file ) { // nejvyšší blok - budeme hledat řádek
+        found= walk(o,line+',');
+        if ( found ) {
+          dbg.proc_id= found.id;
+          dbg.proc_block= found.block;
+          break;
+        }
+      }
+    }
+    // vlastní ladící akce
+    if ( found ) {
+      Ezer.fce.echo("dbg.file;"+line+" proc "+dbg.proc_id);
+      if ( dbg.proc_block.proc_stop ) {
+        dbg.proc_block.proc_stop(1-dbg.proc_block.stop);
+      }
+    }
+  }
+  return found;
+}
+// -------------------------------------------------------------------------------- dbg_onclick_text
+function dbg_onclick_text(el) {
+  return 1;
+}
+// ------------------------------------------------------------------------------- dbg_onclick_start
+function dbg_onclick_start(win) {
+  win= win ? win : window;
+  var dbg_src= win.document.getElementById('dbg_src');
+  if ( dbg_src ) {
+    dbg_src.addEvents({
+      click: function(el) {
+        var chs= el.target.getParent().getChildren(), x= 0;
+        for (var i=0; i<chs.length; i++) {
+          if ( chs[i]==el.target ) {
+            x= i+1;
+            break;
+          }
+        }
+        Ezer.fce.echo("line=",x);
+        return x;
+      }
+    })
+  }
 }

@@ -1,6 +1,6 @@
 // doplnění tříd Ezer o jejich zobrazení v DOM architektuře
 // jména začínající podtržítkem jsou lokální pro DOM-doplnění, nesmí se používat v ezer.js
-// ΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞ app.js
+// ΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞ==> Ezer.Application
 // layout aplikace a jeho ovládání - Ezer.Shield ukrývá obsah pod PanelPopup
 Ezer.is_trace= {};                              // zapínání typů trasování
 Ezer.is_dump= {};                               // zapínání typů výpisů
@@ -42,7 +42,7 @@ Ezer.Application= new Class({
     if ( $('drag') ) Ezer.drag.init($('drag'));
     this.bar_clock();
   },
-  // ----------------------------------------------------------------------------- DOM_layout
+  // ------------------------------------------------------------------------==> . DOM_layout
   // pokud inner==true (asi jen pro Android) ...
   DOM_layout_mode: Ezer.platform=='A' ? 'inner' : 'outer',     // metoda získávání rozměrů
   DOM_layout: function() {
@@ -208,7 +208,7 @@ Ezer.Application= new Class({
     this._help(false);
     return false;
   },
-  // ----------------------------------------------------------------------------- _mini_debug
+  // ------------------------------------------------------------------------==> . _mini_debug
   // ikona má název *logo.gif kde * je '+' nebo '-'
   _mini_debug_virgin: true,
   _mini_debug: function (on) {
@@ -237,18 +237,32 @@ Ezer.Application= new Class({
               ['-drag',                 function(el) { Ezer.run.$.dragBlock(true,false) }],
               ['save',                  function(el) { Ezer.App.save_drag() }],
               ['-help mode start',      function(el) { Ezer.run.$.helpBlock(1) }],
-              ['help mode end',         function(el) { Ezer.run.$.helpBlock(0) }],
-              ['-relogin',              function(el) {
-                Cookie.dispose('PHPSESSID',{path: '/'});
-                alert('Obnovte prosím svoje přihlášení do systému...');
-                window.location.href= window.location.href;}],
-              ['-stop',                 function(el) { Ezer.dbg.stop=true }],
-              ['continue',              function(el) { Ezer.dbg.stop=false }]
+              ['help mode end',         function(el) { Ezer.run.$.helpBlock(0) }]
+//               ['-relogin',              function(el) {
+//                 Cookie.dispose('PHPSESSID',{path: '/'});
+//                 alert('Obnovte prosím svoje přihlášení do systému...');
+//                 window.location.href= window.location.href;}],
+//               ['-stop',                 function(el) { Ezer.dbg.stop=true }],
+//               ['continue',
+//               ]
             ],arguments[0]);
             return false;
           }.bind(this)
         });
       }
+    }
+    // pokračování zastopované procedury
+    this.logoContinue= $('logoContinue');
+    if ( this.logoContinue ) {
+      this.logoContinue.addEvents({
+        click: function(el) {
+          if ( Ezer.continuation ) {
+            this.logoContinue.setStyles({display:'none'});
+            Ezer.continuation.eval();
+          }
+          return false;
+        }.bind(this)
+      });
     }
     // kontextové menu pro Android a iPad
     function actual_dim() {
@@ -329,7 +343,7 @@ Ezer.Application= new Class({
   _resetTrace: function() {
     this._barRightDom.getChildren().destroy();
   },
-  // ----------------------------------------------------------------------------- _setTrace
+  // ------------------------------------------------------------------------==> . _setTrace
   // vytvoření ovládání trasování, hlášení chyb, FAQ
   _setTrace: function() {
     var touch_now= 0;
@@ -355,6 +369,7 @@ Ezer.Application= new Class({
         )
       };
       if ( true ) {
+        // ==> . debugger
         menu.push(
         // spuštění panel meta z ezer2.help.ezer - zobrazí výsledek Ezer.fce.meta_tree (area.js)
         ['-popup: struktura aplikace',   function(el) {
@@ -431,6 +446,7 @@ Ezer.Application= new Class({
       this._barSwitch('q','kód interpreta');
       this._barSwitch('Q','kód interpreta (jen s ift,iff,is)');
       this._barSwitch('C','trasování kompilátoru');
+      // debugger
       if ( Ezer.options.dbg ) {
         // debug - zobrazení debuggeru - zachází se s ním jako s trasováním '$'
         Ezer.is_trace['$']= this.options.ae_trace.indexOf('$')>=0;
@@ -709,7 +725,7 @@ Ezer.Application= new Class({
       }
     }).inject(this._barRightDom);
   },
-  // =============================================================================================== CLOCK & CHAT
+  // -----------------------------------------------------------------------------==> . clock & chat
   clock_tics: 0,              // minutky: počet tiků (minut) od minulé činnosti
   session_tics: 0,            // minutky: počet tiků (minut) od minulé obnovy SESSION
   hits: 0,                    // počet uživatelských interakcí (button, menu, ...)
@@ -875,7 +891,7 @@ Ezer.Application= new Class({
     }
     this.putFootDom(x);
   },
-  // =============================================================================================== SERVER
+  // -----------------------------------------------------------------------------------==> . SERVER
   pb: null,
   // ----------------------------------------------------------------------------- _ajax
   // zobrazí změnu zatížení serveru
@@ -933,7 +949,7 @@ Ezer.Application= new Class({
     Ezer.calls= [];
   }
 });
-// ΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞ ServerBar
+// =================================================================================> Ezer.ServerBar
 // class from http://davidwalsh.name/progress-bar-animated-mootools
 Ezer.ServerBar = new Class({
   // implements
@@ -985,8 +1001,7 @@ Ezer.ServerBar = new Class({
     this.animate(to);
   }
 });
-// ΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞΞ ezer.js
-// ------------------------------------------------------------------------------------------------- Block + DOM
+// =====================================================================================> Ezer.Block
 //c: Block-DOM ([options])
 //      základní třída
 //s: Block-DOM
@@ -1005,8 +1020,7 @@ Ezer.Block= new Class({
     if ( this.DOM_add2 ) this.DOM_add2();
   }
 });
-// ================================================================================================= Help
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  Ezer.help
+// ======================================================================================> Ezer.help
 // programátorské informace
 Ezer.help= {
   block: null,                  // poslední blok, na který bylo kliknuto
@@ -1031,8 +1045,7 @@ Ezer.help= {
     Ezer.help.dom(the).set('title',the._help ? the._help(help) : help);
   }
 };
-// ================================================================================================= Drag
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  Ezer.drag
+// ======================================================================================> Ezer.drag
 // obsluha klávesnicí
 Ezer.drag= {
   text: '',                             // zdrojový text načtený v Dbg
@@ -1227,7 +1240,7 @@ Ezer.drag= {
     return list;
   }
 };
-// ------------------------------------------------------------------------------------------------- Drag
+// ======================================================================================> Ezer.Drag
 Ezer.Drag= new Class({
   _dragSave: {},                        // úschova vlastností
   _dragChange: null,                    // změny l,t,w,h
@@ -1255,7 +1268,7 @@ Ezer.Drag= new Class({
     }
   }
 });
-// ------------------------------------------------------------------------------------------------- Help
+// ======================================================================================> Ezer.Help
 Ezer.Help= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _helpThis
   _helpSave: {},                        // úschova vlastností
@@ -1320,68 +1333,3 @@ Ezer.Help= new Class({
     }
   }
 });
-/*
-// https://developer.mozilla.org/en-US/docs/Web/Events/resize
-var optimizedResize = (function() {
-    var callbacks = [],
-        running = false;
-    // fired on resize event
-    function resize() {
-        if (!running) {
-            running = true;
-            if (window.requestAnimationFrame) {
-                window.requestAnimationFrame(runCallbacks);
-            } else {
-                setTimeout(runCallbacks, 66);
-            }
-        }
-    }
-    // run the actual callbacks
-    function runCallbacks() {
-        callbacks.forEach(function(callback) {
-            callback();
-        });
-        running = false;
-    }
-    // adds callback to loop
-    function addCallback(callback) {
-        if (callback) {
-            callbacks.push(callback);
-        }
-    }
-    return {
-        // initalize resize event listener
-        init: function(callback) {
-            window.addEventListener('resize', resize);
-            addCallback(callback);
-        },
-        // public method to add additional callback
-        add: function(callback) {
-            addCallback(callback);
-        }
-    }
-}());
-
-// start process
-optimizedResize.init(function() {
-    console.log('Resource conscious resize callback!')
-});
-setTimeout(function() {
-  window.addEventListener("resize", resizeThrottler, false);
-  var resizeTimeout;
-  function resizeThrottler() {
-    // ignore resize events as long as an actualResizeHandler execution is in the queue
-    if ( !resizeTimeout ) {
-      resizeTimeout = setTimeout(function() {
-        resizeTimeout = null;
-        actualResizeHandler();
-       // The actualResizeHandler will execute at a rate of 15fps
-       }, 66);
-    }
-  }
-  function actualResizeHandler() {
-    // handle the resize event
-    Ezer.app.DOM_layout()
-  }
-}());
-*/

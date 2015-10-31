@@ -524,6 +524,7 @@ $html_header
   <div id='horni' class="MainBar">
     <div id="appl" $version>$title_right</div>
     <div id='logo'>
+      <button id='logoContinue' style='display:none;outline:3px solid orange;'>continue</button>
       <img class="StatusIcon" id="StatusIcon_idle" src="./$app/img/-logo.gif" />
       <img class="StatusIcon" id="StatusIcon_server" src="./$app/img/+logo.gif" />
     </div>

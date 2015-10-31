@@ -7,6 +7,7 @@ client/area.js -text
 client/dbg.css -text
 client/dbg.js -text
 client/dbgf.html -text
+client/ezer.css -text
 client/ezer.css.php -text
 client/ezer.js -text
 client/ezer_fdom1.js -text
@@ -133,6 +134,7 @@ code/comp2tab.php -text
 /comp.php -text
 /comp.png -text
 /comp_local.png -text
+/dbg.php -text
 /ezer2.help.ezer -text
 /ezer2.pers.ezer -text
 /ezer2.syst.ezer -text

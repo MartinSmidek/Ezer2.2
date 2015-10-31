@@ -423,15 +423,15 @@ Ezer.Application.implement({
   // toggle příznaku (stopadresy,trasování) procedury
   // obj :: {id:key,desc:value,path:idkey};
   toggle: function (obj,tag) {
-    obj.desc[tag]= obj.desc[tag] ? false : true;
+//     obj.desc[tag]= obj.desc[tag] ? false : true;
   },
   // ------------------------------------------------------------------------------------- stopped
   // interpret narazil na stop-adresu
   stopped: function (proc) {
-    if ( this.options.debug /*window.top.dbg*/ && window.top.dbg.show_stop )
-      window.top.dbg.show_stop(proc);
-    else
-      alert('proc '+proc.id+' stopped');
+//     if ( this.options.debug /*window.top.dbg*/ && window.top.dbg.show_stop )
+//       window.top.dbg.show_stop(proc);
+//     else
+//       alert('proc '+proc.id+' stopped');
   },
   // ------------------------------------------------------------------------------------- load_$
   // load_$ (aplikace)

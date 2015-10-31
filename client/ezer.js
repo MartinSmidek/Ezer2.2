@@ -719,7 +719,7 @@ Ezer.Block= new Class({
     this.fire(event_name,[arg]);
     return 1;
   },
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  subBlocks
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ==> . subBlocks
 //Block.subBlocks (desc,DOM,wrap_fce,extend)
 //      zapojí části bloku do bloku
 //   extend=='rewrite' pro přepsání bloků
@@ -2131,6 +2131,10 @@ Ezer.Proc= new Class({
     this.code= desc.code;
     this.prior= this.options && this.options.prior ? this.options.prior : 0;
     this.context= context;
+    this.stop= 0;
+  },
+  proc_stop: function(on) {
+    this.stop= on;
   },
   reinitialize: function(desc) {
     this.code= desc.code;
@@ -6597,7 +6601,7 @@ Ezer.Eval= new Class({
   eval: function(step,back) {
     var eval_start= Ezer.options.to_speed ? new Date().valueOf() : 0;       // měření spotřebovaného času
     try {
-//       // reaguj na stopadresu
+//       //==> . stopadresa
 //             if ( this.proc && (this.proc.stop || this.proc.desc && this.proc.desc.stop) ) {
 //               this.trace_proc('>>>STOP '+this.context.id+'.'+this.code[this.c].i,this.proc,this.nargs,this.nvars,'T');
 //               Ezer.continuation= this;
@@ -6750,6 +6754,7 @@ Ezer.Eval= new Class({
             //   c|C i a v - Ezer funkce: na zásobníku jsou argumenty - po volání hodnota funkce 'i'
             //               a=počet parametrů, v=počet proměnných (ale to se bere z proc.desc)
             //               je-li instrukce C, použije se kód z popisu procedury (tj. z form)
+            //==> . eval c
             case 'c':
             case 'C':
               val= false;
@@ -6789,6 +6794,7 @@ Ezer.Eval= new Class({
               }
               if ( this.step || this.proc.stop || this.proc.desc && this.proc.desc.stop ) {
                 this.trace_proc(cc.s,'>>>STOP '+this.context.id+'.'+cc.i,this.proc,this.nargs,this.nvars,'T');
+                $('logoContinue').setStyles({display:'block'});
                 Ezer.continuation= this;
                 Ezer.App.stopped(this.proc);
                 this.simple= false;
@@ -7298,7 +7304,7 @@ Ezer.Eval= new Class({
   }
 });
 // ================================================================================================> obecné funkce
-// -------------------------------------------------------------------------------------- code_name
+// ----------------------------------------------------------------------------------==> . code_name
 // funkce vrací bezkontextový význam name v code jako pole
 //   name :: ('$'|'#') ( '.' id )*  | ( '.'+ | id ) ( '.' id )*  NEBO [id+]
 // kde '#' označuje lokální kořen knihovního bloku (první s atributem library)
@@ -7346,7 +7352,7 @@ Ezer.code_run_name= function (name,context,ctx,ids) {
   }
   return ok;
 }
-// -------------------------------------------------------------------------------------- run_name
+// -----------------------------------------------------------------------------------==> . run_name
 // funkce vrací kontextový význam name tzn. Ezer-třídu v kontextu dané Ezer-třídy
 // pro name='@' vrací Ezer.App
 // jako pole context, kde pole[0] je pojmenovaný objekt
@@ -7541,7 +7547,7 @@ Ezer.obj_ref= function (name,obj) {
   }
   return ctx;
 }
-// ================================================================================================> str
+// ======================================================================================> STRUKTURY
 // struktury dostávají jako argumenty ne hodnoty ale kód
 Ezer.str= {};
 // -------------------------------------------------------------------------------------- each
@@ -7692,7 +7698,7 @@ Ezer.str.if_= function (that,value) {
 // funkce dostávají jako argumenty hodnoty
 // Ezer.obj= {};                                   // případné hodnoty k funkcím se stavem (trail ap.)
 // Ezer.fce= {};                                // přesunuto do hlavního programu
-// ================================================================================================> . array
+// ========================================================================================> . array
 // ------------------------------------------------------------------------------------ array
 //ff: fce.array (value1,value2,...)
 //      zkonstruuje pole [value1,value2,...]
@@ -7712,7 +7718,7 @@ Ezer.fce.array= function () {
 Ezer.fce.array_length= function (a) {
   return a.length;
 }
-// ================================================================================================> . objektové
+// ====================================================================================> . objektové
 // ------------------------------------------------------------------------------------ object
 //ff: fce.object (name1,value1,name2,value2,...)
 //      zkonstruuje objekt {name1:value1,name2:value2,...

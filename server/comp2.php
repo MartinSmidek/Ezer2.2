@@ -1969,6 +1969,7 @@ function get_ezer_keys (&$keywords,&$attribs1,&$attribs2) {
 //                                                             debug($attribs1,'$attribs1');
 //                                                             debug($attribs2,'$attribs2');
 }
+/** ========================================================================================> SYNTAX */
 # -------------------------------------------------------------------------------------------------- block
 # $root je nadřazený blok
 # block  :: vars | key [ id ] [':' key id] [pars|args] [coord] [code] [struct]
@@ -1977,7 +1978,7 @@ function get_ezer_keys (&$keywords,&$attribs1,&$attribs2) {
 function get_if_block ($root,&$block,&$id) {
 //                                                 debug($root,"get_if_block",(object)array('depth'=>2));
   global $blocs, $blocs2, $blocs3, $specs, $attribs1, $attribs2, $tree, $last_lc;
-  global $pragma_syntax, $pragma_group, $pragma_box;
+  global $pragma_syntax, $pragma_group, $pragma_box, $call_php;
   global $errors; if ( $errors ) return false;
   $TEST_NEW_VAR= 1;  // ------------------------------------------------- testování var !!!!!!!
   $block= null; $nt= null;
@@ -2114,6 +2115,24 @@ function get_if_block ($root,&$block,&$id) {
         }
         $block->_lc= $lc;
         $block->id= $id;
+        // analýza select.auto - přidání par.fce do seznamu volaných php-funkcí
+        if ( $block->type=='select.auto' ) {
+//                                                                 debug($block);
+          if ( isset($block->options->par->fce) ) {
+            $ask= $block->options->par->fce;
+            if ( !in_array($ask,$call_php) )
+              $call_php[]= $ask;
+          }
+        }
+        // analýza browse - přidání optimize.ask do seznamu volaných php-funkcí
+        if ( $block->type=='browse' ) {
+//                                                                 debug($block);
+          if ( isset($block->options->optimize->ask) ) {
+            $ask= $block->options->optimize->ask;
+            if ( !in_array($ask,$call_php) )
+              $call_php[]= $ask;
+          }
+        }
       }
     }
 //                                                 debug($root,"vars old");
