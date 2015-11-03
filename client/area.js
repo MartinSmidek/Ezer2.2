@@ -328,7 +328,7 @@ Ezer.Area= new Class({
         path:Ezer.paths.images_lib,     // cesta k mootree.gif
         theme:'mootree_white.gif',
         // ----------------------------------------------------------------- onclick
-        onClick: function(node) { // při kliknutí na libovolný uzel
+        onClick: function(node,context) { // při kliknutí na libovolný uzel context=true/undefined
           // spočítáme sumu data - shora dolů
           if ( node ) {
             var data= {}, datas= [], texts= del= '';
@@ -348,7 +348,10 @@ Ezer.Area= new Class({
               Ezer.sys.dbg= {app:node.data.pos.app,file:node.data.pos.file,
                 start:node.data.pos.start,start_lc:node.data.pos.lc||''};
             }
-            this.fire('tree_onclick',[node.id,idn,node.data,ndata,adata,texts,node.text]);
+            if ( context )
+              this.fire('tree_oncontextmenu',[node.id,idn,node.data,ndata,adata,texts,node.text]);
+            else
+              this.fire('tree_onclick',[node.id,idn,node.data,ndata,adata,texts,node.text]);
           }
           return false;
         }.bind(this)

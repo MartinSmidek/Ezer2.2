@@ -1085,9 +1085,12 @@ function i_doc_menu($chapters,$section0,$class0) {
 }
 # -------------------------------------------------------------------------------------------------- i_doc_table_struct
 # ASK - zobrazení struktury tabulky, předpokládá strukturované okomentování řádků tabulek
-# #cis  - cis je jméno číselníku - expanduje se současná hodnota položek tohoto číselníku
+# #cis   - cis je jméno číselníku - expanduje se současná hodnota položek tohoto číselníku
+# ##cis  - cis je jméno číselníku v ezer_group
+# ###cis - cis je jméno číselníku v ezer_kernel
 # -x    - položka je označena jako méně důležitá (tiskne se jen, pokud je all=1)
 function i_doc_table_struct($tab,$all=1) {  #trace();
+  global $ezer_root;
   $html= '';
   $row= 0;
   $max_note= 200;
@@ -1108,20 +1111,27 @@ function i_doc_table_struct($tab,$all=1) {  #trace();
       $note= $c->Comment;
       if ( $all || $note[0]!='-' ) {
         if ( $note[0]=='#' ) {
+          $db= ''; $inote= 1;
+          if ( $note[1]=='#' && $note[2]=='#' ) {
+            $db= 'ezer_kernel.'; $inote= 3;
+          }
+          elseif ( $note[1]=='#' && isset($_SESSION[$ezer_root]['group_db']) ) {
+            $db= $_SESSION[$ezer_root]['group_db'].'.'; $inote= 2;
+          }
           // číselníková položka
           $joins++;
           $strip= false;
-          $zkratka= substr($note,1);
+          $zkratka= substr($note,$inote);
           if ( strstr($note,'...') ) {
             $zkratka= trim(str_replace('...','',$zkratka));
             $strip= true;
           }
           $note= "číselník <b>'$zkratka'</b> <i>";
-          $note.= select("popis","_cis","druh='_meta_' AND zkratka='$zkratka'");
+          $note.= select("popis","{$db}_cis","druh='_meta_' AND zkratka='$zkratka'");
           $note.= "</i> (";
           // nelze použít GROUP_CONCAT kvůli omezení v ORDER
           $del= '';
-          $resd= mysql_query("SELECT * FROM _cis WHERE druh='$zkratka' ORDER BY LPAD(5,'0',data)");
+          $resd= mysql_qry("SELECT * FROM {$db}_cis WHERE druh='$zkratka' ORDER BY LPAD(5,'0',data)");
           while ( (!$strip || strlen($note)<$max_note) && $resd && ($d= mysql_fetch_object($resd))){
             if ( $d->hodnota != '---' ) {
               $popis= $d->hodnota ?: $d->zkratka;

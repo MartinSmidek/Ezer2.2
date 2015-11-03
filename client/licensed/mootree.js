@@ -101,7 +101,6 @@ var MooTreeControl = new Class({
 		this.onExpand = config.onExpand || new Function(); // called when any node in the tree is expanded/collapsed
 		this.onSelect = config.onSelect || new Function(); // called when any node in the tree is selected/deselected
 		this.onClick = config.onClick || new Function(); // called when any node in the tree is clicked
-		
 		this.root.update(true);
 		
 	},
@@ -131,8 +130,8 @@ var MooTreeControl = new Class({
 		node - the <MooTreeNode> object to select.
 	*/
 	
-	select: function(node) {
-		this.onClick(node); node.onClick(); // fire click events
+	select: function(node,left) {
+		this.onClick(node,left); node.onClick(); // fire click events
 		if (this.selected === node) return; // already selected
 		if (this.selected) {
 			// deselect previously selected node:
@@ -257,7 +256,7 @@ var MooTreeNode = new Class({
 		this.onExpand = options.onExpand || new Function(); // called when the individual node is expanded/collapsed
 		this.onSelect = options.onSelect || new Function(); // called when the individual node is selected/deselected
 		this.onClick = options.onClick || new Function(); // called when the individual node is clicked
-		
+
 		this.open = options.open ? true : false; // flag: node open or closed?
 		
 		this.icon = options.icon;
@@ -288,16 +287,21 @@ var MooTreeNode = new Class({
 		
 		// attach event handler to gadget:
 		this.div.gadget._node = this;
-		this.div.gadget.onclick = this.div.gadget.ondblclick = function() {
+		this.div.gadget.onclick = function() {
 			this._node.toggle();
 		}
 		
 		// attach event handler to icon/text:
 		this.div.icon._node = this.div.text._node = this;
-		this.div.icon.onclick = this.div.icon.ondblclick = this.div.text.onclick = this.div.text.ondblclick = function() {
+		this.div.icon.onclick = this.div.text.onclick = function() {
 			this._node.control.select(this._node);
 		}
-		
+
+                // attach left mouse click to icon/text
+                this.div.icon.oncontextmenu = this.div.text.oncontextmenu = function() {
+                        this._node.control.select(this._node,true);
+                        return false;
+                }
 	},
 	
 	/*
@@ -363,7 +367,7 @@ var MooTreeNode = new Class({
 		// remove this node's divs:
 		this.div.main.destroy();
 		this.div.sub.destroy();
-		
+
 		if (this.parent) {
 			
 			// remove this node from the parent's collection of nodes:

@@ -9,13 +9,35 @@ proc the_formsave (f,b) {
 | f.insert; f.load;
   b.raise('onrowclick',b.browse_seek(conc(f.id_key,'=',f.key)))
 }
-# =================================================================================================> ČÍSELNÍKY
-panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
+# =======================================================================================> ČÍSELNÍKY
+panel cis [,,,*] {type:'right', title:'Číselníky', _sys:'cis', skill:'m|m'
+  use u: form _tit [12,4,,]
+  menu {type:'left', active:*, format:'f-'
+    proc onstart() {
+      [ sys('options','group_db')     | h.g.enable(0) ];
+      [ sys('options','curr_version') | h.k.enable(0) ];
+    }
+    menu h {title:'Editace nápovědy', type:'group'
+      item a {title:'[fa-question] číselník aplikace',                par:°{level:'a',db:''} }
+      item g {title:'[fa-question-circle] číselník skupiny aplikací', par:°{level:'g',db:'ezer_group'} }
+      item k {title:'[fa-cogs] číselník jádra Ezer',                  par:°{level:'k',db:'ezer_kernel'} }
+      proc onclick(i) {
+        u.fill(replace_fa(conc(i.owner.title,' - ',i.title)));
+        mklice.lst.browse_init; mklic.init;
+        klice.lst.browse_init; klic.init;
+        function('block','new_db',"return remap_fields_db(block,new_db);",mklice.lst,i.par.db);
+        function('block','new_db',"return remap_fields_db(block,new_db);",mklic,i.par.db);
+        function('block','new_db',"return remap_fields_db(block,new_db);",klice.lst,i.par.db);
+        function('block','new_db',"return remap_fields_db(block,new_db);",klic,i.par.db);
+        reload_meta;
+      }
+    }
+  }
   var druh_cond: text
-  use mklice: form _mklice [5,5,,],
-  use mklic:  form _mklic [660,5,,],
-  use klice:  form _klice [5,142,,],
-  use klic:   form _klic [660,138,,],
+  use mklice: form _mklice [5,35,,],
+  use mklic:  form _mklic [660,35,,],
+  use klice:  form _klice [5,172,,],
+  use klic:   form _klic [660,168,,],
   var novy: text,
   var cis_druh: text,
   var cis_id: number
@@ -132,8 +154,12 @@ panel cis [,,,474] {type:'plain', title:'Číselníky', _sys:'cis', skill:'m|m'
     button create [294,376,,] { title:'Nový', proc onclick () { key_novy } }
     button delete [340,376,,] { title:'Smazat', proc onclick () { key_smaz } }
   }
+  # ------------------------------------------------------------------------ _tit
+  form _tit [,,*,30] {
+    label head [0,0,*,31] { title:'' }
+    proc fill(h) { [ h; head.set(replace_fa(conc("<div class='karta'>",h,"</div>"))) ]; }
+  }
 }
-
 # =================================================================================================> AKTIVITY
 panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a;aa|aa'
   menu left { type:'left', format:'f'

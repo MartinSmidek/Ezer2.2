@@ -11,8 +11,9 @@
   $app_name= 'Debugger pro framework Ezer';
   $skin=     'default';
 
-  $src= $_GET['src'].".ezer";
-  $url= "../$src";
+  $src= $_GET['src'];
+  $src_ezer= "$src.ezer";
+  $url= "../$src_ezer";
 
   $html= "
     <ol id='dbg_src'>
@@ -20,8 +21,9 @@
   $lns= file($url,FILE_IGNORE_NEW_LINES);
   foreach($lns as $i=>$ln) {
     $lnx= htmlentities($ln);
-    $iii= str_pad($i+1,3,' ',STR_PAD_LEFT);
-    $html.= "\n<li><span>$iii</span>$lnx</li>";
+    $i1= $i+1;
+    $iii= str_pad($i1,4,' ',STR_PAD_LEFT);
+    $html.= "\n<li id='$i1'><span>$iii</span>$lnx</li>";
   }
   $html.= "
     </ol>
@@ -69,26 +71,34 @@ function html_closure($win_name,$body) {
     <script src="http://ys2.ezer:8080/ezer2.2/client/licensed/clientcide.js" type="text/javascript" charset="utf-8"></script>
     <style>
       ol {
-        padding: 0;
+        padding: 0; margin-top: 5px;
       }
       li {
         white-space: pre;
-        font-family: monospace,consolas;
         font-size: 8pt;
         list-style-type: none;
       }
       li span {
         background-color: silver;
-        padding-right: 5px;
-        margin-right: 5px;
+        padding-right: 5px; margin-right: 5px; padding: 2px;
       }
       li.break span {
         background-color: darkred;
         color: yellow;
       }
+      li.curr {
+        background-color: orange;
+      }
+      #source {
+        position: fixed; right: 10px; top: 2px; font-size: 16px; color: lightgray;
+      }
+      body {
+        font-family: monospace,consolas;
+      }
     </style>
   </head>
   <body onload="dbg_onclick_start()" style="background-color:oldlace;">
+  <div id="source">$win_name</div>
   $body
   </body>
 </html>

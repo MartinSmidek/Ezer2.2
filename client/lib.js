@@ -598,3 +598,14 @@ Ezer.browser=='IE' ? null :
  // let's keep this DOM node in RAM for all resizes we want
  this.document.createElement("canvas"))
 );
+// ========================================================================================= pomocné
+// --------------------------------------------------------------------------------- remap_fields_db
+function remap_fields_db (block,new_db) {
+  for (var ic in block.part) {
+    field= block.part[ic];
+    if ( field.table ) {
+      field.table.options.db= new_db;
+    }
+  }
+  return 1;
+}
