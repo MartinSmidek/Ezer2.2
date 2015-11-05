@@ -672,7 +672,12 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
   $ezer_sylk_cp=  'windows-1250';
   // cesty
 //   $ezer_path_root= $path_root[$sada];
-  $ezer_path_root= $_SERVER['DOCUMENT_ROOT'].$_SESSION[$ezer_root]['app_path'];
+  if ( isset($_SESSION[$ezer_root]['abs_root']) ) {
+    $ezer_path_root= $_SESSION[$ezer_root]['abs_root'];
+  }
+  else {
+    $ezer_path_root= $_SERVER['DOCUMENT_ROOT'].$_SESSION[$ezer_root]['app_path'];
+  }
 //                                                 echo("<hr>ezer_path_root=$ezer_path_root ($ezer_root)");
   $sess_save_path= "$ezer_path_root/sess";
   $ezer_path_appl= "$ezer_path_root/$ezer_root";
