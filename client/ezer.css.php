@@ -480,6 +480,7 @@ button::-moz-focus-inner { border:0; padding:0; }
 .fa {
   font-family:FontAwesome,sans-serif !important; }
 button i.fa-red, a i.fa-red  { color:red }
+button i.fa-grey, a i.fa-grey  { color:grey }
 button:disabled i.fa-red { color:grey }
 input.Button {
   position:absolute; font-size:9pt; z-index:1; text-align:center; $button }

@@ -1,3 +1,136 @@
+// =======================================================================================> DEBUGGER
+// funkce debuggeru
+// ----------------------------------------------------------------------------- isElementInViewport
+function isElementInViewport(el) {
+  var rect= el.getBoundingClientRect();
+  return rect.bottom > 0 &&
+    rect.right > 0 &&
+    rect.left < (window.innerWidth || document. documentElement.clientWidth) /*or $(window).width() */ &&
+    rect.top < (window.innerHeight || document. documentElement.clientHeight) /*or $(window).height() */;
+}
+// -------------------------------------------------------------------------------- dbg_onshiftclick
+function dbg_onshiftclick(block) {
+  if ( !Ezer.options.dbg ) return false;
+  if ( !Ezer.sys.dbg ) Ezer.sys.dbg= {win:null,file:''};
+  var pos= block.app_file();
+  if ( pos.file ) {
+    var show= function() {
+      var lc= block.desc._lc.split(',');
+      var win= Ezer.sys.dbg.window;
+      win.focus();
+      var line= win.document.getElement('li.curr');
+      if ( line )
+        line.removeClass('curr');
+      line= win.document.getElementById(lc[0]);
+      if ( line && !isElementInViewport(line) )
+        line.scrollIntoView();
+      line.addClass('curr');
+    };
+    // zobrazení
+    Ezer.sys.dbg.start= block.self();
+    if ( pos.file==Ezer.sys.dbg.file ) {
+      show();
+    }
+    else {
+      var fname= pos.app+'/'+pos.file;
+      Ezer.sys.dbg.window= window.open('./ezer2.2/dbg.php?err=1&src='+fname,'dbg',
+        'width=650,height=700,resizable=1,titlebar=0,menubar=0');
+      if ( Ezer.sys.dbg.window ) {
+        Ezer.sys.dbg.file= pos.file;
+      };
+    }
+  }
+  return false;
+}
+// -------------------------------------------------------------------------------- dbg_onclick_line
+// op= stop+ | stop- | trace+ | trace- | dump
+function dbg_onclick_line(line,op) {
+  var found= null;
+  var type= op=='dump' ? 'var' : 'proc';
+  if ( Ezer.sys.dbg ) {
+    var walk = function(o,ln) {
+      if ( o.part ) for (var i in o.part) {
+        if ( found ) break;
+        var oo= o.part[i];
+        if ( oo.desc && oo.desc._lc && oo.type==type && oo.desc._lc.contains(ln) ) {
+          found= {id:i,block:oo};
+          break;
+        }
+        found= walk(oo,ln);
+        if ( !found && oo instanceof Ezer.Var && oo._of=='form' && oo.value ) {
+          found= walk(oo.value,ln);
+        }
+      }
+      return found;
+    };
+    var dbg= Ezer.sys.dbg;
+    dbg.line= line;
+    // nalezení Ezer.Block podle dbg.start
+    var ctx= [], known;
+    known= Ezer.run_name(dbg.start,null,ctx);
+    if ( known ) for (var i=ctx.length-1; i>=0; i--) {
+      var o= ctx[i];
+      if ( o.desc._file==dbg.file ) { // nejvyšší blok - budeme hledat řádek
+        found= walk(o,line+',');
+        if ( found ) {
+          dbg.id= found.id;
+          dbg.block= found.block;
+          break;
+        }
+      }
+    }
+    // upravení found - jen hodnotové var
+    if ( found && type=='var' && (found.block._of=='form' || found.block._of=='area')) {
+      found= null;
+    }
+    // vlastní ladící akce
+    if ( found ) switch (op) {
+      case 'dump':
+        if ( typeof dbg.block.value == "object" )
+          found.value= debug(dbg.block.value,dbg.id,3);
+        else
+          found.value= dbg.id+'='+dbg.block.value;
+        break;
+      case 'stop+':
+        dbg.block.proc_stop(1);
+        break;
+      case 'stop-':
+        dbg.block.proc_stop(0);
+        break;
+      case 'trace+':
+        dbg.block.proc_trace(1);
+        break;
+      case 'trace-':
+        dbg.block.proc_trace(0);
+        break;
+    }
+  }
+  return found;
+}
+// -------------------------------------------------------------------------------- dbg_onclick_text
+function dbg_onclick_text(el) {
+  return 1;
+}
+// ------------------------------------------------------------------------------- dbg_onclick_start
+function dbg_onclick_start(win) {
+  win= win ? win : window;
+  var dbg_src= win.document.getElementById('dbg_src');
+  if ( dbg_src ) {
+    dbg_src.addEvents({
+      click: function(el) {
+        var chs= el.target.getParent().getChildren(), x= 0;
+        for (var i=0; i<chs.length; i++) {
+          if ( chs[i]==el.target ) {
+            x= i+1;
+            break;
+          }
+        }
+        Ezer.fce.echo("line=",x);
+        return x;
+      }
+    })
+  }
+}
 // ================================================================================================= ZeroClipboard
 // ------------------------------------------------------------------------------------------------- clipboard
 // vloží text do schránky Windows pomocí podle http://code.google.com/p/zeroclipboard/

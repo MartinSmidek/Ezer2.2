@@ -1,18 +1,22 @@
 <?php
-
+  $text= '?';
   $item= $_GET['item'];
   // otevření databáze a tabulky
-//       'ezer_test'     => array(0,'localhost','gandi','','utf8'),
   $ezer_db= @mysql_connect('localhost','gandi','');
-  $res= @mysql_select_db('ezer_test',$ezer_db);
+//                                         echo "connect=$ezer_db";
+  $res= @mysql_select_db('ezer_kernel',$ezer_db);
+//                                         echo "db=$res";
   @mysql_query("SET NAMES 'utf8'");
-//   $trace.= "<br>mysql_pconnect=$ezer_db,$res";
-  $rt= @mysql_query("SELECT * FROM ezer_doc2 WHERE part='$item'");
+  $rt= @mysql_query("SELECT * FROM ezer_doc2 WHERE class='$item'");
+//                                         echo "query=$rt";
   if ( $rt && $t= mysql_fetch_object($rt) ) {
     $text= $t->text;
   }
 
+  echo_page($text);
+//                                         echo "text=$text";
 
+function echo_page($text) {
   // definice povinného začátku a konce HTML stránky
   $html_header= "\xEF\xBB\xBF";    // DOM pro UTF-8
   $html_header.= <<<__EOD
@@ -29,7 +33,7 @@
 //     }
 //     ask_help('me');
   </script>
-  <link charset="utf-8" media="screen" type="text/css" href="./ezer2.2/client/ezer.css.php" rel="stylesheet">
+  <link charset="utf-8" media="screen" type="text/css" href="./client/ezer.css.php" rel="stylesheet">
 </head>
 __EOD;
   // definice možných HTML template stránky
@@ -53,5 +57,5 @@ $html_header
 __EOD;
 
 echo $template;
-
+}
 ?>

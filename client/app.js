@@ -12,6 +12,7 @@ Ezer.loads= [];                 // kódy modulů přečtené jedním příkazem 
 Ezer.run= {};                   // běhové struktury
 Ezer.dbg= {stop:false};         // ladící struktury
 Ezer.design= false;             // design-mode
+Ezer.help_mode= false;          // help-mode
 Ezer.continuation= null;        // pokračování po stop-adrese
 Ezer.modal_fce= [];             // zásobník pro operaci 'j'
 Ezer.DOM= null;                 // uživatelská plocha
@@ -47,6 +48,12 @@ Ezer.const_value= function (id,val) {
   }
   return value;
 }
+// ----------------------------------------------------------------------------- ON unload
+window.addEvent('unload', function() {
+  if ( Ezer.sys.dbg && Ezer.sys.dbg.window ) {
+    Ezer.sys.dbg.window.close();
+  }
+});
 // ----------------------------------------------------------------------------- ON load
 window.addEvent('load', function() {
   Ezer.app= new Ezer.Application(Ezer.options);

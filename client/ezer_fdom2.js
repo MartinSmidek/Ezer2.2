@@ -564,6 +564,7 @@ Ezer.Item.implement({
       else {
         this.DOM_Block.addEvents({
           click: function(el) {
+            if ( el.shift ) return dbg_onshiftclick(this);  /* context.item */
             if ( !el.target.hasClass('disabled') ) {
               Ezer.fce.touch('block',this,'click');       // informace do _touch na server
               this.owner.ContextMenu.hide();
@@ -781,7 +782,8 @@ Ezer.PanelInTabs_add= function(panel) {
   var a= new Element('a',{href:href,html:title}).inject(
     new Element('div').inject(
       panel._tabDom= new Element('li',{styles:{display:'none'},events:{
-        click: function(event) {
+        click: function(el) {
+          if ( el.shift ) return dbg_onshiftclick(panel); /* panel */
           if ( !this.owner.activePanel
             || (this.owner.activePanel && !this.owner.activePanel.is_fixed) ) {
             // pokud panel není blokován proti ztrátě focusu
@@ -1023,13 +1025,21 @@ Ezer.Label.implement({
     if ( this.part && this.part.onclick ) {
       this.DOM_Block.addEvents({
         click: function(el) {
+          if ( el.shift ) return dbg_onshiftclick(this);  /* label with onclick */
           if ( !Ezer.design && (this.options.enabled || this.options.enabled===undefined) ) {
             Ezer.fce.touch('block',this,'click');           // informace do _touch na server
             this.fire('onclick',[],el);
           }
         }.bind(this)
       })
-    };
+    }
+    else if ( Ezer.options.dbg ) {
+      this.DOM_Block.addEvents({
+        click: function(el) {
+          if ( el.shift ) return dbg_onshiftclick(this);  /* label (dbg only) */
+        }.bind(this)
+      })
+    }
   },
 // ------------------------------------------------------- Label.DOM_set
   DOM_set: function (str) {
@@ -1413,6 +1423,7 @@ Ezer.Button.implement({
 //           }
 //         }.bind(this)
         click: function(el) {
+          if ( el.shift ) return dbg_onshiftclick(this); /* button */
           (function(el){
             el.stopPropagation();
             if ( !Ezer.design ) {
@@ -1567,6 +1578,7 @@ Ezer.Elem.implement({
   DOM_ElemEvents: function (no_focus_blur) {
     this.DOM_Input.addEvents({
       click: function(el) {
+        if ( el.shift ) return dbg_onshiftclick(this); /* element */
         if ( el && el.control ) {
           Ezer.fce.source(this);
           return false;
@@ -1744,7 +1756,8 @@ Ezer.FieldList.implement({
       ? new Element('button',{'class':'fa', html:"<i class='fa fa-ellipsis-h'></i>",tabindex:-1})
       : new Element('img',{align:'right',src:Ezer.version+'/client/img/field_list.gif'});
     this.DOM_Button.inject(this.DOM_Closure).addEvents({
-      click: function() {
+      click: function(el) {
+        if ( el.shift ) return dbg_onshiftclick(this);  /* filedlist */
         if ( this.DOM_Input.hasClass('empty') ) {
           this.DOM_Input.value= this.value;
           this.DOM_Input.removeClass('empty').addClass('empty_focus');
@@ -2208,6 +2221,7 @@ Ezer.Chat.implement({
     this.DOM_Hist.adopt(
       elem= new Element('div',{'class':'Chat_1', tabIndex:-1, html:head, events:{
         click: function(el) {
+          if ( el.shift ) return dbg_onshiftclick(this);  /* chat */
           $clear(timer);
           timer= (function(){
 //             this.DOM_Input.value= el.target.getNext().innerHTML;
@@ -2326,14 +2340,20 @@ Ezer.Select.implement({
 //           ( this.multi ? 'fa-angle-double-down' : 'fa-chevron-down');
         this.DOM_Button= new Element('button',{'class':'fa', html:"<i class='fa "+fa+"'></i>",tabindex:-1,
           events:this.skill==2? {
-            click: function() {this.DOM_Input.focus();}.bind(this)
+            click: function(el) {
+              if ( el.shift ) return dbg_onshiftclick(this); /* select */
+              this.DOM_Input.focus();
+            }.bind(this)
         }:{}}).inject(this.DOM_Closure);
       }
       else {
         // varianta s obrázkem šipky
         var src= this.type=='select.auto' ? 'select_auto.gif' : 'select.gif';
           new Element('img',{align:'right',src:Ezer.version+'/client/img/'+src,events:this.skill==2? {
-            click: function() {this.DOM_Input.focus();}.bind(this)
+            click: function(el) {
+              if ( el.shift ) return dbg_onshiftclick(this); /* select */
+              this.DOM_Input.focus();
+            }.bind(this)
           }:{}}).inject(this.DOM_Closure);
       }
     }
@@ -2874,6 +2894,7 @@ Ezer.Browse.implement({
             this.DOM_head= new Element('tr').adopt(
               this.DOM_reload= new Element('td',{'class':'tag0',styles:{width:8}, events:{
                 click: function(el) {
+                  if ( el.shift ) return dbg_onshiftclick(this); /* browse */
                   // znovu načti obsah, pokud je povoleno
                   if ( this.DOM_reload.hasClass('BrowseReload') )
                     this._ask_queries(true,old_key= this.browse_key());
@@ -3005,6 +3026,7 @@ Ezer.Browse.implement({
           return false;
         }.bind(this),
         click: function(el) {
+          if ( el.shift ) return dbg_onshiftclick(this); /* browse */
           if ( this.enabled ) {
             Ezer.fce.touch('block',this,'click');         // informace do _touch na server
             var tr= el.target.tagName=='TD' ? el.target.parentNode : el.target;

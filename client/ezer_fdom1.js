@@ -1307,34 +1307,24 @@ Ezer.Help= new Class({
             return false;
           }.bind(this),
           click:  function(ev) {
-//             if ( Ezer.help.dbg && this._helpIn ) {
-//               Ezer.help.block= this;
-//                                                     Ezer.trace('*','context: '+this.self()+'/'+this._helpIn);
-//               Ezer.help.dbg= false;
-//               Ezer.run.$.helpBlock(0);
-//               var dom= Ezer.help.dom(this);
-//               if ( dom ) {
-//                 dom.addClass('dbg_context');
-//               }
-//             }
-//             else {
                                                     Ezer.trace('*','click: '+this.self());
-            if ( Ezer.sys.dbg.file ) {
+            if ( Ezer.help_mode && Ezer.sys.dbg.file ) {
               var pos= this.app_file();
               if ( Ezer.sys.dbg && pos.file==Ezer.sys.dbg.file && Ezer.sys.dbg.window ) {
                 var lc= this.desc._lc.split(',');
-                var dbg= Ezer.sys.dbg.window.document;
-                var line= dbg.getElement('li.curr');
+                var win= Ezer.sys.dbg.window;
+                if ( ev.shift )
+                  win.focus();
+                var line= win.document.getElement('li.curr');
                 if ( line )
                   line.removeClass('curr');
-                line= dbg.getElementById(lc[0]);
+                line= win.document.getElementById(lc[0]);
                 line.scrollIntoView();
                 line.addClass('curr');
               }
+              return ev.shift;   // při drženém Shift pošle click dál
             }
-//               Ezer.App.edit_source(this);
-//             }
-            return ev.control;   // při drženém Ctrl pošle cklick dál
+            return true;
           }.bind(this)
         });
       }

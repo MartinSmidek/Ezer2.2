@@ -1112,7 +1112,7 @@ Ezer.Block= new Class({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  helpBlock
 // zahájení a ukončení help modu tzn. zviditelňování programátorských informací
   helpBlock: function(on,root_too) {
-    Ezer.design= on;
+    Ezer.help_mode= on;
     if ( root_too && this._helpThis )
       this._helpThis(on);
     if ( this.part)
@@ -1795,7 +1795,7 @@ Ezer.Var= new Class({
   initialize: function(owner,desc,DOM,id) {
     this.parent(owner,desc,DOM,id);
     this._of= desc._of;
-    if ( this.options.value ) {
+    if ( this.options.value!=undefined ) {
       // proměnná má počáteční hodnotu
       this.value= this.options.value;
     }
@@ -2132,9 +2132,13 @@ Ezer.Proc= new Class({
     this.prior= this.options && this.options.prior ? this.options.prior : 0;
     this.context= context;
     this.stop= 0;
+    this.trace= 0;
   },
   proc_stop: function(on) {
     this.stop= on;
+  },
+  proc_trace: function(on) {
+    this.trace= on;
   },
   reinitialize: function(desc) {
     this.code= desc.code;
@@ -4410,6 +4414,11 @@ Ezer.SelectMap= new Class({
         ,'map_pipe:'+this.options.map_pipe+' je chybné jméno map',this);
       this.map_pipe= m[0];
     }
+    for (var key in this.Items) {
+      this._key= this.multi ? [key] : key;
+      this.key(this._key);
+      break;
+    }
     return true;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _check
@@ -4576,6 +4585,12 @@ Ezer.List= new Class({
     this.part= {};
     this.last= -1;
     return 1;
+  },
+// ------------------------------------------------------------------------------------ get
+//fm: List.get ()
+//      vrátí počet řádků elementů v seznamu
+  get: function () {
+    return this.last+1;
   },
 // ------------------------------------------------------------------------------------ add
 //fm: List.add ()
@@ -4872,7 +4887,8 @@ Ezer.Browse= new Class({
 //      vynuluj klíče a tabulku
 //e: onblur
   browse_init: function () {
-    this.browse_fill('');               // vyprázdnění
+    this.browse_fill('','',0,'','','');  // vyprázdnění
+    this.css= {};
     this.blur();
     return 1;
   },
@@ -6790,7 +6806,8 @@ Ezer.Eval= new Class({
                   this.trace_proc(cc.s,this.context.id+(cc.o=='C'?'.desc.':'.')+cc.i,
                     this.proc,this.nargs,this.nvars,'E',cc.i);
                 else if ( Ezer.is_trace.T && this.proc.trace )
-                  this.trace_proc(cc.s,this.context.id+'.'+cc.i,this.proc,this.nargs,this.nvars,'T');
+                  this.trace_proc(cc.s,'>'+this.context.id+(cc.o=='C'?'.desc.':'.')+cc.i,
+                    this.proc,this.nargs,this.nvars,'T',cc.i);
               }
               if ( this.step || this.proc.stop || this.proc.desc && this.proc.desc.stop ) {
                 this.trace_proc(cc.s,'>>>STOP '+this.context.id+'.'+cc.i,this.proc,this.nargs,this.nvars,'T');
@@ -7101,6 +7118,9 @@ Ezer.Eval= new Class({
         // konec tohoto kódu
         if ( this.calls.length>0 ) {
           // pokud je to konec vnořené procedury, odstraň argumenty
+          if ( Ezer.is_trace.T && this.proc.trace )
+            this.trace_proc(cc.s,'&lt;'+this.context.id+(cc.o=='C'?'.desc.':'.')+this.proc.id,
+              this.proc,this.nargs,this.nvars,'T',cc.i);
           this.top= this.act-this.nargs-this.nvars;
           var last= this.calls.pop();
           this.code= last.code;
