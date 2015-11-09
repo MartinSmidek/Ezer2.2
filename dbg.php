@@ -190,33 +190,33 @@ function html_closure($win_name,$notes,$source) {
                 found= opener.dbg_onclick_line(x.ln,'stop-');
                 if ( found ) x.chs[x.ln-1].removeClass('break');
                 return false;
-            }],
-            ['-oprav text', function(el) {
-                if ( !open ) {
-                  for (var i=0; i<x.chs.length; i++) {
-                    var text= x.chs[i].getElement('span.text');
-                    text.contentEditable= true;
-                  }
-                  open= true;
-                  $('src').focus();
-                }
-                return false;
-            }],
-            ['ulož text', function(el) {
-                if ( open ) {
-                  var ln= [], iln= 0;
-                  for (var i=0; i<x.chs.length; i++) {
-                    var text= x.chs[i].getElement('span.text');
-                    text.contentEditable= false;
-                    var tt= text.textContent.split("\\n");
-                    for (t of tt) {
-                      ln[iln++]= t;
-                    }
-                  }
-                  open= false;
-                  dbg_show_text(ln);
-                }
-                return false;
+//             }],
+//             ['-oprav text', function(el) {
+//                 if ( !open ) {
+//                   for (var i=0; i<x.chs.length; i++) {
+//                     var text= x.chs[i].getElement('span.text');
+//                     text.contentEditable= true;
+//                   }
+//                   open= true;
+//                   $('src').focus();
+//                 }
+//                 return false;
+//             }],
+//             ['ulož text', function(el) {
+//                 if ( open ) {
+//                   var ln= [], iln= 0;
+//                   for (var i=0; i<x.chs.length; i++) {
+//                     var text= x.chs[i].getElement('span.text');
+//                     text.contentEditable= false;
+//                     var tt= text.textContent.split("\\n");
+//                     for (t of tt) {
+//                       ln[iln++]= t;
+//                     }
+//                   }
+//                   open= false;
+//                   dbg_show_text(ln);
+//                 }
+//                 return false;
             }]
           ],arguments[0]);
         }

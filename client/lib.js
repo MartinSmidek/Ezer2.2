@@ -34,7 +34,7 @@ function dbg_onshiftclick(block) {
     else {
       var fname= pos.app+'/'+pos.file;
       Ezer.sys.dbg.window= window.open('./ezer2.2/dbg.php?err=1&src='+fname,'dbg',
-        'width=650,height=700,resizable=1,titlebar=0,menubar=0');
+        'width=770,height=500,resizable=1,titlebar=0,menubar=0');
       if ( Ezer.sys.dbg.window ) {
         Ezer.sys.dbg.file= pos.file;
       };
