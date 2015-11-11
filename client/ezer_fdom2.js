@@ -3858,7 +3858,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs,db) {
   if ( !Ezer.obj.DOM.help ) {
     Ezer.obj.DOM.help= {};
     var _w= Ezer.options.help && Ezer.options.help.width || 500;
-    var _h= Ezer.options.help && Ezer.options.help.height || 300;
+    var _h= Ezer.options.help && Ezer.options.help.height || 400;
     var dotaz= null, options= {draggable:true, closeOnClickOut:true,
       relativeTo:document.id('work'), position:'upperLeft',
       content:StickyWin.ui('HELP: informace, otázky a odpovědi k této kartě','',{

@@ -4888,7 +4888,7 @@ Ezer.Browse= new Class({
 //e: onblur
   browse_init: function () {
     this.browse_fill('','',0,'','','');  // vyprázdnění
-    this.css= {};
+    //this.css= {};
     this.blur();
     return 1;
   },
