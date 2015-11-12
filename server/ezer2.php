@@ -2392,4 +2392,31 @@ function cz2ascii($x,$but='') {
   }
   return $z;
 }
+# ========================================================================================> DEBUGGER
+# ---------------------------------------------------------------------------------------- save_file
+function save_file($path,$text) {
+  $ok= 0;
+  if ( file_exists($path) ) {
+    // nejprve zkopíruj současnou verzi s časovým razítkem
+    $sgn= date('YmdHi');
+    $lom= strrpos($path,'/');
+    $path2= substr($path,0,$lom).'/@'.substr($path,$lom).".$sgn";
+    copy($path,$path2);
+    // potom ulož novou verzi
+    $ok= file_put_contents($path,$text);
+  }
+  return "$ok, saved:$path2";
+}
+# ---------------------------------------------------------------------------------------- item_help
+function item_help($item) {
+  // otevření databáze a tabulky
+  $ezer_db= @mysql_connect('localhost','gandi','');
+  $res= @mysql_select_db('ezer_kernel',$ezer_db);
+  @mysql_query("SET NAMES 'utf8'");
+  $rt= mysql_query("SELECT * FROM ezer_kernel.ezer_doc2 WHERE '$item' IN (class,part)");
+  if ( $rt && $t= mysql_fetch_object($rt) ) {
+    $html= $t->text;
+  }
+  return $html;
+}
 ?>

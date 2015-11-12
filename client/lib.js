@@ -1,50 +1,63 @@
-// =======================================================================================> DEBUGGER
-// funkce debuggeru
-// ----------------------------------------------------------------------------- isElementInViewport
-function isElementInViewport(el) {
-  var rect= el.getBoundingClientRect();
-  return rect.bottom > 0 &&
-    rect.right > 0 &&
-    rect.left < (window.innerWidth || document. documentElement.clientWidth) /*or $(window).width() */ &&
-    rect.top < (window.innerHeight || document. documentElement.clientHeight) /*or $(window).height() */;
+// ================================================================================> DEBUGGER REMOTE
+// funkce debuggeru - volané z dbg.php
+// ------------------------------------------------------------------------------------ dbg_onunload
+// DBG - voláno z dbg.php
+// zavření okna
+function dbg_onunload(block) {
+//   Ezer.sys.dbg= {window:null,file:''};
 }
-// -------------------------------------------------------------------------------- dbg_onshiftclick
-function dbg_onshiftclick(block) {
-  if ( !Ezer.options.dbg ) return false;
-  if ( !Ezer.sys.dbg ) Ezer.sys.dbg= {win:null,file:''};
-  var pos= block.app_file();
-  if ( pos.file ) {
-    var show= function() {
-      var lc= block.desc._lc.split(',');
-      var win= Ezer.sys.dbg.window;
-      win.focus();
-      var line= win.document.getElement('li.curr');
-      if ( line )
-        line.removeClass('curr');
-      line= win.document.getElementById(lc[0]);
-      if ( line && !isElementInViewport(line) )
-        line.scrollIntoView();
-      line.addClass('curr');
-    };
-    // zobrazení
-    Ezer.sys.dbg.start= block.self();
-    if ( pos.file==Ezer.sys.dbg.file ) {
-      show();
-    }
-    else {
-      var fname= pos.app+'/'+pos.file;
-      Ezer.sys.dbg.window= window.open('./ezer2.2/dbg.php?err=1&src='+fname,'dbg',
-        'width=770,height=500,resizable=1,titlebar=0,menubar=0');
-      if ( Ezer.sys.dbg.window ) {
-        Ezer.sys.dbg.file= pos.file;
-      };
-    }
-  }
-  return false;
+// -------------------------------------------------------------------------------------- dbg_onsave
+// DBG - voláno z dbg.php
+function dbg_onsave(url,source) { Ezer.fce.echo("save "+url);//+"<hr>"+source);
+  dbg_ask('save_file',[url,source],_dbg_onsave);
 }
-// -------------------------------------------------------------------------------- dbg_onclick_line
+function _dbg_onsave(y) { //Ezer.fce.echo(Ezer.fce.debug(y,"saved"));
+  Ezer.fce.echo(y.value);
+  return y.value;
+}
+// ---------------------------------------------------------------------------------------- dbg_help
+// dotaz na server o help pro daný item
+function dbg_help (item) {
+  dbg_ask('item_help',[item],_dbg_help);
+}
+function _dbg_help(y) { //Ezer.fce.echo(Ezer.fce.debug(y,"help"));
+  Ezer.fce.echo(y.value);
+  Ezer.sys.dbg.window.dbg_show_help(y.value)
+  return y.value;
+}
+// ----------------------------------------------------------------------------------------- dbg_ask
+// dotaz na server se jménem funkce po dokončení
+function dbg_ask (fce,args,then) {
+  x= {cmd:'ask',fce:fce,args:args,nargs:args.length};
+  x.root= Ezer.root;                  // název/složka aplikace
+  x.app_root= Ezer.app_root;          // {root].inc je ve složce aplikace
+  x.session= Ezer.options.session;    // způsob práce se SESSION
+  var ajax= new Request({url:Ezer.App.options.server_url, data:x, method: 'post',
+    onSuccess: function(ay) {
+      Ezer.App._ajax(-1);
+      var y;
+      try { y= JSON.decode(ay); } catch (e) { y= null; }
+      if ( !y  )
+        Ezer.error('ASK(dbg): syntaktická chyba v PHP na serveru:'+ay,'C');
+      else if ( y.error )
+        Ezer.error(y.error,'C');
+      else {
+        if ( y.trace ) Ezer.trace('u',y.trace);
+        then.bind(this)(y);
+      }
+    }.bind(this),
+    onFailure: function(xhr) {
+      Ezer.error('SERVER failure (dbg)','C');
+    }
+  });
+  ajax.send();
+  Ezer.App._ajax(1);
+}
+// ------------------------------------------------------------------------------- dbg_oncontextmenu
+// DBG - voláno z dbg.php
+// akce kontextového menu na určitém řádku
 // op= stop+ | stop- | trace+ | trace- | dump
-function dbg_onclick_line(line,op) {
+function dbg_oncontextmenu(line,op) {
   var found= null;
   var type= op=='dump' ? 'var' : 'proc';
   if ( Ezer.sys.dbg ) {
@@ -106,6 +119,51 @@ function dbg_onclick_line(line,op) {
     }
   }
   return found;
+}
+// =================================================================================> DEBUGGER LOCAL
+// funkce debuggeru - volané z aplikace
+// ----------------------------------------------------------------------------- isElementInViewport
+function isElementInViewport(el) {
+  var rect= el.getBoundingClientRect();
+  return rect.bottom > 0 &&
+    rect.right > 0 &&
+    rect.left < (window.innerWidth || document. documentElement.clientWidth) /*or $(window).width() */ &&
+    rect.top < (window.innerHeight || document. documentElement.clientHeight) /*or $(window).height() */;
+}
+// -------------------------------------------------------------------------------- dbg_onshiftclick
+function dbg_onshiftclick(block) {
+  if ( !Ezer.options.dbg ) return false;
+  if ( !Ezer.sys.dbg )
+    Ezer.sys.dbg= {window:null,file:''};
+  var pos= block.app_file();
+  if ( pos.file ) {
+    var show= function() {
+      var lc= block.desc._lc.split(',');
+      var win= Ezer.sys.dbg.window;
+      win.focus();
+      var line= win.document.getElement('li.curr');
+      if ( line )
+        line.removeClass('curr');
+      line= win.document.getElementById(lc[0]);
+      if ( line && !isElementInViewport(line) )
+        line.scrollIntoView();
+      line.addClass('curr');
+    };
+    // zobrazení
+    Ezer.sys.dbg.start= block.self();
+    if ( pos.file==Ezer.sys.dbg.file ) {
+      show();
+    }
+    else {
+      var fname= pos.app+'/'+pos.file;
+      Ezer.sys.dbg.window= window.open('./ezer2.2/dbg.php?err=1&src='+fname,'dbg',
+        'width=770,height=500,resizable=1,titlebar=0,menubar=0');
+      if ( Ezer.sys.dbg.window ) {
+        Ezer.sys.dbg.file= pos.file;
+      };
+    }
+  }
+  return false;
 }
 // -------------------------------------------------------------------------------- dbg_onclick_text
 function dbg_onclick_text(el) {

@@ -22,17 +22,18 @@
     $lnx= htmlentities($ln);
     $i1= $i+1;
     $iii= str_pad($i1,4,' ',STR_PAD_LEFT);
-    $html.= "\n<li id='$i1'><span class='line'>$iii</span><span class='text'>$lnx</span></li>";
+    if ( !$lnx ) $lnx= ' ';
+    $html.= "\n<li id='$i1'><span class='line'>$iii</span><span class='text' spellcheck='false'>$lnx</span></li>";
     // detekce dokumentace
     $note= strpos($ln,'==>');
     if ( $note ) {
       $notes.= "\n<li id='N_$i1'>".substr($ln,$note+3)."</li>";
     }
   }
-  $html= html_closure($src,$notes,$html);
+  $html= html_closure($src,$notes,$html,$src_ezer);
   echo $html;
 // ------------------------------------------------------------------------------------ html_closure
-function html_closure($win_name,$notes,$source) {
+function html_closure($win_name,$notes,$source,$url) {
   $html= <<<__EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
@@ -48,14 +49,30 @@ function html_closure($win_name,$notes,$source) {
     <script src="client/lib.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
 // =====================================================================================> JAVASCRIPT
+  var url= "$url";
   var log;
   var open= false;
+  var help;
+// ----------------------------------------------------------------------------------------- ON load
   window.addEvent('load', function() {
     log= $('log');
+    help= $('help');
     $('body').addEvents({
-      'click': function() { log.setStyles({display:'none'}); }
+      'click': function() { log.setStyles({display:'none'}); help.setStyles({display:'none'}); }
     });
   });
+// --------------------------------------------------------------------------------------- ON unload
+  window.addEvent('unload', function() {
+    opener.dbg_onunload();
+  });
+// ----------------------------------------------------------------------------------- dbg_show_help
+  function dbg_show_help(html) {
+    help.innerHTML= html;
+  }
+// ----------------------------------------------------------------------------------- dbg_save_text
+  function dbg_save_text(source) {
+    opener.dbg_onsave(url,source);
+  }
 // ----------------------------------------------------------------------------------- dbg_show_text
   function dbg_show_text(ln) {
     // odstraň src
@@ -148,7 +165,12 @@ function html_closure($win_name,$notes,$source) {
         var ln= el.target.id.substr(2);
         var line= win.document.getElementById(ln);
         line.scrollIntoViewIfNeeded();
-        var pick= win.document.getElement('li.pick');
+        // zvýraznění poznámky
+        var pick= win.document.getElement('li.note_pick');
+        if ( pick ) pick.removeClass('note_pick');
+        el.target.addClass('note_pick');
+        // zvýraznění v textu
+        pick= win.document.getElement('li.pick');
         if ( pick ) pick.removeClass('pick');
         line.addClass('pick');
       }
@@ -161,12 +183,12 @@ function html_closure($win_name,$notes,$source) {
         if ( x.ln ) {
           Ezer.fce.contextmenu([
             ['zjisti hodnotu', function(el) {
-                found= opener.dbg_onclick_line(x.ln,'dump');
+                found= opener.dbg_oncontextmenu(x.ln,'dump');
                 dbg_touch(found ? found.value : '?',menu_el)
                 return false;
             }],
             ['-nastav trasování', function(el) {
-                found= opener.dbg_onclick_line(x.ln,'trace+');
+                found= opener.dbg_oncontextmenu(x.ln,'trace+');
                 if ( found ) {
                   dbg_touch('proc '+found.id,menu_el)
                   x.chs[x.ln-1].addClass('trace');
@@ -174,12 +196,12 @@ function html_closure($win_name,$notes,$source) {
                 return false;
             }],
             ['zruš trasování', function(el) {
-                found= opener.dbg_onclick_line(x.ln,'trace-');
+                found= opener.dbg_oncontextmenu(x.ln,'trace-');
                 if ( found ) x.chs[x.ln-1].removeClass('trace');
                 return false;
             }],
             ['-zastopuj proceduru', function(el) {
-                found= opener.dbg_onclick_line(x.ln,'stop+');
+                found= opener.dbg_oncontextmenu(x.ln,'stop+');
                 if ( found ) {
                   dbg_touch('proc '+found.id,menu_el)
                   x.chs[x.ln-1].addClass('break');
@@ -187,36 +209,40 @@ function html_closure($win_name,$notes,$source) {
                 return false;
             }],
             ['uvolni proceduru', function(el) {
-                found= opener.dbg_onclick_line(x.ln,'stop-');
+                found= opener.dbg_oncontextmenu(x.ln,'stop-');
                 if ( found ) x.chs[x.ln-1].removeClass('break');
                 return false;
-//             }],
-//             ['-oprav text', function(el) {
-//                 if ( !open ) {
-//                   for (var i=0; i<x.chs.length; i++) {
-//                     var text= x.chs[i].getElement('span.text');
-//                     text.contentEditable= true;
-//                   }
-//                   open= true;
-//                   $('src').focus();
-//                 }
-//                 return false;
-//             }],
-//             ['ulož text', function(el) {
-//                 if ( open ) {
-//                   var ln= [], iln= 0;
-//                   for (var i=0; i<x.chs.length; i++) {
-//                     var text= x.chs[i].getElement('span.text');
-//                     text.contentEditable= false;
-//                     var tt= text.textContent.split("\\n");
-//                     for (t of tt) {
-//                       ln[iln++]= t;
-//                     }
-//                   }
-//                   open= false;
-//                   dbg_show_text(ln);
-//                 }
-//                 return false;
+            }],
+            ['-oprav text', function(el) {
+                if ( !open ) {
+                  for (var i=0; i<x.chs.length; i++) {
+                    var text= x.chs[i].getElement('span.text');
+                    text.contentEditable= true;
+                  }
+                  open= true;
+                  $('src').focus();
+                }
+                return false;
+            }],
+            ['ulož text', function(el) {
+                if ( open ) {
+                  var ln= [], iln= 0, source= '';
+                  for (var i=0; i<x.chs.length; i++) {
+                    var text= x.chs[i].getElement('span.text');
+                    text.contentEditable= false;
+                    var childs= text.childNodes;
+                    for (var j= 0; j<childs.length; j++ ) {
+                      if ( Browser.name=='chrome' || childs[j].nodeType==3 ) {
+                        ln[iln++]= childs[j].textContent;
+                      }
+                    }
+                  }
+                  source= ln.join("\\n");
+                  open= false;
+                  dbg_save_text(source);
+                  dbg_show_text(ln);
+                }
+                return false;
             }]
           ],arguments[0]);
         }
@@ -227,26 +253,42 @@ function html_closure($win_name,$notes,$source) {
         var x= dbg_context(el.target), sel= window.getSelection(), range= sel.getRangeAt(0);
         var text= range ? range.startContainer.data.substring(range.startOffset,range.endOffset) : '';
         if ( text ) {
-          var url= "./help.php?item="+text;
-          var help= window.document.open(url,'help','width=400,height=400,resizable=1,titlebar=0,menubar=0');
+          help.setStyles({display:'block'});
+          help.set('text',text);
+          opener.dbg_help(text);
         }
       },
       // ---------------------------- klávesnice při opravě zdrojového textu
       keydown: function(event) {
+        var line= event.target.getParent(), clmn= get_caret(), text;
         switch (event.key) {
-        case 'backspace':   // zrušit hledací vzory
-          var char= window.getSelection().getRangeAt(0).startOffset;
-          if ( char==0 ) {
-            var text= event.target.innerText;
-            var li= event.target.getParent();
-            if ( li ) {
-              var li2= li.previousElementSibling;
-              var span= li2.getElement('span.text');
-              var end= span.innerText.length;
-              span.innerText+= text;
-              li.destroy();
-              placeCaretAt(span,end);
-            }
+        case 'up':              // arrow-up:    předchozí řádek, stejný sloupec
+          line= line.previousElementSibling;
+          if ( line ) {
+            text= line.getElement('span.text')
+            line.focus();
+            set_caret(text,clmn);
+            event.stop();
+          }
+          break;
+        case 'down':            // arrow-down:  další řádek, stejný sloupec
+          line= line.nextElementSibling;
+          if ( line ) {
+            text= line.getElement('span.text')
+            line.focus();
+            set_caret(text,clmn);
+            event.stop();
+          }
+          break;
+        case 'backspace':       // backspace:   na začátku řádku spojit s předchozím
+          if ( clmn==0 && line.id!='1' ) {
+            var line2= line.previousElementSibling;
+            var text2= line2.getElement('span.text');
+            var clmn2= text2.innerText.length;
+            text= line.getElement('span.text')
+            text2.innerText+= text.innerText;
+            line.destroy();
+            set_caret(text2,clmn2);
             event.stop();
           }
           break;
@@ -255,52 +297,83 @@ function html_closure($win_name,$notes,$source) {
       }
     })
   };
-  function placeCaretAt(node,caret) {
+  function myTrimRight(x) {
+    return x.replace(/ +$/gm,'');
+  }
+  function get_caret() {
+    return window.getSelection().getRangeAt(0).startOffset;
+  }
+  function set_caret(node,caret) {
     node.focus();
     var textNode= node.firstChild;
-    var range= document.createRange();
-    range.setStart(textNode, caret);
-    range.setEnd(textNode, caret);
-    var sel= window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
+    if ( textNode ) {
+      var clmn= Math.min(caret,textNode.length);
+      var range= document.createRange();
+      range.setStart(textNode, clmn);
+      range.setEnd(textNode, clmn);
+      var sel= window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
   }
 // =========================================================================================> STYLES
     </script>
     <style>
       body {
         font-size: 8pt; font-family: monospace,consolas; overflow: hidden; }
+      li {
+        white-space: pre; list-style-type: none; text-overflow: ellipsis; overflow: hidden; }
+      /* ----------------------- help */
+      div#help {
+        position: fixed; right: 30px; top: 25px; width: 300px; min-height: 100px;
+        background-color: #eee; border: 1px solid #aaa; z-index: 2;
+        overflow-y: auto; max-height: 50%; display: none; }
+      /* ----------------------- notes */
       ul#notes {
-        padding: 0; margin-top: 5px;
+        padding: 0; margin-top: 10px;
         left: 0; width: 120px; position: absolute;}
       #notes li {
         cursor: alias; }
+      /* ----------------------- source */
+      #source {
+        position: fixed; right: 10px; top: 2px; font-size: 16px; color: lightgray;}
       div#src {
         padding: 0; margin-top: 5px; overflow: scroll; height: 100%;
         left: 120px; right: 0px; position: absolute;}
       #src ul {
         padding: 0; margin-top: 5px; }
-      li {
-        white-space: pre; list-style-type: none; text-overflow: ellipsis; overflow: hidden; }
+      li span.text {
+        margin-left:40px; display: block; }
+      li span.text[contenteditable=true] {
+        word-wrap: inherit; outline: none; }
+      li span.text[contenteditable=true]:focus {
+        background-color:#ffa; }
+      /* ----------------------- lines */
       li span.line {
         position: absolute;
         background-color: silver; vertical-align: top; padding-right: 5px; margin-right: 5px;
         width: 24px; text-align: right;  }
-      li span.text {
-        margin-left:40px; display: block; }
-      li span.text[contenteditable=true] {
-        word-wrap: inherit; }
+      /* ----------------------- break */
+      li span.line {
+        position: absolute;
+        background-color: silver; vertical-align: top; padding-right: 5px; margin-right: 5px;
+        width: 24px; text-align: right;  }
       li.break span {
         background-color: darkred;
         color: yellow; }
+      /* ----------------------- trace */
+      li span.line {
+        position: absolute;
+        background-color: silver; vertical-align: top; padding-right: 5px; margin-right: 5px;
+        width: 24px; text-align: right;  }
       li.trace {
         background-color: silver; }
       li.curr {
         background-color: orange; }
       li.pick {
         background-color: yellow; }
-      #source {
-        position: fixed; right: 10px; top: 2px; font-size: 16px; color: lightgray;}
+      li.note_pick {
+        background-color: yellow; }
       /* ----------------------- debug */
       #log {
         position:absolute; display: none; background-color:#eee; box-shadow:5px 5px 10px #567;
@@ -340,6 +413,7 @@ function html_closure($win_name,$notes,$source) {
     </style>
   </head>
   <body id='body' onload="dbg_onclick_start()" style="background-color:oldlace;">
+    <div id="help">...</div>
     <div id="source">$win_name</div>
     <ul id='notes'>$notes</ul>
     <div id='src'>

@@ -344,10 +344,10 @@ Ezer.Area= new Class({
             var fid= node.id.split('.');
             var idn= fid[fid.length-1];
 //             var node_id= node.id.split('.');
-            if ( node.data.pos ) {
-              Ezer.sys.dbg= {app:node.data.pos.app,file:node.data.pos.file,
-                start:node.data.pos.start,start_lc:node.data.pos.lc||''};
-            }
+//             if ( node.data.pos ) {
+//               Ezer.sys.dbg= {app:node.data.pos.app,file:node.data.pos.file,
+//                 start:node.data.pos.start,start_lc:node.data.pos.lc||''};
+//             }
             if ( context )
               this.fire('tree_oncontextmenu',[node.id,idn,node.data,ndata,adata,texts,node.text]);
             else
