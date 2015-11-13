@@ -9,6 +9,8 @@ Ezer.code= {};                  // kód modulů stažený ze serveru jako celkov
 Ezer.file= {};                  // kód modulů jako seznam podle jména souborů
 Ezer.loads= [];                 // kódy modulů přečtené jedním příkazem load_code2
                                 // [ {name:složené_jméno,app:aplikace,code:kód}... ]
+Ezer.login= function() {};      // funkce volané po přihlášení
+Ezer.logout= function() {};     // a odhlášení z aplikace
 Ezer.run= {};                   // běhové struktury
 Ezer.dbg= {stop:false};         // ladící struktury
 Ezer.design= false;             // design-mode
@@ -85,7 +87,7 @@ Ezer.pushState = Ezer.browser=='IE'
       }
       history.pushState(null,null,href);
     }
-// ================================================================================================= ClientCide - úpravy
+// ============================================================================> ClientCide - úpravy
 Locale.use('cs-CZ');
 Element.NativeEvents = $merge(Element.NativeEvents, {dragover:2, dragleave:2, drop:2});
 Element.implement({
@@ -99,7 +101,7 @@ Element.implement({
   }
 });
 Clientcide.setAssetLocation(Ezer.paths.images_cc);
-// ================================================================================================> Google
+// =========================================================================================> Google
 // propojení s API Google Disk, v {root}.php musí být definováno
 //   $options= (object)array('Google' => "{CLIENT_ID:'...'}",...)
 // a připojen skript: https://apis.google.com/js/client.js?onload=Ezer.Google.ApiLoaded
@@ -158,7 +160,7 @@ Ezer.Google= {
     });
   }
 };
-// ================================================================================================= Application
+// ====================================================================================> Application
 //c: Application ([options])
 //      základní třída aplikace
 //s: system
@@ -274,6 +276,7 @@ Ezer.Application.implement({
         this.status= 'loading';
         this.clear();
         this.ask({cmd:'user_login',uname:Ezer.sys.user.username,pword:Ezer.sys.pword},'logged')
+        Ezer.sys.pword= "**********";
       }
     }
     else {

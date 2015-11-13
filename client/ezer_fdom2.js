@@ -215,6 +215,7 @@ Ezer.MenuMain.implement({
             events:{
               click: function(event) {
                 Ezer.fce.touch('logout');
+                Ezer.onlogout();
               }.bind(desc)
             }
           }).inject(this._menuDom)));

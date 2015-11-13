@@ -5,7 +5,7 @@
 Ezer.is_trace= {};                              // zapínání typů trasování
 Ezer.is_dump= {};                               // zapínání typů výpisů
 Ezer.Application= new Class({
-  // ----------------------------------------------------------------------------------------------- DOM...
+  // ---------------------------------------------------------------------------------------- DOM...
   domApp: null,    // aplikace
   domTitle: null,  // název aplikace
   domTFoot: null,  // patička
@@ -133,7 +133,9 @@ Ezer.Application= new Class({
       var bw= {body:$('body').getSize(),screen:{x:screen.width,y:screen.height}};
       $('login_on').addEvent('click',function(){
         Ezer.sys.pword= $('password').value;
-        this.ask({cmd:'user_login',uname:$('username').value,pword:Ezer.sys.pword,size:bw},after)
+        this.ask({cmd:'user_login',uname:$('username').value,pword:Ezer.sys.pword,size:bw},after);
+        Ezer.sys.pword= "**********";
+        Ezer.onlogin();
       }.bind(this));
       this.loginDomMsg(Cookie.read(Ezer.root+'_logoff')||'');
       $('username').focus();
@@ -788,15 +790,17 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- bar_clock_show
   // zobrazování času a stavu v ae_bar.time
   bar_clock_show: function (zbyva) {
-    var org= Ezer.sys.user.org, access= Ezer.sys.user.access;
+    var org= Ezer.sys.user.org, access= Ezer.sys.user.access, has= Ezer.sys.user.has_access;
     if ( Ezer.options.watch_access_opt && Ezer.options.watch_access_opt.abbr ) {
-      org= Ezer.options.watch_access_opt.abbr[org];
+      org=    Ezer.options.watch_access_opt.abbr[org];
       access= Ezer.options.watch_access_opt.abbr[access];
+      has=    Ezer.options.watch_access_opt.abbr[has];
     }
+    has= has==access ? '' : '('+has+')';
     var abbr= Ezer.sys.user
       ? "<span title='id="+Ezer.sys.user.id_user
         +', start='+Ezer.options.start_datetime
-        +', data='+org+'/'+access
+        +', data='+org+'/'+access+has
         +', funkce='+Ezer.sys.user.skills+"'>"
         +(Ezer.sys.user.abbr||'---')+(Ezer.sys.user.note||'')+'</span>'
       : '';

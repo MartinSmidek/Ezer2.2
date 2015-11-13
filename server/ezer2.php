@@ -1145,6 +1145,7 @@
         $USER->abbr= $u->abbr;
         $USER->skills= $u->skills;
         $USER->org= $u->org;
+        $USER->has_access= $u->access;
         $USER->access= $u->access;
         $USER->username= $u->username;
         $USER->forename= $u->forename;
@@ -1198,6 +1199,7 @@
         $USER->abbr= $u->abbr;
         $USER->org= $u->org;
         $USER->skills= $u->skills;
+        $USER->has_access= $u->access;
         $USER->access= $u->access;
         $USER->username= $u->username;
         $USER->forename= $u->forename;

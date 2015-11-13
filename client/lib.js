@@ -189,8 +189,8 @@ function dbg_onclick_start(win) {
     })
   }
 }
-// ================================================================================================= ZeroClipboard
-// ------------------------------------------------------------------------------------------------- clipboard
+// ==================================================================================> ZeroClipboard
+// --------------------------------------------------------------------------------------- clipboard
 // vloží text do schránky Windows pomocí podle http://code.google.com/p/zeroclipboard/
 function clipboard_init () {
   Ezer.clip= new ZeroClipboard.Client();
@@ -208,7 +208,7 @@ function clip_complete(client, text) {
 //   Ezer.clip.setText( 'nazdar' );
 //   alert("Copied text to clipboard: " + text );
 }
-// ------------------------------------------------------------------------------------------------- make_url_menu
+// ----------------------------------------------------------------------------------- make_url_menu
 // sestavení url aplikace se změněným odkazem na menu
 // menu = pole pro parametr menu
 function make_url_menu(menu) {
@@ -231,7 +231,7 @@ function make_url_menu(menu) {
 //                                                 Ezer.trace('*',url);
   return url;
 }
-// ------------------------------------------------------------------------------------------------- get_url_param
+// ----------------------------------------------------------------------------------- get_url_param
 // zjištění hodnoty parametru v url
 // see http://www.netlobo.com/url_query_string_javascript.html
 function get_url_param(name) {
@@ -244,7 +244,7 @@ function get_url_param(name) {
   else
     return results[1];
 }
-// ------------------------------------------------------------------------------------------------- get_scrollbar_width
+// ----------------------------------------------------------------------------- get_scrollbar_width
 // zjištění šířky srollbar
 function get_scrollbar_width() {
    var scr = null;
@@ -270,14 +270,14 @@ function get_scrollbar_width() {
    document.body.removeChild(document.body.lastChild);
    return (wNoScroll - wScroll);
 }
-// ------------------------------------------------------------------------------------------------- padNum
+// ------------------------------------------------------------------------------------------ padNum
 // dorovnání čísla nulami do dané délky
 function padNum(number, numDigits) {
   var str= number ? number.toString() : '0';
   while (str.length < numDigits) str= '0' + str;
   return str;
 }
-// ------------------------------------------------------------------------------------------------- padStr
+// ------------------------------------------------------------------------------------------- padStr
 // dorovnání stringu mezerami resp. omezení do dané délky
 function padStr(str, len) {
   str= htmlentities(str);
@@ -289,7 +289,7 @@ function padStr(str, len) {
   }
   return str;
 }
-// ------------------------------------------------------------------------------------------------- datum
+// ------------------------------------------------------------------------------------------- datum
 // vrátí dnešní datum a pokud je time=1 i čas ve tvaru používaném v položkách date
 // pokud je time==2 zobrazují se i sekundy
 // pokud je sql==1 ve formátu pro SQL
@@ -310,7 +310,7 @@ function ae_datum(time,sql) {
   }
   return dat;
 }
-// ------------------------------------------------------------------------------------------------- time2ymd
+// ---------------------------------------------------------------------------------------- time2ymd
 // převede datum typu "d.m.y h:m:s" na pole [y,m,d,h,m,s]
 ae_time2ymd= function (dmy) {
   var y, m, d, s= [];
@@ -334,7 +334,7 @@ ae_time2ymd= function (dmy) {
   }
   return s;
 }
-// ------------------------------------------------------------------------------------------------- time
+// -------------------------------------------------------------------------------------------- time
 // vrátí čas,pokud je time==2 zobrazují se i sekundy
 function ae_time(time) {
   var t= new Date();
@@ -342,7 +342,7 @@ function ae_time(time) {
   var tim= ' '+th+':'+padNum(tn,2)+(time==2 ? ':'+padNum(ts,2) : '');
   return tim;
 }
-// ------------------------------------------------------------------------------------------------- htmlentities
+// ------------------------------------------------------------------------------------ htmlentities
 // jednoduchá varianta php funkce
 function htmlentities(h,breaks) {
   var t= typeof(h)=='string' ? h.replace(/[<]/g,'&lt;').replace(/[>]/g,'&gt;') : h.toString();
@@ -351,7 +351,7 @@ function htmlentities(h,breaks) {
   t= breaks ? t.replace(/[\n]/g,'<br/>') : t.replace(/[\n]/g,'\\n')
   return t;
 }
-// ------------------------------------------------------------------------------------------------- firstPropertyId
+// --------------------------------------------------------------------------------- firstPropertyId
 // vrátí klíč první vlatnosti objektu (podle for...in)
 function firstPropertyId(o) {
   var i= null;
@@ -360,7 +360,7 @@ function firstPropertyId(o) {
       break;
   return i;
 }
-// ------------------------------------------------------------------------------------------------- debug
+// ------------------------------------------------------------------------------------------- debug
 // zobrazení struktury objektu nebo pole
 function debug (gt,label,depth) {
   var x= gt;
@@ -392,7 +392,7 @@ function debugx (gt,label,depth) {
   }
   return x;
 }
-// ================================================================================================= ContextMenu
+// ====================================================================================> ContextMenu
 // Class:ContextMenu, Author:David Walsh, Website:http://davidwalsh.name, Version:1.0, Date:1/20/2009
 // simplified by Martin Smidek
 var ContextMenu = new Class({
@@ -588,9 +588,9 @@ var ContextMenu = new Class({
     return this;
   }
 });
-// ================================================================================================= Mootools parts
-// ================================================================================================= Base64
-// ------------------------------------------------------------------------------------------------- base64_decode
+// =================================================================================> Mootools parts
+// =========================================================================================> Base64
+// ----------------------------------------------------------------------------------- base64_decode
 function base64_decode (data) {
     // http://kevin.vanzonneveld.net
     // +   original by: Tyler Akins (http://rumkin.com)
@@ -646,7 +646,7 @@ function base64_decode (data) {
 
     return dec;
 }
-// ------------------------------------------------------------------------------------------------- base64_encode
+// ----------------------------------------------------------------------------------- base64_encode
 function base64_encode (data) {
     // Encodes string using MIME base64 algorithm
     // discuss at: http://phpjs.org/functions/base64_encode
@@ -677,7 +677,7 @@ function base64_encode (data) {
     var r = data.length % 3;
     return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
 }
-// ================================================================================================= Resample
+// =======================================================================================> Resample
 function dataURItoBlob(dataURI) {
   // convert base64 to raw binary data held in a string
   // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
@@ -789,7 +789,7 @@ Ezer.browser=='IE' ? null :
  // let's keep this DOM node in RAM for all resizes we want
  this.document.createElement("canvas"))
 );
-// ========================================================================================= pomocné
+// ========================================================================================> pomocné
 // --------------------------------------------------------------------------------- remap_fields_db
 function remap_fields_db (block,new_db) {
   for (var ic in block.part) {

@@ -34,6 +34,7 @@ function sess_read($id,$login=false) {
       $USER->id_user= $u->id_user;
       $USER->abbr= $u->abbr;
       $USER->skills= $u->skills;
+      $USER->has_access= $u->access;
       $USER->access= $u->access;
       $USER->username= $u->username;
       $USER->forename= $u->forename;

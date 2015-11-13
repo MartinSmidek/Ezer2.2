@@ -407,7 +407,10 @@ __EOD;
       }
     }
     foreach($css as $x) {
-      $head.= "\n  <link rel='stylesheet' href='$x' type='text/css' media='screen' charset='utf-8' />";
+      // rozklad zápisu href=id
+      list($href,$id)= explode('=',"$x=");
+      if ( $id ) $id= "id='$id'";
+      $head.= "\n  <link $id rel='stylesheet' href='$href' type='text/css' media='screen' charset='utf-8' />";
     }
   }
   // definice povinného začátku a konce HTML stránky
