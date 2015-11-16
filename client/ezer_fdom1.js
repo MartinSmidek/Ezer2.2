@@ -135,7 +135,6 @@ Ezer.Application= new Class({
         Ezer.sys.pword= $('password').value;
         this.ask({cmd:'user_login',uname:$('username').value,pword:Ezer.sys.pword,size:bw},after);
         Ezer.sys.pword= "**********";
-        Ezer.onlogin();
       }.bind(this));
       this.loginDomMsg(Cookie.read(Ezer.root+'_logoff')||'');
       $('username').focus();

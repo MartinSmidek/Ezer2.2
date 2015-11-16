@@ -291,10 +291,17 @@ Ezer.Application.implement({
   },
   // ------------------------------------------------------------------------------------- login
   login: function() {
-    this.loginDomOpen('logged','','');      // zavolá this.logged(odpověď serveru)
+    this.loginDomOpen('logged1','','');      // zavolá this.logged(odpověď serveru)
+  },
+  // ------------------------------------------------------------------------------------- logged1
+  // logged: akce po přihlášení
+  logged1: function(y,parm) {
+    this.logged(y,parm);
+    if ( y.user_id)
+      Ezer.onlogin();
   },
   // ------------------------------------------------------------------------------------- logged
-  // logged: akce po přihlášení
+  // logged: akce po změně přihlášení
   // naplnění objektu Ezer.sys.user.(id_user - klíč uživatele,abbr    - zkratka (3 znaky),...)
   // a Ezer.sys.ezer hodnotami z $root.php
   logged: function(y,parm) {
