@@ -3019,7 +3019,7 @@ Ezer.Browse.implement({
           var i= tr.retrieve('i');
           if ( i && i <= this.tlen ) {
 //             this.DOM_focus();
-                                                        Ezer.trace('T','browse row touch '+i);
+//                                                         Ezer.trace('T','browse row touch '+i);
             this.DOM_hi_row(this.t+i-1,0,0,el.control);
 //             this.fire('onrowclick',[this.keys[i-1]],el);
           }

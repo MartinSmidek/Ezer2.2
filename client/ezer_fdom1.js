@@ -602,8 +602,8 @@ Ezer.Application= new Class({
   _help: function(on) {
     if ( on && Ezer.App.hits_block ) {
       var key= Ezer.App.hits_block.self_sys(1);
-                                                Ezer.trace('*',"FAQ "+key.sys+'  '+key.title);
-                                                Ezer.debug(key,'trace/key');
+//                                                 Ezer.trace('*',"FAQ "+key.sys+'  '+key.title);
+//                                                 Ezer.debug(key,'trace/key');
       Ezer.App.help_text(key);
     }
     else if ( !on && Ezer.obj.DOM.help.sticky ) {
@@ -1310,7 +1310,7 @@ Ezer.Help= new Class({
             return false;
           }.bind(this),
           click:  function(ev) {
-                                                    Ezer.trace('*','click: '+this.self());
+//                                                     Ezer.trace('*','click: '+this.self());
             if ( Ezer.help_mode && Ezer.sys.dbg.file ) {
               var pos= this.app_file();
               if ( Ezer.sys.dbg && pos.file==Ezer.sys.dbg.file && Ezer.sys.dbg.window ) {

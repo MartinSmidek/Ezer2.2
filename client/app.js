@@ -342,7 +342,7 @@ Ezer.Application.implement({
             var path= !Ezer.options.skin || Ezer.options.skin=='default'
               ? Ezer.version+'/client/skins/' : "skins/";
             path+= (Ezer.options.skin||'default')+"/"+y.sys.user.options.css+".css";
-                                                        Ezer.trace('*',path);
+//                                                         Ezer.trace('*',path);
             var myCSS= new Asset.css(path, {id:'userStyle',title:'userStyle'});
           }
         }
@@ -464,7 +464,7 @@ Ezer.Application.implement({
       Ezer.code= {'$':y.app};
       Ezer.file.$= y.app;
       if ( this.options.debug /*window.top.dbg*/ && window.top.dbg.show_code ) window.top.dbg.show_code(Ezer);
-      Ezer.trace('L','loaded '+y.msg);
+//       Ezer.trace('L','loaded '+y.msg);
       var root= new Ezer.BlockMain(y.app);
       Ezer.run= {$:root};
 //       root.includeBlock();
@@ -483,7 +483,7 @@ Ezer.Application.implement({
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  included
 // vlož načtený kód do Ezer.code a Ezer.run
   included: function(y,sender) {
-    Ezer.trace('L','loaded '+y.msg);
+//     Ezer.trace('L','loaded '+y.msg);
     // zavolej sender._include(y)
     Ezer.Block.prototype.include_.apply(sender,[y]);
     // zavolej sender._include(y)
@@ -512,7 +512,7 @@ Ezer.Application.implement({
   start_code_seq: function(top,code,end) {
     if ( code.length ) {
       new Ezer.Eval(code,top,[],'(startup)',{fce:function(id,val){
-        Ezer.trace('L',id+' skončila se stavem '+this.value+", pokračuje "+end);
+//         Ezer.trace('L',id+' skončila se stavem '+this.value+", pokračuje "+end);
         if ( end )
           Ezer.app[end](top);
       },args:['inicializace '+top.id],stack:true},true);
@@ -555,13 +555,16 @@ Ezer.Application.implement({
     var file= '', info= '?';
     lc= lc||'';
     // najdi pozici
-    if ( !lc && b.desc && b.desc._lc )
-      lc= b.desc._lc;
-    var pos= b.app_file();                              // najdi jméno zdrojového textu
-    // požádej server o text, pokud se to chce
-    if ( ask_source && pos.file && lc )
-      this.ask({cmd:'source_line',file:pos.file,app:pos.app,lc:lc},'block_info_',{});
-    return pos.file+'.ezer;'+lc;
+    if ( b.app_file ) {
+      if ( !lc && b.desc && b.desc._lc )
+        lc= b.desc._lc;
+      var pos= b.app_file();                              // najdi jméno zdrojového textu
+      // požádej server o text, pokud se to chce
+      if ( ask_source && pos.file && lc )
+        this.ask({cmd:'source_line',file:pos.file,app:pos.app,lc:lc},'block_info_',{});
+      info= pos.file+'.ezer;'+lc;
+    }
+    return info;
   },
   block_info_: function(y,parm) {
     if ( y && y.text )
@@ -572,7 +575,7 @@ Ezer.Application.implement({
   edit_source: function(elem) {
     var pos= elem.app_file();
     if ( pos.file && elem.desc._lc ) {
-                                                    Ezer.trace('*','edit: PSPad '+pos.file+' '+elem.desc._lc);
+//                              Ezer.trace('*','edit: PSPad '+pos.file+' '+elem.desc._lc);
       this.ask({cmd:'edit_source',file:pos.file,app:pos.app,lc:elem.desc._lc});
     }
   },

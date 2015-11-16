@@ -912,12 +912,12 @@ Ezer.Block= new Class({
     }
     this.parm.app= this.parm.name.split('.')[0];
     this.parm.method= method;
-                                                Ezer.trace('L','including '+this.parm.name+' then '+method);
+//                                                 Ezer.trace('L','including '+this.parm.name+' then '+method);
     this.ask({cmd:'load_code2',file:this.parm.app+'/'+this.parm.name,
       block:this.self(),i:3},'include2_');
   },
   include2_: function(y) {
-                                                Ezer.trace('L','queued '+y.file);
+//                                                 Ezer.trace('L','queued '+y.file);
     Ezer.app.calls_queue(this,'include3',[y]);
   },
   include3: function(y) {
@@ -932,7 +932,7 @@ Ezer.Block= new Class({
     if ( y.error )
       Ezer.error(y.error,'C');
     // rozšíření Ezer.code v místě definovaném  'name' o y.app, pokud nebyla chyba
-                                                Ezer.trace('L','loaded2 '+y.file+' '+y.msg);
+//                                                 Ezer.trace('L','loaded2 '+y.file+' '+y.msg);
     var desc= null;
     ids= name.split('.');
     for (var i= ids[0]=='$'?1:0, desc= Ezer.code.$; i<ids.length; i++) {
@@ -969,9 +969,9 @@ Ezer.Block= new Class({
       this.subBlocks(desc,this.DOM,null,'include');
       desc.options.include= 'loaded';
       this.options.include= 'loaded';
-                                                  Ezer.trace('L','included '+y.file);
+//                                                   Ezer.trace('L','included '+y.file);
       Ezer.app.start_code(this);
-                                                  Ezer.trace('L','started '+y.file);
+//                                                   Ezer.trace('L','started '+y.file);
       if ( this.parm.method )
         this[this.parm.method]();
     }
@@ -1041,7 +1041,7 @@ Ezer.Block= new Class({
         self= o._id+(self ? '.'+self : '');
     }
     self= self ? (o._library ? '#.' : '$.')+self : '$';
-                                                Ezer.trace('*','self='+self);
+//                                                 Ezer.trace('*','self='+self);
     var x= {cmd:'dbg_compile',context:{self:self,app:s.app,file:s.file},script:script};
     this.ask(x,'runScript_');
     return 1;
@@ -1080,15 +1080,15 @@ Ezer.Block= new Class({
       }
       // řetězení onstart
       if ( this.part && (proc= this.part['onstart']) ) {
-                                                                  Ezer.trace('L','queue onstart '+this.id);
+//                              Ezer.trace('L','queue onstart '+this.id);
         codes.onstart.extend([{o:'d',i:this.self()}]).extend(this.part['onstart'].code).extend([{o:'z',i:0}]);
       }
       // start podbloků
       for(var i in this.part) {
         if ( this.part[i].start )
-//                                                 Ezer.trace('L','starting '+this.part[i].type+'.'+this.part[i]._id );
+//                              Ezer.trace('L','starting '+this.part[i].type+'.'+this.part[i]._id );
           this.part[i].start(codes,oneval);
-//                                                 Ezer.trace('L','started  '+this.part[i].type+'.'+this.part[i]._id);
+//                              Ezer.trace('L','started  '+this.part[i].type+'.'+this.part[i]._id);
       }
     }
     if ( this.start_code ) {
@@ -1149,7 +1149,8 @@ Ezer.Block= new Class({
         }) )
           return;
       }
-      Ezer.trace('e','EVENT:'+event_type+'.'+id+'.'+event_name+' in '+Ezer.App.block_info(fce),fce);
+      if ( Ezer.to_trace )
+        Ezer.trace('e','EVENT:'+event_type+'.'+id+'.'+event_name+' in '+Ezer.App.block_info(fce),fce);
     };
 
     args= args||[];
@@ -3457,7 +3458,7 @@ Ezer.LabelMap= new Class({
     this.geo= geo;
     this.geocode_counter++;
     var ms= 0;
-                                                Ezer.trace('*','geocode '+this.geocode_counter+': '+geo.address);
+//                          Ezer.trace('*','geocode '+this.geocode_counter+': '+geo.address);
     if ( (this.geocode_counter % 10) == 0 ) {
       ms= 10000;
 //       if ( (this.geocode_counter % 100) == 0 )
@@ -5479,7 +5480,7 @@ Ezer.Browse= new Class({
       if ( ishow ) {
         for (var i= 0; i<this.buf.length; i++) {
           if ( this.buf[i][ishow] && this.buf[i][ishow][0].toUpperCase()==patt ) {
-                                                        Ezer.trace('U','row_seek['+vi+','+i+']='+this.buf[i][ishow]);
+//                                   Ezer.trace('U','row_seek['+vi+','+i+']='+this.buf[i][ishow]);
             this._row_move(i);
             break;
           }
@@ -6790,7 +6791,7 @@ Ezer.Eval= new Class({
               if ( (cc.a||0)<this.nargs )
                 Ezer.error('procedura '+cc.i+' je volána s '+(cc.a||0)+' argumenty místo s '+this.nargs,
                   'S',this.proc,last_lc);
-              this.nvars= (cc.o=='c' ? this.proc.nvar : this.proc.desc.nvar) || 0;
+              this.nvars= (cc.o=='C' ? this.proc.nvar : this.proc.desc.nvar) || 0;
               this.context= this.proc.owner;
               if ( this.nvars ) {           // vymezení inicializovaného místa na lokální proměnné
                 for (var i=0; i<this.nvars; i++) {
@@ -7302,8 +7303,9 @@ Ezer.Eval= new Class({
         Ezer.fce.speed('show');
       }
       if ( y.trace ) Ezer.trace('u',y.trace,null,ms);
-      if ( Ezer.App.options.ae_trace.indexOf('M')>=0 && y.qry )
-        Ezer.trace('M',y.qry,null,Math.round(y.qry_ms*1000)/1000);
+      if ( Ezer.App.options.ae_trace.indexOf('M')>=0 && y.qry ) {
+        if ( Ezer.to_trace ) Ezer.trace('M',y.qry,null,Math.round(y.qry_ms*1000)/1000);
+      }
       if ( y.error ) {
         Ezer.error('EVAL: '+y.error,'s',this.proc,this.proc?this.proc.desc._lc:null);
       }
@@ -8597,7 +8599,7 @@ Ezer.fce.clipboard= function () {
 //      EXPERIMENTÁLNÍ - všechny komponenty musí již být ve stavu loaded - jinak warning
 //s: funkce
 Ezer.fce.href= function (path) {
-  Ezer.trace('U','href='+path);
+//   Ezer.trace('U','href='+path);
   // nalezení kořene
   var hs= path.split('#');              // oddělení odkazu na name
   var ps= hs[0].split('/');             // oddělení parametrů
@@ -9256,7 +9258,7 @@ Ezer.fce.trail= function (op) {
     if ( Ezer.obj.trail.elems.length > Ezer.obj.trail.max ) {
       Ezer.obj.trail.elems.shift();
     }
-                Ezer.trace('*',(arguments[1].options.title || arguments[1].id)+':'+arguments[2]);
+//                 Ezer.trace('*',(arguments[1].options.title || arguments[1].id)+':'+arguments[2]);
     Ezer.obj.trail.elems.push({o:arguments[1],m:arguments[2],t:new Date().format("%M:%S")});
     break;
   }
