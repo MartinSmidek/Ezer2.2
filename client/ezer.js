@@ -6784,9 +6784,9 @@ Ezer.Eval= new Class({
                   'S',this.proc,last_lc);
               this.proc= obj[0];
               // pro C použijeme kód z popisu formuláře
-              this.code= cc.o=='c' ? this.proc.code : this.proc.desc.code;
+              this.code= cc.o=='C' ? this.proc.code : this.proc.desc.code;
               this.c= 0;
-              this.nargs= (cc.o=='c' ? this.proc.npar : this.proc.desc.npar) || 0;
+              this.nargs= (cc.o=='C' ? this.proc.npar : this.proc.desc.npar) || 0;
               if ( (cc.a||0)<this.nargs )
                 Ezer.error('procedura '+cc.i+' je volána s '+(cc.a||0)+' argumenty místo s '+this.nargs,
                   'S',this.proc,last_lc);
