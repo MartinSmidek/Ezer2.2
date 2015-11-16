@@ -297,8 +297,11 @@ Ezer.Application.implement({
   // logged: akce po přihlášení
   logged1: function(y,parm) {
     this.logged(y,parm);
-    if ( y.user_id)
+    if ( y.user_id) {
+      Ezer.sys.user= y.sys.user;
+      Ezer.sys.ezer= y.sys.ezer;
       Ezer.onlogin();
+    }
   },
   // ------------------------------------------------------------------------------------- logged
   // logged: akce po změně přihlášení
@@ -463,7 +466,8 @@ Ezer.Application.implement({
     else {
       Ezer.code= {'$':y.app};
       Ezer.file.$= y.app;
-      if ( this.options.debug /*window.top.dbg*/ && window.top.dbg.show_code ) window.top.dbg.show_code(Ezer);
+      if ( this.options.debug /*window.top.dbg*/ && window.top.dbg.show_code )
+        window.top.dbg.show_code(Ezer);
 //       Ezer.trace('L','loaded '+y.msg);
       var root= new Ezer.BlockMain(y.app);
       Ezer.run= {$:root};
@@ -563,6 +567,10 @@ Ezer.Application.implement({
       if ( ask_source && pos.file && lc )
         this.ask({cmd:'source_line',file:pos.file,app:pos.app,lc:lc},'block_info_',{});
       info= pos.file+'.ezer;'+lc;
+    }
+    else {
+      info= '!';
+      Ezer.fce.error_(info);
     }
     return info;
   },

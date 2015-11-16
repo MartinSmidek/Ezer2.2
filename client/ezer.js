@@ -1085,11 +1085,12 @@ Ezer.Block= new Class({
       }
       // start podbloků
       for(var i in this.part) {
-        if ( this.part[i].start )
-//                              Ezer.trace('L','starting '+this.part[i].type+'.'+this.part[i]._id );
+        if ( this.part[i].start && typeof this.part[i].start=='function' ) {
+//                                                 Ezer.trace('L','starting '+this.part[i].type+'.'+this.part[i]._id );
           this.part[i].start(codes,oneval);
-//                              Ezer.trace('L','started  '+this.part[i].type+'.'+this.part[i]._id);
+//                                                 Ezer.trace('L','started  '+this.part[i].type+'.'+this.part[i]._id);
       }
+    }
     }
     if ( this.start_code ) {
       codes[this.start_code.level].extend(this.start_code.code).extend([{o:'z',i:0}]);
@@ -1150,7 +1151,7 @@ Ezer.Block= new Class({
           return;
       }
       if ( Ezer.to_trace )
-        Ezer.trace('e','EVENT:'+event_type+'.'+id+'.'+event_name+' in '+Ezer.App.block_info(fce),fce);
+      Ezer.trace('e','EVENT:'+event_type+'.'+id+'.'+event_name+' in '+Ezer.App.block_info(fce),fce);
     };
 
     args= args||[];
@@ -6785,7 +6786,7 @@ Ezer.Eval= new Class({
                   'S',this.proc,last_lc);
               this.proc= obj[0];
               // pro C použijeme kód z popisu formuláře
-              this.code= cc.o=='C' ? this.proc.code : this.proc.desc.code;
+              this.code= cc.o=='c' ? this.proc.code : this.proc.desc.code;
               this.c= 0;
               this.nargs= (cc.o=='C' ? this.proc.npar : this.proc.desc.npar) || 0;
               if ( (cc.a||0)<this.nargs )
@@ -7303,9 +7304,8 @@ Ezer.Eval= new Class({
         Ezer.fce.speed('show');
       }
       if ( y.trace ) Ezer.trace('u',y.trace,null,ms);
-      if ( Ezer.App.options.ae_trace.indexOf('M')>=0 && y.qry ) {
-        if ( Ezer.to_trace ) Ezer.trace('M',y.qry,null,Math.round(y.qry_ms*1000)/1000);
-      }
+      if ( Ezer.App.options.ae_trace.indexOf('M')>=0 && y.qry )
+        Ezer.trace('M',y.qry,null,Math.round(y.qry_ms*1000)/1000);
       if ( y.error ) {
         Ezer.error('EVAL: '+y.error,'s',this.proc,this.proc?this.proc.desc._lc:null);
       }
