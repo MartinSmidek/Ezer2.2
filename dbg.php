@@ -13,27 +13,20 @@
   $skin=     'default';
 
   $src= $_GET['src'];
-  $src_ezer= "$src.ezer";
+  $src_ezer= $src;
+//   $src_ezer= "$src.ezer";
   $url= "../$src_ezer";
 
-  $html= $notes= "";
+  $html= $notes= $lines= "";
   $lns= file($url,FILE_IGNORE_NEW_LINES);
   foreach($lns as $i=>$ln) {
-    $lnx= htmlentities($ln);
-    $i1= $i+1;
-    $iii= str_pad($i1,4,' ',STR_PAD_LEFT);
-    if ( !$lnx ) $lnx= ' ';
-    $html.= "\n<li id='$i1'><span class='line'>$iii</span><span class='text' spellcheck='false'>$lnx</span></li>";
-    // detekce dokumentace
-    $note= strpos($ln,'==>');
-    if ( $note ) {
-      $notes.= "\n<li id='N_$i1'>".substr($ln,$note+3)."</li>";
-    }
+    $ln= str_replace('</script','<\/script',$ln);
+    $lines.= "\n\"".addslashes($ln).'",';
   }
-  $html= html_closure($src,$notes,$html,$src_ezer);
+  $html= html_closure($src,$notes,$html,$src_ezer,$lines);
   echo $html;
 // ------------------------------------------------------------------------------------ html_closure
-function html_closure($win_name,$notes,$source,$url) {
+function html_closure($win_name,$notes,$source,$url,$lines) {
   $html= <<<__EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
@@ -45,6 +38,9 @@ function html_closure($win_name,$notes,$source,$url) {
     <script src="client/licensed/clientcide.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
       Ezer= {fce:{},obj:{}};
+      source= [
+        $lines
+      ];
     </script>
     <script src="client/lib.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
@@ -53,17 +49,21 @@ function html_closure($win_name,$notes,$source,$url) {
   var log;
   var open= false;
   var help;
-// ----------------------------------------------------------------------------------------- ON load
+  var src= not= [];
+// ------------------------------------------------------------------------------------==> . ON load
   window.addEvent('load', function() {
     log= $('log');
     help= $('help');
+    dbg_show_text(source);
     $('body').addEvents({
       'click': function() { log.setStyles({display:'none'}); help.setStyles({display:'none'}); }
     });
   });
-// --------------------------------------------------------------------------------------- ON unload
+// ----------------------------------------------------------------------------------==> . ON unload
   window.addEvent('unload', function() {
-    opener.dbg_onunload();
+    var pos= window.getCoordinates();
+    var p= window.screenX+','+window.screenY+','+pos.width+','+pos.height;
+    opener.dbg_onunload(p);
   });
 // ----------------------------------------------------------------------------------- dbg_show_help
   function dbg_show_help(html) {
@@ -73,7 +73,8 @@ function html_closure($win_name,$notes,$source,$url) {
   function dbg_save_text(source) {
     opener.dbg_onsave(url,source);
   }
-// ----------------------------------------------------------------------------------- dbg_show_text
+// ------------------------------------------------------------------------------==> . dbg_show_text
+// zobrazení textu ve struktuře
   function dbg_show_text(ln) {
     // odstraň src
     var ul= $('src').getElement('ul');
@@ -81,17 +82,45 @@ function html_closure($win_name,$notes,$source,$url) {
     var notes= $('notes');
     notes.empty();
     // vytvoř text
+    src= [];
+    not= [];
     for (i= 0; i<ln.length; i++) {
       var i1= i+1;
-      ul.adopt(
+      ul.adopt(src[i1]=
         new Element('li',{id:i1}).adopt(
           new Element('span',{text:i1,'class':'line'}),
           new Element('span',{text:ln[i],'class':'text'})
       ));
       // detekce dokumentace
-      var note= ln[i].indexOf('==>');
+      var note= ln[i].indexOf('=='+'>');
       if ( note!=-1 ) {
-        notes.adopt(new Element('li',{text:ln[i].substr(note+3),id:'N_'+i1}));
+        notes.adopt(not[i1]=
+          new Element('li',{text:ln[i].substr(note+3),id:'N_'+i1}));
+      }
+    }
+  }
+// ------------------------------------------------------------------------------==> . dbg_show_line
+// zobrazení textu ve struktuře
+  function dbg_show_line(ln,css) {
+    //opener.console.log(ln);
+    src.each(function(s){s.removeClass(css)});
+    src[ln].addClass(css);
+    src[ln].scrollIntoViewIfNeeded();
+    // označení poznámek
+    not.each(function(s){s.removeClass('pick')});
+    for (var i= 0; i<src.length; i++ ) {
+      if ( not[i] && ( i>=ln || i==not.length-1 )) {
+        not[i].addClass('pick');
+        not[i].scrollIntoViewIfNeeded();
+        if ( i>ln ) {
+          for (var j= i-1; j>0; j-- ) {
+            if ( not[j] ) {
+              not[j].addClass('pick');
+              break;
+            }
+          }
+        }
+        break;
       }
     }
   }
@@ -160,27 +189,42 @@ function html_closure($win_name,$notes,$source,$url) {
     // reakce na click na poznámku
     var dbg_not= win.document.getElementById('notes');
     dbg_not.addEvents({
-      // ----------------------------------- click na poznámku
+      // -----------------------------------==> .. click na poznámku
       click: function(el) {
         var ln= el.target.id.substr(2);
         var line= win.document.getElementById(ln);
         line.scrollIntoViewIfNeeded();
         // zvýraznění poznámky
-        var pick= win.document.getElement('li.note_pick');
-        if ( pick ) pick.removeClass('note_pick');
-        el.target.addClass('note_pick');
+        not.each(function(s){s.removeClass('pick')});
+        not[ln].addClass('pick');
         // zvýraznění v textu
-        pick= win.document.getElement('li.pick');
-        if ( pick ) pick.removeClass('pick');
+        src.each(function(s){s.removeClass('pick')});
         line.addClass('pick');
       }
     });
     var dbg_src= win.document.getElementById('src'), found= null;
     dbg_src.addEvents({
-      // ----------------------------------- kontextové menu pro zdrojový text
+      // -----------------------------------==> .. click na zdrojový text
+      click: function(el) {
+        var x= dbg_context(el.target);
+        dbg_show_line(x.ln,'pick');
+      },
+      // -----------------------------------==> .. dvojclick na zdrojový text
+      dblclick: function(el) {
+        console.log(2);
+        var x= dbg_context(el.target), sel= window.getSelection(), range= sel.getRangeAt(0);
+        var text= range ? range.startContainer.data.substring(range.startOffset,range.endOffset) : '';
+        if ( text ) {
+          help.setStyles({display:'block'});
+          help.set('text',text);
+          opener.dbg_help(text);
+        }
+      },
+      // -----------------------------------==> .. kontextové menu pro zdrojový text
       contextmenu: function(menu_el) {
         var x= dbg_context(menu_el.target);
         if ( x.ln ) {
+          dbg_show_line(x.ln,'pick');
           Ezer.fce.contextmenu([
             ['zjisti hodnotu', function(el) {
                 found= opener.dbg_oncontextmenu(x.ln,'dump');
@@ -248,17 +292,7 @@ function html_closure($win_name,$notes,$source,$url) {
         }
         return false;
       },
-      // ----------------------------------- dvojclick na zdrojový text
-      dblclick: function(el) {
-        var x= dbg_context(el.target), sel= window.getSelection(), range= sel.getRangeAt(0);
-        var text= range ? range.startContainer.data.substring(range.startOffset,range.endOffset) : '';
-        if ( text ) {
-          help.setStyles({display:'block'});
-          help.set('text',text);
-          opener.dbg_help(text);
-        }
-      },
-      // ---------------------------- klávesnice při opravě zdrojového textu
+      // ----------------------------==> .. klávesnice při opravě zdrojového textu
       keydown: function(event) {
         var line= event.target.getParent(), clmn= get_caret(), text;
         switch (event.key) {
@@ -328,17 +362,21 @@ function html_closure($win_name,$notes,$source,$url) {
         position: fixed; right: 30px; top: 25px; width: 300px; min-height: 100px;
         background-color: #eee; border: 1px solid #aaa; z-index: 2;
         overflow-y: auto; max-height: 50%; display: none; }
+      #sources {
+        position: fixed; right: 10px; top: 2px; font-size: 16px; color: lightgray; }
       /* ----------------------- notes */
-      ul#notes {
-        padding: 0; margin-top: 10px;
+      div#notes {
+        padding: 0; margin-top: 5px; overflow-y: scroll; height: 100%;
         left: 0; width: 120px; position: absolute;}
+      #notes ul {
+        padding: 0; margin-top: 5px; }
       #notes li {
         cursor: alias; }
       /* ----------------------- source */
       #source {
         position: fixed; right: 10px; top: 2px; font-size: 16px; color: lightgray;}
       div#src {
-        padding: 0; margin-top: 5px; overflow: scroll; height: 100%;
+        padding: 0; margin-top: 5px; overflow-y: scroll; height: 100%;
         left: 120px; right: 0px; position: absolute;}
       #src ul {
         padding: 0; margin-top: 5px; }
@@ -370,9 +408,7 @@ function html_closure($win_name,$notes,$source,$url) {
         background-color: silver; }
       li.curr {
         background-color: orange; }
-      li.pick {
-        background-color: yellow; }
-      li.note_pick {
+      li.pick, span.pick {
         background-color: yellow; }
       /* ----------------------- debug */
       #log {
@@ -415,7 +451,9 @@ function html_closure($win_name,$notes,$source,$url) {
   <body id='body' onload="dbg_onclick_start()" style="background-color:oldlace;">
     <div id="help">...</div>
     <div id="source">$win_name</div>
-    <ul id='notes'>$notes</ul>
+    <div id='notes'>
+      <ul>$notes</ul>
+    </div>
     <div id='src'>
       <ul>$source</ul>
     </div>

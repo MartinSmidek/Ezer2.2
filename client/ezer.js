@@ -506,7 +506,7 @@ Ezer.Block= new Class({
     }
     return ok;
   },
-// ------------------------------------------------------------------------------------ display
+// --------------------------------------------------------------------------------==> . display
 //fm: Block.display ([on[,tags]])
 //      zobrazí pokud on=1 resp. skryje blok pokud on=0;
 //      na skryté bloky (např. kvůli skill) nemá vliv;
@@ -539,7 +539,9 @@ Ezer.Block= new Class({
     }
     var ok= 1;
     if ( on===undefined ) {
-      var block= this instanceof Ezer.Var && this.value ? this.value.DOM_Block : this.DOM_Block;
+      var block= this instanceof Ezer.PanelPopup        ? this.DOM : (
+                 this instanceof Ezer.Var && this.value ? this.value.DOM_Block
+                                                        : this.DOM_Block);
       ok= block && block.getStyle('display')=='block' ? 1 : 0;
     }
     else {

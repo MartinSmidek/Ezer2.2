@@ -3,8 +3,11 @@
 // ------------------------------------------------------------------------------------ dbg_onunload
 // DBG - voláno z dbg.php
 // zavření okna
-function dbg_onunload(block) {
-//   Ezer.sys.dbg= {window:null,file:''};
+function dbg_onunload(position) {
+  //   Ezer.sys.dbg= {window:null,file:''};
+  Ezer.sys.dbg.file= '';
+  // zápis polohy a rozměru do cookies ezer_dbg_win=l,t,w,h ==> . dbg unload
+  Ezer.fce.set_cookie('ezer_dbg_win',position);
 }
 // -------------------------------------------------------------------------------------- dbg_onsave
 // DBG - voláno z dbg.php
@@ -141,13 +144,7 @@ function dbg_onshiftclick(block) {
       var lc= block.desc._lc.split(',');
       var win= Ezer.sys.dbg.window;
       win.focus();
-      var line= win.document.getElement('li.curr');
-      if ( line )
-        line.removeClass('curr');
-      line= win.document.getElementById(lc[0]);
-      if ( line && !isElementInViewport(line) )
-        line.scrollIntoView();
-      line.addClass('curr');
+      win.dbg_show_line(lc[0],'pick');
     };
     // zobrazení
     Ezer.sys.dbg.start= block.self();
@@ -155,9 +152,15 @@ function dbg_onshiftclick(block) {
       show();
     }
     else {
-      var fname= pos.app+'/'+pos.file;
+      var fname= pos.app+'/'+pos.file+'.ezer';
+      //fname= pos.app+'/tut.the.php';  -- test otevření PHP
+      //fname= pos.app+'/i_fce.js';     -- test otevření JS
+      // pokud je poloha a rozměr v cookies ezer_dbg_win=l,t,w,h ==> . dbg open
+      var ltwh= Ezer.fce.get_cookie('ezer_dbg_win','0,0,770,500');
+      var x= ltwh.split(',');
+      var position= 'left='+x[0]+',top='+x[1]+',width='+x[2]+',height='+x[3];
       Ezer.sys.dbg.window= window.open('./ezer2.2/dbg.php?err=1&src='+fname,'dbg',
-        'width=770,height=500,resizable=1,titlebar=0,menubar=0');
+        position+',resizable=1,titlebar=0,menubar=0');
       if ( Ezer.sys.dbg.window ) {
         Ezer.sys.dbg.file= pos.file;
       };

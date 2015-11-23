@@ -808,7 +808,7 @@ Ezer.PanelInTabs_add= function(panel) {
     }
   }
 }
-// ---------------------------------------------------------------------------------- PanelPlain-DOM
+// -----------------------------------------------------------------------------------==> PanelPlain
 // panel vnořený do Tabs
 Ezer.PanelPlain.implement({
   _tabDom: null,                                // li-element zanořený do Tabs nebo null
@@ -840,7 +840,7 @@ Ezer.PanelPlain.implement({
     return this;
   } */
 });
-// ---------------------------------------------------------------------------------- PanelRight-DOM
+// -----------------------------------------------------------------------------------==> PanelRight
 // panel vnořený do Tabs společně s MenuLeft
 Ezer.PanelRight.implement({
   DOM_add1: function() {
@@ -870,7 +870,7 @@ Ezer.PanelRight.implement({
     return this;
   }
 });
-// ---------------------------------------------------------------------------------- PanelPopup-DOM
+// -----------------------------------------------------------------------------------==> PanelPopup
 Ezer.PanelPopup.implement({
   DOM_shown: false,                           // true - pokud bylo poprvé ukázáno
   // ---------------------------------------------------------------------------------- DOM_add1
@@ -946,7 +946,7 @@ Ezer.PanelPopup.implement({
       Ezer.Shield.hide();
   }
 });
-// ----------------------------------------------------------------------------------- PanelFree-DOM
+// ------------------------------------------------------------------------------------==> PanelFree
 Ezer.PanelFree.implement({
   DOM_shown: false,                           // true - pokud bylo poprvé ukázáno
   // ---------------------------------------------------------------------------------- DOM_add1
