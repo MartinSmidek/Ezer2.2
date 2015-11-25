@@ -224,7 +224,7 @@ Ezer.Application.implement({
     //Ezer.trace('L','load root');
     if ( this.options.must_log_in ) {
       if (this.options.refresh ) {
-        this.ask({cmd:'user_relogin'},'logged');
+        this.ask({cmd:'user_relogin'},'logged1');
         this.putFoot(' obnovení');
       }
       else {
