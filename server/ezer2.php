@@ -2411,14 +2411,28 @@ function save_file($path,$text) {
 }
 # ---------------------------------------------------------------------------------------- item_help
 function item_help($item) {
-  // otevření databáze a tabulky
-  $ezer_db= @mysql_connect('localhost','gandi','');
-  $res= @mysql_select_db('ezer_kernel',$ezer_db);
-  @mysql_query("SET NAMES 'utf8'");
-  $rt= mysql_query("SELECT * FROM ezer_kernel.ezer_doc2 WHERE '$item' IN (class,part)");
-  if ( $rt && $t= mysql_fetch_object($rt) ) {
-    $html= $t->text;
+  global $ezer_path_serv, $ezer_root;
+  $ret= (object)array(
+    'html'=>$item,
+    'item'=>$item
+  );
+  // prohledání php-modulů
+  $ret->trace= $names= doc_ezer(true);
+  if ( isset($names[$item]) && $names[$item]->typ=='php' ) {
+    $ret->html= "$item je PHP funkce z {$names[$item]->php}";
+    $ret->typ= 'php';
+    $ret->php= $names[$item]->php;
   }
-  return $html;
+  else {
+    // otevření databáze a tabulky
+    $ezer_db= @mysql_connect('localhost','gandi','');
+    $res= @mysql_select_db('ezer_kernel',$ezer_db);
+    @mysql_query("SET NAMES 'utf8'");
+    $rt= mysql_query("SELECT * FROM ezer_kernel.ezer_doc2 WHERE '$item' IN (class,part)");
+    if ( $rt && $t= mysql_fetch_object($rt) ) {
+      $ret->html= $t->text;
+    }
+  }
+  return $ret;
 }
 ?>

@@ -52,8 +52,13 @@ Ezer.const_value= function (id,val) {
 }
 // ----------------------------------------------------------------------------- ON unload
 window.addEvent('unload', function() {
-  if ( Ezer.sys.dbg && Ezer.sys.dbg.window ) {
-    Ezer.sys.dbg.window.close();
+  if ( Ezer.sys.dbg ) {
+    if ( Ezer.sys.dbg.win_ezer ) {
+      Ezer.sys.dbg.win_ezer.close();
+    }
+    if ( Ezer.sys.dbg.win_php ) {
+      Ezer.sys.dbg.win_php.close();
+    }
   }
 });
 // ----------------------------------------------------------------------------- ON load

@@ -3,11 +3,17 @@
 // ------------------------------------------------------------------------------------ dbg_onunload
 // DBG - voláno z dbg.php
 // zavření okna
-function dbg_onunload(position) {
-  //   Ezer.sys.dbg= {window:null,file:''};
-  Ezer.sys.dbg.file= '';
-  // zápis polohy a rozměru do cookies ezer_dbg_win=l,t,w,h ==> . dbg unload
-  Ezer.fce.set_cookie('ezer_dbg_win',position);
+function dbg_onunload(typ,position) {
+  if ( typ=='ezer' ) {
+    Ezer.sys.dbg.win_ezer= null;
+    Ezer.sys.dbg.file= '';
+    // zápis polohy a rozměru do cookies ezer_dbg_win=l,t,w,h ==> . dbg unload
+    Ezer.fce.set_cookie('ezer_dbg_win',position);
+  }
+  else if ( typ=='php' )  {
+    Ezer.sys.dbg.win_php= null;
+    Ezer.fce.set_cookie('ezer_dbg_win2',position);
+  }
 }
 // -------------------------------------------------------------------------------------- dbg_onsave
 // DBG - voláno z dbg.php
@@ -20,12 +26,14 @@ function _dbg_onsave(y) { //Ezer.fce.echo(Ezer.fce.debug(y,"saved"));
 }
 // ---------------------------------------------------------------------------------------- dbg_help
 // dotaz na server o help pro daný item
-function dbg_help (item) {
-  dbg_ask('item_help',[item],_dbg_help);
+function dbg_help (typ,item) {
+  if ( typ=='ezer' ) {
+    dbg_ask('item_help',[item],_dbg_help);
+  }
 }
 function _dbg_help(y) { //Ezer.fce.echo(Ezer.fce.debug(y,"help"));
   Ezer.fce.echo(y.value);
-  Ezer.sys.dbg.window.dbg_show_help(y.value)
+  Ezer.sys.dbg.win_ezer.dbg_show_help(y.value)
   return y.value;
 }
 // ----------------------------------------------------------------------------------------- dbg_ask
@@ -137,12 +145,12 @@ function isElementInViewport(el) {
 function dbg_onshiftclick(block) {
   if ( !Ezer.options.dbg ) return false;
   if ( !Ezer.sys.dbg )
-    Ezer.sys.dbg= {window:null,file:''};
+    Ezer.sys.dbg= {win_ezer:null,file:'',win_php:null};
   var pos= block.app_file();
   if ( pos.file ) {
     var show= function() {
       var lc= block.desc._lc.split(',');
-      var win= Ezer.sys.dbg.window;
+      var win= Ezer.sys.dbg.win_ezer;
       win.focus();
       win.dbg_show_line(lc[0],'pick');
     };
@@ -159,9 +167,9 @@ function dbg_onshiftclick(block) {
       var ltwh= Ezer.fce.get_cookie('ezer_dbg_win','0,0,770,500');
       var x= ltwh.split(',');
       var position= 'left='+x[0]+',top='+x[1]+',width='+x[2]+',height='+x[3];
-      Ezer.sys.dbg.window= window.open('./ezer2.2/dbg.php?err=1&src='+fname,'dbg',
+      Ezer.sys.dbg.win_ezer= window.open('./ezer2.2/dbg.php?err=1&src='+fname,'dbg',
         position+',resizable=1,titlebar=0,menubar=0');
-      if ( Ezer.sys.dbg.window ) {
+      if ( Ezer.sys.dbg.win_ezer ) {
         Ezer.sys.dbg.file= pos.file;
       };
     }

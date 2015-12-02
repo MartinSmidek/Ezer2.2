@@ -1,10 +1,12 @@
 <?php # (c) 2007-2009 Martin Smidek <martin@smidek.eu>
 /** =====================================================================================> CALLGRAPH */
 # ----------------------------------------------------------------------------------------- doc_ezer
-# seznam Ezer modulů
-function doc_ezer() { trace();
-  global $ezer_root, $ezer_php;
+# seznam Ezer modulů, vytvoří globální struktury pro debugger, pokud je $info_only nevrací text
+# $ezer_dbg_names= [ name: {typ:'php', php:file}, ... ];
+function doc_ezer($info_only=false) { trace();
+  global $ezer_root, $ezer_php, $ezer_dbg_names;
 //                                                 display("$ezer_root, $ezer_php"); return;
+  $ezer_dbg_names= array();
   $html= "<div class='CSection CMenu'>";
   $html.= "<h3 class='CTitle'>Komentovaný seznam Ezer modulů aplikace '$ezer_root'</h3>";
   $html.= "
@@ -33,6 +35,10 @@ function doc_ezer() { trace();
     if ( $php ) {
       $html.= "<dd>";
       foreach($cg->calls as $mod=>$fces) {
+        // rejstřík jmen pro debugger
+        foreach ($fces as $name=>$def) if ($name!='?') {
+          $ezer_dbg_names[$name]= (object)array('typ'=>'php','php'=>$mod);
+        }
         // funkce definované v některém modulu
         $lst= array();
         foreach($php as $i=>$f) {
@@ -60,20 +66,13 @@ function doc_ezer() { trace();
       if ( count($php) ) {
         $html.= "<dd style='color:red'>".implode(', ',$php)."</dd>";
       }
-//       $del= '';
-//       foreach ($php as $f) {
-//         $html.= $del; $del= ', ';
-//         if ( in_array($f,$fce['user']) || in_array($f,$fce['internal']) )
-//           $html.= $f;
-//         else
-//           $html.= "<b style='color:red'>$f</b>";
-//       }
-//       $html.= "</dd>";
     }
   }
   $html.= "</dl>";
   $html.= "</div>";
-  return $html;
+//                                                 $ezer_dbg_names= array(1,2,3);
+                                                debug($ezer_dbg_names);
+  return $info_only ? $ezer_dbg_names : $html;
 }
 # ------------------------------------------------------------------------------------------ doc_php
 # seznam PHP modulů s označením nepoužitých

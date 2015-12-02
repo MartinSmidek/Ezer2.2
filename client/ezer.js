@@ -8140,14 +8140,15 @@ Ezer.fce.replace= function () {
   return x;
 }
 // ----------------------------------------------------------------------------------- replace_fa
-//ff: fce.replace_fa (x)
+//ff: fce.replace_fa (x,delete=0)
 //      vrátí x ve kterém provede náhradu podřetězců [fa-ikona] za html kód zobrazující ikony
 //      podle http://fortawesome.github.io/Font-Awesome/icons/
+//      pokud je delete=1 pak tyto podřetězce odstraní
 //s: funkce
-Ezer.fce.replace_fa= function (x) {
+Ezer.fce.replace_fa= function (x,del) {
   if ( typeof(x)!='string' && x.toString() )
     x= x.toString();
-  return x.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
+  return x.replace(/\[fa-([^\]]+)\]/g,del ? "" : "<i class='fa fa-$1'></i>");
 }
 // -------------------------------------------------------------------------------------- conc
 //ff: fce.conc (s1,s2,...)

@@ -186,9 +186,9 @@ Ezer.MenuMain.implement({
     if ( this.part ) {
       $each(this.part,function(desc,id) {
         var href= make_url_menu([id]); // 'ezer://'+id;
+        var title= desc.options.title||id;
+        title= title.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
         if ( desc.type=='tabs' ) {
-          var title= desc.options.title||id;
-          title= title.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
           var a= new Element('a',{href:href,html:title}).inject(new Element('div').inject(
           desc.DOM_li= new Element('li',{
             events:{
@@ -210,7 +210,7 @@ Ezer.MenuMain.implement({
         }
         // odhlášení (i když není požadováno přihlášení)
         else if ( desc.type=='tabs.logoff' ) {
-          new Element('a',{html:desc.options.title||id}).inject(new Element('div').inject(
+          new Element('a',{html:title}).inject(new Element('div').inject(
           desc.DOM_li= new Element('li',{
             events:{
               click: function(event) {
@@ -3706,7 +3706,8 @@ Ezer.Show.implement({
   DOM_show: function (r) {
     if ( this.DOM_cell ) {
       var browse= this.owner;
-      Ezer.assert(browse.b<=r&&r<=browse.b+browse.blen,"Show.DOM_show("+r+") - mimo rozsah");
+      Ezer.assert(browse.b<=r&&r<=browse.b+browse.blen && browse.buf[r-browse.b],
+        "Show.DOM_show("+r+") - mimo rozsah");
       // získání transformovanou hodnotu ti-tého řádku v buferu
       var val= browse.buf[r-browse.b][this.id];
       // zjištění případných transformací

@@ -13,20 +13,28 @@
   $skin=     'default';
 
   $src= $_GET['src'];
-  $src_ezer= $src;
-//   $src_ezer= "$src.ezer";
-  $url= "../$src_ezer";
+  $typ= isset($_GET['typ']) ? $_GET['typ'] : 'ezer';
+  $start= isset($_GET['start']) ? $_GET['start'] : '';
 
+  $url= "../$src";
   $html= $notes= $lines= "";
   $lns= file($url,FILE_IGNORE_NEW_LINES);
   foreach($lns as $i=>$ln) {
     $ln= str_replace('</script','<\/script',$ln);
     $lines.= "\n\"".addslashes($ln).'",';
   }
-  $html= html_closure($src,$notes,$html,$src_ezer,$lines);
+  switch($typ) {
+  case 'ezer':
+    $background= 'oldlace';
+    break;
+  case 'php':
+    $background= '#fafaff';
+    break;
+  }
+  $html= html_closure($src,$notes,$html,$src,$lines,$typ,$start,$background);
   echo $html;
 // ------------------------------------------------------------------------------------ html_closure
-function html_closure($win_name,$notes,$source,$url,$lines) {
+function html_closure($win_name,$notes,$source,$url,$lines,$typ,$start,$background) {
   $html= <<<__EOD
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
@@ -38,18 +46,17 @@ function html_closure($win_name,$notes,$source,$url,$lines) {
     <script src="client/licensed/clientcide.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
       Ezer= {fce:{},obj:{}};
-      source= [
-        $lines
-      ];
     </script>
     <script src="client/lib.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
 // =====================================================================================> JAVASCRIPT
-  var url= "$url";
+  var typ= '$typ';
+  var start= '$start';
   var log;
   var open= false;
   var help;
   var src= not= [];
+//   var win_php= win_js= null;
 // ------------------------------------------------------------------------------------==> . ON load
   window.addEvent('load', function() {
     log= $('log');
@@ -63,15 +70,49 @@ function html_closure($win_name,$notes,$source,$url,$lines) {
   window.addEvent('unload', function() {
     var pos= window.getCoordinates();
     var p= window.screenX+','+window.screenY+','+pos.width+','+pos.height;
-    opener.dbg_onunload(p);
+    opener.dbg_onunload(typ,p);
+//     if ( typ=='php' ) {
+//       Cookie.write('ezer_dbg_win2',p,{duration:100});
+//       opener.Ezer.sys.dbg.win_php= null;
+//     }
   });
 // ----------------------------------------------------------------------------------- dbg_show_help
-  function dbg_show_help(html) {
-    help.innerHTML= html;
+  function dbg_show_help(ret) {
+    if ( ret.typ=='php' ) {
+      if ( !opener.Ezer.sys.dbg.win_php ) {
+        dbg_php_open(ret.php,ret.item);
+      }
+      opener.Ezer.sys.dbg.win_php.dbg_php_item(ret.item);
+    }
+    else {
+      help.innerHTML= ret.html;
+    }
   }
 // ----------------------------------------------------------------------------------- dbg_save_text
   function dbg_save_text(source) {
     opener.dbg_onsave(url,source);
+  }
+// ========================================================================================> DBG PHP
+// -------------------------------------------------------------------------------==> . dbg_php_open
+// zobrazení textu ve struktuře
+  function dbg_php_open(fname,item) {
+    var ltwh= Cookie.read('ezer_dbg_win2');
+    ltwh= ltwh ? ltwh : '0,0,770,500';
+    var x= ltwh.split(',');
+    var position= 'left='+x[0]+',top='+x[1]+',width='+x[2]+',height='+x[3];
+    var path= './ezer2.2/dbg.php?err=1&typ=php&start='+item+'&src='+fname;
+    var arg= position+',resizable=1,titlebar=0,menubar=0';
+    opener.Ezer.sys.dbg.win_php= opener.open(path,'php',arg);
+  }
+// -------------------------------------------------------------------------------==> . dbg_php_item
+// nalezení itemu v PHP
+  function dbg_php_item(item) {
+    for (var ln= 0; ln<source.length; ln++) {
+      if ( source[ln].indexOf(item)>=0 ) {
+        dbg_show_line(ln+1,'pick');
+        break;
+      }
+    }
   }
 // ------------------------------------------------------------------------------==> . dbg_show_text
 // zobrazení textu ve struktuře
@@ -217,7 +258,7 @@ function html_closure($win_name,$notes,$source,$url,$lines) {
         if ( text ) {
           help.setStyles({display:'block'});
           help.set('text',text);
-          opener.dbg_help(text);
+          opener.dbg_help(typ,text);
         }
       },
       // -----------------------------------==> .. kontextové menu pro zdrojový text
@@ -350,6 +391,10 @@ function html_closure($win_name,$notes,$source,$url,$lines) {
       sel.addRange(range);
     }
   }
+  var url= "$url";
+  source= [
+    $lines
+  ];
 // =========================================================================================> STYLES
     </script>
     <style>
@@ -448,7 +493,7 @@ function html_closure($win_name,$notes,$source,$url,$lines) {
         background-color:#ffa !important; }
     </style>
   </head>
-  <body id='body' onload="dbg_onclick_start()" style="background-color:oldlace;">
+  <body id='body' onload="dbg_onclick_start()" style="background-color:$background;">
     <div id="help">...</div>
     <div id="source">$win_name</div>
     <div id='notes'>
