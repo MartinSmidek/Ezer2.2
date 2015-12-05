@@ -581,6 +581,9 @@ $html_header
     <input id="drag_title" type="text" style="float:right;width:165px" />
     <div style="padding:3px 0 0 2px;width:30px">title:</div>
   </form>
+  <div id="wait_mask">
+    <div id="wait"></div>
+  </div>
 <!-- konec -->
 </body>
 $html_footer
