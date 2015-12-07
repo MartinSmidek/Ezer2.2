@@ -10,7 +10,6 @@ proc the_formsave (f,b) {
   b.raise('onrowclick',b.browse_seek(conc(f.id_key,'=',f.key)))
 }
 proc reaccess() { #==> reaccess - změna
-  users.last_par.set(conc(users.last_par.get('cond')," AND access&",sys('user','access')),'cond');
   users.refresh
 }
 
@@ -269,7 +268,6 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
 #   }
 #   proc onstart () {
     last_par.set(see.all.actives.par);
-    last_par.set(conc(last_par.get('cond')," AND access&",sys('user','access')),'cond');
     sel.set('use');
     refresh;
     uzivatel.get.display(sys('options','watch_access'),'ac');
@@ -309,7 +307,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   }
   # obnovení seznamu uživatelů
   proc refresh() {
-    uzivatele.lst.browse_load(last_par.get('cond'));
+    uzivatele.lst.browse_load(conc(last_par.get('cond')," AND access&",sys('user','access')));
     cmd.enable(1,last_par.get('on'));
     cmd.enable(0,last_par.get('off'));
     watch_css;
@@ -332,7 +330,6 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     }
     proc onclick (i) {
       last_par.set(i.par);
-      last_par.set(conc(last_par.get('cond')," AND access&",sys('user','access')),'cond');
       refresh;
     }
   }
