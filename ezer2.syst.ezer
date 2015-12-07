@@ -9,6 +9,11 @@ proc the_formsave (f,b) {
 | f.insert; f.load;
   b.raise('onrowclick',b.browse_seek(conc(f.id_key,'=',f.key)))
 }
+proc reaccess() { #==> reaccess - změna
+  users.last_par.set(conc(users.last_par.get('cond')," AND access&",sys('user','access')),'cond');
+  users.refresh
+}
+
 # =======================================================================================> ČÍSELNÍKY
 panel cis [,,,*] {type:'right', title:'Číselníky', _sys:'cis', skill:'m|m'
   use u: form _tit [12,4,,]
@@ -249,7 +254,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   const sys_users_skills = 16
   const sys_users_cmd = 476
 
-  var last_par: object
+  var last_par: object,
   var novy: number,
   var new_skill: text,
   var sel: text,
@@ -259,16 +264,17 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   use cmd: form butt [22,sys_users_cmd,,],
   use dskill: form desc_skills [430+180,127,,]
 
-  proc onstart () {
+  proc onfirstfocus() {
+    watch_css;
+#   }
+#   proc onstart () {
     last_par.set(see.all.actives.par);
+    last_par.set(conc(last_par.get('cond')," AND access&",sys('user','access')),'cond');
     sel.set('use');
     refresh;
     uzivatel.get.display(sys('options','watch_access'),'ac');
     uzivatel.get.display(sys('options','watch_ip'),'ip');
     cmd.watch_key.display(sys('options','watch_key'));
-  }
-  proc onfirstfocus() {
-    watch_css;
   }
   # ==> ... uložení uživatele s kontrolou
   proc u_uloz () {
@@ -326,6 +332,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     }
     proc onclick (i) {
       last_par.set(i.par);
+      last_par.set(conc(last_par.get('cond')," AND access&",sys('user','access')),'cond');
       refresh;
     }
   }
