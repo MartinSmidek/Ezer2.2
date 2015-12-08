@@ -394,6 +394,9 @@ Ezer.MenuContext.implement({
   },
   DOM_add2: function() {
     var options= {target:this.owner.DOM_Block,menu:this.DOM,ezer_owner:null};
+    if ( this.options.par && this.options.par.trigger=='click' ) {
+      options.trigger='click';
+    }
     if ( this._f('m')>=0 ) {
       // zvýraznit oblast kontextového menu pomocí masky - musí existovat element s id='mask'
       options.focus_mask= true;
@@ -2999,9 +3002,9 @@ Ezer.Browse.implement({
         this.keys_sel.splice(ikey,1);
       else
         this.keys_sel.push(key);
-      this.fire('onchoice');
+      this.fire('onchoice',[ikey>=0?0:1]);
       this._css_row(this.tact);
-      this.DOM_hi_row(this.t+this.tact-1);
+      this.DOM_hi_row(this.t+this.tact-1,1);
       break;
     }
   },

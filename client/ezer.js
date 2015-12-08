@@ -3264,9 +3264,10 @@ Ezer.LabelMap= new Class({
     }
   },
 // -------------------------------------------------------------------------------- LabelMap.get
-//fm: LabelMap.get (op)
+//fm: LabelMap.get (op[,id])
 // get('ids') vrátí seznam zobrazených značek
-  get: function (op) {
+// get('id') vrátí značku s daným id nebo null
+  get: function (op,id) {
     var ret= del= '';
     switch (op) {
     case 'ids':
@@ -3274,6 +3275,15 @@ Ezer.LabelMap= new Class({
         if ( this.mark[i].id && this.mark[i].id!==undefined ) {
           ret+= del+this.mark[i].id;
           del= ',';
+        }
+      }
+      break;
+    case 'id':
+      ret= null;
+      for (var i in this.mark) {
+        if ( this.mark[i].id==id ) {
+          ret= this.mark[i];
+          break;
         }
       }
       break;
@@ -4791,16 +4801,18 @@ Ezer.Browse= new Class({
 // ------------------------------------------------------------------------------------ selected+
 //fm: Browse.selected (op[,param[,option]])
 //      ovládá chování browse vzhledem vybraným řádkům
-//a: clear      - zruší výběr
+//a: set        - nastaví klíče podle daného seznamu (string s klíči oddělenými čárkou)
+//   unset      - zruší výběr klíčů podle daného seznamu
+//   get        - vrátí seznam param prvních (pro option='D' posledních) klíčů  nebo všech klíčů, pokud je param 0
+//   clear      - zruší výběr param prvních klíčů nebo všech klíčů, pokud je param 0
 //   set_page   - zruší výběr a nastaví jako vybrané ty viditelné
 //   add_page   - přidá k výběru ty viditelné
 //   refresh    - obnoví zobrazení výběru
 //   toggle     - změní stav aktivního řádku, pokud je param=1 nebude vyvoláno onrowclick
 //   use        - operace browse_load, browse_seek budou vracet jen vybrané řádky
 //   ignore     - operace browse_load, browse_seek se budou chovat jakoby nic
-//   set        - nastaví klíče podle daného seznamu (string s klíči oddělenými čárkou)
-//   get        - vrátí seznam param prvních (pro option='D' posledních) klíčů  nebo všech klíčů, pokud je param 0
 //   key        - vrátí param tý klíč (pro option='D' od konce)
+//   this       - vrátí stav aktivního řádku
   selected: function(op,param,option) {
     var result= 1;
     switch ( op ) {
@@ -4821,11 +4833,28 @@ Ezer.Browse= new Class({
       this._css_row(this.tact);
       this.DOM_hi_row(this.t+this.tact-1,param||0);
       break;
+    case 'this':  // vrátí stav aktivního řádku
+      var key= this.keys[this.t+this.tact-1-this.b];
+      var ikey= this.keys_sel.indexOf(key);
+      if ( ikey<0 )
+        result= 0;
+      break;
     case 'set': // nastaví klíče podle daného seznamu (string s klíči oddělenými čárkou)
       if ( param )
         this.keys_sel= $type(param)=='string' ? param.split(',') : [param];
       else
         this.keys_sel= [];
+      this.selected('refresh');
+      break;
+    case 'unset': // zruší klíče podle daného seznamu
+      if ( !param ) break;
+      var ikey, p= param.split(',');
+      for (var i= 0; i < p.length; i++) {
+        ikey= this.keys_sel.indexOf(p[i]);
+        if ( ikey >= 0 ) {
+          this.keys_sel.splice(ikey,1);
+        }
+      }
       this.selected('refresh');
       break;
     case 'get': // vrátí seznam param prvních (pro záporné posledních) klíčů nebo všech klíčů, pokud je param vynecháno nebo 0
@@ -5759,6 +5788,8 @@ Ezer.Browse= new Class({
         }
         // a technickou podobu dotazu pro browse/ask
         x.show= this._get_query();
+        // pokud bylo selected(use) předej vybrané klíče
+        x.selected= this.selected_op=='use' ? this.keys_sel.toString() : null;
         return x;
       }
     }

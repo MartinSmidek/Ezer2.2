@@ -1613,7 +1613,7 @@
     function dbg_includes() { trace();
       global $includes;
 //                                                 debug($includes,'includes',(object)array('depth'=>2));
-      foreach($includes as $ids=>$include) {
+      if ( $includes ) foreach($includes as $ids=>$include) {
         $id= strrpos($ids,'.') ? substr($ids,strrpos($ids,'.')+1) : $ids;
         $includes[$ids]->id= $id;
 //                                                 display("$ids-$id-{$includes[$ids]->id}");
