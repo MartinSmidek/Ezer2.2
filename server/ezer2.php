@@ -956,6 +956,12 @@
   # v popisu pole se může objevit (narozdíl od ostatních metod browse) popis "map" pro map_pipe
   #   map = { field:id, table:id, t_options: {db:id,...}, m_options: {where:s, order:s, key_id:id}
   case 'browse_export':
+    if ( isset($x->optimize->ask) ) {
+      $fce= $x->optimize->ask;
+      if ( function_exists($fce) ) $y= call_user_func($fce,$x);
+      else fce_error("browse/ask: funkce '$fce' neexistuje");
+      break;
+    }
     if ( $x->db ) ezer_connect($x->db);
     $fields= ''; $clmns= ''; $del= '';
     $y->par= $x->par;

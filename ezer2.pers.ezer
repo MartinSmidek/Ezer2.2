@@ -122,7 +122,7 @@ form right [,,*,50] {
   } }
   label note [0,170,*,550] { title:' ' }
   proc fill(h,n) {
-    [ h; head.set(conc("<div class='CSection CMenu'><h3 class='CTitle'>",h,"</h3></div>")) ];
+    [ h; head.set(conc("<div class='karta'>",h,"</div>")) ];
     [ n; note.set(n) ]
   }
   proc append(n) {

@@ -546,7 +546,13 @@ Ezer.Application.implement({
         }
       }
     })
-    Ezer._MenuMain.excite();                        // vlastní spuštění aplikace
+    // vlastní spuštění aplikace
+    Ezer._MenuMain.excite();
+    // pokud je použito 'wait_mask' tak je potlač
+    var wait= $('wait_mask');
+    if ( wait ) {
+      wait.setStyle('display','none');
+    }
   },
 // ------------------------------------------------------------------------------------ onfirstfocus
 // je voláno v případě prvního focus panelu - obdoba události domready

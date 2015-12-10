@@ -5282,7 +5282,8 @@ Ezer.Browse= new Class({
 //fx: Browse.browse_export (par,[cond[,order[,having]]])
 //      export dat podle zadaných parametrů, pokud je v par.show obsažen seznam jmen,
 //      budou exportovány jen takto pojmenované sloupce
-//a:    par - {[dir:podsložka docs,]file:jméno souboru v docs,type:csv|xls|xlsx,[,show:seznam exportovaných show]}
+//a:    par - {[dir:podsložka docs,]file:jméno souboru v docs,type:csv|xls|xlsx,
+//             [,show:seznam exportovaných show]}
 //      cond - MySQL podmínka umístěná za WHERE
 //      order - nepovinná část za ORDER BY
 //      having - nepovinná část umístěná za HAVING v GROUP BY klauzuli
@@ -5290,6 +5291,10 @@ Ezer.Browse= new Class({
   browse_export: function(par,cond,order,having,sql) {
     // vytvoř parametry dotazu
     var x= this._params({cmd:'browse_export',par:par},cond,order||null,having||null);
+    // pokud je požadováno selected, předej klíče
+    if ( par.selected ) {
+      x.selected= this.selected('get');
+    }
     return x;
   },
   browse_export_: function(y) {

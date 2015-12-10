@@ -783,7 +783,7 @@ panel needs [,,770,] {type:'right', title:'Požadavky', _sys:'poz', skill:'sp'
     }}
     // fce
     proc fill(h,n) {
-      [ h; head.set(conc("<div class='CSection CMenu'><h3 class='CTitle'>",h,"</h3></div>")) ];
+      [ h; head.set(conc("<div class='karta'>",h,"</div>")) ];
       [ n; note.set(n) ]
     }
     proc append(n) {

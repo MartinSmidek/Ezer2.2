@@ -1966,7 +1966,9 @@ function export_tail($show_xls=0) { #trace();
     if ( $show_xls )
       $ret= $export_par->_xls;
     else {
-      $inf= Excel5($export_par->_xls,1,$wb,$export_par->dir,$export_par->type);
+      $wb= null;
+//       $inf= Excel5($export_par->_xls,1,$wb,$export_par->dir,$export_par->type);
+      $inf= Excel5($export_par->_xls);
       $export_par->ok= $inf ? 0 : 1;
 //                                                         debug($export_par,$inf);
       if ( $inf ) fce_warning($inf);
