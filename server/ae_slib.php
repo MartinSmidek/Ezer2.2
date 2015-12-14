@@ -2560,6 +2560,12 @@ end:
 #          | { fld:field, op:i,   val:value }                     -- pro vytvoření
 # 3. ezer_qry("UPDATE_keys",$table,$keys,$zmeny[,$key_id]);    -- hromadná oprava pro key IN ($keys)
 #     zmeny= { fld:field, op:m|p|a, val:value}                    -- SET fld=value
+function user_test() {
+  global $mysql_db_track, $USER;
+  if ( $mysql_db_track && !$USER->abbr ) {
+    fce_error("Vaše přihlášení již vypršelo - přihlaste se prosím znovu a operaci opakujte");
+  }
+}
 function ezer_qry ($op,$table,$cond_key,$zmeny,$key_id='') {
   global $json, $mysql_db, $mysql_db_track, $mysql_tracked, $USER;
 //                                                         debug($zmeny,"qry_update($op,$table,$cond_key)");
@@ -2569,6 +2575,7 @@ function ezer_qry ($op,$table,$cond_key,$zmeny,$key_id='') {
   $tab= str_replace("$mysql_db.",'',$table);
   if ( !$key_id ) $key_id= $tab=='pdenik' ? 'id_pokl' : str_replace('__','_',"id_$tab");
   $user= $USER->abbr;
+  user_test();
   // zpracování parametrů -- jen pro UPDATE
   switch ( $op ) {
   case 'INSERT':
@@ -2720,6 +2727,7 @@ function ezer_qry ($op,$table,$cond_key,$zmeny,$key_id='') {
       }
     }
   }
+end:
   return $result;
 }
 ?>
