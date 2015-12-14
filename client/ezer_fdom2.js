@@ -1583,11 +1583,12 @@ Ezer.Elem.implement({
     this.DOM_Input.addEvents({
       click: function(el) {
         if ( el.shift ) return dbg_onshiftclick(this); /* element */
-        if ( el && el.control ) {
-          Ezer.fce.source(this);
-          return false;
-        }
-        else if ( this.type=='check' ) {
+//         if ( el && el.control ) {
+//           Ezer.fce.source(this);
+//           return false;
+//         }
+//         else
+        if ( this.type=='check' ) {
           this.change();
         }
       }.bind(this),
@@ -3507,6 +3508,10 @@ Ezer.Show.implement({
           }
           else if ( this.options.expr ) {
             this.owner.order= this.options.expr + (this.sorting=='a' ? ' ASC' : ' DESC');
+            this.owner.order_by= this;
+          }
+          else {
+            this.owner.order= this._id + (this.sorting=='a' ? ' ASC' : ' DESC');
             this.owner.order_by= this;
           }
         }

@@ -1160,16 +1160,16 @@ Ezer.Block= new Class({
     var fce= null, res= true, v;
     if ( this.part ) {
       if ( fce= this.part[event_name] ) {
-        if ( el && el.control ) {
-          Ezer.fce.source(fce);
-        }
-        else {
+//         if ( el && el.control ) {
+//           Ezer.fce.source(fce);
+//         }
+//         else {
           trace_event(this.type,this.id,event_name,fce);
           //Ezer.trace('e','EVENT:'+this.type+'.'+this.id+'.'+event_name+' in '+Ezer.App.block_info(fce),fce);
           v= new Ezer.Eval([{o:'c',i:fce.desc._init||event_name,a:args.length}],
             fce.context||this,args,event_name,false,false,fce);
           res= v.simple ? v.value : false;
-        }
+//         }
       };
     }
     if ( this instanceof Ezer.Elem ) {
@@ -4466,12 +4466,26 @@ Ezer.SelectMap= new Class({
 //a: val - hodnota
   set: function (val) {
     this.value= val;
-//     this.empty= false;
-    // nalezení klíče k hodnotě
-    for (var key in this.Items) {
-      if ( this.Items[key]==val ) {
-        this._key= key;
-        break;
+    if ( this.multi ) {
+      // nalezení klíčů k hodnotám
+      this._key= [];
+      var values= this.value.split(',');
+      values.each(function(value){
+        for (var key in this.Items) {
+          if ( this.Items[key]==value ) {
+            this._key.push(key);
+            break;
+          }
+        }
+      }.bind(this));
+    }
+    else {
+      // nalezení klíče k hodnotě
+      for (var key in this.Items) {
+        if ( this.Items[key]==val ) {
+          this._key= key;
+          break;
+        }
       }
     }
     this._changed= false;
