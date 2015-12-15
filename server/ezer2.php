@@ -65,7 +65,7 @@
   case 'touch':
     if ( isset($x->logout) ) {
       $user= $_SESSION[$ezer_root]['user_id'];
-      $ezer_user_id= $_SESSION[$ezer_root]['user_id']= $y->user_id= 0;
+      $ezer_user_id= $_SESSION[$ezer_root]['user_id']= /*$y->user_id=*/ 0;
       $_SESSION[$ezer_root]['last_op'].= ' touch/logout';
 //       $_SESSION[$ezer_root]= array();
 //       if ( $ezer_session=='ezer' )
@@ -204,6 +204,13 @@
   $y->cmd= $x->cmd;
   $totrace= $x->totrace;                // kopie ae_trace: používá se k omezení trasovacích informací
   $y->qry_ms= 0;
+  // ochrana proti ztrátě přihlášení
+  if ( !$USER->id_user
+    && !in_array($x->cmd,array('user_login','user_relogin','user_group_login')) ) {
+    $y->error= "<big>Vaše přihlášení již vypršelo - odhlaste se prosím a znovu přihlaste</big>";
+    $y->value= array();
+    goto end_switch;
+  }
   switch ( $x->cmd ) {
   # ================================================================================================ VOLÁNÍ z EZER
   # ------------------------------------------------------------------------------------------------ touch
@@ -1895,6 +1902,7 @@
     break;
   }
 # ================================================================================================== answer
+end_switch:
   global $trace, $warning;
   if ( $trace && strpos($x->totrace,'u')!==false )
     $y->trace= $trace;

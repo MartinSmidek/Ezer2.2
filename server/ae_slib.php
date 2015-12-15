@@ -1053,6 +1053,10 @@ function debugx(&$gt,$label=false,$html=0,$depth=64,$length=64,$win1250=0,$getty
 # Příklad: echo(ask('PHP','global $USER;display("ok");debug($USER);return $USER->options->email;'));
 # (používat výhradně pro účely ladění v debugeru! - eval nevrací paměť - viz informace na webu)
 function PHP($expr) {
+  global $USER,$EZER;
+  display($expr);
+  debug($USER,'$USER');
+  debug($EZER,'$EZER');
   $fce= eval($expr);
   return $fce;
 }
