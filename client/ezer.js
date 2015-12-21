@@ -5467,7 +5467,7 @@ Ezer.Browse= new Class({
 //  zopakuje předchozí browse_load včetně nastavení záznamu s klíčem key
 //a: key   - klíč
   browse_refresh: function(oldkey) {
-    x= this._params({cmd:'browse_load',subcmd:'refresh'},null,null,null,this.b,-1,0,null);
+    var x= this._params({cmd:'browse_load',subcmd:'refresh'},null,null,null,this.b,-1,0,null);
     x.oldkey= oldkey;
     x.quiet= 1;
     return x;
