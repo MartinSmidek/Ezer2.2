@@ -309,6 +309,11 @@ Ezer.Application.implement({
       Ezer.sys.ezer= y.sys.ezer;
       Ezer.onlogin();
     }
+    // pokud je použito 'wait_mask' tak ji zobraz
+    var wait= $('wait_mask');
+    if ( wait ) {
+      wait.setStyle('display','block');
+    }
   },
   // ------------------------------------------------------------------------------------- logged
   // logged: akce po změně přihlášení

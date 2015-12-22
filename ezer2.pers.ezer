@@ -113,7 +113,7 @@ form _chng [,,700,120] { style:'z-index:2'
 # formulář pro levostranné menu s postupným zápisem
 form right [,,*,50] {
   label head [0,0,*,50]  { title:' ' }
-  select id_user [-20,19,100,20] { type:'map', options:user.surname, format:'xt', skill:'a|a'
+  select id_user [-20,5,100,20] { type:'map', options:user.surname, format:'xt', skill:'a|a'
     help:'výběr uživatele'
     proc onchange () {
       echo('vybráno:',id_user.get,',',id_user.key);

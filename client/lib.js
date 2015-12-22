@@ -160,6 +160,11 @@ function dbg_onshiftclick(block) {
       show();
     }
     else {
+      if ( Ezer.sys.dbg.win_ezer ) {
+        // zavření zobrazeného
+        Ezer.sys.dbg.win_ezer.noevent= true;
+        Ezer.sys.dbg.win_ezer.close();
+      }
       var fname= pos.app+'/'+pos.file+'.ezer';
       //fname= pos.app+'/tut.the.php';  -- test otevření PHP
       //fname= pos.app+'/i_fce.js';     -- test otevření JS
@@ -171,6 +176,8 @@ function dbg_onshiftclick(block) {
         position+',resizable=1,titlebar=0,menubar=0');
       if ( Ezer.sys.dbg.win_ezer ) {
         Ezer.sys.dbg.file= pos.file;
+        Ezer.sys.dbg.typ= 'ezer';
+        Ezer.sys.dbg.noevent= false;
       };
     }
   }

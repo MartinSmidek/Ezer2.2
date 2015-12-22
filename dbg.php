@@ -103,6 +103,7 @@ function html_closure($win_name,$notes,$source,$url,$lines,$typ,$start,$backgrou
     var path= './ezer2.2/dbg.php?err=1&typ=php&start='+item+'&src='+fname;
     var arg= position+',resizable=1,titlebar=0,menubar=0';
     opener.Ezer.sys.dbg.win_php= opener.open(path,'php',arg);
+    opener.Ezer.sys.dbg.typ= 'php';
   }
 // -------------------------------------------------------------------------------==> . dbg_php_item
 // nalezení itemu v PHP

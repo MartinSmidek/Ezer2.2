@@ -100,6 +100,7 @@ echo <<<__EOD
 .orange { background-color:#fa0 !important; }
 .white  { background-color:#fff !important; }
 .grey   { background-color:#aaa !important; }
+.silver { background-color:#ddd !important; }
 
 .red_text   { color:#f00 !important; }
 .green_text { color:#0f0 !important; }
