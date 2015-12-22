@@ -582,7 +582,7 @@ $html_header
     <div style="padding:3px 0 0 2px;width:30px">title:</div>
   </form>
   <div id="wait_mask">
-    <div id="wait"></div>
+    <div id="wait" onclick="$('wait_mask').setStyle('display','none');"></div>
   </div>
 <!-- konec -->
 </body>

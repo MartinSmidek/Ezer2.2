@@ -234,7 +234,8 @@ panel act [,,*,] {type:'right', title:'Aktivita', _sys:'akt', skill:'a|a;aa|aa'
       }
     }
     proc onclick (i) {
-      u.result.set(conc("<div id='info'>",ask('sys_activity',i.par,skip.get,u.den.get),"</div>"))
+      u.result.set(conc("<div id='info'>",
+        ask('sys_activity',i.par,skip.get,u.den.get,sys('options','watch_access_opt')),"</div>"))
     }
   }
   use u: form _touch [12,4,,]

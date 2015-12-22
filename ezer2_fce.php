@@ -687,10 +687,13 @@ function sys_watch_key() {
 # ------------------------------------------------------------------------------------- sys_activity
 # vygeneruje přehled aktivit podle menu
 # pokud ... tak vynechá uživatele, jejichž zkratky jsou v seznamu $EZER->activity->skip
-function sys_activity($k,$to_skip=0,$den=0) {
+# $watch_access_opt je tabulka tabulek name, abbr, css mapujících access na hodnoty
+function sys_activity($k,$to_skip=0,$den=0,$_watch_access_opt='') {
 //                                                                 debug($k,'sys_activity');
-  global $ezer_root, $json, $user_options, $APLIKACE, $USER, $EZER;
+  global $ezer_root, $json, $user_options, $APLIKACE, $USER, $EZER, $watch_access_opt;
+  $watch_access_opt= $_watch_access_opt;
   $user_options= $_SESSION[$ezer_root]['user_options'];
+                                        debug($watch_access_opt);
   $skip= $to_skip && $EZER->activity->skip ? $EZER->activity->skip : '';
   $html= "<div class='CSection CMenu'>";
   switch ( "{$k->s} {$k->c}" ) {
@@ -846,16 +849,21 @@ function sys_sign_obsolete($module,$menu) {
 # ---------------------------------------------------------------------------------- sys_day_modules
 # vygeneruje podrobný přehled aktivity modulů pro daný den
 function sys_day_modules($skip,$day,$short=false) {
-  global $user_options, $USER;
+  global $user_options, $USER, $watch_access_opt;
   $touch= array();
   $hours= array();
   $and=  $skip ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
-  $qry= "SELECT day,hour(time) as hour,user,module,menu,count(*) as c,msg FROM _touch
+  $qry= "SELECT org,day,hour(time) as hour,user,module,menu,count(*) as c,msg FROM _touch
+         JOIN _user ON abbr=user
          WHERE day='$day' AND user!='' $and
          GROUP BY module,menu,user,hour(time) ORDER BY module,menu";
   $res= mysql_qry($qry);
   while ( $res && $row= mysql_fetch_assoc($res) ) {
-    $user= $row['user'];
+    $user_clr= $user= $row['user'];
+    if ( $watch_access_opt && isset($watch_access_opt->css->{$row['org']}) ) {
+      $clr= $watch_access_opt->css->{$row['org']};
+      $user_clr= "<span class='$clr'>$user</span>";
+    }
     $hour= $row['hour'];
     $hours[$hour]= true;
     $module= $row['module'];
@@ -869,7 +877,7 @@ function sys_day_modules($skip,$day,$short=false) {
     $c= $row['c'];
     if ( !$touch[$menu] ) $touch[$menu]= array(array());
     if ( strpos($touch[$menu][$hour][0],$user)==false )
-      $touch[$menu][$hour][0].= $user=="---" ? " $ip" : " $user";
+      $touch[$menu][$hour][0].= $user=="---" ? " $ip" : " $user_clr";
   }
   ksort($touch);
   $html= sys_table($touch,$hours,'module','#dce7f4');
@@ -878,16 +886,21 @@ function sys_day_modules($skip,$day,$short=false) {
 # --------------------------------------------------------------------------------- sys_days_modules
 # vygeneruje podrobný přehled aktivity modulů pro dané období (počátek a délka)
 function sys_days_modules($skip,$day,$ndays,$short=false) {
-  global $user_options, $USER;
+  global $user_options, $USER, $watch_access_opt;
   $touch= array();
   $days= array();
   $and=  $skip ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
-  $qry= "SELECT day,user,module,menu,count(*) as c FROM _touch
+  $qry= "SELECT org,day,user,module,menu,count(*) as c FROM _touch
+         JOIN _user ON abbr=user
          WHERE day BETWEEN '$day'-INTERVAL $ndays DAY AND '$day' AND user!='' /*AND module='block'*/ $and
          GROUP BY module,menu,user,day ORDER BY module,menu";
   $res= mysql_qry($qry);
   while ( $res && $row= mysql_fetch_assoc($res) ) {
     $user= $row['user'];
+    if ( $watch_access_opt && isset($watch_access_opt->css->{$row['org']}) ) {
+      $cls= $watch_access_opt->css->{$row['org']};
+      $user= "<span class='$cls'>$user</span>";
+    }
     $day= $row['day'];
     $days[$day]= true;
     $module= $row['module'];
@@ -912,17 +925,22 @@ function sys_days_modules($skip,$day,$ndays,$short=false) {
 # ------------------------------------------------------------------------------------ sys_day_users
 # vygeneruje přehled aktivit uživatelů pro daný den
 function sys_day_users($skip,$day,$short=false) {  trace();
-  global $user_options, $USER;
+  global $user_options, $USER, $watch_access_opt;
   $touch= array();
   $hours= array();
   $AND=  $skip     ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
   $AND=  $short==2 ? "AND module='speed' " : '';
-  $qry= "SELECT day,hour(time) as hour,user,module,menu,count(*) as c,sum(hits) as h,
+  $qry= "SELECT org,day,hour(time) as hour,user,module,menu,count(*) as c,sum(hits) as h,
          GROUP_CONCAT(msg SEPARATOR ';') AS _speed FROM _touch
+         JOIN _user ON abbr=user
          WHERE day='$day' AND user!='' $AND GROUP BY user,module,menu,hour(time) ORDER BY user,hour";
   $res= mysql_qry($qry);
   while ( $res && $row= mysql_fetch_assoc($res) ) {
     $user= $row['user'];
+    if ( $watch_access_opt && isset($watch_access_opt->css->{$row['org']}) ) {
+      $cls= $watch_access_opt->css->{$row['org']};
+      $user= "<span class='$cls'>$user</span>";
+    }
     $hour= $row['hour'];
     $hours[$hour]= true;
     $module= $row['module'];
@@ -951,18 +969,23 @@ function sys_day_users($skip,$day,$short=false) {  trace();
 # ----------------------------------------------------------------------------------- sys_days_users
 # vygeneruje přehled aktivit uživatelů pro dané období (počátek a délka)
 function sys_days_users($skip,$day,$ndays,$short=false) {
-  global $user_options, $USER;
+  global $user_options, $USER, $watch_access_opt;
   $touch= array();
   $days= array();
   $AND=  $skip     ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
   $AND=  $short==2 ? "AND module='speed' " : '';
-  $qry= "SELECT day,user,module,menu,count(*) as c,sum(hits) as h,
+  $qry= "SELECT org,day,user,module,menu,count(*) as c,sum(hits) as h,
          GROUP_CONCAT(msg SEPARATOR ';') AS _speed FROM _touch
+         JOIN _user ON abbr=user
          WHERE day BETWEEN '$day'-INTERVAL $ndays DAY AND '$day' AND user!='' $AND
          GROUP BY user,module,menu,day ORDER BY user,day";
   $res= mysql_qry($qry);
   while ( $res && $row= mysql_fetch_assoc($res) ) {
     $user= $row['user'];
+    if ( $watch_access_opt && isset($watch_access_opt->css->{$row['org']}) ) {
+      $cls= $watch_access_opt->css->{$row['org']};
+      $user= "<span class='$cls'>$user</span>";
+    }
     $day= $row['day'];
     $days[$day]= true;
     $module= $row['module'];
@@ -1052,14 +1075,16 @@ __JS
 #   $sign= 'all' => všechno
 function sys_day_logins($skip,$day,$sign='=') {
 //                                                         display("sys_day_logins($day,$sign)");
-  global $user_options, $USER;
+  global $user_options, $USER, $watch_access_opt;
   $max_len= 512;
   $n= 0;
   $and=  $skip ? "AND NOT FIND_IN_SET(user,'$skip')" : '';
   $html.= '<br><table>';
   $cond= $sign=='all' ? '1' : "day$sign'$day'";
-  $qry= "SELECT id_touch, msg, day, time, user, menu
-         FROM _touch WHERE $cond AND msg!='' AND menu IN ('login','acount?','ip?') $and
+  $qry= "SELECT org, id_touch, msg, day, time, user, menu
+         FROM _touch
+         JOIN _user ON abbr=user
+         WHERE $cond AND msg!='' AND menu IN ('login','acount?','ip?') $and
          ORDER BY day DESC,time DESC";
   $res= mysql_qry($qry);
   while ( $res && $t= mysql_fetch_object($res) ) {
@@ -1069,23 +1094,29 @@ function sys_day_logins($skip,$day,$sign='=') {
     if ( $menu=='ip?' ) {
       $typ= 'IP?';
       $color= '#eee';
+      $cls= 'silver';
       list($user,$ip,$screen,$browser,$plat,$brow)= explode('|',$t->msg);
     }
     elseif ( $menu=='login' ) {
       $typ= 'login';
       $color= '#afA';
+      $cls= 'green';
       list($user,$ip,$screen1,$screen2,$browser,$plat,$brow)= explode('|',$t->msg);
       $screen= "$screen1 ($screen2)";
     }
     else {
       $typ= 'error';
       $color= '#fb6';
+      $cls= 'red';
       list($user,$ip,$screen1,$screen2,$browser,$plat,$brow)= explode('|',$t->msg);
       $screen= "$screen1 ($screen2)";
     }
     // generování
+    if ( $watch_access_opt && isset($watch_access_opt->css->{$t->org}) ) {
+      $cls= $watch_access_opt->css->{$t->org};
+    }
     $html.= "<tr title='$browser'><td>$typ</td><td>$when</td>
-               <td style='background-color:$color'><b>$user</b></td>
+               <td class='$cls'><b>$user</b></td>
                <td><b>$ip</b></td><td>$screen</td><td>$plat</td><td>$brow</td></tr>";
   }
   $html.= '</table>';
