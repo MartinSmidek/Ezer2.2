@@ -393,7 +393,7 @@ Ezer.MenuContext.implement({
     this.DOM= new Element('ul',{'class':'ContextMenu'}).inject($('body'));
   },
   DOM_add2: function() {
-    var options= {target:this.owner.DOM_Block,menu:this.DOM,ezer_owner:null};
+    var options= {target:this.owner.DOM_Block,menu:this.DOM};
     if ( this.options.par && this.options.par.trigger=='click' ) {
       options.trigger='click';
     }
@@ -1201,7 +1201,7 @@ Ezer.LabelDrop.implement({
           + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all','',''])}]"
         + "],arguments[0])};return false;\"";
       }
-      href= "<a target='docs' href='"+Ezer.options.path_files_href+this.folder+f.name+"'"+m+">"
+      href= "<a target='docs' href='"+(Ezer.options.path_files_href||'')+this.folder+f.name+"'"+m+">"
         + f.name+"</a>";
     }
     if ( this.cloud=='H:' ) {   // úložiště neviditelné protokolem http: ../files/{root}
@@ -1269,7 +1269,7 @@ Ezer.LabelDrop.implement({
 // konec vkládání a případný upload na Google Disk
   DOM_upload_Disk: function(f,do_upload) {
     if ( do_upload ) {
-      //f.name= do_upload;
+      // ==> . upload G:
       f.td2.innerHTML= "přenášení";
       const boundary = '-------314159265358979323846';
       const delimiter = "\r\n--" + boundary + "\r\n";
@@ -1351,20 +1351,18 @@ Ezer.LabelDrop.implement({
       f.td2.innerHTML= "přerušeno";
       return 0;
     }
-    // postupné poslání dat
+    // ==> . upload S:,H:
     var data= f.data.slice((n-1)*CHUNK,n*CHUNK);
     var xhr = new XMLHttpRequest();
     xhr.open('POST', Ezer.version+'/server/file_send.php', true);
     xhr.setRequestHeader("EZER-FILE-NAME", encodeURIComponent(f.newname ? f.newname : f.name));
     xhr.setRequestHeader("EZER-FILE-CHUNK", n);
     xhr.setRequestHeader("EZER-FILE-CHUNKS", max);
-//     if ( this.cloud=='S:' )             // S: relativní cesta pro http
-//       xhr.setRequestHeader("EZER-FILE-RELPATH", this.folder);
-//     else                                // H: absolutní
-//       xhr.setRequestHeader("EZER-FILE-ABSPATH", Ezer.options.path_files+this.folder);
-    xhr.setRequestHeader("EZER-FILE-ABSPATH", this.cloud=='S:'
-      ? Ezer.options.path_files_s+this.folder
-      : Ezer.options.path_files_h+this.folder);
+    if ( this.cloud=='S:' && !Ezer.options.path_files_s )   // S: relativní (zpětná kompatibilita)
+      xhr.setRequestHeader("EZER-FILE-RELPATH", this.folder);
+    else                                                    // S:,H: absolutní
+      xhr.setRequestHeader("EZER-FILE-ABSPATH",
+        (this.cloud=='S:' ? Ezer.options.path_files_s : Ezer.options.path_files_h) + this.folder);
     xhr.onload = function(e) {
       if (e.target.status == 200) {
         // vraci pole:name|chunk/chunks|path|strlen
@@ -1396,7 +1394,7 @@ Ezer.LabelDrop.implement({
     return 1;
   }
 });
-// =====================================================================================> Button-DOM
+// =========================================================================================> Button
 Ezer.Button.implement({
   Implements: [Ezer.Drag,Ezer.Help],
   DOM_add: function() {

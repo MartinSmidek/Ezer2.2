@@ -7868,6 +7868,9 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
         else if ( field._load ) {
           field._load(x[id],key);
         }
+        else if ( field.set ) {
+          field.set(x[id],value);
+        }
       }
     });
 //     $each(y.part,function(field,id) {

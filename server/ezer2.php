@@ -2344,7 +2344,12 @@ function load_files($x,$y) {
 # pokud $file=* budou smazány všechny soubory v dané složce, funkce vrací počet smazaných souborů
 function drop_unlink($folder,$file,$cloud='S:') {
   global $ezer_root;
-  $path_files= trim($_SESSION[$ezer_root][$cloud=='S:' ? 'path_files_s' :  'path_files_h'],"' ");
+  if ( $cloud=='S:' && isset($_SESSION[$ezer_root]['path_files']) )
+    // S: relativně (zpětná kompatibilita)
+    $path_files= trim($_SESSION[$ezer_root]['path_files']);
+  else
+    // S: H: absolutní (od září 2015)
+    $path_files= trim($_SESSION[$ezer_root][$cloud=='S:' ? 'path_files_s' :  'path_files_h'],"' ");
   $path_files= rtrim($path_files,"/");
   $deleted= 0;
   if ( $file=='*' ) {
@@ -2373,7 +2378,12 @@ function drop_unlink($folder,$file,$cloud='S:') {
 # že soubor obsahuje odkaz na skutečný soubor
 function drop_find($folder,$mask,$cloud='S:') {     //trace();
   global $ezer_root;
-  $path_files= trim($_SESSION[$ezer_root][$cloud=='S:' ? 'path_files_s' :  'path_files_h'],"' ");
+  if ( $cloud=='S:' && isset($_SESSION[$ezer_root]['path_files']) )
+    // S: relativně (zpětná kompatibilita)
+    $path_files= trim($_SESSION[$ezer_root]['path_files']);
+  else
+    // S: H: absolutní (od září 2015)
+    $path_files= trim($_SESSION[$ezer_root][$cloud=='S:' ? 'path_files_s' :  'path_files_h'],"' ");
   $found= '';
   // projdi soubory složky
   $path= str_replace('//','/',"$path_files/$folder");

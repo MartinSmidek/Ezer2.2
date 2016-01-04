@@ -72,10 +72,9 @@ else {
   $name=   utf2ascii(urldecode($name));
   $chunk=  $_SERVER['HTTP_EZER_FILE_CHUNK'];
   $chunks= $_SERVER['HTTP_EZER_FILE_CHUNKS'];
-//   $path=   isset($_SERVER['HTTP_EZER_FILE_RELPATH'])
-//          ? $_SERVER['DOCUMENT_ROOT'].'/'.$_SERVER['HTTP_EZER_FILE_RELPATH']  // S:
-//          : $_SERVER['HTTP_EZER_FILE_ABSPATH'];                               // H:
-  $path=   $_SERVER['HTTP_EZER_FILE_ABSPATH'];
+  $path=   isset($_SERVER['HTTP_EZER_FILE_RELPATH'])
+         ? $_SERVER['DOCUMENT_ROOT'].'/'.$_SERVER['HTTP_EZER_FILE_RELPATH']  // S: relativní
+         : $_SERVER['HTTP_EZER_FILE_ABSPATH'];                               // S: H: absolutní
   $pname= stripslashes("$path/$name");
 
   $data= file_get_contents("php://input");
