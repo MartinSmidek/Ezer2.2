@@ -546,13 +546,16 @@ Ezer.Item.implement({
       var title= this.options.title||this.id;
       title= title.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
       new Element('li').adopt(
-        this.DOM_Block= new Element('a',{html:title[0]=='-' ? title.substr(1) : title})
+        this.DOM_Block= new Element('a',{html:title[0]=='-'||title[0]=='=' ? title.substr(1) : title})
       ).inject(this.owner.DOM);
       if ( this._fc('d') ) {
         this.DOM_Block.addClass('disabled');
       }
       if ( title[0]=='-' ) {
         this.DOM_Block.setStyles({borderTop:"1px solid #AAAAAA"});
+      }
+      else if ( title[0]=='=' ) {
+        this.DOM_Block.setStyles({borderTop:"3px double #AAAAAA"});
       }
       if ( this.type=='item.clipboard' ) {
         // pokud je definováno
