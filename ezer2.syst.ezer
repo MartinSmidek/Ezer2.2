@@ -307,8 +307,9 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
     return(0)
   }
   # obnovení seznamu uživatelů
-  proc refresh() {
-    uzivatele.lst.browse_load(conc(last_par.get('cond')," AND access&",sys('user','access')));
+  proc refresh() { var see_access:text
+    see_access.set(cconc(sys('options','watch_access_opt')," AND access&",sys('user','access'),""));
+    uzivatele.lst.browse_load(conc(last_par.get('cond'),see_access));
     cmd.enable(1,last_par.get('on'));
     cmd.enable(0,last_par.get('off'));
     watch_css;

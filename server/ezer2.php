@@ -208,6 +208,7 @@
   if ( !$USER->id_user
     && !in_array($x->cmd,array('user_login','user_relogin','user_group_login')) ) {
     $y->error= "<big>Vaše přihlášení již vypršelo - odhlaste se prosím a znovu přihlaste</big>";
+//     $y->error.= debugx($x);
     $y->value= array();
     goto end_switch;
   }
