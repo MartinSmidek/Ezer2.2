@@ -151,7 +151,9 @@ panel nov [,,770,] {type:'right', title:'Přehled změn', _sys:'*'
     // příkazy
     label  [12,5,145,30] { css:'ae_parm'}
     button [20,11,,] { title:"[fa-database] Nový", proc onclick() {
-        form.init(2); version.set(sum(1,sys('options','curr_version'))); version.change;
+        form.init(2);
+        version.set(max(ask('root_svn',0),ask('root_svn',1),sys('options','curr_version')));
+        version.change;
         kind.change; datum.set(now); datum.change; topic.change; hlp.change; }}
     button [79,11,,] { title:"[fa-trash-o] Vymazat", proc onclick() {
       confirm("Opravdu vymazat zprávu ",s.topic.get,"?");
