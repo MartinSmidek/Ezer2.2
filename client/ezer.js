@@ -7865,9 +7865,9 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
         if ( field.key ) {
           field.key(x[id],key);
         }
-        else if ( field._load ) {
-          field._load(x[id],key);
-        }
+        //else if ( field._load ) {  3.2.2016:  toto není možné, protože _load nastavuje originální
+        //  field._load(x[id],key);     Gándí   hodnoty, které se při save porovnávají s těmi na
+        //}                                     disku - při save by tedy docházelo k chybám
         else if ( field.set ) {
           field.set(x[id],value);
         }
