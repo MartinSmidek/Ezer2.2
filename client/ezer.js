@@ -7360,6 +7360,7 @@ Ezer.Eval= new Class({
         Ezer.trace('M',y.qry,null,Math.round(y.qry_ms*1000)/1000);
       if ( y.error ) {
         Ezer.error('EVAL: '+y.error,'s',this.proc,this.proc?this.proc.desc._lc:null);
+        this.stack[++this.top]= y.value || 0;
       }
       else if ( obj ) {
         val= obj[fce+'_'].call(obj,y);
