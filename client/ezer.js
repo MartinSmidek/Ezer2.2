@@ -7807,7 +7807,7 @@ Ezer.fce.object= function () {
   return o;
 }
 // ------------------------------------------------------------------------------------ copy_by_name
-//ff: fce.copy_by_name (form|browse|object|string,form|browse|object[,delimiters='|:'])
+//ff: fce.copy_by_name (form|browse|object|string, form|browse|object[, delimiters='|:' [,set_original]])
 //      zkopíruje zleva doprava stejně pojmenované hodnoty.
 //      Pokud se kopíruje do form, je třeba touto operací naplnit form.key (použije se při definici
 //      originality hodnoty, pokud to není žádoucí, je třeba form.key definovat jako 0)
@@ -7815,9 +7815,10 @@ Ezer.fce.object= function () {
 //      Hodnoty zkopírované do formuláře jsou nastaventy jako originální
 //      (musí být ovšem definován klíč formuláře) a
 //      po ukončení kopírování nastane událost onload na formulář.
+//      Pro kombinaci of lze použít 4. parametr, vnucující přepsání originálních hodnot (použít _load místo set)
 // Pozn.: implementovány jsou tyto kombinace parametrů: fb, bf, of, fo, sf.
 //s: funkce
-Ezer.fce.copy_by_name= function (x,y,delimiters) {
+Ezer.fce.copy_by_name= function (x,y,delimiters,set_original) {
   var x0= x, y0= y;
   if ( x.type=='var' ) x= x.value;
   if ( y.type=='var' ) y= y.value;
@@ -7866,9 +7867,9 @@ Ezer.fce.copy_by_name= function (x,y,delimiters) {
         if ( field.key ) {
           field.key(x[id],key);
         }
-        //else if ( field._load ) {  3.2.2016:  toto není možné, protože _load nastavuje originální
-        //  field._load(x[id],key);     Gándí   hodnoty, které se při save porovnávají s těmi na
-        //}                                     disku - při save by tedy docházelo k chybám
+        else if ( set_original && field._load ) {  // od 7.4.2016, Gándí
+          field._load(x[id],key);
+        }
         else if ( field.set ) {
           field.set(x[id],value);
         }
