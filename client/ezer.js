@@ -3712,13 +3712,13 @@ Ezer.Elem= new Class({
  },
 // ------------------------------------------------------------------------------------ let
 // fm: Elem.let (val)
-//      změní zobrazenou hodnotu elementu (bez vyvolání onchange(d), bez orámování)
-// a: val - hodnota
-//   let: function (val) {
-//     this.value= val;
-//     this.DOM_set();              // zobrazení v DOM z this.value
-//     return 1;
-//  },
+//      změní zobrazenou hodnotu elementu (bez vyvolání onchange(d), bez změny orámování)
+//a: val - hodnota
+  let: function (val) {
+    this.value= val;
+    this.DOM_set();              // zobrazení v DOM z this.value
+    return 1;
+ },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _load
 // interní hodnota uschovávaná na serveru je shodná se zobrazovanou hodnotou
   _load: function (val,key) {
