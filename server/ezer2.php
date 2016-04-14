@@ -156,6 +156,9 @@
         $answer->msg.= "<br><br><b>SVN</b><br>$ezer_root=$answer->sa_version, ezer=$answer->sk_version";
       }
       break;
+    case 'users?':            // {op:'users?'});
+      check_users($answer);
+      break;
     case 're_log_me':         // {op:'re_log_me',user_id:...,hits:n});
       $_SESSION[$ezer_root]['relog']++;
       // obnova SESSION
@@ -2061,6 +2064,18 @@ function browse_status($x) {
   }
   $y->qry.= $y->order;
   return $y;
+}
+# -------------------------------------------------------------------------------------------------- check_users
+# předá informaci o aktuálně aktivních uživatelích
+function check_users($y) {
+  global $EZER, $ezer_root;
+  $y->msg= '';
+  $qry= "SELECT IFNULL(GROUP_CONCAT(DISTINCT user SEPARATOR ' '),'-') AS _users FROM _touch
+         WHERE day=CURDATE() AND HOUR(time)>=HOUR(NOW())  AND module='speed'";
+  $rh=@ mysql_query($qry);
+  if ( $rh && ($h= mysql_fetch_object($rh)) ) {
+    $y->msg= $h->_users;
+  }
 }
 # -------------------------------------------------------------------------------------------------- check_version
 # předá informaci při změně verze jádra; při $y->curr_version porovná verze

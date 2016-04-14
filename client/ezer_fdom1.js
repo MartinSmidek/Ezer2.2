@@ -344,6 +344,11 @@ Ezer.Application= new Class({
   _resetTrace: function() {
     this._barRightDom.getChildren().destroy();
   },
+  // ----------------------------------------------------------------------------- _show_users
+  // zobrazí aktivní uživatele
+  _show_users: function(lst) {
+    Ezer.sys.users= lst.replace(Ezer.sys.user.abbr,'');
+  },
   // ------------------------------------------------------------------------==> . _setTrace
   // vytvoření ovládání trasování, hlášení chyb, FAQ
   _setTrace: function() {
@@ -366,7 +371,8 @@ Ezer.Application= new Class({
         menu.push(
         // v případě hlídání verzí
         ["-alert:  verze",    function(el) { Ezer.app.bar_chat({op:'message?'},true) }],
-        ["test verze",    function(el) { Ezer.app.bar_chat({op:'message?'}) }]
+        ["test verze",    function(el) { Ezer.app.bar_chat({op:'message?'}) }],
+        ["-uživatelé",    function(el) { Ezer.app.bar_chat({op:'users?'},false,'_show_users') }]
         )
       };
       if ( true ) {
@@ -796,12 +802,17 @@ Ezer.Application= new Class({
       has=    Ezer.options.watch_access_opt.abbr[has];
     }
     has= has==access ? '' : '('+has+')';
+    if ( Ezer.options.curr_users ) {    // pokud je v {root}.php nastaveno tak sleduj uživatele
+      this.bar_chat({op:'users?'},false,'_show_users')
+    }
     var abbr= Ezer.sys.user
       ? "<span title='id="+Ezer.sys.user.id_user
         +', start='+Ezer.options.start_datetime
         +', data='+org+'/'+access+has
         +', funkce='+Ezer.sys.user.skills+"'>"
-        +(Ezer.sys.user.abbr||'---')+(Ezer.sys.user.note||'')+'</span>'
+        +(Ezer.sys.user.abbr||'---')
+        +'<span style=\"color:#aaa;\">'+(Ezer.sys.users||'')+'</span>'
+        +(Ezer.sys.user.note||'')+'</span>'
       : '';
     var hm= ae_time();
     this.domUser.innerHTML= hm+' '+abbr;
@@ -834,7 +845,7 @@ Ezer.Application= new Class({
   },
   // ----------------------------------------------------------------------------- bar_chat
   // udržuje se serverem konverzaci
-  bar_chat: function (x,test) {
+  bar_chat: function (x,test,next) {
     x.cmd= 'chat';
     x.root= Ezer.root;                  // název/složka aplikace
     x.app_root= Ezer.app_root;          // {root].inc je ve složce aplikace
@@ -853,6 +864,9 @@ Ezer.Application= new Class({
         if ( test ) {
           Ezer.debug(y,'bar_chat (response)');
           Ezer.fce.DOM.alert(y.msg);
+        }
+        else if ( next ) {
+          this[next](y.msg);
         }
         else {
           var cv= y.curr_version ? y.curr_version.toInt() : 0,
