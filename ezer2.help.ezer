@@ -153,6 +153,8 @@ panel nov [,,770,] {type:'right', title:'Přehled změn', _sys:'*'
     button [20,11,,] { title:"[fa-database] Nový", proc onclick() {
         form.init(2);
         version.set(max(ask('root_svn',0),ask('root_svn',1),sys('options','curr_version')));
+        // pokud je verze=0, asi není na serveru SVN, nastav verzi o 1 větší, než maximum
+        [ eq(version.get,'NaN'); { s.browse_count; version.set(sum(1,s.ver.get)) | version.set(1) }];
         version.change;
         kind.change; datum.set(now); datum.change; topic.change; hlp.change; }}
     button [79,11,,] { title:"[fa-trash-o] Vymazat", proc onclick() {
@@ -177,7 +179,7 @@ panel nov [,,770,] {type:'right', title:'Přehled změn', _sys:'*'
     browse s [0,75,150,100] { rows:20, qry_rows:1
       show id_help { data:h.id_help }
       show [,,72,] { title:'datum', data:h.datum, format:'s-q*rt' }
-      show [,,60,] { title:'rev.SVN', data:h.version, format:'s-q*rt' }
+      show ver [,,60,] { title:'rev.SVN', data:h.version, format:'s-q*rt' }
       show topic [,,150,] { title:'topic', data:h.topic, format:'sq*t' }
       show [,,419,] { title:'help', data:h.help, format:'sq*t' }
       proc onrowclick() {

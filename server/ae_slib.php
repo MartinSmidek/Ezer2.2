@@ -714,10 +714,12 @@ function root_svn($app=0) {
   if ( defined("SQLITE3_ASSOC") ) {
     $sub_root= $_SESSION[$ezer_root]['app_root'] ? "/$ezer_root": '';
     $sub= $app ? ($sub_root ?: '') : "/$EZER->version";
-    $verze= "$ezer_path_root$sub/.svn/wc.db";
-    $db=@ new SQLite3("$ezer_path_root$sub/.svn/wc.db");
-    if ( $db ) {
-      $verze=@ $db->querySingle("SELECT MAX(revision) from NODES");
+    $db_file= "$ezer_path_root$sub/.svn/wc.db";
+    if ( file_exists($db_file) ) {
+      $db=@ new SQLite3($db_file);
+      if ( $db ) {
+        $verze=@ $db->querySingle("SELECT MAX(revision) from NODES");
+      }
     }
   }
   return $verze;
