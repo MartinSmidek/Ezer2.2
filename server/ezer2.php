@@ -2071,7 +2071,7 @@ function check_users($y) {
   global $EZER, $ezer_root;
   $y->msg= '';
   $qry= "SELECT IFNULL(GROUP_CONCAT(DISTINCT user SEPARATOR ' '),'-') AS _users FROM _touch
-         WHERE day=CURDATE() AND HOUR(time)>=HOUR(NOW())  AND module='speed'";
+         WHERE day=CURDATE() AND HOUR(time)>=HOUR(NOW())  AND module='block'";
   $rh=@ mysql_query($qry);
   if ( $rh && ($h= mysql_fetch_object($rh)) ) {
     $y->msg= $h->_users;
