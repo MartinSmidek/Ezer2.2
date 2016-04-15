@@ -613,7 +613,7 @@ function i_doc_final($class,$id,$info,$t) { #if ($t=='i') trace();
     // definice záznamu v doc_elem
     if ( $sect ) $set.= "section='$sect',";
     if ( $hist ) $set.= "history='$hist',";
-    $html= mysql_real_escape_string($html);
+    $html= @mysql_real_escape_string($html);
     $set.= "text=\"$html\",";
     break;
   case 'Fire':         // fire (události) :: abstract (; x : y)*

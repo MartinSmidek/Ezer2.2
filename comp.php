@@ -110,8 +110,19 @@
   // -------------------------------------------------------------------------------- obnova tabulek
   if ( $_GET['refresh']=='tables' ) {
     require_once("server/reference.php");
-    require_once("$ezer_path_root/$root.inc");
-    ezer_connect();
+    if ( $root=='ezer2.2' ) {
+      global $EZER;
+      $EZER= (object)array('version'=>'ezer2.2');
+      $ezer_comp_ezer= "app,area,ezer,ezer_report,ezer_fdom1,ezer_fdom2";
+      $ezer_comp_root= "";
+      require_once("$ezer_path_root/$root.inc");
+                                        debug($ezer_db);
+      ezer_connect('ezer_kernel');
+    }
+    else {
+      require_once("$ezer_path_root/$root.inc");
+      ezer_connect();
+    }
     $lst.= i_doc('javascript');
     $lst.= $trace;
     $lst.= $display;
