@@ -3228,15 +3228,19 @@ Ezer.LabelMap= new Class({
 //fm: LabelMap.init ([TERRAIN|ROADMAP][,options])
 // inicializace oblasti se zobrazením mapy ČR
   init: function (type,options) {
-    var stredCR= new google.maps.LatLng(49.8, 15.6);
-    var map_id= google.maps.MapTypeId[type||'TERRAIN'];
-    var g_options= {zoom:7, center:stredCR, mapTypeId:map_id,
-      mapTypeControlOptions:{position: google.maps.ControlPosition.RIGHT_BOTTOM},
-      zoomControlOptions:{position: google.maps.ControlPosition.LEFT_BOTTOM}
-    };
-    if ( options )
-      g_options= Object.merge(g_options,options);
-    this.map= new google.maps.Map(this.DOM_Block,g_options);
+    this.map= null;
+    var ok= typeof google!="undefined" && google.maps;
+    if ( ok ) {
+      var stredCR= new google.maps.LatLng(49.8, 15.6);
+      var map_id= google.maps.MapTypeId[type||'TERRAIN'];
+      var g_options= {zoom:7, center:stredCR, mapTypeId:map_id,
+        mapTypeControlOptions:{position: google.maps.ControlPosition.RIGHT_BOTTOM},
+        zoomControlOptions:{position: google.maps.ControlPosition.LEFT_BOTTOM}
+      };
+      if ( options )
+        g_options= Object.merge(g_options,options);
+      this.map= new google.maps.Map(this.DOM_Block,g_options);
+    }
     this.poly= null;
     this.rect= null;
     this.mark= {};
@@ -5022,7 +5026,7 @@ Ezer.Browse= new Class({
   browse_key: function () {
     return this.tact ? this.keys[this.r-this.b] : 0;
   },
-// ------------------------------------------------------------------------------------ raise+
+// ---------------------------------------------------------------------------------==> . raise+
 //fm: Browse.raise (event[,key[,info[,row[,noevent=false]]]])
 //      simulace kliknutí na řádek se zadaným klíčem, nebo na první zobrazený řádek;
 //      klíč vyznačeného řádku lze získat funkcí browse_key;
@@ -5403,7 +5407,7 @@ Ezer.Browse= new Class({
     this.scrolling= false;
     return this.blen;
   },
-// ------------------------------------------------------------------------------------ browse_seek-
+// --------------------------------------------------------------------------------==> . browse_seek
 //fx: Browse.browse_seek ([seek_cond [,cond[,having]]])
 //      naplnění browse daty z tabulky;
 //      pro správnou funkci musí browse obsahovat show s klíčem řídící tabulky
