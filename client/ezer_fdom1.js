@@ -861,31 +861,32 @@ Ezer.Application= new Class({
         try { y= JSON.decode(ay); } catch (e) { y= null; }
         if ( !y )
           Ezer.error('EVAL: syntaktická chyba na serveru:'+ay,'E');
-        if ( test ) {
-          Ezer.debug(y,'bar_chat (response)');
-          Ezer.fce.DOM.alert(y.msg);
-        }
-        else if ( next ) {
-          this[next](y.msg);
-        }
         else {
-          var cv= y.curr_version ? y.curr_version.toInt() : 0,
-             yav= y.a_version ? y.a_version.toInt() : 0,
-             ygv= y.g_version ? y.g_version.toInt() :0, ykv= y.k_version ? y.k_version.toInt() : 0;
-          if ( ykv > cv || yav > cv || (ygv && ygv > cv) ) {
-            var msg= "Na serveru byly provedeny programové změny, obnovte prosím okno prohlížeče"
-              + "<br>pomocí tlačítka (nebo co nejdříve stiskem Ctrl-R), aby vám mohly sloužit.<hr>"
-              + y.help;
-            Ezer.fce.DOM.confirm(msg,
-              function(x){ if (x) document.location.reload(true); },{
-                'Obnov nyní (doporučeno)':1,'Provedu za chvíli ...':0},{heading:
-                "<span style='color:orange;text-align:center;display:block'>Upozornění systému</span>",
-                width:520});
+          if ( test ) {
+            Ezer.debug(y,'bar_chat (response)');
+            Ezer.fce.DOM.alert(y.msg);
           }
+          else if ( next ) {
+            this[next](y.msg);
+          }
+          else {
+            var cv= y.curr_version ? y.curr_version.toInt() : 0,
+               yav= y.a_version ? y.a_version.toInt() : 0,
+               ygv= y.g_version ? y.g_version.toInt() :0, ykv= y.k_version ? y.k_version.toInt() : 0;
+            if ( ykv > cv || yav > cv || (ygv && ygv > cv) ) {
+              var msg= "Na serveru byly provedeny programové změny, obnovte prosím okno prohlížeče"
+                + "<br>pomocí tlačítka (nebo co nejdříve stiskem Ctrl-R), aby vám mohly sloužit.<hr>"
+                + y.help;
+              Ezer.fce.DOM.confirm(msg,
+                function(x){ if (x) document.location.reload(true); },{
+                  'Obnov nyní (doporučeno)':1,'Provedu za chvíli ...':0},{heading:
+                  "<span style='color:orange;text-align:center;display:block'>Upozornění systému</span>",
+                  width:520});
+            }
+          }
+          if ( y.log_out )
+            location.replace(window.location.href);
         }
-        if ( y.log_out )
-          location.replace(window.location.href);
-        //this.putFootDom(ae_time()+' '+(y?y.msg:'?'));
       }.bind(this)});
     ajax.send();
     //this._ajax(1);
