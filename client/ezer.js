@@ -270,32 +270,37 @@ Ezer.Block= new Class({
 //fm: Block.part/_part (name[,n,[attr,value]])
 //      pokud není uvedeno n vrátí podblok daného složeného jména
 //        (pokud podblok začíná $ pak se chápe jako absolutní cesta);
-//      pokud je uvedeno n vrátí n-tý podblok jehož typ má jako prefix name;
-//      pokud je uvedeno attr a value, hledá podblok jehož atribut 'attr' má hodnotu 'value'
+//      pokud je uvedeno n vrátí n-tý podblok jehož typ vyhovuje podmínce '^value'
+//        (pokud name neni reg.expr, je to vlastně dotaz na shodu s prefixem name);
+//      pokud je uvedeno attr a value, hledá podblok jehož atribut 'attr' vyhovuje podmínce 'value'
 //      při nenalezení vrací 0
 //      (pokud je blok proměnnou aplikuje postup na hodnotu)
 //r: objekt
   _part: function(name,n,attr,value) {
-    var o= 0;
+    var o= 0, k= 1;
     var b= (this.type=='var'||this.type=='view') ? this.value : this;
     if ( attr ) {
-      var k= 1;
       for (var i in b.part) {
         var p= b.part[i];
-        if ( p.options[attr]==value ) {
-          o= p;
-          break;
+        if ( p.options[attr] ) {
+          var re= new RegExp(value);
+          if ( re.test(p.options[attr]) ) {
+            o= p;
+            break;
+          }
         }
       }
     }
     else if ( n ) {
-      var k= 1;
       for (var i in b.part) {
         var p= b.part[i];
-        if ( p && p.type.substr(0,name.length)==name ) {
-          if ( n==k++ ) {
-            o= p;
-            break;
+        if ( p.type ) {
+          var re= new RegExp('^'+name);
+          if ( re.test(p.type) ) {
+            if ( n==k++ ) {
+              o= p;
+              break;
+            }
           }
         }
       }
@@ -1349,7 +1354,7 @@ Ezer.MenuMain= new Class({
       this.excited= true;
       // najdi aktivní záložku
       var tabs= null, id= null;
-      if ( Ezer.options && Ezer.options.start && Ezer.excited<1 ) {
+      if ( Ezer.options && Ezer.options.start /*&& Ezer.excited<1*/ ) { // 160509 upřednostnit start
         var ids= Ezer.options.start.split('.');
         id= ids[0];
         tabs= this._part(id);
@@ -1544,6 +1549,7 @@ Ezer.Tabs= new Class({
       // zobraz aktivní podmenu
       this.DOM_excite();
       // pokud je definován atribut active a tab je aktivní
+      var panel= null;
       if ( Ezer.options && Ezer.options.start && Ezer.excited<2 ) {
         var ids= Ezer.options.start.split('.');
         if ( ids.length>1 ) {
@@ -1571,7 +1577,7 @@ Ezer.Tabs= new Class({
         }
       }
       if ( !panel ) {
-        panel= this._part('panel',1);
+        panel= this._part('panel.plain|panel.right',1);
         if ( this instanceof Ezer.Tabs && !panel )
           Ezer.error('v menu '+(this.options.title||this.id)+' není přístupné žádné podmenu');
       }
