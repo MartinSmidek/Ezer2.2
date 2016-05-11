@@ -2648,6 +2648,7 @@ function ezer_qry ($op,$table,$cond_key,$zmeny,$key_id='') {
         $and.= " AND $fld='$old'";
         break;
       case 'u':
+      case 'U': // určeno pro hromadné změny
         $set.= "$del$fld='$val'";
         $old= mysql_real_escape_string($zmena->old);
         $and.= " AND $fld='$old'";
