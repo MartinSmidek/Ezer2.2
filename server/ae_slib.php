@@ -661,7 +661,7 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
     $EZER;
   // nastavení verze jádra na 'toto'
   $EZER->version= 'ezer2.2';
-  $ezer_root= $ezer_root ?: $ezer_root0;
+  //$ezer_root= $ezer_root ?: $ezer_root0; - vzniklo 14.4.2015
   // nastavení databází
   $sada= $ezer_local ? 1 : 0;
 //   $mysql_db= $db[$sada];
