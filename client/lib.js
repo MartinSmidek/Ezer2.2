@@ -207,24 +207,25 @@ function dbg_onclick_start(win) {
     })
   }
 }
-// ==================================================================================> ZeroClipboard
+// ==================================================================================> Clipboard.js
 // --------------------------------------------------------------------------------------- clipboard
-// vloží text do schránky Windows pomocí podle http://code.google.com/p/zeroclipboard/
-function clipboard_init () {
-  Ezer.clip= new ZeroClipboard.Client();
-  Ezer.clip.setHandCursor( true );
-//   Ezer.clip.addEventListener('mouseOver', clip_mouse_over);
-  Ezer.clip.addEventListener('complete', clip_complete);
-//   Ezer.fce.echo($('clipboard')?'clipboard nalezen':'clipboard nenalezen');
-  Ezer.clip.glue('clipboard','clipboard');
-  Ezer.clip.info= 'ok';
-}
+// vloží text do schránky Windows pomocí podle https://clipboardjs.com/
 function clipboard_set(text) {
-  Ezer.clip.setText(text);
-}
-function clip_complete(client, text) {
-//   Ezer.clip.setText( 'nazdar' );
-//   alert("Copied text to clipboard: " + text );
+  var clip = document.getElementById('clipboard');
+  var clipboard = new Clipboard(clip, {
+    text: function() {
+      return text;
+    }
+  });
+  clipboard.on('success', function(e) {
+//    console.info('Text byl zkopírován do schránky!');
+//    console.inof(e.text);
+    Ezer.fce.warning('Text byl zkopírován do schránky!');
+  });
+  clipboard.on('error', function(e) {
+    console.log('Chyba při kopírování textu do schránky!');
+    console.log(e);
+  });
 }
 // ----------------------------------------------------------------------------------- make_url_menu
 // sestavení url aplikace se změněným odkazem na menu

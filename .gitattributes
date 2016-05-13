@@ -39,6 +39,7 @@ client/lib.js -text
 client/licensed/Mdrag.js -text
 client/licensed/Mslider.js -text
 client/licensed/clientcide.js -text
+client/licensed/clipboard.min.js -text
 client/licensed/datepicker.js -text
 client/licensed/datepicker/datepicker_vista/buttons.png -text
 client/licensed/datepicker/datepicker_vista/datepicker_vista.css -text

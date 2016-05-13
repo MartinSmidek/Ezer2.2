@@ -560,7 +560,6 @@ Ezer.Item.implement({
       if ( this.type=='item.clipboard' ) {
         // pokud je definováno
         this.DOM_Block.set('id','clipboard');
-        clipboard_init();
         this.DOM_Block.addEvent(Ezer.browser=='CH' ? 'mouseover' : 'mousedown',
           function(el) {
             this.fire('onclick',[],el);
