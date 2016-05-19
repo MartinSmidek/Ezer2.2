@@ -62,6 +62,10 @@ Ezer.Block= new Class({
       var i= 1;
       Ezer._MenuMain= this;
     }
+    else if ( this instanceof Ezer.PanelMain ) {
+      var i= 1;
+      Ezer._PanelMain= this;
+    }
     this.owner= owner;
     this.skill= skill;
     if ( id ) this.id= this._id= id;
@@ -1287,8 +1291,8 @@ Ezer.BlockMain= new Class({
       var part= null;
       switch (idesc.type) {
         case 'menu.main': part= new Ezer.MenuMain(this,idesc,null,id); break;
-        case 'panel.main':part= new Ezer.PanelMain(this,desc,null,id); break;
-        case 'panel.popup':part= new Ezer.PanelPopup(this,desc,null,id); break;
+        case 'panel.main':part= new Ezer.PanelMain(this,idesc,null,id); break;
+        case 'panel.popup':part= new Ezer.PanelPopup(this,idesc,null,id); break;
 //         case 'panel':     part= new Ezer.Panel(this,idesc,null,id);    break;
         case 'table':     part= new Ezer.Table(this,idesc,null,id);    break;
         case 'map':       part= new Ezer.Map(this,idesc,null,id);      break;
@@ -1312,7 +1316,7 @@ Ezer.BlockMain= new Class({
     return true;
   }
 });
-// ================================================================================================> Menu
+// ================================================================================================> MenuMain
 //c: Menu ([options])
 //      varianty implementace zobrazení Menu
 //t: Block
@@ -1326,7 +1330,6 @@ Ezer.Menu= new Class({
     if ( this.DOM_add2 ) this.DOM_add2();               // specificky doplní menu
   }
 });
-// ------------------------------------------------------------------------------------------------- Menu Main
 //c: MenuMain ([options])
 //      hlavní menu aplikace, obsahuje Tabs+
 //t: Menu,Block
@@ -8037,12 +8040,14 @@ Ezer.fce.contextmenu= function (menu,event,id,up) {
     }
   });
   if ( Ezer.obj.contextmenu.menu ) {
+    if ( id )
+      Ezer.obj.contextmenu.menu.options.focus= $(id);
     Ezer.obj.contextmenu.menu.reinitialize({event:event,target:event.originalTarget||event.target,
       menu:Ezer.obj.contextmenu.DOM,own_listener:true,up:up});
   }
   else {
     Ezer.obj.contextmenu.menu=
-      new ContextMenu({event:event,target:event.originalTarget||event.target,
+      new ContextMenu({event:event,target:event.originalTarget||event.target,focus:$(id),
         menu:Ezer.obj.contextmenu.DOM,own_listener:true,up:up});
   }
   return 1;
@@ -8659,6 +8664,15 @@ Ezer.fce.clipboard= function () {
   return 1;
 }
 // ================================================================================================> . system
+// ------------------------------------------------------------------------------------ logout
+//ff: fce.logout ()
+//      odhlásí uživatele stejně jako při použití menu odhlásit
+//s: funkce
+Ezer.fce.logout= function () {
+  Ezer.fce.touch('logout');
+  Ezer.onlogout();
+  return 1;
+}
 // ------------------------------------------------------------------------------------ href
 //ff: fce.href (path)
 //      přepne aplikaci podle path=m[.s[.l.g.i]][.p]  -- tabs, panel, menu.left, menu.group, menu.item

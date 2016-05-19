@@ -189,7 +189,7 @@ __EOD;
     $js_options->pword= "'$autologin[1]'";
   }
   else {
-    $js_options->must_log_in= $ezer_template=='menu' ? 'true' : 'false';
+    $js_options->must_log_in= $ezer_template=='menu' || $ezer_template=='mini+' ? 'true' : 'false';
   }
   $js_options->watch_ip= $EZER->options->watch_ip= isset($pars->watch_ip) ? '1' : '0';
   $js_options->watch_key= $EZER->options->watch_key= isset($pars->watch_key) ? '1' : '0';
@@ -617,7 +617,75 @@ $html_header
       <div id='status_center' style="float:left;">zpráva</div>
       <div id='status_right' style="float:right;"></div>
     </div>
-    <pre id="kuk"></pre>
+    <div id="trace">
+      $debugger
+      <pre id="kuk"></pre>
+    </div>
+  </div>
+<!-- konec -->
+</body>
+$html_footer
+__EOD;
+    break;
+# ------------------------------------------------------------------------------- HTML mini
+# minimální template hlavního objektu aplikace
+  case 'mini+':
+$dbg_script= isset($_SESSION[$ezer_root]['dbg_script'])
+  ? trim($_SESSION[$ezer_root]['dbg_script'])
+  : "set_trace('m',1,'init,set,key');";
+$debugger= isset($js_options->dbg) ? <<<__EOD
+    <form action="" method="post" enctype="multipart/form-data" id="form">
+      <textarea id="dbg" name='query' class='sqlarea jush-sql' spellcheck='false' wrap='off'
+      >$dbg_script</textarea>
+      <script type='text/javascript'>focus(document.getElementsByTagName('textarea')[0]);</script>
+    </form>
+__EOD
+ : '';
+  case 'mini':
+$template= <<<__EOD
+$html_header
+<body id="body">
+<!-- bez menu a submenu -->
+  <div id='horni' class="MainBar">
+    <!-- div id="StatusIcon">$title</div -->
+  </div>
+  <div id='ajax_bar'></div>
+<!-- login -->
+  <div id="login" style="display:none">
+    <div id="login_1" class="$css_login">
+      <h1>Přihlášení ...</h1>
+      <div class="login_a">
+        $login
+      </div>
+    </div>
+    <div id="login_2" class="$css_login">
+      <h1 style='text-align:right'>... informace</h1>
+      <div class="login_a">
+        $info
+      </div>
+    </div>$chngs
+  </div>
+<!-- pracovní plocha -->
+  <div id="stred">
+    <!-- div id="shield"></div -->
+    <div id="work"></div>
+  </div>
+<!-- paticka -->
+  <div id="dolni">
+    <div id="warning"></div>
+    <div id="kuk_err"></div>
+    <div id="paticka">
+      <div id="error"></div>
+    </div>
+    <div id="status_bar" style="width:100%;height:16px;padding: 1px 0pt 0pt;">
+      <div id='status_left' style="float:left;"></div>
+      <div id='status_center' style="float:left;">zpráva</div>
+      <div id='status_right' style="float:right;"></div>
+    </div>
+    <div id="trace">
+      $debugger
+      <pre id="kuk"></pre>
+    </div>
   </div>
 <!-- konec -->
 </body>

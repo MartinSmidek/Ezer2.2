@@ -30,6 +30,7 @@ Ezer.evals= 0;                  // počet aktivních objektů Ezer.Eval (nuluje 
 Ezer.process= 0;                // jednoznačné číslo procesu
 Ezer.calls= [];                 // fronta volání čekajících na Ezer.evals==0
 Ezer._MenuMain= null;
+Ezer._PanelMain= null;
 Ezer.excited= 0;                // >0 pokud bylo již použito Ezer.options.start
 Ezer.konst= Ezer.konst || {};   // hodnoty nedefinovaných konsta(const x;y;z)
 Ezer.curr= {panel:null};        // zobrazený panel
@@ -554,7 +555,10 @@ Ezer.Application.implement({
       }
     })
     // vlastní spuštění aplikace
-    Ezer._MenuMain.excite();
+    if ( Ezer._MenuMain )
+      Ezer._MenuMain.excite();
+    else if ( Ezer._PanelMain )
+      Ezer._PanelMain.excite();
     // pokud je použito 'wait_mask' tak je potlač
     var wait= $('wait_mask');
     if ( wait ) {

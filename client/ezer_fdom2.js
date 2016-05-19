@@ -214,8 +214,7 @@ Ezer.MenuMain.implement({
           desc.DOM_li= new Element('li',{
             events:{
               click: function(event) {
-                Ezer.fce.touch('logout');
-                Ezer.onlogout();
+                Ezer.fce.logout();
               }.bind(desc)
             }
           }).inject(this._menuDom)));

@@ -22,7 +22,7 @@ Ezer.Application= new Class({
     this.domMenu= $('menu');
     this.domFoot= $('status_center');
     this.domUser= $('status_left');
-    this.domUser.addEvent('click',this.bar_click.bind(this));
+    if ( this.domUser ) this.domUser.addEvent('click',this.bar_click.bind(this));
     this.domAjax= $('ajax_bar');
     this.mooWarn= new Fx.Slide('warning');
     this.mooWarn.element.addEvent('click',function(){Ezer.App.mooWarn.slideOut()});
@@ -454,7 +454,8 @@ Ezer.Application= new Class({
       this._barSwitch('Q','kód interpreta (jen s ift,iff,is)');
       this._barSwitch('C','trasování kompilátoru');
       // debugger
-      if ( Ezer.options.dbg ) {
+      var dbg= $('form');
+      if ( Ezer.options.dbg && dbg ) {
         // debug - zobrazení debuggeru - zachází se s ním jako s trasováním '$'
         Ezer.is_trace['$']= this.options.ae_trace.indexOf('$')>=0;
         var debug= new Element('span', {id:'dbg_switch', text:'debug!', title:'zobrazí debugger',
@@ -481,14 +482,6 @@ Ezer.Application= new Class({
             return false;
           }.bind(this)
         }}).inject(this._barRightDom);
-        $('form').addEvents({
-          keydown: function (event) {
-            if (event.key=='enter' && event.control ) {
-              if ( event.shift ) Ezer.fce.clear();
-              __run();
-            }
-          }.bind(this),
-        })
         $('body').addEvents({
           keydown: function(event){
             bodyKeydown(event)
@@ -497,7 +490,15 @@ Ezer.Application= new Class({
             bodyClick(event)
           }
         });
-        $('form').setStyles({display:Ezer.to_trace && Ezer.is_trace['$'] ? 'block' : 'none'});
+        dbg.addEvents({
+          keydown: function (event) {
+            if (event.key=='enter' && event.control ) {
+              if ( event.shift ) Ezer.fce.clear();
+              __run();
+            }
+          }.bind(this),
+        });
+        dbg.setStyles({display:Ezer.to_trace && Ezer.is_trace['$'] ? 'block' : 'none'});
         bodyLoad('5.1');
 //         // pro dotyková zařízení
 //         if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
