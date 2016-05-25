@@ -1627,6 +1627,13 @@ Ezer.Elem.implement({
         }
         else  {
           this.fire('onchange',[]);
+          if ( this._fc('F') &&  this.DOM_Input.value.length>0 ) {
+            var first= this.DOM_Input.value[0];
+            if ( first==first.toLowerCase() ) {
+              this.DOM_Input.value= first.toUpperCase()+this.DOM_Input.value.substr(1);
+              this.DOM_Input.removeClass('empty_focus');
+            }
+          }
           if ( !this._fc('t') ) {
             if ( this.original.value==this.DOM_Input.value ) {
               this.DOM_Input.removeClass('changed');
