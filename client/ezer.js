@@ -8040,6 +8040,7 @@ Ezer.fce.contextmenu= function (menu,event,id,up) {
     }
   });
   if ( Ezer.obj.contextmenu.menu ) {
+    Ezer.obj.contextmenu.menu.options.focus= null; // zapomeneme starý focus
     if ( id )
       Ezer.obj.contextmenu.menu.options.focus= $(id);
     Ezer.obj.contextmenu.menu.reinitialize({event:event,target:event.originalTarget||event.target,

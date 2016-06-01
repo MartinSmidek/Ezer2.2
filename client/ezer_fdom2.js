@@ -1194,12 +1194,20 @@ Ezer.LabelDrop.implement({
     var m, href;
     if ( this.cloud=='S:' ) {   // úložiště viditelné protokolem http: ./docs/{root}
       // kontextové menu, pokud je přítomna procedura onremove
-      var m= '';
+      var m= mopt= '';
       if ( this.part && (obj= this.part['onmenu']) ) {
-        m= " oncontextmenu=\"var event= arguments[0];event.stopPropagation();var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
+        if ( this.options.par && this.options.par.contextmenu ) {
+          var mopts= this.options.par.contextmenu.split(';');
+          mopts.each(function(mo){
+            mopt+= ",['"+mo+"',function(el){obj.callProc('onmenu',['"+mo+"','"+f.name+"',''])}]";
+          });
+        }
+        m= " oncontextmenu=\"var event= arguments[0];event.stopPropagation();"
+        + "var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
         + "obj=obj[0].value||obj[0];Ezer.fce.contextmenu(["
           + "['vyjmout',function(el){obj.callProc('onmenu',['remove','"+f.name+"',''])}],"
           + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all','',''])}]"
+          + mopt
         + "],arguments[0])};return false;\"";
       }
       href= "<a target='docs' href='"+(Ezer.options.path_files_href||'')+this.folder+f.name+"'"+m+">"
@@ -1974,13 +1982,13 @@ Ezer.EditHtml.implement({
       // dokončení nastavení editoru verze 3.6.2
       }
       // ----------------------------------------------- ošetření focus, blur, change
-      this.ckeditor.on('focus', function(ev) {
+      if ( this.ckeditor ) this.ckeditor.on('focus', function(ev) {
         this._value= this.ckeditor.getData();
         this.focused= true;
         this.DOM_outline.addClass(this._changed ? 'changed_focus' : 'focus');
         this.fire('onfocus');
       }.bind(this));
-      this.ckeditor.on('change', function(ev) {
+      if ( this.ckeditor ) this.ckeditor.on('change', function(ev) {
         if ( this.focused ) {
           if ( !this._changed ) {
             this.DOM_outline.removeClass('focus').addClass('changed_focus');
@@ -1989,7 +1997,7 @@ Ezer.EditHtml.implement({
           this.fire('onchange');
         }
       }.bind(this));
-      this.ckeditor.on('blur', function(ev) {
+      if ( this.ckeditor ) this.ckeditor.on('blur', function(ev) {
         this.focused= false;
         this.DOM_outline.removeClass('focus').removeClass('changed_focus');
 //         if ( this.ckeditor.checkDirty() && this._value!=this.ckeditor.getData() ) {

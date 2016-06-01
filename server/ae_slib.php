@@ -34,7 +34,8 @@
 #     contact              -- string: alternativní kontaktní údaje při přihlášení
 #     news_days            -- int: počet dnů pro novinky (default 12)
 #     news_cond            -- string: výběrová relace pro novinky (default 'cast!=1')
-#     template             -- string: menu|panel typ hlavního objektu aplikace (MenuMain,Panel)
+#     template             -- string: menu|panel|user typ hlavního objektu aplikace (MenuMain,Panel)
+#     template_user        -- string: pokud template=user - může obsahovat %header,%login,%info,%chngs
 #     post_server          -- array: server ze kterého jsou volány dialogy (ostrý,lokální)
 #     gc_maxlifetime       -- int: životnost SESSION v sec (default 12 hodin)
 #   $const: object      -- definice hodnot nedefinovaných konstant
@@ -73,7 +74,7 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   if ( $platform=='A' ) {
     $s= 1280/1024;
     $meta_link= <<<__EOD
-  <meta name="viewport" content="user-scalable=1.0,initial-scale=$s,minimum-scale=$s,maximum-scale=$s">
+  <meta name="viewport" content="user-scalable=yes,initial-scale=0.5,minimum-scale=0.1,maximum-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
 __EOD;
@@ -152,7 +153,8 @@ __EOD;
     'skin'              => "'$skin'",
     'start_datetime'    => date("'Y-m-d H:i:s'"),
     'login_interval'    => 2*60,                // povolená nečinnost v minutách - default=2 hodiny
-    'mini_debug'        => $ezer_template=='menu' ? 'true' : 'false',
+    'mini_debug'        => isset($options->mini_debug) ? $options->mini_debug
+                         : ($ezer_template=='menu' ? 'true' : 'false'),
     'status_bar'        => $ezer_template=='menu' ? 'true' : 'false',
     'to_speed'          => 1,
     'to_trace'          => $ezer_template=='menu' ? 'true' : 'false',
@@ -188,8 +190,8 @@ __EOD;
     $js_options->uname= "'$autologin[0]'";
     $js_options->pword= "'$autologin[1]'";
   }
-  else {
-    $js_options->must_log_in= $ezer_template=='menu' || $ezer_template=='mini+' ? 'true' : 'false';
+  elseif ( !isset($js_options->must_log_in) ) {
+    $js_options->must_log_in= $ezer_template=='menu' ? 'true' : 'false';
   }
   $js_options->watch_ip= $EZER->options->watch_ip= isset($pars->watch_ip) ? '1' : '0';
   $js_options->watch_key= $EZER->options->watch_key= isset($pars->watch_key) ? '1' : '0';
@@ -627,70 +629,12 @@ $html_header
 $html_footer
 __EOD;
     break;
-# ------------------------------------------------------------------------------- HTML mini
-# minimální template hlavního objektu aplikace
-  case 'mini+':
-$dbg_script= isset($_SESSION[$ezer_root]['dbg_script'])
-  ? trim($_SESSION[$ezer_root]['dbg_script'])
-  : "set_trace('m',1,'init,set,key');";
-$debugger= isset($js_options->dbg) ? <<<__EOD
-    <form action="" method="post" enctype="multipart/form-data" id="form">
-      <textarea id="dbg" name='query' class='sqlarea jush-sql' spellcheck='false' wrap='off'
-      >$dbg_script</textarea>
-      <script type='text/javascript'>focus(document.getElementsByTagName('textarea')[0]);</script>
-    </form>
-__EOD
- : '';
-  case 'mini':
-$template= <<<__EOD
-$html_header
-<body id="body">
-<!-- bez menu a submenu -->
-  <div id='horni' class="MainBar">
-    <!-- div id="StatusIcon">$title</div -->
-  </div>
-  <div id='ajax_bar'></div>
-<!-- login -->
-  <div id="login" style="display:none">
-    <div id="login_1" class="$css_login">
-      <h1>Přihlášení ...</h1>
-      <div class="login_a">
-        $login
-      </div>
-    </div>
-    <div id="login_2" class="$css_login">
-      <h1 style='text-align:right'>... informace</h1>
-      <div class="login_a">
-        $info
-      </div>
-    </div>$chngs
-  </div>
-<!-- pracovní plocha -->
-  <div id="stred">
-    <!-- div id="shield"></div -->
-    <div id="work"></div>
-  </div>
-<!-- paticka -->
-  <div id="dolni">
-    <div id="warning"></div>
-    <div id="kuk_err"></div>
-    <div id="paticka">
-      <div id="error"></div>
-    </div>
-    <div id="status_bar" style="width:100%;height:16px;padding: 1px 0pt 0pt;">
-      <div id='status_left' style="float:left;"></div>
-      <div id='status_center' style="float:left;">zpráva</div>
-      <div id='status_right' style="float:right;"></div>
-    </div>
-    <div id="trace">
-      $debugger
-      <pre id="kuk"></pre>
-    </div>
-  </div>
-<!-- konec -->
-</body>
-$html_footer
-__EOD;
+# ------------------------------------------------------------------------------- HTML user
+# uživatelský template hlavního objektu aplikace
+  case 'user':
+    $template= strtr($pars->template_body,
+      array('%header'=>$html_header,'%login'=>$login,'%info'=>$info,'%chngs'=>$chngs,
+        '%html_footer'=>$html_footer));
     break;
   default:
 # ------------------------------------------------------------------------------- HTML prázdný
@@ -1125,8 +1069,8 @@ function debugx(&$gt,$label=false,$html=0,$depth=64,$length=64,$win1250=0,$getty
 function PHP($expr) {
   global $USER,$EZER;
   display($expr);
-  debug($USER,'$USER');
-  debug($EZER,'$EZER');
+//   debug($USER,'$USER');
+//   debug($EZER,'$EZER');
   $fce= eval($expr);
   return $fce;
 }
