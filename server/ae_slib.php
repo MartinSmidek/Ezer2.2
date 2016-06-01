@@ -71,7 +71,10 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   // doplnění meta tagů pro mobilní platformy
   $meta_link= "";
 //                                                 $platform= 'I';
-  if ( $platform=='A' ) {
+  if ( isset($pars->template_meta) ) {
+    $meta_link= $pars->template_meta;
+  }
+  elseif ( $platform=='A' ) {
     $s= 1280/1024;
     $meta_link= <<<__EOD
   <meta name="viewport" content="user-scalable=yes,initial-scale=0.5,minimum-scale=0.1,maximum-scale=1">
@@ -91,6 +94,7 @@ __EOD;
 //   <meta name="apple-mobile-web-app-capable" content="yes" />
   }
   // interpretace parametrů
+  $head= "";
   $minify= false;
   $autologin= isset($pars->autologin) ? explode('/',$pars->autologin) : null;
   $app_root=  isset($pars->app_root) ? $pars->app_root : 0;
@@ -395,14 +399,13 @@ __EOD;
     file_put_contents("$ezer_root.css",$css= $minifyCSS->combine());
     file_put_contents("$ezer_root.js",$js= $minifyJS->combine());
     // header pro běh bez laděni
-    $head= <<<__EOD
+    $head.= <<<__EOD
     <script src="$ezer_root.js" type="text/javascript" charset="utf-8"></script>
     <link rel="stylesheet" href="$ezer_root.css" type="text/css" media="screen" charset="utf-8" />
 __EOD;
   }
   else {
     // header pro běh s laděním
-    $head= "";
     if ( $browser!='IE' ) {
       foreach($js as $x) {
         $head.= "\n  <script src='$x' type='text/javascript' charset='utf-8'></script>";
