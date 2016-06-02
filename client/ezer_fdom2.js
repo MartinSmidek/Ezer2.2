@@ -905,13 +905,26 @@ Ezer.PanelPopup.implement({
 //   // ---------------------------------------------------------------------------------- DOM_add2
 //   DOM_add2: function() {
 //   },
+// ----------------------------------------------------------------------------- DOM_set_properties
+// změní jen některé vlastnosti: left, top, width, height podle parametru, smooth se ignooruje
+  DOM_set_properties: function(prop) {
+    var vdiv= this.DOM_Block;
+    if ( prop.left!==undefined )                                  // left
+      this.DOM.setStyle('left',Number(prop.left));
+    if ( prop.top!==undefined )                                   // top
+      this.DOM.setStyle('top',Number(prop.top));
+    if ( prop.width!==undefined )                                 // width
+      vdiv.setStyle('width',Number(prop.width));
+    if ( prop.height!==undefined )                                // height
+      vdiv.setStyle('height',Number(prop.height));
+  },
   // ---------------------------------------------------------------------------------- _show
   _show: function(l,t,noevent,title) {
     this.DOM.setStyles({display:'block'});
     if ( !this.DOM_shown ) {
       if ( l==undefined || t==undefined ) {
         // pokud není definován počátek, bude dialog centrální
-        this.DOM.setStyles({left:Ezer.sys.screen.width/2 - this._w/2,
+        this.DOM.setStyles({left:Ezer.sys.screen.width/2 - this._w/2 - 27,
           top:Ezer.sys.screen.height/2 - this._h/2});
       }
       else {
@@ -2033,6 +2046,20 @@ Ezer.EditHtml.implement({
       this.DOM_Block= this.DOM_Input= new Element('textarea',{'class':'Edit',styles:this.coord()
       }).inject(this.owner.DOM_Block);
     }
+  },
+// ----------------------------------------------------------------------------- DOM_set_properties
+// změní jen některé vlastnosti: left, top, width, height podle parametru, smooth se ignooruje
+  DOM_set_properties: function(prop) {
+    var wdiv= this.DOM_Block.getElement('.cke');;
+    var hdiv= this.DOM_Block.getElement('.cke_contents');;
+    if ( prop.left!==undefined )                                  // left
+      this.DOM_Block.setStyle('left',Number(prop.left));
+    if ( prop.top!==undefined )                                   // top
+      this.DOM_Block.setStyle('top',Number(prop.top));
+    if ( prop.width!==undefined )                                 // width
+      wdiv.setStyle('width',Number(prop.width));
+    if ( prop.height!==undefined )                                // height
+      hdiv.setStyle('height',Number(prop.height));
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_empty
 //f: EditHtml-DOM.DOM_empty ()
