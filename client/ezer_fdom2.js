@@ -2050,16 +2050,21 @@ Ezer.EditHtml.implement({
 // ----------------------------------------------------------------------------- DOM_set_properties
 // změní jen některé vlastnosti: left, top, width, height podle parametru, smooth se ignooruje
   DOM_set_properties: function(prop) {
-    var wdiv= this.DOM_Block.getElement('.cke');;
-    var hdiv= this.DOM_Block.getElement('.cke_contents');;
-    if ( prop.left!==undefined )                                  // left
-      this.DOM_Block.setStyle('left',Number(prop.left));
-    if ( prop.top!==undefined )                                   // top
-      this.DOM_Block.setStyle('top',Number(prop.top));
-    if ( prop.width!==undefined )                                 // width
-      wdiv.setStyle('width',Number(prop.width));
-    if ( prop.height!==undefined )                                // height
-      hdiv.setStyle('height',Number(prop.height));
+    if ( this.ckeditor ) {
+      var wdiv= this.DOM_Block.getElement('.cke');;
+      var hdiv= this.DOM_Block.getElement('.cke_contents');;
+      if ( prop.left!==undefined )                                  // left
+        this.DOM_Block.setStyle('left',Number(prop.left));
+      if ( prop.top!==undefined )                                   // top
+        this.DOM_Block.setStyle('top',Number(prop.top));
+      if ( prop.width!==undefined )                                 // width
+        wdiv.setStyle('width',Number(prop.width));
+      if ( prop.height!==undefined )                                // height
+        hdiv.setStyle('height',Number(prop.height));
+    }
+    else {
+      this.parent(prop);
+    }
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_empty
 //f: EditHtml-DOM.DOM_empty ()
@@ -2077,11 +2082,10 @@ Ezer.EditHtml.implement({
     if ( on ) {
       this._changed= true;
       Ezer.fce.touch('block',this,'changed');     // informace do _touch na server
-      if ( !quiet )
+      if ( !quiet && this.DOM_outline )
         this.DOM_outline.addClass('changed');
-//       this.DOM_outline.removeClass('empty').removeClass('empty_focus');
     }
-    else if ( !quiet )
+    else if ( !quiet && this.DOM_outline )
       this.DOM_outline.removeClass('changed');
   },
 // ------------------------------------------------------------------------------------ DOM_set
