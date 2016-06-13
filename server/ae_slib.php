@@ -635,9 +635,12 @@ __EOD;
 # ------------------------------------------------------------------------------- HTML user
 # uživatelský template hlavního objektu aplikace
   case 'user':
-    $template= strtr($pars->template_body,
-      array('%header'=>$html_header,'%login'=>$login,'%info'=>$info,'%chngs'=>$chngs,
-        '%html_footer'=>$html_footer));
+    if ( $ip_ok )
+      $template= strtr($pars->template_body,array(
+      '%header'=>$html_header,'%login'=>$login,'%info'=>$info,'%chngs'=>$chngs,
+      '%html_footer'=>$html_footer));
+    else
+      return 0;
     break;
   default:
 # ------------------------------------------------------------------------------- HTML prázdný
@@ -651,6 +654,7 @@ __EOD;
     break;
   }
   echo $template;
+  return 1;
 //   echo nl2br(htmlentities($template));
 }
 # -------------------------------------------------------------------------------------------------- root_inc

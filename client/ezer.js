@@ -8869,8 +8869,10 @@ Ezer.fce.alert= function () {
 Ezer.fce._alert= function () {
   // konec modálního dialogu - jeho hodnotu (pro alert 1) dej na zásobník
   var x= Ezer.modal_fce.pop();
-  x.stack[++x.top]= 1;
-  x.eval.apply(x,[x.step,true]);
+  if ( x ) {
+    x.stack[++x.top]= 1;
+    x.eval.apply(x,[x.step,true]);
+  }
   return 1;
 }
 // -------------------------------------------------------------------------------------- wait
