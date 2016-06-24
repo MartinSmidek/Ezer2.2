@@ -2591,7 +2591,7 @@ end:
 # 2. ezer_qry("UPDATE",$table,$x->key,$zmeny[,$key_id]);       -- oprava 1 záznamu
 #     zmeny= [ zmena,...]
 #     zmena= { fld:field, op:a|p|d|c, val:value, row:n }          -- pro chat
-#          | { fld:field, op:u,   val:value, old:value }          -- pro opravu
+#          | { fld:field, op:u,   val:value, [old:value] }        -- pro opravu
 #          | { fld:field, op:i,   val:value }                     -- pro vytvoření
 # 3. ezer_qry("UPDATE_keys",$table,$keys,$zmeny[,$key_id]);    -- hromadná oprava pro key IN ($keys)
 #     zmeny= { fld:field, op:m|p|a, val:value}                    -- SET fld=value
@@ -2669,8 +2669,10 @@ function ezer_qry ($op,$table,$cond_key,$zmeny,$key_id='') {
       case 'u':
       case 'U': // určeno pro hromadné změny
         $set.= "$del$fld='$val'";
-        $old= mysql_real_escape_string($zmena->old);
-        $and.= " AND $fld='$old'";
+        if ( isset($zmena->old) ) {
+          $old= mysql_real_escape_string($zmena->old);
+          $and.= " AND $fld='$old'";
+        }
         break;
       case 'i':
         $set.= "$del$fld='$val'";
