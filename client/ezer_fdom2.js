@@ -2926,7 +2926,6 @@ Ezer.Browse.implement({
       this.DOM_Block= DOM_table= this.DOM_head= this.DOM_foot= this.DOM_status= null;
       this.DOM_tbody= this.DOM_input= this.DOM_th_posun= null;
       this.DOM_qry_row= this.DOM_row= this.DOM_tag= [];
-      this.DOM_Input_state= 0;
     }
   },
 // ------------------------------------------------------------------------------------ DOM_add1+
@@ -3057,8 +3056,6 @@ Ezer.Browse.implement({
 // ------------------------------------------------------------------------------------ DOM_addEvents+
 //f: Browse-DOM.DOM_addEvents ()
 //      připojí (nebo odpojí) události
-  DOM_Input_state: 0,           // 1 se nastaví pomocí ALT - další písmeno je interpretováno
-                                // jako jednopísmenný vzor pro skok na hodnotu prvního sloupce
   DOM_addEvents: function() {
     // přidání událostí myši
     for (var i= 1; i<=this.tmax; i++) {
@@ -3100,25 +3097,18 @@ Ezer.Browse.implement({
       blur: function (event) {
         this.DOM_blur();
       }.bind(this),
-      // ovládání hledání prvním písmenem po Alt
-      keypress: function(event) {
-        event.stop();
-        if ( this.DOM_Input_state ) {
-          if ( event.code!=27 )                                 // 'esc' - konec bez hledání
-            this._row_seek(event.key.toUpperCase());            // jednopísmenné hledání
-          this.DOM_Input_state= 0;
-        }
-      }.bind(this),
       // ovládání tabulky klávesnicí
       keydown: function(event) {
         event.stop();
         if ( event.code==9 )                                    // tab
           return true;
+        if ( event.event.altKey && event.code!=18 ) {
+          // ovládání hledání přes Alt+první písmeno
+          var key= 0<=event.key&& event.key<=9 ? "É.ĚŠČŘŽÝÁÍ"[event.key] : event.key.toUpperCase();
+          this._row_seek(key);
+        }
         Ezer.fce.touch('block',this,'keydown');     // informace do _touch na server
         switch (event.code) {
-        case 18:                                                // 'alt':
-          this.DOM_Input_state= 1;
-          break;
         case 45:                                                // 'insert':
           this.DOM_riseEvent('keydown_insert');
           break;
@@ -3154,10 +3144,6 @@ Ezer.Browse.implement({
           break;
         case 13:                                                // 'enter'
           this._row_submit(event.control?1:0);
-          break;
-        case 27:                                                // 'esc'
-          this.DOM_Input_state= 0;
-          this.fire('oncancel');
           break;
         }
         return false;
