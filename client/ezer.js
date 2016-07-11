@@ -1433,6 +1433,7 @@ Ezer.MenuLeft= new Class({
 //      je-li zadán stav=2 minimalizuje menu, je-li stav=1 zobrazí menu v plné šíři;
 //      pro quiet=1 nevolá onresize
   click: function (stav,quiet) {
+    this.excited= true;
     this.DOM_click(stav,quiet);
     return 1;
   },
