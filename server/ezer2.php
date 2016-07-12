@@ -2002,7 +2002,8 @@ function json_encode_short($data) {
   }
 }
 # -------------------------------------------------------------------------------------------------- browse_status
-# doplněk metody browse.browse_status - z jejího výsledku zkonstruuje části dotazu a celý dotaz
+# doplněk metody browse.browse_status
+# - z jejího výsledku zkonstruuje části dotazu a celý dotaz bez části LIMIT
 function browse_status($x) {
   $clmns= ''; $del= '';
   $y= (object)array();
