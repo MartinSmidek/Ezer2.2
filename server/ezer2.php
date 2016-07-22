@@ -1,17 +1,17 @@
 <?php # (c) 2008 Martin Smidek <martin@smidek.eu>
   error_reporting(E_ALL & ~E_NOTICE);
-  # ------------------------------------------------------------------------------------------------ paths, globals
+  # --------------------------------------------------------------------------------- paths, globals
   # globální objekty ($json bude v PHP6 zrušeno)
   global $app_root, $ezer_root, $ezer_path_serv, $ezer_path_appl, $ezer_path_root, $ezer_db, $ezer_system, $salt;
   global $json, $USER, $EZER, $ezer_user_id;
 //   if ( $_POST['app_root'] ) chdir("..");
-  # ------------------------------------------------------------------------------------------------ requires
+  # --------------------------------------------------------------------------------------- requires
   # vložení a inicializace balíků
   $ezer_root= $_POST['root'];                        // jméno adresáře a hlavního objektu aplikace
   if ( !$ezer_root ) $ezer_root= $_GET['root'];
   $ezer_session= $_POST['session'];                  // způsob práce se $_SESSION php|ezer
   if ( !$ezer_session ) $ezer_session= $_GET['session'];
-  # ------------------------------------------------------------------------------------------------ session
+  # ---------------------------------------------------------------------------------------- session
   # session - vlastní nebo standardní obsluha $_SESSION
   if ( $ezer_session=='ezer' ) {
     require_once("$ezer_path_serv/session.php");
@@ -21,22 +21,17 @@
     session_start(); // defaultní práce se session
     $USER= $_SESSION[$ezer_root]['USER'];
   }
-  # ------------------------------------------------------------------------------------------------ root.ini
-//                                                         die("--".getcwd());
-  $ezer_root_inc= file_exists("./../../$ezer_root/$ezer_root.inc.php") ? "$ezer_root.inc.php" : "$ezer_root.inc";
-  require_once($_POST['app_root'] ? "./../../$ezer_root/$ezer_root_inc" : "./../../$ezer_root_inc");
+  # --------------------------------------------------------------------------------- root.inc[.php]
+  $path= $_POST['app_root'] ? "./../../$ezer_root" : "./../../";
+  $ezer_root_inc= file_exists("$path/$ezer_root.inc.php") ? "$ezer_root.inc.php" : "$ezer_root.inc";
+  require_once("$path/$ezer_root_inc");
   require_once("$ezer_path_serv/ae_slib.php");
   $php_start= getmicrotime();                        // měření času
-//                                                         debug(array($mysql_db,$ezer_db),'tabulka databází $mysql_db,$ezer_db');
-//                                                         debug($USER,"USER=$ezer_user_id,{$_SESSION['user_id']}");
-//                                                         debug($_SESSION,"USER=$ezer_user_id,{$_SESSION['user_id']}");
   // licensované knihovny I
-//   require_once("$ezer_path_serv/licensed/JSON.php");
-//   $json= new Services_JSON();
   require_once("$ezer_path_serv/licensed/JSON_Ezer.php");
   $json= new Services_JSON_Ezer();
   ezer_connect();
-  # ------------------------------------------------------------------------------------------------ json ...
+  # --------------------------------------------------------------------------------------- json ...
   if ( !function_exists("json_encode") ) {
     function json_encode ($x) {
       global $json;
@@ -47,13 +42,13 @@
       return $json->decode($x);
     }
   }
-  # ------------------------------------------------------------------------------------------------ FancyUpload
+  # ------------------------------------------------------------------------------------ FancyUpload
   # zpracování požadavku na Upload
   if ( isset($_GET['upload']) ) {
     echo json_encode(upload());
     die;
   }
-  # ------------------------------------------------------------------------------------------------ params
+  # ----------------------------------------------------------------------------------------- params
   # cmd    - příkaz
   # x      - parametry
   if (get_magic_quotes_gpc()) $_POST= stripSlashes_r($_POST);
