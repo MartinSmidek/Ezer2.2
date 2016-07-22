@@ -13,7 +13,7 @@ function doc_ezer($info_only=false) { trace();
     <i>Seznam <b style='color:blue'>Ezer-modulů</b> aplikace se seznamem PHP-funkcí, volaných
     prostřednictvím <b>ask</b>, <b>make</b> a použitých v atributu <b>sql_pipe</b>, uspořádaným
     podle <b style='color:blueviolet'>PHP modulů</b>. <b style='color:green'>Standardní</b>
-    funkce obsažené v seznamu \$ezer_php_libr v $ezer_root.inc
+    funkce obsažené v seznamu \$ezer_php_libr v $ezer_root.inc[.php]
     a knihovní funkce PHP jsou uvedeny zvlášť.
     Nedefinované funkce jsou označeny <span style='color:red'>červeně</span>.
     </i>";
@@ -88,7 +88,7 @@ function doc_php() {
     resp. jako volaná <b style='color:limegreen'>přímo </b> resp. <b style='color:blue'>nepřímo </b>
     z Ezerscriptu.
     Jméno funkce je následováno seznamem volaných funkcí
-    (standardní funkce obsažené v seznamu \$ezer_php_libr v $ezer_root.inc jsou vynechány).
+    (standardní funkce obsažené v seznamu \$ezer_php_libr v $ezer_root.inc[.php] jsou vynechány).
     </i>";
   $ezers= doc_ezer_list();
   $cg= doc_php_cg(implode(',',$ezer_php));

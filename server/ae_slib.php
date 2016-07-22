@@ -1370,7 +1370,8 @@ function datum_rc($rodne_cislo) {
 function rc2time($rodcis) {
   $t= 0;
   if (preg_match('~^([0-9]{2})([0-9]{2})([0-9]{2})~', $rodcis, $match)) {
-    $y= ($match[1] >= 12 ? "19" : "20") . $match[1];
+    //$y= ($match[1] >= 12 ? "19" : "20") . $match[1];
+    $y= (strlen($rodcis)==9 && $match[1]<54 ? "19" : "20") . $match[1];
     $m= $match[2] % 50;  $m= $m ? $m : 1;
     $d= $match[3];       $d= $d ? $d : 1;
     $t= mktime(0,0,0,$m,$d,$y)+1;

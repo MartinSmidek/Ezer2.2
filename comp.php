@@ -115,7 +115,8 @@
       $EZER= (object)array('version'=>'ezer2.2');
       $ezer_comp_ezer= "app,area,ezer,ezer_report,ezer_fdom1,ezer_fdom2";
       $ezer_comp_root= "";
-      require_once("$ezer_path_root/$root.inc");
+      $root_inc= file_exists("$ezer_path_root/$root.inc.php") ? "$root.inc.php" : "$root.inc";
+      require_once("$ezer_path_root/$root_inc");
                                         debug($ezer_db);
       ezer_connect('ezer_kernel');
     }

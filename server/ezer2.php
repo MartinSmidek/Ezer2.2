@@ -23,7 +23,8 @@
   }
   # ------------------------------------------------------------------------------------------------ root.ini
 //                                                         die("--".getcwd());
-  require_once($_POST['app_root'] ? "./../../$ezer_root/$ezer_root.inc" : "./../../$ezer_root.inc");
+  $ezer_root_inc= file_exists("./../../$ezer_root/$ezer_root.inc.php") ? "$ezer_root.inc.php" : "$ezer_root.inc";
+  require_once($_POST['app_root'] ? "./../../$ezer_root/$ezer_root_inc" : "./../../$ezer_root_inc");
   require_once("$ezer_path_serv/ae_slib.php");
   $php_start= getmicrotime();                        // měření času
 //                                                         debug(array($mysql_db,$ezer_db),'tabulka databází $mysql_db,$ezer_db');
@@ -154,6 +155,9 @@
         $answer->sa_version= root_svn(1);
         $answer->sk_version= root_svn(0);
         $answer->msg.= "<br><br><b>SVN</b><br>$ezer_root=$answer->sa_version, ezer=$answer->sk_version";
+      }
+      if ( $answer->d_version ) {
+        $answer->msg.= "<br><br><b>poslední změna dat</b><br>$answer->d_version";
       }
       break;
     case 'users?':            // {op:'users?'});
@@ -2112,6 +2116,12 @@ function check_version($y) {
       $y->help.= ($y->help ? "<br>" : '')
         . str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","ezer_kernel._help",
           "kind='v' AND version>$yv GROUP BY kind"));
+    }
+    // verze dat, podle posledního záznamu v _track
+    $qry= mysql_qry("SHOW TABLES LIKE '_track'");
+    if ( mysql_num_rows($qry) ) {
+      $y->d_version=
+        select1("DATE_FORMAT(kdy,'%e.%c.%Y %H:%i')","_track","1 ORDER BY id_track DESC LIMIT 1");
     }
     $y->msg= $msg;
   }
