@@ -772,9 +772,9 @@ Ezer.browser=='IE' ? null :
     pw= max_width / img.width,
     ph= max_height / img.height,
     p= Math.min(pw,ph);                         // poměr změny
-    // vypocitame vysku a sirku změněného obrazku - vrátíme ji do výstupních parametrů
-  width = round(img.width * p);
-  height = round(img.height * p);
+  // vypocitame vysku a sirku změněného obrazku - vrátíme ji do výstupních parametrů
+  width= p>=1 ? img.width : round(img.width * p);
+  height= p>=1 ? img.height : round(img.height * p);
   // remove (hopefully) stored info
   delete img._onresample;
   delete img._width;
