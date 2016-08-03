@@ -527,7 +527,7 @@ __EOD
  : '';
 $template= <<<__EOD
 $html_header
-<body id="body" x=1>
+<body id="body" x="1" x-ms-format-detection="none">
 <!-- menu a submenu -->
   <div id='horni' class="MainBar">
     <div id="appl" $version>$title_right</div>
