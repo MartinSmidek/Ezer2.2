@@ -881,7 +881,7 @@ Ezer.PanelPopup.implement({
   DOM_add1: function() {
     var close= this.options.par && this.options.par.close=='no' ? false : true;
     this.DOM= $(this.StickyWin= new StickyWin({draggable:true,
-      content:StickyWin.ui(this.options.title||' ',null,{
+      content:StickyWin.ui(this.options.title||' ','',{
         cornerHandle:true, width:this._w+55,
         cssClassName:'PanelPopup',closeButton:close
       })

@@ -331,7 +331,7 @@ __EOD
   case 'test':                          // zobraz stav SESSION, pokud je url parametr
     $info= isset($_GET['session'])
       ? "<div class='dbg'>".debugx($_SESSION,'$_SESSION:')."</div>"
-      : "...&session=1 zobrazí \$_SESSION<br/><br/>".
+      : "...&amp;session=1 zobrazí \$_SESSION<br/><br/>".
         (is_array($welcome) ? $welcome[1] : $kontakt);
     break;
   case 'info':
