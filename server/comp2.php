@@ -13,7 +13,7 @@ function ezer2code ($name,$root='') {  #trace();
   global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
     $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes;
   global $pragma_library, $pragma_syntax, $pragma_attrs, $pragma_names, $pragma_get, $pragma_prefix,
-    $pragma_group, $pragma_box, $pragma_using, $pragma_test, $pragma_strings;
+    $pragma_group, $pragma_box, $pragma_using, $pragma_test, $pragma_strings, $pragma_switch;
   global $includes,$including;
 }
 # -------------------------------------------------------------------------------------------------- comp
@@ -40,7 +40,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
   global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
     $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes, $onloads;
   global $pragma_library, $pragma_syntax, $pragma_attrs, $pragma_names, $pragma_get, $pragma_prefix,
-    $pragma_group, $pragma_box, $pragma_using, $pragma_test, $pragma_strings;
+    $pragma_group, $pragma_box, $pragma_using, $pragma_test, $pragma_strings, $pragma_switch;
   global $call_php;
   $errors= 0;
   try {
@@ -67,6 +67,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
       if ( in_array('get',$pragma) )    $pragma_get= true;
       if ( in_array('box',$pragma) )    $pragma_box= true;
       if ( in_array('test',$pragma) )   $pragma_test= true;
+      if ( in_array('switch',$pragma) ) $pragma_switch= true;
       if ( in_array('strings',$pragma)) $pragma_strings= true;
 //       if ( in_array('using',$pragma) ) {
 //         $i= array_search('using',$pragma);
@@ -1158,7 +1159,7 @@ function walk_struct($down,$pcode,$beg,$end,$ift,$iff,$is_arg=0) {
   $i_end= $beg + $down->len;
 
   if ( $typ=='sw' ) {  // switch
-//                                         debug($down,"switch beg:$beg,$end,$ift,$iff");
+//                                         debug($down,"switch beg:$beg,$end,$ift,$iff,$is_arg");
     $expr= $down->arr[0]; $e_len= $expr->len;
     walk_struct($expr,$pcode,$icode,$end,0,0,0);
 
@@ -1173,12 +1174,14 @@ function walk_struct($down,$pcode,$beg,$end,$ift,$iff,$is_arg=0) {
       $icode+= $l_len;
       walk_struct($test,$pcode,$icode,$end,$icode+$t_len,$icode+$ts_len,0);
       $icode+= 1;
-      walk_struct($stmnt,$pcode,$icode,$end,$i_end,$i_end,1);
+//       walk_struct($stmnt,$pcode,$icode,$end,$i_end,$i_end,1);
+      walk_struct($stmnt,$pcode,$icode,$end,$ift,$ift,1); // switch skončí vždy jako true
       $icode+= $s_len;
     }
     if ($i<$n) {
       $stmnt= $down->arr[$n-1]; $s_len= $stmnt->len;
-      walk_struct($stmnt,$pcode,$icode,$end,$i_end,$i_end,1);
+//       walk_struct($stmnt,$pcode,$icode,$end,$i_end,$i_end,1);
+      walk_struct($stmnt,$pcode,$icode,$end,$ift,$ift,1);
     }
 
 //                                         debug($down,"switch end:$beg,$end,$ift,$iff");
@@ -1578,7 +1581,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
   $struct= (object)array('typ'=>$c->expr,'i'=>-1,'ift'=>-1,'iff'=>-1,'len'=>-1);
   global $trace_me;
   global $context, $names, $code_top;
-  global $pragma_names, $pragma_get, $pragma_test, $proc_path;
+  global $pragma_names, $pragma_get, $pragma_test, $pragma_switch, $proc_path;
   global $call_php;
   switch ( $c->expr ) {
   case 'value':
@@ -1657,7 +1660,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
 //                                         debug($struct);
     }
     // -------------------------------------- switch e l1 {s1}
-    elseif ( $pragma_test && $c->op=='switch' ) {
+    elseif ( $pragma_switch && $c->op=='switch' ) {
       // {expr:'call',op:'switch',par:[e,l1,s1,...]}
       if ( count($c->par)>2 ) {
         $n= count($c->par);
