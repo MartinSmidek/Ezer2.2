@@ -66,7 +66,7 @@
   $checks.= "\n<input type='checkbox' $checked  onchange='set_option_source(this.checked)'/> zdroj";
   $checked= $option_state==7 ? 'checked' : '';
   $checks.= "<br>\n<input type='checkbox' $checked  onchange='set_option_trace(this.checked,7)'/> list proc";
-  $checks.= "<input type='text' value='$option_list' size=7 onchange='set_option_list(this)'/>";
+  $checks.= "<input type='text' title='výběr trasované procedury regulárním výrazem' value='$option_list' size=7 onchange='set_option_list(this)'/>";
   $checks.= "<br>\n<input type='submit' value='celou aplikaci' onclick='go_all(\"yes\");' />";
   $checks.= "<br>\n<input type='submit' value='... včetně err' onclick='go_all(\"err\");' />";
   $checks.= "<br>\n<input type='submit' value='obnova tabulek' onclick='go_tables();' />";

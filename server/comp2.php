@@ -13,7 +13,7 @@ function ezer2code ($name,$root='') {  #trace();
   global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
     $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes;
   global $pragma_library, $pragma_syntax, $pragma_attrs, $pragma_names, $pragma_get, $pragma_prefix,
-    $pragma_group, $pragma_box, $pragma_using, $pragma_test, $pragma_strings, $pragma_switch;
+    $pragma_group, $pragma_box, $pragma_using, $pragma_if, $pragma_strings, $pragma_switch;
   global $includes,$including;
 }
 # -------------------------------------------------------------------------------------------------- comp
@@ -40,7 +40,7 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
   global $ezer, $json, $ezer_path_appl, $ezer_path_code, $ezer_path_root,
     $code, $module, $procs, $context, $ezer_name, $ezer_app, $tree, $errors, $includes, $onloads;
   global $pragma_library, $pragma_syntax, $pragma_attrs, $pragma_names, $pragma_get, $pragma_prefix,
-    $pragma_group, $pragma_box, $pragma_using, $pragma_test, $pragma_strings, $pragma_switch;
+    $pragma_group, $pragma_box, $pragma_using, $pragma_if, $pragma_strings, $pragma_switch;
   global $call_php;
   $errors= 0;
   try {
@@ -66,7 +66,8 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
       if ( in_array('prefix',$pragma) ) $pragma_prefix= true;
       if ( in_array('get',$pragma) )    $pragma_get= true;
       if ( in_array('box',$pragma) )    $pragma_box= true;
-      if ( in_array('test',$pragma) )   $pragma_test= true;
+      if ( in_array('test',$pragma) )   $pragma_if= $pragma_switch= true;
+      if ( in_array('if',$pragma) )     $pragma_if= true;
       if ( in_array('switch',$pragma) ) $pragma_switch= true;
       if ( in_array('strings',$pragma)) $pragma_strings= true;
 //       if ( in_array('using',$pragma) ) {
@@ -426,7 +427,8 @@ function xlist($x,$ind,$list_only='') {
   $sp= str_repeat('  ',$ind);
   if ( $x->part ) foreach ($x->part as $id=>$desc) {
     $type= $desc->type;
-    if ( $list_only=='' || strstr(",$list_only,",",$id,") ) {
+    if ( $list_only==''
+      || preg_match("/$list_only/",$id) ) {
       $lst.= "\n$sp$type $id";
       if ( $type=='proc' ) {
   //                                                 debug($desc);
@@ -1175,7 +1177,7 @@ function walk_struct($down,$pcode,$beg,$end,$ift,$iff,$is_arg=0) {
       walk_struct($test,$pcode,$icode,$end,$icode+$t_len,$icode+$ts_len,0);
       $icode+= 1;
 //       walk_struct($stmnt,$pcode,$icode,$end,$i_end,$i_end,1);
-      walk_struct($stmnt,$pcode,$icode,$end,$ift,$ift,1); // switch skončí vždy jako true
+      walk_struct($stmnt,$pcode,$icode,$end,$ift,$ift,1); // switch skončí vždy úspěchem
       $icode+= $s_len;
     }
     if ($i<$n) {
@@ -1183,38 +1185,28 @@ function walk_struct($down,$pcode,$beg,$end,$ift,$iff,$is_arg=0) {
 //       walk_struct($stmnt,$pcode,$icode,$end,$i_end,$i_end,1);
       walk_struct($stmnt,$pcode,$icode,$end,$ift,$ift,1);
     }
-
 //                                         debug($down,"switch end:$beg,$end,$ift,$iff");
     def_jumps($down,$pcode);
   }
-
-  elseif ( $typ=='if1' ) {  // if - then
-//                                         debug($down,"if-then");
-    $test= $down->arr[0];
-    $then= $down->arr[1];
-    $t_len= $test->len;
-    $tt_len= $t_len + $then->len;
-    walk_struct($test,$pcode,$icode,$end,$icode+$t_len,$iff,1);
-    $icode+= $t_len;
-    walk_struct($then,$pcode,$icode,$end,$ift,$iff,0);
-    def_jumps($down,$pcode);
-  }
-  elseif ( $typ=='if2' ) {  // if - then - then
+  elseif ( $typ=='if' ) {  // if - then - else
     $test= $down->arr[0];
     $then= $down->arr[1]; $then->is_go= 1;
-    $else= $down->arr[2];
+    $else= $down->arr[2]; $else->is_go= 1;
     $t_len= $test->len;
     $tt_len= $t_len + $then->len;
     $te_len= $then->len + $else->len;
     $tte_len= $tt_len + $else->len;
-    walk_struct($test,$pcode,$icode,$end,$icode+$t_len,$icode+$tt_len,1);
+    walk_struct($test,$pcode,$icode,$end,$icode+$t_len,$icode+$tt_len,0);
     $icode+= $t_len;
-    walk_struct($then,$pcode,$icode,$end,$icode+$te_len,$icode+$te_len,0);
+//     walk_struct($then,$pcode,$icode,$end,$icode+$te_len,$icode+$te_len,0);
+    walk_struct($then,$pcode,$icode,$end,
+      $is_arg ? $icode+$te_len : $ift,$is_arg ? $icode+$te_len : $ift,1);
     $icode+= $tt_len;
-    walk_struct($else,$pcode,$icode,$end,$ift,$iff,0);
-//                                         debug($pcode,"if2");
+    walk_struct($else,$pcode,$icode,$end,
+      $is_arg ? $icode+$te_len : $ift,$is_arg ? $icode+$te_len : $ift,1);
+//                                         debug($pcode,"if");
     def_jumps($down,$pcode);
-//                                         debug($down,"if-then-then");
+//                                         display("if end:$beg,$end,$ift,$iff");
   }
   elseif ( $down->arr ) {
     $last= count($down->arr) - 1;
@@ -1581,7 +1573,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
   $struct= (object)array('typ'=>$c->expr,'i'=>-1,'ift'=>-1,'iff'=>-1,'len'=>-1);
   global $trace_me;
   global $context, $names, $code_top;
-  global $pragma_names, $pragma_get, $pragma_test, $pragma_switch, $proc_path;
+  global $pragma_names, $pragma_get, $pragma_if, $pragma_switch, $proc_path;
   global $call_php;
   switch ( $c->expr ) {
   case 'value':
@@ -1638,7 +1630,7 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
       $code_top-= $npar;
     }
     // -------------------------------------- if e {s1} [{s2}]
-    elseif ( $pragma_test && $c->op=='if' ) {
+    elseif ( $pragma_if && $c->op=='if' ) {
       // {expr:'call',op:'if',par:[e,s1[,s2]]}
       if ( count($c->par)>1 ) {
         $expr= gen($pars,$vars,$c->par[0],0,$struct1);
@@ -1647,16 +1639,18 @@ function gen($pars,$vars,$c,$icall=0,&$struct) { #trace();
         $struct->arr[]= $struct1;
       }
       if ( count($c->par)==2 ) {
-        $code[]= array($expr,$then);
-        $struct->typ= 'if1';
+        $false= (object)array('o'=>'v','v'=>0);
+        $code[]= array($expr,$then,$false);
+//         $struct->typ= 'if2';
       }
       elseif ( count($c->par)==3 ) {
         $else= gen($pars,$vars,$c->par[2],0,$struct1);
         $struct->arr[]= $struct1;
         $code[]= array($expr,$then,$else);
-        $struct->typ= 'if2';
+//         $struct->typ= 'if2';
       }
       else comp_error("CODE: if musí mít 2-3 parametry");
+      $struct->typ= 'if';
 //                                         debug($struct);
     }
     // -------------------------------------- switch e l1 {s1}
