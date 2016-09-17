@@ -4702,6 +4702,7 @@ Ezer.Browse= new Class({
 //os: Browse.key_id   - jméno sloupce s klíčem pro browse_load ap. (pokud není udáno, odvozuje se z použité tabulky)
 //-
   selected_op: 'ignore',                // co budeme s klíči dělat ... viz fce selected
+  query_seek: 0,                        // 1 = podmínka v get_query je pro seek (Enter+shift)
   cond: null,                           // aktuální pro WHERE ...    expr
   order: null,                          // aktuální pro ORDER BY ... id [ASC|DESC]
   order_by: null,                       // objekt browse_clmn podle kterého se řadí
@@ -5114,6 +5115,7 @@ Ezer.Browse= new Class({
 //a: reload - pokud je reload=0 nebude po zrušení pomínek proveden dotaz
   init_queries: function (reload) {
     reload= reload===undefined ? 1 : reload;
+    this.query_seek= 0;       // výběr bez shiftu
     this.DOM_focus();
     for ( var ic in this.part ) {
       var clmn= this.part[ic];
@@ -5129,19 +5131,29 @@ Ezer.Browse= new Class({
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  _ask_queries+
 // proveď výběr
-// pokud je no_focus , jde o volání kvůli refresh a oldkey může obsahovat žádaný browse_key
-  _ask_queries: function (no_focus,oldkey) {
+// pokud je no_focus, jde o volání kvůli refresh a oldkey může obsahovat žádaný browse_key
+// pokud je seek_only, zavolá browse_seek s podmínkou místo browse_load
+  _ask_queries: function (no_focus,oldkey,seek_only) {
     if ( no_focus ) {  // voláno kvůli refresh
       var continuation=  this.findProc('onrefreshed')
         ? {fce:this._ask_queries_,args:[],stack:true,obj:this} : null;
       var code= [{o:'x',i:'browse_refresh',a:1}];
       new Ezer.Eval(code,this,[this,oldkey],'refresh',continuation);
     }
+    else if ( seek_only ) {
+      this.DOM_focus();
+      var code= [{o:'x',i:'browse_seek',a:1}];
+      if ( this.findProc('onchange') ) code.push({o:'c',i:'onchange'});
+      var wcond= this.get_query(false);           // podmínky za WHERE
+      this.query_seek= 1;       // výběr se shiftem
+      new Ezer.Eval(code,this,[this,wcond],'seek');
+    }
     else {
       this.DOM_focus();
       var code= [{o:'x',i:'browse_load',a:5}];
       if ( this.findProc('onchange') ) code.push({o:'c',i:'onchange'});
 //       browse_load: function(cond,order,having,from,len,quiet,sql) {
+      this.query_seek= 0;       // výběr bez shiftu
       new Ezer.Eval(code,this,[this,null,null,null,null,-1],'query');
     }
     return true;
@@ -5418,7 +5430,7 @@ Ezer.Browse= new Class({
     return this.blen;
   },
 // --------------------------------------------------------------------------------==> . browse_seek
-//fx: Browse.browse_seek ([seek_cond [,cond[,having]]])
+//fx: Browse.browse_seek ([seek_cond [,cond[,having[,sql]]]])
 //      naplnění browse daty z tabulky;
 //      pro správnou funkci musí browse obsahovat show s klíčem řídící tabulky
 //    1.pokud není definováno seek_cond, zopakuje předchozí browse_load včetně nastavení záznamu
@@ -5826,13 +5838,15 @@ Ezer.Browse= new Class({
         return x;
       }
     }
-    // doplň podmínku o dotazy zadané v zobrazených sloupcích browse
-    var wcond= this.get_query(false);           // podmínky za WHERE
-    if ( this.get_query_pipe )
-      x.pipe= this.get_query_pipe;
-    x.cond+= (x.cond && wcond ? " AND " : '' ) + wcond;
-    var hcond= this.get_query(true);            // podmínky za HAVING
-    x.having+= (x.having && hcond ? " AND " : '' ) + hcond;
+    if ( !this.query_seek ) {
+      // doplň podmínku o dotazy zadané v zobrazených sloupcích browse
+      var wcond= this.get_query(false);           // podmínky za WHERE
+      if ( this.get_query_pipe )
+        x.pipe= this.get_query_pipe;
+      x.cond+= (x.cond && wcond ? " AND " : '' ) + wcond;
+      var hcond= this.get_query(true);            // podmínky za HAVING
+      x.having+= (x.having && hcond ? " AND " : '' ) + hcond;
+    }
     // vytvoř parametry dotazu
     // x: table, cond, order, fields:{id:label,field|expr}, from, cursor, rows, key_id, {joins...} [, group]
     // y: from, rows, values**, key_id

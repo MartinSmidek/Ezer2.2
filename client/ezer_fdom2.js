@@ -3630,7 +3630,7 @@ Ezer.Show.implement({
                 case 'enter': // provést hledání
                   event.stop();
                   event.stopPropagation();
-                  this.owner._ask_queries();
+                  this.owner._ask_queries(0,0,event.shift);
                   break;
                 }
   //               return false;
