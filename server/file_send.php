@@ -93,8 +93,16 @@ else {
   // test konce
   if ( count($_SESSION['upload'][$name])==($chunks-1) ) {
     // poskládej a ulož soubor
+    $errmsg0= "ERROR soubor $name byl přenesen ale nelze vytvořit složku '$path' na serveru";
     $errmsg1= "ERROR soubor $name byl přenesen ale nelze zapsat do složky '$path' na serveru";
     $errmsg2= "ERROR soubor $name byl přenesen ale má nulovou délku";
+    if ( !file_exists($path) ) {
+      // založení složky
+      $dir= rtrim($path,"/");
+      $ok= recursive_mkdir($dir,"/");
+      if ( !$ok ) { $err= $errmsg0; goto end; }
+    }
+    // zapsání souboru
     $f= @fopen($pname,'w');
     if ( !$f ) { $err= $errmsg1; goto end; }
     for  ($i= 1; $i<=$chunks; $i++) {
@@ -142,5 +150,19 @@ function utf2ascii($val) {
   $ref= mb_strtolower($ref);
   $ref= preg_replace('~[^-a-z0-9_\.]+~', '', $ref);
   return $ref;
+}
+# ---------------------------------------------------------------------------------- recursive_mkdir
+// vytvoří adresář
+function recursive_mkdir($path, $sep="\\", $mode = 0777) {
+  $dirs= explode($sep, $path);
+  $count= count($dirs);
+  $path= '';
+  for ($i= 0; $i < $count; ++$i) if ( $dirs[$i] ) {
+    $path.= strchr($dirs[$i],':') ? $dirs[$i] : $sep . $dirs[$i];
+    if (!is_dir($path) && !@mkdir($path, $mode)) {
+      return false;
+    }
+  }
+  return true;
 }
 ?>

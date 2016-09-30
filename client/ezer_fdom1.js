@@ -93,12 +93,18 @@ Ezer.Application= new Class({
       $('dolni').setStyles({top:hh+hw+hs-4,bottom:'initial'});
       ws.y= hh+hw;
     }
-    else {
+    else { // outer
       var t= $('dolni').getCoordinates().top;
-      var h= t - $('work').getCoordinates().top - 15;
-      $('work').setStyle('height',h);
-      $('paticka').setStyle('bottom',ws.y-t+pruh);
-      ws.y= t;
+      if ( !t ) { // bez status bar
+        ws.y= window.innerHeight;
+        $('work').setStyle('height',ws.y);
+      }
+      else { // včetně status bar
+        var h= t - $('work').getCoordinates().top - 15;
+        $('work').setStyle('height',h);
+        $('paticka').setStyle('bottom',ws.y-t+pruh);
+        ws.y= t;
+      }
     }
     // definice sys.screen width a height
     Ezer.sys.screen= {width:ws.x,height:ws.y};
