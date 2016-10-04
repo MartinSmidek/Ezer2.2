@@ -245,8 +245,8 @@ __EOD;
   $ip_ok= true;
   $ip_msg= '';
   $key_msg= '';
-  if ( (isset($pars->watch_ip)
-     || isset($pars->watch_key)) && (isset($pars->no_local) || !$ezer_local ) ) {
+  if ( (isset($pars->watch_ip) || isset($pars->watch_key))
+    && (isset($pars->no_local) && $pars->no_local || !$ezer_local ) ) {
     // ověření přístupu - externí přístup hlídat vždy, lokální jen je-li  no_local=true
     if ( $pars->watch_key && ($watch_key= isset($_POST['watch_try']) ? $_POST['watch_try'] : '') ) {
       $watch_lock= @file_get_contents("$ezer_root/code/$ezer_root.key");
