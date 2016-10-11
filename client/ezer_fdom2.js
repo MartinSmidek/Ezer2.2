@@ -1710,6 +1710,8 @@ Ezer.Field.implement({
     else {
       this.DOM_Block= this.DOM_Input.inject(owners_block);
     }
+    if ( this.options.id!=undefined )
+      this.DOM_Input.set('id',this.options.id);
     if ( this.options.tabindex!=undefined )
       this.DOM_Input.set('tabindex',this.options.tabindex||-1);
     this.DOM_Block.setStyles(this.coord({height:this._h||15}));
