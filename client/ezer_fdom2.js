@@ -3330,9 +3330,9 @@ Ezer.Browse.implement({
 //         }
 //       }
 //       else
-      if ( Ezer.platform!=='A' && Ezer.platform!=='I' ) // MOBILE: focus() zobrazí klávesnici
-        this.DOM_input.focus();
     }
+    if ( Ezer.platform!=='A' && Ezer.platform!=='I' ) // MOBILE: focus() zobrazí klávesnici
+      this.DOM_input.focus();
     return true;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_blur

@@ -8383,7 +8383,7 @@ Ezer.fce.now_sql= function (time_too) {
 // -------------------------------------------------------------------------------------- fdate
 //ff: fce.fdate (format[,datetime])
 //      zjednodušená analogie PHP funkce date
-//a:    format - řetězec s řídícími písmeny, implementovány jsou: Y,n,j,w,H,i,s
+//a:    format - řetězec s řídícími písmeny, implementovány jsou: Y,n,j,w,W,t,H,i,s
 //      datetime - číslo s významem timestamp nebo textový formát data d.m.y
 //s: funkce
 Ezer.fce.fdate= function (format,datetime) {
@@ -8406,6 +8406,8 @@ Ezer.fce.fdate= function (format,datetime) {
     case 'n':  y= d.getMonth()+1; break;
     case 'j':  y= d.getDate(); break;
     case 'w':  y= d.getDay(); break;
+    case 'W':  y= d.get('week'); break;
+    case 't':  y= d.get('LastDayOfMonth'); break;
     case 'H':  y= padNum(d.getHours(),2); break;
     case 'i':  y= padNum(d.getMinutes(),2); break;
     case 's':  y= padNum(d.getSeconds(),2); break;
