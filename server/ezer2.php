@@ -775,6 +775,7 @@
     $fields= ''; $del= '';
     $x->from= $x->from ? $x->from : 0;
     $y->key_id= $x->key_id;
+    $y->quiet= $x->quiet;
     $key_id= ($x->view ? "{$x->view}." : '').$x->key_id;
     $rows= $x->rows;
     $tmax= $x->tmax;

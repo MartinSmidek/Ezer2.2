@@ -5445,7 +5445,8 @@ Ezer.Browse= new Class({
 //   cond        - podmínka pro všechny řádky browse, je-li vynechána bude užita stávající
 //   having      - podmínka pro všechny řádky browse umístěná za HAVING v GROUP BY
 //   sql         - nepovinný MYSQL dotaz vykonaný před hlavním dotazem
-  browse_seek: function(seek,cond,having,sql) {
+//   quiet       - nepovinný po načtení nemá být vyvoláno onrowclick
+  browse_seek: function(seek,cond,having,sql,quiet) {
     var x;
     if ( seek ) {
       x= this._params({cmd:'browse_seek', seek:seek, tmax:this.tmax},
@@ -5454,6 +5455,7 @@ Ezer.Browse= new Class({
     else {
       x= this._params({cmd:'browse_load'},null,null,null,this.b,-1,0,sql||null);
     }
+    x.quiet= quiet||0;
     return x;
   },
   browse_seek_: function (y) {
@@ -5480,7 +5482,7 @@ Ezer.Browse= new Class({
       var key= Number(y.seek);
       for (var iv= 0; iv<this.blen; iv++) {
         if ( this.keys[iv]==key ) {             // projdi klíče přečtených řádků browse
-          this._row_move(this.b+iv);
+          this._row_move(this.b+iv,y.quiet);    // NOEVENT! pokud bylo zakázáno
           break;
         }
       }
