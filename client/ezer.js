@@ -5974,6 +5974,7 @@ Ezer.Show= new Class({
 //  ; 'u' : EXPERIMENTÁLNÍ hodnotu lze interaktvně změnit po dvojklik
 //  ;     : po dvojtečce
 //  ; 'e' : místo 0 se zobrazuje ''
+//  ; 'i' : čísla se ukazují zaokrouhlená na integer (fcí Math.round)
   Extends: Ezer.Elem,
 //oi: Show.map_pipe - transformace zobrazených hodnot pomoci Map
   map_pipe: null,                       // význam atributu map_pipe (tabulka hodnot)

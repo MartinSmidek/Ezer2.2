@@ -3711,12 +3711,14 @@ Ezer.Show.implement({
 // ------------------------------------------------------------------------------------ DOM_set+
 //f: Show-DOM.DOM_set (i)
 //      zobrazí hodnotu i-tého řádku (1..tlen) s uvážením případné specifikace za ':'
-//      pro datové hodnoty lze uvádět: d.m;
+//      pro datové hodnoty lze uvádět: d.m, pro zaokrouhlení čísel: i;
 //      pokud format obsahuje 't' bude hodnota zobrazena i v title
 //      pokud format obsahuje 'h' nebudou zobrazeny HTML a PHP tagy
   DOM_set: function (ti) {
     if ( this.DOM_cell ) {
       var val= this.owner.buf[ti-1][this.id], spec= this._f(':');
+      if ( val && spec=='i' )
+        val= Math.round(val);
       if ( val==0 && spec=='e' )
         val= '';
       if ( val && spec=='d.m' ) {
@@ -3741,7 +3743,8 @@ Ezer.Show.implement({
 // ------------------------------------------------------------------------------------ DOM_show+
 //f: Show-DOM.DOM_show (r)
 //      zobrazí hodnotu svého sloupce záznamu r (b..b+blen) v řádku tabulky
-//      s uvážením případné specifikace za ':' - pro datové hodnoty lze uvádět: d.m;
+//      s uvážením případné specifikace za ':' - pro datové hodnoty lze uvádět: d.m,
+//      pro zaokrouhlení čísel: i ;
 //      pokud format obsahuje 't' bude hodnota zobrazena i v title
 //      pokud format obsahuje 'h' nebudou zobrazeny HTML a PHP tagy
   DOM_show: function (r) {
@@ -3753,6 +3756,8 @@ Ezer.Show.implement({
       var val= browse.buf[r-browse.b][this.id];
       // zjištění případných transformací
       var spec= this._f(':');
+      if ( val && spec=='i' )
+        val= Math.round(val);
       if ( val==0 && spec=='e' )
         val= '';
       if ( val && spec=='d.m' ) {
