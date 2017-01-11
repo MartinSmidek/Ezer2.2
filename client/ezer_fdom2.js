@@ -521,8 +521,17 @@ Ezer.Item.implement({
       // náhrada ikony na začátku, případně uprostřed
       var s_ikonou= this.owner.owner.awesome;
       if ( s_ikonou ) {
+//         pop= title.replace(/\[fa-([^\]]+)\]/g,'');
+//         title= title.replace(/^\[fa-([^\]]+)\]/,"<i class='fa fa-$1 fa-fw efa'></i>");
         pop= title.replace(/\[fa-([^\]]+)\]/g,'');
-        title= title.replace(/^\[fa-([^\]]+)\]/,"<i class='fa fa-$1 fa-fw efa'></i>");
+        var re= /^\[fa-([^\]]+)\]/;
+        if ( title.match(re) )
+          title= title.replace(re,"<i class='fa fa-$1 fa-fw efa'></i>");
+        else {
+          re= /^\[([^\]]+)\]/;
+          if ( title.match(re) )
+            title= title.replace(re,"<i class='fa fa-fw efa'>$1</i>");
+        }
       }
       title= title.replace(/\[fa-([^\]]+)\]/g,"<i class='fa fa-$1'></i>");
       this.domA= new Element('a',{href:href,html:title,events:{
