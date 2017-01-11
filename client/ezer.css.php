@@ -548,7 +548,7 @@ ul.SelectDrop {
 .SelectDrop li.selected {
   background-color:#b2b4bf; }
 .SelectDrop li.li-sel {
-  color:$s2_brow !important; background-image:url(img/srafa.png); background-repeat:repeat-x; }
+  color:$s2_brow !important; background-image:url(../img/srafa.png); background-repeat:repeat-x; }
 .List {
   position:absolute; z-index:1; /*outline:1px dotted #fff;*/ overflow:auto; overflow-x:hidden; }
 .ListRow {
@@ -622,7 +622,7 @@ __EOD
 .BrowseSmart td.BrowseNoClmn {
   padding-left:0; border-left:0; width:0; }
 .BrowseSmart .tr-sel td.tr-odd, .BrowseSmart .tr-sel td.tr-even {
-  background-image:url(img/srafa.png); background-repeat:repeat-x;  }
+  background-image:url(../img/srafa.png); background-repeat:repeat-x;  }
 /* input */
 .BrowseSmart input.td_input {
   height:15px; position:relative; margin:-1px 2px -1px -3px; padding-left:2px;
@@ -797,17 +797,17 @@ span.chng_hlp {
                    background-repeat: no-repeat; background-position: center left;
                    /*text-shadow: 2px 2px 1px #5e708e;*/ }
 .CMenu .CTitle, #Content h1
-         	{ padding-left: 50px; background-image: url(img/doc_menu.gif);}
+         	{ padding-left: 50px; background-image: url(../img/doc_menu.gif);}
 .CProperty .CTitle
-         	{ padding-left: 50px; background-image: url(img/method.png);}
+         	{ padding-left: 50px; background-image: url(../img/method.png);}
 .CFunction .CTitle
-         	{ padding-left: 60px; background-image: url(img/function.png);}
+         	{ padding-left: 60px; background-image: url(../img/function.png);}
 .CClass .CTitle
-         	{ padding-left: 40px; background-image: url(img/class.png);}
+         	{ padding-left: 40px; background-image: url(../img/class.png);}
 .CModule .CTitle
-         	{ padding-left: 40px; background-image: url(img/doc_module.gif);}
+         	{ padding-left: 40px; background-image: url(../img/doc_module.gif);}
 .CForm .CTitle
-         	{ padding-left: 40px; background-image: url(img/doc_form.gif);
+         	{ padding-left: 40px; background-image: url(../img/doc_form.gif);
                   background-color:$b_doc_form ; }
 #Content pre    { font: 12px "Monaco", "Courier New", Monospace; background: #f5f5f5;
                   border: 1px solid #ddd; padding: 10px 15px; color: #444; margin-left: 30px;

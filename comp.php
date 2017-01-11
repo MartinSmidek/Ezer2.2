@@ -121,7 +121,7 @@
       ezer_connect('ezer_kernel');
     }
     else {
-      require_once("$ezer_path_root/$root.inc");
+      require_once("$ezer_path_root/$root.inc.php");
       ezer_connect();
     }
     $lst.= i_doc('javascript');
