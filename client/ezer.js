@@ -8724,7 +8724,7 @@ Ezer.fce.href= function (path) {
     var part= Ezer.run.$.part[Ezer.root].part[xs[0]];
     walk:
     if ( part && part._focus ) {
-      part._focus();
+      part._focus(1);
       for (var i=1; i<xs.length; i++) {
         if ( /*(part.options.include===undefined || part.options.include=='onload'
            || part.options.include=='loaded')
@@ -8736,7 +8736,7 @@ Ezer.fce.href= function (path) {
             if ( part.findProc('onpopstate') )
               part.fire('onpopstate',[location.href]);
             else
-              part._focus();
+              part._focus(1);
             break;
           case 'menu.left':
             break;
