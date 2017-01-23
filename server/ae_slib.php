@@ -51,21 +51,9 @@ function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$co
   $skin=    isset($_GET['skin']) ? $_GET['skin'] : $skin;
   $theight= isset($_GET['theight']) ? $_GET['theight'] : 240;
   $dbg=     isset($_GET['dbg']) ? $_GET['dbg'] : '';
-  // identifikace prohlížeče
-  $browser=
-    preg_match('/MSIE/',$_SERVER['HTTP_USER_AGENT'])?'IE':(
-    preg_match('/Opera/',$_SERVER['HTTP_USER_AGENT'])?'OP':(
-    preg_match('/Firefox/',$_SERVER['HTTP_USER_AGENT'])?'FF':(
-    preg_match('/Chrome|Safari/',$_SERVER['HTTP_USER_AGENT'])?'CH':(
-    '?'))));
-  // identifikace platformy prohlížeče: Android => Ezer.client == 'A'
+  // identifikace prohlížeče a platformy prohlížeče: Android => Ezer.client == 'A'
   $ua= $_SERVER['HTTP_USER_AGENT'];
-  $platform=          // x11 hlásí Chrome při vzdáleném ladění (chrome://inspect/#devices)
-    preg_match('/android|x11/i',$ua)            ? 'A' : (
-    preg_match('/iPad/i',$ua)                   ? 'I' : (
-    preg_match('/linux/i',$ua)                  ? 'L' : (
-    preg_match('/macintosh|mac os x/i',$ua)     ? 'M' : (
-    preg_match('/windows|win32/i',$ua)          ? 'W' : '?' ))));
+  ezer_browser($browser,$browser_version,$platform,$ua);
   $_SESSION['platform']= $platform;
   $_SESSION['browser']= $browser;
   // doplnění meta tagů pro mobilní platformy
@@ -744,6 +732,27 @@ function root_svn($app=0) {
     }
   }
   return $verze;
+}
+# ------------------------------------------------------------------------------------- ezer browser
+# identifikace prohlížeče a operačního systému
+function ezer_browser(&$abbr,&$version,&$platform,$agent=null ) {
+  if ( !$agent ) $agent= $_SERVER['HTTP_USER_AGENT'];
+  // identifikace prohlížeče
+  if     ( preg_match('/Edge\/([\d\.])*/',   $agent,$m) ) { $abbr='EG'; $version= $m[0]; }
+  elseif ( preg_match('/MSIE\/([\d\.])*/',   $agent,$m) ) { $abbr='IE'; $version= $m[0]; }
+  elseif ( preg_match('/Opera\/([\d\.])*/',  $agent,$m) ) { $abbr='OP'; $version= $m[0]; }
+  elseif ( preg_match('/Firefox\/([\d\.])*/',$agent,$m) ) { $abbr='FF'; $version= $m[0]; }
+  elseif ( preg_match('/Chrome\/([\d\.])*/', $agent,$m) ) { $abbr='CH'; $version= $m[0]; }
+  elseif ( preg_match('/Safari\/([\d\.])*/', $agent,$m) ) { $abbr='SF'; $version= $m[0]; }
+  else { $abbr='?'; $version= '?/?'; }
+  // identifikace platformy prohlížeče: Android => Ezer.client == 'A'
+  $platform=          // x11 hlásí Chrome při vzdáleném ladění (chrome://inspect/#devices)
+    preg_match('/android|x11/i',$agent)            ? 'A' : (
+    preg_match('/iPad/i',$agent)                   ? 'I' : (
+    preg_match('/linux/i',$agent)                  ? 'L' : (
+    preg_match('/macintosh|mac os x/i',$agent)     ? 'M' : (
+    preg_match('/windows|win32/i',$agent)          ? 'W' : '?'
+  ))));
 }
 # -------------------------------------------------------------------------------------------------- doc_chngs_show
 function doc_chngs_show($type='ak',$days=30,$app_name='') { trace();

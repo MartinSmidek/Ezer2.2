@@ -1070,7 +1070,7 @@ __JS
   $result= $n ? "celkem $n" : "nic";
   return $result.$html;
 }
-# ----------------------------------------------------------------------------------- sys_day_logins
+# ----------------------------------------------------------------------------------- sys day_logins
 # vygeneruje přehled přihlášení pro daný den
 #   $sign= 'all' => všechno
 function sys_day_logins($skip,$day,$sign='=') {
@@ -1115,9 +1115,10 @@ function sys_day_logins($skip,$day,$sign='=') {
     if ( $watch_access_opt && isset($watch_access_opt->css->{$t->org}) ) {
       $cls= $watch_access_opt->css->{$t->org};
     }
+    ezer_browser($b_short,$b_long,$platform,$browser);
     $html.= "<tr title='$browser'><td>$typ</td><td>$when</td>
                <td class='$cls'><b>$user</b></td>
-               <td><b>$ip</b></td><td>$screen</td><td>$plat</td><td>$brow</td></tr>";
+               <td><b>$ip</b></td><td>$screen</td><td>$plat</td><td>$b_long</td></tr>";
   }
   $html.= '</table>';
   $result= $n ? "$n přihlášení" : "bez přihlášení";
