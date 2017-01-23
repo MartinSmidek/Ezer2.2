@@ -3726,6 +3726,10 @@ Ezer.Show.implement({
   DOM_set: function (ti) {
     if ( this.DOM_cell ) {
       var val= this.owner.buf[ti-1][this.id], spec= this._f(':');
+      if ( this._fc('t') ) {
+        // zobrazení hodnoty i jako title pro format:'t' - před případným zaokrouhlením
+        this.DOM_cell[ti].setProperty('title',val);
+      }
       if ( val && spec=='i' )
         val= Math.round(val);
       if ( val==0 && spec=='e' )
@@ -3743,10 +3747,6 @@ Ezer.Show.implement({
       }
       val= val==null ? '' : val;
       this.DOM_cell[ti].setProperty('text',val);
-      if ( this._fc('t') ) {
-        // zobrazení hodnoty i jako title pro format:'t'
-        this.DOM_cell[ti].setProperty('title',val);
-      }
     }
   },
 // ------------------------------------------------------------------------------------ DOM_show+
@@ -3763,6 +3763,10 @@ Ezer.Show.implement({
         "Show.DOM_show("+r+") - mimo rozsah");
       // získání transformovanou hodnotu ti-tého řádku v buferu
       var val= browse.buf[r-browse.b][this.id];
+      if ( this._fc('t') ) {
+        // zobrazení hodnoty i jako title pro format:'t' - před případným zaokrouhlením
+        this.DOM_cell[r-browse.t+1].setProperty('title',val);
+      }
       // zjištění případných transformací
       var spec= this._f(':');
       if ( val && spec=='i' )
@@ -3782,10 +3786,6 @@ Ezer.Show.implement({
       }
       val= val==null ? '' : val;
       this.DOM_cell[r-browse.t+1].setProperty('text',val);
-      if ( this._fc('t') ) {
-        // zobrazení hodnoty i jako title pro format:'t'
-        this.DOM_cell[r-browse.t+1].setProperty('title',val);
-      }
     }
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  DOM_qry_set+
@@ -4100,3 +4100,4 @@ Ezer.trace.y= {'-':'-104px', '+':'-144px', 'o':'-42px', 'c':'-22px', 'x':'0px', 
 Ezer.trace.t= {'-':'+', '+':'-', 'o':'c', 'c':'o', 'x':'x', 'q':'x'};
 Ezer.trace.h= {'-':'r', '+':'a', 'o':'r', 'c':'a', 'x':'-', 'q':'-'};
 // --------------------------------------------------------------------------------------
+
