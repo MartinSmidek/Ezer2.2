@@ -310,11 +310,7 @@ Ezer.Application.implement({
       Ezer.sys.ezer= y.sys.ezer;
       Ezer.onlogin();
     }
-    // pokud je použito 'wait_mask' tak ji zobraz
-    var wait= $('wait_mask');
-    if ( wait ) {
-      wait.setStyle('display','block');
-    }
+    waiting(0);
   },
   // ------------------------------------------------------------------------------------- logged
   // logged: akce po změně přihlášení
@@ -378,6 +374,7 @@ Ezer.Application.implement({
     else /*if ( $('login').getStyle('display')=='block' )*/ {
       // pokud jde o selhání přihlášení
       this.loginDomMsg('chybné přihlašovací údaje');
+      waiting(0);
     }
 //     else {
 //       // pokud jde o refresh
@@ -559,11 +556,7 @@ Ezer.Application.implement({
       Ezer._MenuMain.excite();
     else if ( Ezer._PanelMain )
       Ezer._PanelMain.excite();
-    // pokud je použito 'wait_mask' tak je potlač
-    var wait= $('wait_mask');
-    if ( wait ) {
-      wait.setStyle('display','none');
-    }
+    waiting(0);
   },
 // ------------------------------------------------------------------------------------ onfirstfocus
 // je voláno v případě prvního focus panelu - obdoba události domready

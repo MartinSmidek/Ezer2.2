@@ -117,13 +117,13 @@ panel nov [,,770,] {type:'right', title:'Přehled změn', _sys:'*'
       item all {title:'Přehled uskutečněných změn', par:°{days:9999} }
       proc onclick(i) { panel.display(0,'m'); u.fill2(ask('doc_todo2','chngs','','',i.par)) }
     }
-    menu app {title:'Požadavky na aplikaci',type:'group'
+    menu app {title:'Požadavky na aplikaci',type:'group', skill:'sp'
       item nove {title:'Nově realizované' }
       item stare {title:'Přehled realizovaných' }
       item todo {title:'Čekající požadavky' }
       proc onclick(i) { panel.display(0,'m'); u.fill(ask('doc_todo2',i._id,'app')) }
     }
-    menu eze {title:'Pořadavky na jádro Ezer',type:'group', skill:'m'
+    menu eze {title:'Pořadavky na jádro Ezer',type:'group', skill:'sp'
       item nove {title:'Nově realizované' }
       item stare {title:'Přehled realizovaných' }
       item todo {title:'Čekající požadavky' }

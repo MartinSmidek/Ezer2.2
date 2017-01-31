@@ -207,7 +207,15 @@ function dbg_onclick_start(win) {
     })
   }
 }
-// ==================================================================================> Clipboard.js
+// ===================================================================================> Užitečné fce
+// ----------------------------------------------------------------------------------------- waiting
+// pokud je použito 'wait_mask' tak ji zobraz/skryj podle parametru
+function waiting(on) {
+  var wait= $('wait_mask');
+  if ( wait ) {
+    wait.setStyle('display',on?'block':'none');
+  }
+}
 // --------------------------------------------------------------------------------------- clipboard
 // vloží text do schránky Windows pomocí podle https://clipboardjs.com/
 function clipboard_set(text) {
