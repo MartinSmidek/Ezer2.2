@@ -1169,14 +1169,14 @@ Ezer.LabelDrop.implement({
   },
   DOM_add2: function() {
   },
-// ------------------------------------------------------------------------------ LabelDrop.DOM_init
+// ------------------------------------------------------------------------------ LabelDrop.DOM init
 //f: LabelDrop-DOM.DOM_init (on)
 //      inicializace dat a oblasti pro drop - set(0) ji deaktivuje, set(1) aktivuje
   DOM_init: function() {
     this.DOM_files= [];
     this.DOM_BlockRows.getChildren().destroy();
   },
-// ------------------------------------------------------- LabelDrop.DOM_addFile
+// ------------------------------------------------------- LabelDrop.DOM addFile
 // přidá řádek pro informaci o vkládaném souboru {name,title,status}
 // obohatí f o td1,td2 a volitelně td3
   DOM_addFile: function(f) {
@@ -1192,7 +1192,7 @@ Ezer.LabelDrop.implement({
     f.newname= '';
     this.DOM_files.push(f);
   },
-// ------------------------------------------------------- LabelDrop.DOM_addFile_Disk
+// ------------------------------------------------------- LabelDrop.DOM addFile_Disk
 // přidá řádek pro informaci o souboru vloženém na Google Disk
 // obohatí f o td1,td2 a volitelně td3
   DOM_addFile_Disk: function(f) {
@@ -1967,6 +1967,7 @@ Ezer.EditHtml.implement({
       this.DOM_outline= this.DOM_Block= new Element('div',{'class':'EditHtml',styles:this.coord()}).adopt(
           this.DOM_Input= new Element('textarea')
         ).inject(this.owner.DOM_Block);
+      this.DOM_Block.store('Ezer',this);
       // --------------------------------- ošetření rozdílu mezi verzemi před startem
       if ( Ezer.options.CKEditor.version[0]=='4' ) {
         // základní nastavení editoru verze 4.0.1
