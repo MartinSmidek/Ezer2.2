@@ -122,7 +122,7 @@ function sys_user_change_me($typ,$fld,$val,$p1='',$p2='') {  trace();
 # $typ='fld' -- _user->$fld=$val
 # $typ='pas' -- _user->password=$val pokud stávající _user->password==$p1 a $val==$p2
 function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
-  global $json, $ezer_system, $ezer_root, $mysql_db_system,$salt;
+  global $json, $ezer_system, $ezer_root, $mysql_db_system, $hash_password;
   $html= '';
   $err= '';
   if ( $id_user ) {
@@ -156,18 +156,16 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
       if (!$res) $err.= "CHYBA:".mysql_error();
       break;
     case 'pas':                                         // zápis do _user.fld
-    	if (isset($salt)) {
-	    	$p1 = crypt($p1, $salt);
-	    	$p2 = crypt($p2, $salt);
-	    	$val = crypt($val, $salt);
-			}
-      if ( $p1!=select('password','_user',"id_user='$id_user'",'ezer_system') )
+      if ( $p1!=select('password','_user',"id_user='$id_user'",'ezer_system') && !isset($hash_password) )
+        $err.= "chybně zapsané původní heslo";
+      else if ( !password_verify($p1,select('password','_user',"id_user='$id_user'",'ezer_system')) && isset($hash_password) )
         $err.= "chybně zapsané původní heslo";
       else if ( !$val )
         $err.= "heslo nesmí být prázdné";
       else if ( $val!=$p2 )
         $err.= "chyba v opakovaném zápise hesla";
       else { // testy jsou ok
+        $val= isset($hash_password) ? password_hash($val, PASSWORD_BCRYPT) : $val;
         $qry= "UPDATE $ezer_system._user SET password='$val' WHERE id_user='$id_user'";
         $res= mysql_qry($qry,0,0,0,'ezer_system');
         if (!$res) $err.= "CHYBA:".mysql_error();

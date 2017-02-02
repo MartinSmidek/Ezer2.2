@@ -2,7 +2,7 @@
   error_reporting(E_ALL & ~E_NOTICE);
   # --------------------------------------------------------------------------------- paths, globals
   # globální objekty ($json bude v PHP6 zrušeno)
-  global $app_root, $ezer_root, $ezer_path_serv, $ezer_path_appl, $ezer_path_root, $ezer_db, $ezer_system, $salt;
+  global $app_root, $ezer_root, $ezer_path_serv, $ezer_path_appl, $ezer_path_root, $ezer_db, $ezer_system, $hash_password;
   global $json, $USER, $EZER, $ezer_user_id;
 //   if ( $_POST['app_root'] ) chdir("..");
   # --------------------------------------------------------------------------------------- requires
@@ -1142,15 +1142,21 @@
     if ( $x->uname ) {
       $size= "{$x->size->body->x}/{$x->size->body->y}|{$x->size->screen->x}/{$x->size->screen->y}";
       $info= "{$x->uname}|$ip|$size|$browser|{$_SESSION['platform']}|{$_SESSION['browser']}";
-      if (isset($salt)) {
-	$pword= crypt($x->pword, $salt);
+      if (isset($hash_password)) {
+        $where= " WHERE username='{$x->uname}' ";
+        $qry= "SELECT * FROM $ezer_system._user $where";
+        $res= mysql_qry($qry,0,0,0,'ezer_system');
+		  	$u= mysql_fetch_object($res);
+		  	if (!password_verify($x->pword,$u->password))
+		  		$res = false;
       } else {
-	$pword= $x->pword;
+        $where= " WHERE username='{$x->uname}' AND password='{$x->pword}' ";
+        $qry= "SELECT * FROM $ezer_system._user $where";
+        $res= mysql_qry($qry,0,0,0,'ezer_system');
+		  	$u= mysql_fetch_object($res);
       }
-      $where= " WHERE username='{$x->uname}' AND password='{$pword}' ";
-      $qry= "SELECT * FROM $ezer_system._user $where";
-      $res= mysql_qry($qry,0,0,0,'ezer_system');
-      if ( $res && ($u= mysql_fetch_object($res)) ) {
+      
+      if ( $res && $u ) {
         $ezer_user_id= $_SESSION[$ezer_root]['user_id']= $y->user_id= $u->id_user;
 #        sess_read('',true); // přečte informace z _user do $USER
         $_SESSION[$ezer_root]['user_start']= date("j.n.Y H:i:s");;
