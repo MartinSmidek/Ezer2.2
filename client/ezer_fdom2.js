@@ -3772,7 +3772,7 @@ Ezer.Show.implement({
       var spec= this._f(':');
       if ( val && spec=='i' )
         val= Math.round(val);
-      if ( val==0 && spec=='e' )
+      if ( ( val==0 || val=='00:00:00' ) && spec=='e' )
         val= '';
       if ( val && spec=='d.m' ) {
         var dmy= val.split('.');
