@@ -280,10 +280,9 @@ __EOD
           <span>heslo</span><br />
           <input id="password" type="password" tabindex="2" title="heslo" name="pass"  value="" /><br />
           <span id="login_msg"></span><br />
-          <input id="login_on" type="submit" tabindex="3" value="Přihlásit se" />
-          <input id="login_no"
-            onclick="document.getElementById('logme').submit();"
-          type="button" tabindex="4" value="... ne, děkuji" />
+          <button id="login_on" tabindex="3">
+          	Přihlásit se&nbsp;&nbsp;<i class="fa fa-thumbs-o-up fa-flip-horizontal"></i>
+          </button>
         </form>
 __EOD
     : ( $pars->watch_key ? <<<__EOD
