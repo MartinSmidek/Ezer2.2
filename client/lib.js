@@ -250,7 +250,7 @@ function make_url_menu(menu) {
   });
   // přidání původních $_GET parametrů mimo trace+theight, které je doplněno v pushState
   for (var tag in Ezer.get ) {
-    if ( tag!='trace' && tag!='theight' ) {
+    if ( tag!='trace' && tag!='theight' && tag!='app' ) {
       var val= Ezer.get[tag];
       url+= '&'+tag+'='+val;
     }
