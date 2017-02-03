@@ -145,14 +145,17 @@
     switch ( $x->op ) {
     case 'message?':          // {op:'message?',user_id:...,hits:n});
       $answer->curr_version= $x->curr_version;
-      check_version($answer);
-      if ( $x->svn ) {
-        $answer->sa_version= root_svn(1);
-        $answer->sk_version= root_svn(0);
-        $answer->msg.= "<br><br><b>SVN</b><br>$ezer_root=$answer->sa_version, ezer=$answer->sk_version";
-      }
-      if ( $answer->d_version ) {
-        $answer->msg.= "<br><br><b>poslední změna dat</b><br>$answer->d_version";
+      if ( $x->curr_version ) {
+        // pokud se má zjišťovat aktuální verze
+        check_version($answer);
+        if ( $x->svn ) {
+          $answer->sa_version= root_svn(1);
+          $answer->sk_version= root_svn(0);
+          $answer->msg.= "<br><br><b>SVN</b><br>$ezer_root=$answer->sa_version, ezer=$answer->sk_version";
+        }
+        if ( $answer->d_version ) {
+          $answer->msg.= "<br><br><b>poslední změna dat</b><br>$answer->d_version";
+        }
       }
       break;
     case 'users?':            // {op:'users?'});
