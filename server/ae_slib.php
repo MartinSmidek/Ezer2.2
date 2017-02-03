@@ -162,7 +162,7 @@ __EOD;
   if ( isset($options->group_db) )
     $_SESSION[$ezer_root]['group_db']= strtr($options->group_db,array('"'=>'',"'"=>''));
   //  pokud je definováno $options->curr_version a dostupná db ezer_kernel přečte verzi jádra
-  if ( isset($options->curr_version) ) {
+  if ( isset($options->curr_version) && $options->curr_version ) {
     $version= 0;
     // verze podle db jádra - je, když je curr_version
     $o= select_object("MAX(version) AS _max","_help","kind='v' GROUP BY kind",'ezer_kernel');
