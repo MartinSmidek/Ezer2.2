@@ -49,6 +49,7 @@ Ezer.Block= new Class({
 //      Pokud je skill uváděn jako jedno slovo => definuje přístup pro změnu,
 //      Pokud skill je uváděn jako 2 slova oddělená | => definuje přístup pro: čtení|zápis.
 //      skill může být uváděn jako varianty oddělené středníkem - použije se varianta lepší pro uživatele
+//      za znakem # mohou být naopak zákazy (oddělené středníkem) - použije se varianta horší pro uživatele
 //      Základní hodnoty jsou:
 //      ; 'r' : <i>redaktor</i> základní přístup
 //      ; 'a' : <i>admin</i> změny nastavení aplikace, správa uživatelů
@@ -770,27 +771,37 @@ Ezer.Block= new Class({
           // zjistí, jaké skill má přihlášený uživatel pro blok popsaný desc
           // skill je uváděn jako jedno slovo => definuje přístup pro změnu
           // skill je uváděn jako slova oddělená | => definuje přístup pro: čtení|zápis|specifické...
+          // za znakem # mohou být zákazy pro nositele daného oprávnění (oddělené středníkem)
           // 0 - nemá právo, 1 - smí jen vidět, 2 - smí i měnit
           var ok= 1, a= desc.options?desc.options.skill:null, skill= 2;
           if ( a ) {
-            var as= a.clean().split(';');
-            for (var ai= 0; ai<as.length; ai++) {
-              // probereme všechny varianty skill
-              var aa= as[ai].clean().split('|');
-              ok= us && us.contains(aa[0],' ') ? 1 : 0;
-              if ( ok && (aa.length==1 || (aa.length==2 && !us.contains(aa[1],' '))) )
-                skill= 1;
-              // spokojíme se s první pro uživatele úspěšnou
-              if ( ok )
-                break;
+            var as, bs= a.clean().split('#');
+            if ( bs.length>1 ) {
+              as= bs[1].clean().split(';');
+              for (var ai= 0; ai<as.length; ai++) {
+                // probereme všechny zákazy skill
+                ok= us.contains(as[ai],' ') ? 1 : 0;
+                if ( ok ) {
+                  ok= skill= 0;
+                  break;
+                }
+              }
+            }
+            // pokud nebyl explicitní zákaz
+            if ( skill ) {
+              as= a.clean().split(';');
+              for (var ai= 0; ai<as.length; ai++) {
+                // probereme všechny varianty skill
+                var aa= as[ai].clean().split('|');
+                ok= us && us.contains(aa[0],' ') ? 1 : 0;
+                if ( ok && (aa.length==1 || (aa.length==2 && !us.contains(aa[1],' '))) )
+                  skill= 1;
+                // spokojíme se s první pro uživatele úspěšnou
+                if ( ok )
+                  break;
+              }
             }
           }
-//           if ( a ) {
-//             var aa= a.clean().split('|');
-//             ok= us && us.contains(aa[0],' ') ? 1 : 0;
-//             if ( aa.length==1 || (aa.length==2 && !us.contains(aa[1],' ')) )
-//               skill= 1;
-//           }
           if ( ok ) {
             var id= name, context= this;
             if ( name.indexOf('.')>0 ) {
