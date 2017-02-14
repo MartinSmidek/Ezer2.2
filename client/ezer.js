@@ -773,22 +773,24 @@ Ezer.Block= new Class({
           // skill je uváděn jako slova oddělená | => definuje přístup pro: čtení|zápis|specifické...
           // za znakem # mohou být zákazy pro nositele daného oprávnění (oddělené středníkem)
           // 0 - nemá právo, 1 - smí jen vidět, 2 - smí i měnit
-          var ok= 1, a= desc.options?desc.options.skill:null, skill= 2;
+          var nok, ok= 1, a= desc.options?desc.options.skill:null, skill= 2;
           if ( a ) {
             var as, bs= a.clean().split('#');
             if ( bs.length>1 ) {
+              a= bs[0];
               as= bs[1].clean().split(';');
               for (var ai= 0; ai<as.length; ai++) {
                 // probereme všechny zákazy skill
-                ok= us.contains(as[ai],' ') ? 1 : 0;
-                if ( ok ) {
+                nok= us.contains(as[ai],' ') ? 1 : 0;
+                if ( nok ) {
                   ok= skill= 0;
                   break;
                 }
               }
             }
             // pokud nebyl explicitní zákaz
-            if ( skill ) {
+            if ( a && skill ) {
+              ok= 1;
               as= a.clean().split(';');
               for (var ai= 0; ai<as.length; ai++) {
                 // probereme všechny varianty skill
