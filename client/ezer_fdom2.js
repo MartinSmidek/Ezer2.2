@@ -291,8 +291,10 @@ Ezer.MenuLeft.implement({
     if ( this.awesome && (!stav || stav!=this.awesome) ) {
       this.awesome= !stav ? (this.awesome==1 ? 2 : 1) : (stav==1 ? 1 : 2);
       this.DOM_awesome.toggleClass('fa-caret-square-o-right').toggleClass('fa-caret-square-o-left');
-      this.owner.DOM_Block.setStyle('left',this.owner._folded ? 210 : 30);
       this.DOM_Block.setStyle('width',this.owner._folded ? 210 : 30);
+      var w= this.owner.DOM_Block.getStyle('width').toInt();
+      this.owner.DOM_Block.setStyle('left',this.owner._folded ? 210 : 30);
+      this.owner.DOM_Block.setStyle('width',this.owner._folded ? w-180 : w+180);
       this.owner._folded= !this.owner._folded;
 //       Ezer.app.DOM_layout();
       if ( !quiet )
