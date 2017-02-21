@@ -739,6 +739,7 @@ function ezer_browser(&$abbr,&$version,&$platform,$agent=null ) {
   // identifikace prohlížeče
   if     ( preg_match('/Edge\/([\d\.])*/',   $agent,$m) ) { $abbr='EG'; $version= $m[0]; }
   elseif ( preg_match('/MSIE\/([\d\.])*/',   $agent,$m) ) { $abbr='IE'; $version= $m[0]; }
+  elseif ( preg_match('/Vivaldi\/([\d\.])*/',$agent,$m) ) { $abbr='VI'; $version= $m[0]; }
   elseif ( preg_match('/Opera\/([\d\.])*/',  $agent,$m) ) { $abbr='OP'; $version= $m[0]; }
   elseif ( preg_match('/Firefox\/([\d\.])*/',$agent,$m) ) { $abbr='FF'; $version= $m[0]; }
   elseif ( preg_match('/Chrome\/([\d\.])*/', $agent,$m) ) { $abbr='CH'; $version= $m[0]; }
