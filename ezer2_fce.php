@@ -156,16 +156,16 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
       if (!$res) $err.= "CHYBA:".mysql_error();
       break;
     case 'pas':                                         // zápis do _user.fld
-      if ( $p1!=select('password','_user',"id_user='$id_user'",'ezer_system') && !isset($hash_password) )
+      if ( $p1!=select('password','_user',"id_user='$id_user'",'ezer_system') && (!isset($hash_password) || $hash_password===false) )
         $err.= "chybně zapsané původní heslo";
-      else if ( !password_verify($p1,select('password','_user',"id_user='$id_user'",'ezer_system')) && isset($hash_password) )
+      else if ( !password_verify($p1,select('password','_user',"id_user='$id_user'",'ezer_system')) && $hash_password===true )
         $err.= "chybně zapsané původní heslo";
       else if ( !$val )
         $err.= "heslo nesmí být prázdné";
       else if ( $val!=$p2 )
         $err.= "chyba v opakovaném zápise hesla";
       else { // testy jsou ok
-        $val= isset($hash_password) ? password_hash($val, PASSWORD_BCRYPT) : $val;
+        $val= $hash_password===true ? password_hash($val, PASSWORD_BCRYPT) : $val;
         $qry= "UPDATE $ezer_system._user SET password='$val' WHERE id_user='$id_user'";
         $res= mysql_qry($qry,0,0,0,'ezer_system');
         if (!$res) $err.= "CHYBA:".mysql_error();
@@ -178,6 +178,16 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
   else
     $err.= "Během práce došlo zřejmě k automatickému odhlášení, přihlašte se prosím znovu a opravu opakujte.";
   return "$html<br><br>$err";
+}
+# ---------------------------------------------------------------------------------- sys_hash_password
+# vrátí hash hesla v případě, že je vyžadováno šifrování hesel
+function sys_hash_password($password) {  trace();
+  global $hash_password;
+  if ($hash_password === true) {
+    return password_hash($password, PASSWORD_BCRYPT);
+  } else {
+    return $password;
+  }
 }
 # --------------------------------------------------------------------------- sys_user_skills_format
 # vrátí seznam schopností s poznámkou v title

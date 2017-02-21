@@ -304,6 +304,7 @@ panel users [,,,543] {type:'right', title:'Uživatelé', _sys:'uzi', skill:'a|a'
   | // testy prošly - uprav změny pro uložení
     [ uzivatel.access.changed; uzivatel.access.set(uzivatel.access.key); uzivatel.access.change ];
     [ uzivatel.org.changed; uzivatel.org.set(uzivatel.org.key); uzivatel.org.change ];
+    [ uzivatel.password.changed; msg.set(ask('sys_hash_password', uzivatel.password.get)); uzivatel.password.set(msg.get); uzivatel.password.change ];
     return(0)
   }
   # obnovení seznamu uživatelů

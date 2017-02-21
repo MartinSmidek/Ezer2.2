@@ -1145,18 +1145,18 @@
     if ( $x->uname ) {
       $size= "{$x->size->body->x}/{$x->size->body->y}|{$x->size->screen->x}/{$x->size->screen->y}";
       $info= "{$x->uname}|$ip|$size|$browser|{$_SESSION['platform']}|{$_SESSION['browser']}";
-      if (isset($hash_password)) {
+      if ($hash_password===true) {
         $where= " WHERE username='{$x->uname}' ";
         $qry= "SELECT * FROM $ezer_system._user $where";
         $res= mysql_qry($qry,0,0,0,'ezer_system');
-		  	$u= mysql_fetch_object($res);
-		  	if (!password_verify($x->pword,$u->password))
-		  		$res = false;
+        $u= mysql_fetch_object($res);
+        if (!password_verify($x->pword,$u->password))
+          $res = false;
       } else {
         $where= " WHERE username='{$x->uname}' AND password='{$x->pword}' ";
         $qry= "SELECT * FROM $ezer_system._user $where";
         $res= mysql_qry($qry,0,0,0,'ezer_system');
-		  	$u= mysql_fetch_object($res);
+        $u= mysql_fetch_object($res);
       }
       
       if ( $res && $u ) {
