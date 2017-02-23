@@ -162,15 +162,15 @@ textarea { resize: none; }
 #login_1.login_chngs, #login_2.login_chngs { height:180px; }
 #login_2  { float:right; }
 #login_1, #login_2  { width:250px; border:1px solid $b_group; height:220px; background-color:$b_item; }
-#login_1 div.login_a { padding:15px; }
+#login_1 div.login_a { padding:15px 40px; }
 #login_2 div.login_a { padding:5px; height:180px; overflow-y:auto; }
 #login_2 div.login_a_msg { padding:5px; }
 #login_2 div.login_notify { padding:5px; background-color:$b_kuk; color:$c2_kuk; }
 #login form { margin:0; padding:0;  }
 #login span { margin:0; padding:0;  }
-#login input { margin:2px 0 10px; padding:0 2px; width:auto; overflow:visible;}
+#login input { margin:2px 0 10px; padding:0 2px; width:100%; overflow:visible;}
 #login h1 { background-color:$b_group; color:#FFFFFF; font-size:9pt; margin:0; padding:2px 5px;}
-#login_on { text-decoration:underline; position:absolute; }
+#login_on { text-decoration:none; position:absolute; margin:0 40px; }
 #login_no { position:absolute; left:110px; }
 #watch_key   { padding:5px !important; }
 #login_chngs { margin-top:193px; border:1px solid $b_group; height:180px; background-color:$b_item; }
