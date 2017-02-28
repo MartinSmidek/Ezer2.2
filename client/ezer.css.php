@@ -11,7 +11,7 @@ global $skin, $path, $c, $b, $ab, $c_appl, $ezer_root,
   $c_kuk, $c2_kuk, $b_kuk, $s_kuk, $b_doc_modul, $b_doc_menu, $b_doc_form;
 # c_=color, b_=background-color, a?_=aktivní, f?_=focus, s_=speciál
 # ------------------------------------------------------------------- default barvy podle Office2007
-  $path_img= "../../skins/img";                   // cesta k obecným background-image
+  $path_img= "../client/img";                     // cesta k default background-image
   $path= "./skins/default";                       // cesta k background-image
   $bila= '#ffffff'; $cerna= '#000000'; $seda= '#4d4d4d'; $zelena= '#2c8931'; // základní barvy
   // prvky
@@ -549,7 +549,7 @@ ul.SelectDrop {
 .SelectDrop li.selected {
   background-color:#b2b4bf; }
 .SelectDrop li.li-sel {
-  color:$s2_brow !important; background-image:url(../img/srafa.png); background-repeat:repeat-x; }
+  color:$s2_brow !important; background-image:url($path_img/srafa.png); background-repeat:repeat-x; }
 .List {
   position:absolute; z-index:1; /*outline:1px dotted #fff;*/ overflow:auto; overflow-x:hidden; }
 .ListRow {
@@ -623,7 +623,7 @@ __EOD
 .BrowseSmart td.BrowseNoClmn {
   padding-left:0; border-left:0; width:0; }
 .BrowseSmart .tr-sel td.tr-odd, .BrowseSmart .tr-sel td.tr-even {
-  background-image:url(../img/srafa.png); background-repeat:repeat-x;  }
+  background-image:url($path_img/srafa.png); background-repeat:repeat-x;  }
 /* input */
 .BrowseSmart input.td_input {
   height:15px; position:relative; margin:-1px 2px -1px -3px; padding-left:2px;
