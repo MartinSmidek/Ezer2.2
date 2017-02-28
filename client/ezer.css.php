@@ -11,6 +11,7 @@ global $skin, $path, $c, $b, $ab, $c_appl, $ezer_root,
   $c_kuk, $c2_kuk, $b_kuk, $s_kuk, $b_doc_modul, $b_doc_menu, $b_doc_form;
 # c_=color, b_=background-color, a?_=aktivní, f?_=focus, s_=speciál
 # ------------------------------------------------------------------- default barvy podle Office2007
+  $path_img= "../../skins/img";                   // cesta k obecným background-image
   $path= "./skins/default";                       // cesta k background-image
   $bila= '#ffffff'; $cerna= '#000000'; $seda= '#4d4d4d'; $zelena= '#2c8931'; // základní barvy
   // prvky
@@ -797,17 +798,17 @@ span.chng_hlp {
                    background-repeat: no-repeat; background-position: center left;
                    /*text-shadow: 2px 2px 1px #5e708e;*/ }
 .CMenu .CTitle, #Content h1
-         	{ padding-left: 50px; background-image: url(../img/doc_menu.gif);}
+         	{ padding-left: 50px; background-image: url($path_img/doc_menu.gif);}
 .CProperty .CTitle
-         	{ padding-left: 50px; background-image: url(../img/method.png);}
+         	{ padding-left: 50px; background-image: url($path_img/method.png);}
 .CFunction .CTitle
-         	{ padding-left: 60px; background-image: url(../img/function.png);}
+         	{ padding-left: 60px; background-image: url($path_img/function.png);}
 .CClass .CTitle
-         	{ padding-left: 40px; background-image: url(../img/class.png);}
+         	{ padding-left: 40px; background-image: url($path_img/class.png);}
 .CModule .CTitle
-         	{ padding-left: 40px; background-image: url(../img/doc_module.gif);}
+         	{ padding-left: 40px; background-image: url($path_img/doc_module.gif);}
 .CForm .CTitle
-         	{ padding-left: 40px; background-image: url(../img/doc_form.gif);
+         	{ padding-left: 40px; background-image: url($path_img/doc_form.gif);
                   background-color:$b_doc_form ; }
 #Content pre    { font: 12px "Monaco", "Courier New", Monospace; background: #f5f5f5;
                   border: 1px solid #ddd; padding: 10px 15px; color: #444; margin-left: 30px;

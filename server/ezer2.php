@@ -150,8 +150,10 @@
         check_version($answer);
         if ( $x->svn ) {
           $answer->sa_version= root_svn(1);
-          $answer->sk_version= root_svn(0);
-          $answer->msg.= "<br><br><b>SVN</b><br>$ezer_root=$answer->sa_version, ezer=$answer->sk_version";
+          if ( $answer->sa_version!='?' ) {
+            $answer->sk_version= root_svn(0);
+            $answer->msg.= "<br><br><b>SVN</b><br>$ezer_root=$answer->sa_version, ezer=$answer->sk_version";
+          }
         }
         if ( $answer->d_version ) {
           $answer->msg.= "<br><br><b>poslední změna dat</b><br>$answer->d_version";
@@ -2092,7 +2094,7 @@ function check_users($y) {
 function check_version($y) {
   // kontrola verze systému, pokud je definováno $EZER->options->version
 //   $y->a_version= $y->g_version= $y->k_version= 0; return;
-  global $EZER, $ezer_root;
+  global $EZER, $ezer_root, $ezer_db;
   $msg= '';
   if ( $y->curr_version ) {
     $yv= $y->curr_version;
@@ -2115,12 +2117,16 @@ function check_version($y) {
       }
     }
     // verze jádra
-    $yk= $y->k_version= select1("MAX(version)","ezer_kernel._help","kind='v' GROUP BY kind");
-    $msg.= ", ezer=$yk";
-    if ( $yk > $yv ) {
-      $y->help.= ($y->help ? "<br>" : '')
-        . str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","ezer_kernel._help",
-          "kind='v' AND version>$yv GROUP BY kind"));
+    if ( isset($ezer_db['ezer_kernel']) ) {
+      $ezer_kernel= (isset($ezer_db['ezer_kernel'][5]) && $ezer_db['ezer_kernel'][5]!='')
+        ? $ezer_db['ezer_kernel'][5] : 'ezer_kernel';
+      $yk= $y->k_version= select1("MAX(version)","$ezer_kernel._help","kind='v' GROUP BY kind");
+      $msg.= ", ezer=$yk";
+      if ( $yk > $yv ) {
+        $y->help.= ($y->help ? "<br>" : '')
+          . str_replace('~','<br>',select1("GROUP_CONCAT(help SEPARATOR '~')","$ezer_kernel._help",
+            "kind='v' AND version>$yv GROUP BY kind"));
+      }
     }
     // verze dat, podle posledního záznamu v _track
     $qry= mysql_qry("SHOW TABLES LIKE '_track'");
