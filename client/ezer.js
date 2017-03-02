@@ -5220,7 +5220,7 @@ Ezer.Browse= new Class({
   },
 // ------------------------------------------------------------------------------------ browse_select+
 //fx: Browse.browse_select (cond)
-//      nastavení všech vybraných řádků do browse_keys
+//      nastavení všech vybraných řádků do keys_sel
 //a: cond - MySQL podmínka umístěná za WHERE
   browse_select: function (cond) {
     // zapomeň podmínku
@@ -5235,6 +5235,20 @@ Ezer.Browse= new Class({
     this.selected('refresh');
     this.fire('onchoice');
     return true;
+  },
+// ------------------------------------------------------------------------------------- browse keys
+//fx: Browse.browse_keys ()
+//      navrácení seznamu klíčů aktuálního stavu browse
+  browse_keys: function (cond) {
+    // zapomeň podmínku
+    var selected_op= this.selected_op;          // vypni nastavené selected
+    this.selected_op= 'ignore';
+    var x= this._params({cmd:'browse_select'},null,null,null,null,null,1);
+    this.selected_op= selected_op;
+    return x;
+  },
+  browse_keys_: function (y) {
+    return y.keys;
   },
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - _browse_init1+
 // počáteční hodnoty souboru, buferu, tabulky
