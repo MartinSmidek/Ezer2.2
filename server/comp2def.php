@@ -317,6 +317,7 @@ $tok2lex= array(
   T_STATIC => 'id', T_STRING => 'id', T_STRING_CAST => 'str', T_STRING_VARNAME => 'str',
   T_SWITCH => 'id', T_UNSET => 'id', T_UNSET_CAST => 'x', T_USE => 'id', T_VAR => 'id',
   T_VARIABLE => 'id', T_WHILE => 'id', T_WHITESPACE => 'blank',  T_XOR_EQUAL => 'x',
+  T_ABSTRACT => 'id',
   -1 => 'del'
 );
 $blocs_help = array (                                     // popis pro dokumentaci
