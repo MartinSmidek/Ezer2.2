@@ -705,25 +705,24 @@ function base64_encode (data) {
     return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);
 }
 // =======================================================================================> Resample
+// convert a dataURI to a Blob
+//   http://stackoverflow.com/questions/4998908/convert-data-uri-to-file-then-append-to-formdata
 function dataURItoBlob(dataURI) {
-  // convert base64 to raw binary data held in a string
-  // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-  var byteString = atob(dataURI.split(',')[1]);
-
+  // convert base64/URLEncoded data component to raw binary data held in a string
+  var byteString;
+  if (dataURI.split(',')[0].indexOf('base64') >= 0)
+    byteString = atob(dataURI.split(',')[1]);
+  else
+    byteString = unescape(dataURI.split(',')[1])
+  ;
   // separate out the mime component
-  var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-
-  // write the bytes of the string to an ArrayBuffer
-  var ab = new ArrayBuffer(byteString.length);
-  var ia = new Uint8Array(ab);
+  var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+  // write the bytes of the string to a typed array
+  var ia = new Uint8Array(byteString.length);
   for (var i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
+    ia[i] = byteString.charCodeAt(i);
   }
-
-  // write the ArrayBuffer to a blob, and you're done
-  var bb = new BlobBuilder();
-  bb.append(ab);
-  return bb.getBlob(mimeString);
+  return new Blob([ia], {type:mimeString});
 }
 var Resample =
 Ezer.browser=='IE' ? null :

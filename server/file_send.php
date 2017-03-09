@@ -85,7 +85,7 @@ else {
   if ( $chunk==1 ) {
     $_SESSION['upload'][$name]= array();
     if ( file_exists($pname) ) {
-      $war= "WARNING soubor $name již existuje, lze smazat přes kontextové menu."
+      $war= "WARNING soubor $pname již existuje, lze smazat přes kontextové menu."
           . " Pokud mezi soubory není, změň jméno souboru.";
       goto end;
     }

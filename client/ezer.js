@@ -429,8 +429,8 @@ Ezer.Block= new Class({
                 if ( options.transfer=='base64' )
                   x= base64_encode(x);
                 this.file_drop_info.text= x;
-                this._call(0,options.handler,this.file_drop_info);  // uživatelská funkce ondrop
               }
+              this._call(0,options.handler,this.file_drop_info);  // uživatelská funkce ondrop
             }.bind(this);
             switch(options.transfer) {
             case 'base64':

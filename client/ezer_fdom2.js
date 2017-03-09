@@ -1412,13 +1412,17 @@ Ezer.LabelDrop.implement({
           f.status= resp[5] ? "error" : resp[6] ? "warning" : resp[3];
           f.td2.innerHTML= f.status;
           f.td1.innerHTML= this.DOM_href({name:resp[0]});
+          var ff= {name:resp[0], folder:this.folder, size:f.size, status:f.status};
           // kontrola korektnosti
           if ( resp[5] ) Ezer.error(resp[5],'S',this);
           else if ( resp[6] ) Ezer.fce.warning(resp[6]);
           else if ( this.part && (obj= this.part['onload']) ) {
             // zavolání funkce onload ex-li s kopií f
-            var ff= {name:resp[0], folder:this.folder, size:f.size, status:f.status};
             new Ezer.Eval(obj.code,this,[ff],'onload',null,false,obj,obj.desc.nvar);
+          }
+          // zavolání případného this.onUploaded ... využívá se v pluginu ezer v CKEditor
+          if ( this.onUploaded && typeof this.onUploaded === "function" ) {
+            this.onUploaded(ff);
           }
         }
       }
@@ -1970,43 +1974,52 @@ Ezer.EditHtml.implement({
           this.DOM_Input= new Element('textarea')
         ).inject(this.owner.DOM_Block);
       this.DOM_Block.store('Ezer',this);
-      // --------------------------------- ošetření rozdílu mezi verzemi před startem
-      if ( Ezer.options.CKEditor.version[0]=='4' ) {
-        // základní nastavení editoru verze 4.0.1
+      if ( window.CKEDITOR.version.substr(0,3) >= "4.5" ) {
+      // ---------------------------------------------- verze 4.5 a vyšší s widgetem 'ezer' v lib.js
         var options= {
-          width:this._w, height:this._h-60, resize_enabled:false,
-          entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
-//           skin:'moono'
-          skin:'kama'
-//           skin:'version3'
+          height:this._h-60, entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs'
         };
-      }
-      else {
-        // základní nastavení editoru verze do 3.6.2
-        var options= {
-          width:this._w, height:this._h-60, resize_enabled:false,
-          entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
-          skin:'office2003'
-        };
-      }
-      // ---------------------------------------------- společná část pro verze 3 i 4
-      // úprava options z nastavení aplikace podle options.toolbar z Ezerscriptu
-      Object.append(options,this.options.par||{});
-      Object.append(options,options.toolbar && Ezer.options.CKEditor[options.toolbar]
-        ? Ezer.options.CKEditor[options.toolbar]
-        : {toolbar:[[ 'Find','Replace',    // nebo jednoduchý default
-            '-','Bold','Italic','Subscript','Superscript',
+        Object.append(options,this.options.par||{});
+        Object.append(options,options.toolbar && Ezer.options.CKEditor[options.toolbar]
+          ? Ezer.options.CKEditor[options.toolbar]
+          : {toolbar:[['Maximize','Styles','-','Bold','Italic','RemoveFormat',
             '-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock',
-            '-','Link','Unlink',
-            '-','NumberedList', 'BulletedList',
-            '-','Source','ShowBlocks','RemoveFormat' ]]});
-      this.ckeditor= CKEDITOR.replace(this.DOM_Input,options);
-      // ------------------------------------ ošetření rozdílu mezi verzemi po startu
-      if ( Ezer.options.CKEditor.version[0]=='4' ) {
-        // dokončení nastavení editoru verze 4.0.1
+            '-','Outdent', 'Indent', 'Blockquote',
+            '-','NumberedList','BulletedList',
+            '-','Link','Unlink','Image',
+            '-','Source']]});
+        this.ckeditor= CKEDITOR.replace(this.DOM_Input,options);
       }
       else {
-      // dokončení nastavení editoru verze 3.6.2
+        // --------------------------------- ošetření rozdílu mezi staršími verzemi před startem
+        if ( Ezer.options.CKEditor.version[0]=='4' ) {
+          // základní nastavení editoru verze 4.0.1
+          var options= {
+            width:this._w, height:this._h-60, resize_enabled:false,
+            entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
+            skin:'kama'
+          };
+        }
+        else {
+          // základní nastavení editoru verze do 3.6.2
+          var options= {
+            width:this._w, height:this._h-60, resize_enabled:false,
+            entities:false, entities_latin:false, language:'cs', contentsLanguage:'cs',
+            skin:'office2003'
+          };
+        }
+        // ---------------------------------------------- společná část pro verze 3 i 4 do 4.5
+        // úprava options z nastavení aplikace podle options.toolbar z Ezerscriptu
+        Object.append(options,this.options.par||{});
+        Object.append(options,options.toolbar && Ezer.options.CKEditor[options.toolbar]
+          ? Ezer.options.CKEditor[options.toolbar]
+          : {toolbar:[[ 'Find','Replace',    // nebo jednoduchý default
+              '-','Bold','Italic','Subscript','Superscript',
+              '-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock',
+              '-','Link','Unlink',
+              '-','NumberedList', 'BulletedList',
+              '-','Source','ShowBlocks','RemoveFormat' ]]});
+        this.ckeditor= CKEDITOR.replace(this.DOM_Input,options);
       }
       // ----------------------------------------------- ošetření focus, blur, change
       if ( this.ckeditor ) this.ckeditor.on('focus', function(ev) {
@@ -2027,10 +2040,6 @@ Ezer.EditHtml.implement({
       if ( this.ckeditor ) this.ckeditor.on('blur', function(ev) {
         this.focused= false;
         this.DOM_outline.removeClass('focus').removeClass('changed_focus');
-//         if ( this.ckeditor.checkDirty() && this._value!=this.ckeditor.getData() ) {
-//           this.DOM_changed(true);
-//           this.fire('onchanged');
-//         }
         if ( this._changed ) {
           this.fire('onchanged');
         }
@@ -2057,6 +2066,7 @@ Ezer.EditHtml.implement({
       this.DOM_Block.setStyle('height','');
     }
     else {
+      // balík CKEditor není dostupný
       this.DOM_Block= this.DOM_Input= new Element('textarea',{'class':'Edit',styles:this.coord()
       }).inject(this.owner.DOM_Block);
     }
