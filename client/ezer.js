@@ -3898,6 +3898,8 @@ Ezer.Field= new Class({
 //os: FieldDate.format - poloha dialogu data
 //  ; 'R' : 'right' zobrazit zarovnaný na pravou hranu
 //  ; 'U' : 'upper' zobrazit nad hodnotou
+//  ;     : po dvojtečce
+//  ; 'y' : dialog nabídne výběr roku, který se vrací jako číslo
 Ezer.FieldDate= new Class({
   Extends: Ezer.Field,
   options: {}

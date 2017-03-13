@@ -6,6 +6,8 @@
  *
  * Source/Documentation available at:
  * http://www.monkeyphysics.com/mootools/script/2/datepicker
+ *
+ * MS2017 - yearPickerOnly added
  * 
  * --
  * 
@@ -57,6 +59,7 @@ var DatePicker = new Class({
 		timePicker: false,
 		timePickerOnly: false,
 		yearPicker: true,
+		yearPickerOnly: false,     //MS2017
 		yearsPerPage: 20,
 		format: 'd-m-Y',
 		allowEmpty: false,
@@ -83,6 +86,11 @@ var DatePicker = new Class({
 		if (this.options.timePickerOnly) {
 			this.options.timePicker = true;
 			this.options.startView = 'time';
+		}
+		if (this.options.yearPickerOnly) {    //MS2017
+			this.options.startView = 'decades';
+                        this.options.format= 'Y';
+                        this.options.inputOutputFormat= 'Y';
 		}
 		this.formatMinMaxDates();
 		document.addEvent('mousedown', this.close.bind(this));
@@ -511,6 +519,9 @@ var DatePicker = new Class({
 					this.d.setFullYear(d);
 					this.mode = 'year';
 					this.render('fade');
+					if ( this.options.yearPickerOnly ) {  //MS2017
+                                          this.select({year:d});
+                                        }
 				}.bindWithEvent(this, y));
 			}
 			this.d.setFullYear(this.d.getFullYear() + 1);
