@@ -36,7 +36,7 @@ $blocs2 = array (                                    // překládají se na AE_<
   'item'        =>  explode(",",'proc'),
 #  top
   'panel'       =>  explode(",",'use,proc,var,form,panel.popup'),
-  'panel.popup' =>  explode(",",'use,proc,var,form'),
+  'panel.popup' =>  explode(",",'use,proc,var,form,menu.left'),
   'panel.free'  =>  explode(",",'use,proc,var,form'),
   'panel.plain' =>  explode(",",'use,proc,var,form,panel'),
   'panel.right' =>  explode(",",'use,proc,var,form,menu.left,panel'),

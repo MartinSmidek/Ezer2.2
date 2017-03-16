@@ -255,9 +255,11 @@ Ezer.MenuLeft.implement({
 //f: MenuLeft-DOM.DOM_add1 ()
 //      první zobrazení obalu levého menu
   DOM_add1: function() {
-    Ezer.assert(this.owner.type=='panel.right',"menu typu 'left' může být pouze v panelu typu 'right'");
+    Ezer.assert(this.owner.type=='panel.right' || this.owner.type=='panel.popup',
+      "menu typu 'left' může být pouze v panelu typu 'right' nebo 'popup'");
     // vložení accordionu do panelu na připravené místo
-    this.DOM_Block= new Element('div',{'class':'Accordion',styles:{display:'none'}}).inject($('work'));
+    $owner= this.owner.type=='panel.popup' ? this.owner.DOM_Block : $('work');
+    this.DOM_Block= new Element('div',{'class':'Accordion',styles:{display:'none'}}).inject($owner);
     this.owner.sel_group= null;
     this.awesome= this._f('f')<0 ? 0 : (this.options.format.substr(this._f('f')+1,1)=='-' ? 2 : 1);
   },
@@ -265,7 +267,8 @@ Ezer.MenuLeft.implement({
 //f: MenuLeft-DOM.DOM_re1 ()
 //      další zobrazení obalu levého menu
   DOM_re1: function() {
-    Ezer.assert(this.owner.type=='panel.right',"menu typu 'left' může být pouze v panelu typu 'right'");
+    Ezer.assert(this.owner.type=='panel.right' || this.owner.type=='panel.popup',
+      "menu typu 'left' může být pouze v panelu typu 'right' nebo 'popup'");
     this.owner.sel_group= null;
   },
 // ------------------------------------------------------------------------------------ DOM_start
@@ -949,6 +952,10 @@ Ezer.PanelPopup.implement({
     if ( !noevent ) {
       if ( this.virgin ) {
         this.virgin= false;
+        if ( this.menuleft ) {
+          // pokud je vloženo menu tak je zobraz
+          this.menuleft.excite();
+        }
         Ezer.app.onfirstfocus(this);
         if ( this.part && this.part['onfirstfocus'] )
           this.fire('onfirstfocus',[]);
