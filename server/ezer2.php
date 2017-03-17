@@ -1134,10 +1134,12 @@
   # x: uname, pword      -- uname nesmí být prázdné
   # y: ok, user_id=id_user, user_abbr
   case 'user_login':
-    if ( $_SESSION[$ezer_root]['sess_state']=='on' )
+    if ( isset($_SESSION[$ezer_root]['sess_state']) && $_SESSION[$ezer_root]['sess_state']=='on' )
       $ezer_user_id= $y->user_id= $_SESSION[$ezer_root]['user_id'];
     else
       $ezer_user_id= $_SESSION[$ezer_root]['user_id']= $y->user_id= 0;
+    if ( !isset($_SESSION[$ezer_root]['last_op']) )
+      $_SESSION[$ezer_root]['last_op']= '';
     $_SESSION[$ezer_root]['last_op'].= ' user_login';
     $day= date('Y-m-d');
     $time= date('H:i:s');
