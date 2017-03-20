@@ -213,7 +213,7 @@
   $y->qry_ms= 0;
   // ochrana proti ztrátě přihlášení
   if ( !$USER->id_user
-    && !in_array($x->cmd,array('user_login','user_relogin','user_group_login')) ) {
+    && !in_array($x->cmd,array('user_login','user_prelogin','user_relogin','user_group_login')) ) {
     $y->error= "<big>Vaše přihlášení již vypršelo - odhlaste se prosím a znovu přihlaste</big>";
 //     $y->error.= debugx($x);
     $y->value= array();
@@ -1133,23 +1133,31 @@
   # přihlášení uživatele, zápis do SESSION, zápis do historie, zjištění klíčů _help
   # x: uname, pword      -- uname nesmí být prázdné
   # y: ok, user_id=id_user, user_abbr
+  case 'user_prelogin':
   case 'user_login':
+    $_SESSION[$ezer_root]['note']= 'login';
     if ( isset($_SESSION[$ezer_root]['sess_state']) && $_SESSION[$ezer_root]['sess_state']=='on' )
       $ezer_user_id= $y->user_id= $_SESSION[$ezer_root]['user_id'];
+    elseif ( $x->cmd=='user_prelogin' )
+      $ezer_user_id= $_SESSION[$ezer_root]['user_id'];
     else
       $ezer_user_id= $_SESSION[$ezer_root]['user_id']= $y->user_id= 0;
     if ( !isset($_SESSION[$ezer_root]['last_op']) )
       $_SESSION[$ezer_root]['last_op']= '';
-    $_SESSION[$ezer_root]['last_op'].= ' user_login';
+    $_SESSION[$ezer_root]['last_op'].= $x->cmd;
     $day= date('Y-m-d');
     $time= date('H:i:s');
     $ip= isset($_SERVER['HTTP_X_FORWARDED_FOR'])
       ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
     $browser= $_SERVER['HTTP_USER_AGENT'];
-    if ( $x->uname ) {
+    if ( $x->uname || $ezer_user_id ) {
       $size= "{$x->size->body->x}/{$x->size->body->y}|{$x->size->screen->x}/{$x->size->screen->y}";
-      $info= "{$x->uname}|$ip|$size|$browser|{$_SESSION['platform']}|{$_SESSION['browser']}";
-      if ($hash_password===true) {
+      if ( $x->cmd=='user_prelogin' ) {
+        $qry= "SELECT * FROM $ezer_system._user WHERE id_user=$ezer_user_id ";
+        $res= mysql_qry($qry,0,0,0,'ezer_system');
+        $u= mysql_fetch_object($res);
+      }
+      elseif ($hash_password===true) {
         $where= " WHERE username='{$x->uname}' ";
         $qry= "SELECT * FROM $ezer_system._user $where";
         $res= mysql_qry($qry,0,0,0,'ezer_system');
@@ -1162,8 +1170,8 @@
         $res= mysql_qry($qry,0,0,0,'ezer_system');
         $u= mysql_fetch_object($res);
       }
-      
       if ( $res && $u ) {
+        $info= "{$u->username}|$ip|$size|$browser|{$_SESSION['platform']}|{$_SESSION['browser']}";
         $ezer_user_id= $_SESSION[$ezer_root]['user_id']= $y->user_id= $u->id_user;
 #        sess_read('',true); // přečte informace z _user do $USER
         $_SESSION[$ezer_root]['user_start']= date("j.n.Y H:i:s");;
@@ -1184,24 +1192,28 @@
         $USER->state= $u->state;
         try { $options= $json->decode($u->options); } catch  (Exception $e) { $options= null; };
         $USER->options= $options;
-        if ( $ezer_session!='ezer' )
-          $_SESSION[$ezer_root]['USER']= $USER;
         #// zapiš do historie přihlášení
         #$history= "history=concat('{$USER->abbr}".date(' d.m.Y H:i')." - login|',history)";
         #$qry= "UPDATE $ezer_system._user SET $history,login=now() WHERE id_user=$ezer_user_id";
         #$res= mysql_qry($qry);
-        // zapiš do aktivity
-        $qry= "INSERT {$mysql_db}._touch (day,time,hits,user,module,menu,msg)
-               VALUES ('$day','$time',0,'{$USER->abbr}','app','login','$info')";
-        $res= mysql_query($qry);
+        // zapiš do aktivity - ale jen pro user_login nebo první user_prelogin
+        if ( $x->cmd=='user_login' || !isset($_SESSION[$ezer_root]['USER']) ) {
+          $qry= "INSERT {$mysql_db}._touch (day,time,hits,user,module,menu,msg)
+                 VALUES ('$day','$time',0,'{$USER->abbr}','app','login','$info')";
+          $_SESSION[$ezer_root]['note'].= $qry;
+          $res= mysql_query($qry);
+        }
+        if ( $ezer_session!='ezer' )
+          $_SESSION[$ezer_root]['USER']= $USER;
       }
-      else {
-        // chybné přihlašovací údaje
-        $qry= "INSERT {$mysql_db}._touch (day,time,user,module,menu,msg)
-               VALUES ('$day','$time','---','login','acount?','$info')";
-        $res= mysql_query($qry);
-                                                display("$res:$qry");
-      }
+//       else {
+//         // chybné přihlašovací údaje
+//         $info= "{$x->uname}|$ip|$size|$browser|{$_SESSION['platform']}|{$_SESSION['browser']}";
+//         $qry= "INSERT {$mysql_db}._touch (day,time,user,module,menu,msg)
+//                VALUES ('$day','$time','---','login','acount?','$info')";
+//         $res= mysql_query($qry);
+//                                                 display("$res:$qry");
+//       }
     }
     // zjištění klíčů _help
     $EZER->help_keys= help_keys();
@@ -1214,6 +1226,7 @@
   # obnova přihlášení uživatele podle záznamů v session
   # y: ok, user_id=id_user, user_abbr
   case 'user_relogin':
+    $_SESSION[$ezer_root]['note']= 'relogin';
     $ezer_user_id= $_SESSION[$ezer_root]['user_id'];
     if ( $ezer_user_id ) {
       $where= " WHERE id_user=$ezer_user_id ";

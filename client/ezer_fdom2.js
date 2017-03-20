@@ -542,7 +542,8 @@ Ezer.Item.implement({
       this.domA= new Element('a',{href:href,html:title,events:{
         click: function(el) {
           if ( !el.target.hasClass('disabled') && this.owner.owner.enabled ) {
-            Ezer.pushState(href);
+            if ( this.owner.owner.owner.type!='panel.popup' )
+              Ezer.pushState(href);
             this._click(el);
             Ezer.fce.touch('block',this,'click');     // informace do _touch na server
           }

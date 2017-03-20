@@ -231,7 +231,12 @@ Ezer.Application.implement({
   load: function () {
     //Ezer.trace('L','load root');
     if ( this.options.must_log_in ) {
-      if (this.options.refresh ) {
+      if (this.options.prelogin ) {
+        var bw= {body:$('body').getSize(),screen:{x:screen.width,y:screen.height}};
+        this.ask({cmd:'user_prelogin',size:bw},'logged1');
+        this.putFoot(' přihlašování');
+      }
+      else if (this.options.refresh ) {
         this.ask({cmd:'user_relogin'},'logged1');
         this.putFoot(' obnovení');
       }
