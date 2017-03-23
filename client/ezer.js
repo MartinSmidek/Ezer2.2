@@ -3353,7 +3353,7 @@ Ezer.LabelMap= new Class({
           if ( p[4]=='CIRCLE' ) {
             map_opts.icon= {
               path: google.maps.SymbolPath.CIRCLE, scale: 7,
-              fillColor: p[5], fillOpacity: 0.8, strokeColor: p[6], strokeWeight: 1
+              fillColor: p[5], fillOpacity: 0.3, strokeColor: p[6], strokeWeight: 1
             }
             if ( p[7] )
               map_opts.zIndex= google.maps.Marker.MAX_ZINDEX + 1;
