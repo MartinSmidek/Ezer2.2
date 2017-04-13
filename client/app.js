@@ -55,12 +55,14 @@ Ezer.const_value= function (id,val) {
 }
 // ----------------------------------------------------------------------------- ON unload
 window.addEvent('unload', function() {
-  if ( Ezer.sys.dbg ) {
-    if ( Ezer.sys.dbg.win_ezer ) {
-      Ezer.sys.dbg.win_ezer.close();
-    }
-    if ( Ezer.sys.dbg.win_php ) {
-      Ezer.sys.dbg.win_php.close();
+  if ( Ezer && Ezer.sys ) {
+    if ( Ezer.sys.dbg ) {
+      if ( Ezer.sys.dbg.win_ezer ) {
+        Ezer.sys.dbg.win_ezer.close();
+      }
+      if ( Ezer.sys.dbg.win_php ) {
+        Ezer.sys.dbg.win_php.close();
+      }
     }
   }
 });
@@ -216,7 +218,12 @@ Ezer.Application.implement({
     Ezer.Shield= new Mask('shield',{hideOnClick:false,
       style:{opacity:0.2,backgroundColor:'#333',zIndex:2}});
     this.DOM_add();
-    this.load();
+    if ( options._oninit ) {
+      eval(options._oninit+'()');
+    }
+    else {
+      this.load();
+    }
   },
   // ------------------------------------------------------------------------------------ skin
   // vrátí cestu ke složce s background-image

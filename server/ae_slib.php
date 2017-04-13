@@ -44,13 +44,15 @@
 #   $ezer_path_serv     -- string: cesta ke skriptům
 # -------------------------------------------------------------------------------------------------- root_php
 function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$const=null,$start_sess=true) {
-  global $EZER, $app_root, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system, $gc_maxlifetime, $ezer_db;
+  global $EZER, $app_root, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system,
+    $gc_maxlifetime, $ezer_db, $http;
   // převzetí url-parametrů
   $menu=    isset($_GET['menu']) ? $_GET['menu'] : '';
   $xtrace=  isset($_GET['trace']) ? $_GET['trace'] : '';
   $skin=    isset($_GET['skin']) ? $_GET['skin'] : $skin;
   $theight= isset($_GET['theight']) ? $_GET['theight'] : 240;
   $dbg=     isset($_GET['dbg']) ? $_GET['dbg'] : '';
+  if ( !isset($http) ) $http= 'http';
   // identifikace prohlížeče a platformy prohlížeče: Android => Ezer.client == 'A'
   $ua= $_SERVER['HTTP_USER_AGENT'];
   ezer_browser($browser,$browser_version,$platform,$ua);
@@ -224,7 +226,8 @@ __EOD;
     $k= strtr(substr($key2,0,-1),array("="=>'|',"\n"=>''));
     $head_jush= <<<__EOD
   <script type="text/javascript">
-    jush.links2.sql=/(\b)(($k))\b(\s*)/g;
+//     if ( jush )
+//       jush.links2.sql=/(\b)(($k))\b(\s*)/g;
   </script>
 __EOD;
   }
@@ -397,7 +400,10 @@ __EOD;
     // header pro běh s laděním
     if ( $browser!='IE' ) {
       foreach($js as $x) {
-        $head.= "\n  <script src='$x' type='text/javascript' charset='utf-8'></script>";
+        $x= trim($x);
+        $head.= substr($x,0,1)=='<'
+          ? "\n  $x\n"
+          : "\n  <script src='$x' type='text/javascript' charset='utf-8'></script>";
       }
     }
     foreach($css as $x) {
@@ -410,7 +416,7 @@ __EOD;
   // definice povinného začátku a konce HTML stránky
   $html_footer= '';
   //$html_base= $app_root ? "\n  <base href=\"http://".$_SERVER["HTTP_HOST"].'">' : '';
-  $html_base= $app_root ? "\n  <base href=\"http://$app_root\">" : '';
+  $html_base= $app_root ? "\n  <base href=\"$http://$app_root\">" : '';
   $html_header= '';
 //   $html_header.= "\xEF\xBB\xBF";    // DOM pro UTF-8
   $html_header.= <<<__EOD
@@ -624,12 +630,10 @@ __EOD;
 # ------------------------------------------------------------------------------- HTML user
 # uživatelský template hlavního objektu aplikace
   case 'user':
-    if ( $ip_ok )
-      $template= strtr($pars->template_body,array(
+    if ( !$ip_ok ) session_destroy();
+    $template= strtr($pars->template_body,array(
       '%header'=>$html_header,'%login'=>$login,'%info'=>$info,'%chngs'=>$chngs,
       '%html_footer'=>$html_footer));
-    else
-      return 0;
     break;
   default:
 # ------------------------------------------------------------------------------- HTML prázdný

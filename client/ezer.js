@@ -3374,7 +3374,10 @@ Ezer.LabelMap= new Class({
         // pokud existuje obsluha onmarkclick, přidej listener
         if ( this.part && this.part.onmarkclick ) {
           google.maps.event.addListener(mark,'click', function() {
-            label._call(0,'onmarkclick',this);
+            if ( typeof label.part.onmarkclick === 'function' )
+              label.part.onmarkclick(this);
+            else
+              label._call(0,'onmarkclick',this);
           });
         }
       }.bind(this));

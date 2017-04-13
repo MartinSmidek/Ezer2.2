@@ -125,25 +125,28 @@ Ezer.Application= new Class({
   },
   // ----------------------------------------------------------------------------- loginDomOpen
   loginDomOpen: function(after,uname,pword) {
-    $('login').setStyle('display','block');
-    if ( uname ) $('username').value= uname;
-    if ( pword ) $('password').value= pword;
-    // odmítnutí přihlásit se
-    if ( $('login_no') && Ezer.options.web!=undefined ) {
-      $('login_no').addEvent('click',function(){
-        document.location.href= Ezer.options.web;
-      });
-    }
-    // přihlášení
-    if ( $('login_on') ) {
-      var bw= {body:$('body').getSize(),screen:{x:screen.width,y:screen.height}};
-      $('login_on').addEvent('click',function(){
-        Ezer.sys.pword= $('password').value;
-        this.ask({cmd:'user_login',uname:$('username').value,pword:Ezer.sys.pword,size:bw},after);
-        Ezer.sys.pword= "**********";
-      }.bind(this));
-      this.loginDomMsg(Cookie.read(Ezer.root+'_logoff')||'');
-      $('username').focus();
+    var login= $('login');
+    if ( login ) {
+      $('login').setStyle('display','block');
+      if ( uname ) $('username').value= uname;
+      if ( pword ) $('password').value= pword;
+      // odmítnutí přihlásit se
+      if ( $('login_no') && Ezer.options.web!=undefined ) {
+        $('login_no').addEvent('click',function(){
+          document.location.href= Ezer.options.web;
+        });
+      }
+      // přihlášení
+      if ( $('login_on') ) {
+        var bw= {body:$('body').getSize(),screen:{x:screen.width,y:screen.height}};
+        $('login_on').addEvent('click',function(){
+          Ezer.sys.pword= $('password').value;
+          this.ask({cmd:'user_login',uname:$('username').value,pword:Ezer.sys.pword,size:bw},after);
+          Ezer.sys.pword= "**********";
+        }.bind(this));
+        this.loginDomMsg(Cookie.read(Ezer.root+'_logoff')||'');
+        $('username').focus();
+      }
     }
   },
   // ----------------------------------------------------------------------------- loginDomMsg
@@ -493,7 +496,8 @@ Ezer.Application= new Class({
             bodyKeydown(event)
           },
           click: function(event){
-            bodyClick(event)
+            if ( typeof bodyClick=="function" )
+              bodyClick(event)
           }
         });
         dbg.addEvents({
@@ -505,7 +509,8 @@ Ezer.Application= new Class({
           }.bind(this),
         });
         dbg.setStyles({display:Ezer.to_trace && Ezer.is_trace['$'] ? 'block' : 'none'});
-        bodyLoad('5.1');
+        if ( typeof bodyLoad=="function" )
+          bodyLoad('5.1');
 //         // pro dotyková zařízení
 //         if ( Ezer.platform=='A' || Ezer.platform=='I' ) {
 //           var mc= new Hammer(debug);
