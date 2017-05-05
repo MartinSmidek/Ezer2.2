@@ -3933,6 +3933,26 @@ Ezer.fce.DOM.confirm= function (str,continuation,butts,options) {
   });
   return win;
 };
+// -------------------------------------------------------------------------------------- prompt2
+// default butts={Ano:1,Ne:0}
+Ezer.fce.DOM.prompt2= function (msg,deflt,continuation) {
+  var butts= {Ok:1,Zpět:0}, options= {};
+  var win= null, width= options && options.width||350,
+      heading= options && options.heading||'Dotaz',
+      buttons= [];
+  Object.each(butts,function(value,title){
+    buttons.push({text:title,onClick:function(){continuation(value)}});
+  });
+  win= new StickyWin.Alert(heading,msg,{hideOnClick:false,closeOnEsc:true,
+    uiOptions:{closeButton:false,width:width,buttons:buttons},
+    maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
+  });
+  var dom= win.element.getElement('.body');
+  var DOM_Input= new Element('input',{id:'prompt',type:'text',styles:{width:'98%'}});
+  DOM_Input.inject(dom);
+  DOM_Input.value= deflt;
+  return win;
+};
 // -------------------------------------------------------------------------------------- help
 // zobrazení helpu v popup okně s možností editace
 Ezer.obj.DOM.help= null;                                // popup StickyWin

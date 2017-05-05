@@ -9009,7 +9009,6 @@ Ezer.fce.choose= function (query,buttons) {
 //r: 1 - pokud bylo stisknuto Ano
 //   0 - pokud bylo stisknuto Ne
 //s: funkce
-Ezer.fce.confirm=
 Ezer.fce.confirm= function () {
   var str= '';
   for (var i=0; i<arguments.length; i++) str+= arguments[i];
@@ -9017,9 +9016,26 @@ Ezer.fce.confirm= function () {
   return 1;
 };
 Ezer.fce._confirm= function (res) {
-  // konec modálního dialogu - jeho hodnotu (pro conform 0/1) dej na zásobník
+  // konec modálního dialogu - jeho hodnotu (pro confirm 0/1) dej na zásobník
   var x= Ezer.modal_fce.pop();
   x.stack[++x.top]= res;
+  x.eval.apply(x,[x.step,true]);
+  return 1;
+}
+// -------------------------------------------------------------------------------------- prompt2
+//fj: fce.prompt2 (msg[,default=''])
+//      ve zvláštním okně položí otázku msg a přečte odpověď, kterou vrátí jako výsledek
+//r: zapsaný text - pokud bylo stisknuto Ok
+//   '' - pokud bylo stisknuto Zpět nebo byl vrácen prázdný text
+//s: funkce
+Ezer.fce.prompt2= function (msg,deflt) {
+  Ezer.fce.DOM.prompt2(msg,deflt||'',Ezer.fce._prompt2);
+  return 1;
+};
+Ezer.fce._prompt2= function (res) {
+  // konec modálního dialogu - jeho hodnotu (text) dej na zásobník
+  var x= Ezer.modal_fce.pop();
+  x.stack[++x.top]= res ? $('prompt').value : '';
   x.eval.apply(x,[x.step,true]);
   return 1;
 }
