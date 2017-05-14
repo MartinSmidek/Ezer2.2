@@ -1312,9 +1312,10 @@ Ezer.LabelDrop.implement({
     if ( do_upload ) {
       // ==> . upload G:
       f.td2.innerHTML= "přenášení";
-      const boundary = '-------314159265358979323846';
-      const delimiter = "\r\n--" + boundary + "\r\n";
-      const close_delim = "\r\n--" + boundary + "--";
+      // konstanty boundery, delimiter, close_delim, CHUNK nahrazeny var kvůli IE
+      var boundary = '-------314159265358979323846';
+      var delimiter = "\r\n--" + boundary + "\r\n";
+      var close_delim = "\r\n--" + boundary + "--";
       var contentType = f.type || 'application/octet-stream';
       var metadata= {
         title: f.name,
@@ -1375,7 +1376,7 @@ Ezer.LabelDrop.implement({
           f.cancel= true;
         }.bind(this)
       }}).inject(f.td2);
-      const CHUNK= 100000; //512 * 1024; // 0.5MB chunk sizes.
+      var CHUNK= 100000; //512 * 1024; // 0.5MB chunk sizes.
       if (bar) bar.value= 0;
       var max= Math.ceil(f.data.size/CHUNK);
       this.DOM_upload_chunk(1,max,CHUNK,f,bar);
@@ -3948,7 +3949,7 @@ Ezer.fce.DOM.prompt2= function (msg,deflt,continuation) {
     maskOptions:{style:{opacity:0.2,backgroundColor:'#333',zIndex:2}}
   });
   var dom= win.element.getElement('.body');
-  var DOM_Input= new Element('input',{id:'prompt',type:'text',styles:{width:'98%'}});
+  var DOM_Input= new Element('input',{id:'ezer_prompt',type:'text',styles:{width:'98%'}});
   DOM_Input.inject(dom);
   DOM_Input.value= deflt;
   return win;

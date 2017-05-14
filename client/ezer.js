@@ -417,7 +417,8 @@ Ezer.Block= new Class({
             r.onload= function(e) {
               var x= e.target.result;
               // pokud je definováno omezení velkosti, zmenši obrázek
-              if ( options.max_width || options.max_height ) {
+              if ( this.file_drop_info.type.substr(0,5)=='image'
+                && (options.max_width || options.max_height) ) {
                 Resample(x,options.max_width,options.max_height, function(data64){
                   this.file_drop_info.text= data64; // výstup je base 64 encoded
                   //$("StatusIcon_idle").src= data64;
@@ -3104,14 +3105,22 @@ Ezer.LabelDrop= new Class({
       }.bind(this));
     }
     else if ( lst && $type(lst)=='array' ) {
-      for (f of lst) {
+      lst.each(function(f) {
         if ( this.cloud=='G:' )
           this.DOM_addFile_Disk(f);
         else if ( this.cloud=='S:' || this.cloud=='H:' )
           this.DOM_addFile({name:f.name,title:f.title,status:f.size});
         else
           Ezer.error("'"+this.cloud+"' není podporovaný cloud pro upload")
-      }
+      }.bind(this));
+//       for (f of lst) {  // verze pro non IE
+//         if ( this.cloud=='G:' )
+//           this.DOM_addFile_Disk(f);
+//         else if ( this.cloud=='S:' || this.cloud=='H:' )
+//           this.DOM_addFile({name:f.name,title:f.title,status:f.size});
+//         else
+//           Ezer.error("'"+this.cloud+"' není podporovaný cloud pro upload")
+//       }
     }
     return 1;
   },
@@ -3120,10 +3129,14 @@ Ezer.LabelDrop= new Class({
 // vrátí seznam jmen souborů oddělených čárkou (po dvojtečce je vždy status)
   get: function () {
     var lst= '', del= '', f;
-    for (f of this.DOM_files) {
+    this.DOM_files.each(function(f) {
       lst+= del+(this.cloud=='G:' ? f.title+':'+(f.fileSize||'doc') : f.name+':'+f.status);
       del= ',';
-    };
+    }.bind(this));
+//     for (f of this.DOM_files) { verze pro non IE
+//       lst+= del+(this.cloud=='G:' ? f.title+':'+(f.fileSize||'doc') : f.name+':'+f.status);
+//       del= ',';
+//     };
     return lst;
   },
 // ------------------------------------------------------------------------------ LabelDrop.lsdir
@@ -9035,7 +9048,7 @@ Ezer.fce.prompt2= function (msg,deflt) {
 Ezer.fce._prompt2= function (res) {
   // konec modálního dialogu - jeho hodnotu (text) dej na zásobník
   var x= Ezer.modal_fce.pop();
-  x.stack[++x.top]= res ? $('prompt').value : '';
+  x.stack[++x.top]= res ? $('ezer_prompt').value : '';
   x.eval.apply(x,[x.step,true]);
   return 1;
 }

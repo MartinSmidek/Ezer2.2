@@ -62,8 +62,8 @@ Ezer.Application= new Class({
       }
     }
     // změna šířky změní width ve stylu PanelRight
-    const pruh= 30;
-    const leftMenuWidth= 210;
+    var pruh= 30;                // bylo const ale IE neumí
+    var leftMenuWidth= 210;      // bylo const ale IE neumí
     var ws= this.DOM_layout_mode=='inner'
       ? {x:window.innerWidth,y:window.innerHeight} : window.getSize();
     $$('.PanelRight').each(function(dom_panel){
