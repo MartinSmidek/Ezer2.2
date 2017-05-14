@@ -2544,7 +2544,7 @@ function mysql_qry($qry,$pocet=null,$err=null,$to_throw=false,$db='') {
   if ( !isset($y) ) $y= (object)array();
   $msg= ''; $abbr= '';
   $qry_count++;
-  $myqry= str_replace('"',"U",$qry);
+  $myqry= strtr($qry,array('"'=>"'","<="=>'&le;',"<"=>'&lt;'));
 //                                                         display($myqry);
   // dotaz s měřením času
   $time_start= getmicrotime();
