@@ -356,7 +356,9 @@ Ezer.Application= new Class({
   // ----------------------------------------------------------------------------- _show_users
   // zobrazí aktivní uživatele
   _show_users: function(lst) {
-    Ezer.sys.users= lst.replace(Ezer.sys.user.abbr,'');
+    if ( lst ) {
+      Ezer.sys.users= lst.replace(Ezer.sys.user.abbr,'');
+    }
   },
   // ------------------------------------------------------------------------==> . _setTrace
   // vytvoření ovládání trasování, hlášení chyb, FAQ

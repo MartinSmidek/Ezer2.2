@@ -7883,7 +7883,7 @@ Ezer.fce.object= function () {
   return o;
 }
 // ------------------------------------------------------------------------------------ copy_by_name
-//ff: fce.copy_by_name (form|browse|list|object|string, form|browse|object[, delimiters='|:' [,set_original]])
+//ff: fce.copy_by_name (form|browse|list|object|string, form|browse|object[, delimiters='|:' [,set_original|only_changed]])
 //      zkopíruje zleva doprava stejně pojmenované hodnoty.
 //      Pokud se kopíruje do form, je třeba touto operací naplnit form.key (použije se při definici
 //      originality hodnoty, pokud to není žádoucí, je třeba form.key definovat jako 0)
@@ -7892,9 +7892,10 @@ Ezer.fce.object= function () {
 //      (musí být ovšem definován klíč formuláře) a
 //      po ukončení kopírování nastane událost onload na formulář.
 //      Pro kombinaci of lze použít 4. parametr, vnucující přepsání originálních hodnot (použít _load místo set)
+//      Pro kombinaci fo lze použít 4. parametr, který omezí kopírování pouze na změněné položky
 // Pozn.: implementovány jsou tyto kombinace parametrů: fb, bf, of, fo, sf, lo.
 //s: funkce
-Ezer.fce.copy_by_name= function (x,y,delimiters,set_original) {
+Ezer.fce.copy_by_name= function (x,y,delimiters,par4) {
   var x0= x, y0= y;
   if ( x.type=='var' ) x= x.value;
   if ( y.type=='var' ) y= y.value;
@@ -7943,7 +7944,7 @@ Ezer.fce.copy_by_name= function (x,y,delimiters,set_original) {
         if ( field.key ) {
           field.key(x[id],key);
         }
-        else if ( set_original && field._load ) {  // od 7.4.2016, Gándí
+        else if ( par4 && field._load ) {       // od 7.4.2016, Gándí ... par4 = set_original
           field._load(x[id],key);
         }
         else if ( field.set ) {
@@ -7971,6 +7972,8 @@ Ezer.fce.copy_by_name= function (x,y,delimiters,set_original) {
   }
   else if ( typ_x=='f' && typ_y=='o' ) {        // form --> object
     $each(x.part,function(field,id) {
+      if ( par4 && (!field.changed || !field.changed()) ) // od 7.6.2017, Gándí ... par4 = only_changed
+        return;
       if ( id[0]!='$' && field.key ) {          // přednost má definice klíče
         y[id]= field.key();
       }
