@@ -1165,6 +1165,7 @@
         if (!password_verify($x->pword,$u->password))
           $res = false;
       } else {
+        $x->pword= str_replace("'",'"',$x->pword);
         $where= " WHERE username='{$x->uname}' AND password='{$x->pword}' ";
         $qry= "SELECT * FROM $ezer_system._user $where";
         $res= mysql_qry($qry,0,0,0,'ezer_system');
