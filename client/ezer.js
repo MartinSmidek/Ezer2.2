@@ -3256,6 +3256,7 @@ Ezer.LabelMap= new Class({
   geo: null,            // běžný gobjekt pro asynchronní metody
   map: null,            // Google mapa
   // prvky v mapě
+  clustering: true,     // sdružovat značky (nastavuje se v init)
   poly: null,           // seznam aktuálních polygonů
   mark: null,           // pole aktuálních značek indexovaných předaným id
   zoom: null,           // aktivní výřez mapy (LatLngBounds)
@@ -3263,8 +3264,10 @@ Ezer.LabelMap= new Class({
 // ------------------------------------------------------------------------------- LabelMap.init
 //fm: LabelMap.init ([TERRAIN|ROADMAP][,options])
 // inicializace oblasti se zobrazením mapy ČR
+// pokud je options.clustering=true budou sdružovány značky
   init: function (type,options) {
     this.map= null;
+    this.clustering= options && options.clustering ? true : false;
     var ok= typeof google!="undefined" && google.maps;
     if ( ok ) {
       var stredCR= new google.maps.LatLng(49.8, 15.6);
@@ -3274,7 +3277,7 @@ Ezer.LabelMap= new Class({
         zoomControlOptions:{position: google.maps.ControlPosition.LEFT_BOTTOM}
       };
       if ( options )
-        g_options= Object.merge(g_options,options);
+        g_options= Object.merge(g_options,options,this.options);
       this.map= new google.maps.Map(this.DOM_Block,g_options);
     }
     this.poly= null;
@@ -3394,6 +3397,15 @@ Ezer.LabelMap= new Class({
           });
         }
       }.bind(this));
+      // volitelné sdružování značek (marker clustering)
+      // https://developers.google.com/maps/documentation/javascript/marker-clustering
+      if ( this.clustering ) {
+        var gridSize= 40;
+        new MarkerClusterer(this.map, this.mark, {imagePath:
+           'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m',
+          gridSize
+        });
+      }
     }
     // -------------------------------------------- ZOOM
     if ( geo.zoom == '' && this.zoom ) {                // zruš ohraničení
