@@ -1,3 +1,5 @@
+/* global Ezer, Options */
+
 // Tento modul abstrahuje od konkrétní DOM-reprezentace
 // 'DOM' je vlastnost se kterou se smí pracovat jen jako s celkem
 // (aby v některé implementaci mohla být objektem)
