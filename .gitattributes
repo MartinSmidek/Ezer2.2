@@ -132,7 +132,6 @@ client/skins/default/sort_n.png -text
 client/skins/default/submenu_bg.png -text
 client/skins/default/tab_top.png -text
 client/skins/default/tree.png -text
-code/comp2tab.php -text
 /comp.css -text
 /comp.php -text
 /comp.png -text
@@ -152,9 +151,6 @@ server/file_send.php -text
 server/licensed/JSON.php -text
 server/licensed/JSON_Ezer.php -text
 server/licensed/class_WikiParser.php -text
-server/licensed/phpmailer/class.phpmailer.php -text
-server/licensed/phpmailer/class.smtp.php -text
-server/licensed/phpmailer/language/phpmailer.lang-cz.php -text
 server/licensed/xls/BIFFwriter.php -text
 server/licensed/xls/Format.php -text
 server/licensed/xls/OLEwriter.php -text
