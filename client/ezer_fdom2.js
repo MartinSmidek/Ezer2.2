@@ -1237,7 +1237,8 @@ Ezer.LabelDrop.implement({
         m= " oncontextmenu=\"var event= arguments[0];event.stopPropagation();"
         + "var obj=[];if(Ezer.run_name('"+this.self()+"',null,obj)==1){"
         + "obj=obj[0].value||obj[0];Ezer.fce.contextmenu(["
-          + "['vyjmout',function(el){obj.callProc('onmenu',['remove','"+f.name+"',''])}],"
+          + "['přejmenovat',function(el){obj.callProc('onmenu',['rename','"+f.name+"',''])}],"
+          + "['-vyjmout',function(el){obj.callProc('onmenu',['remove','"+f.name+"',''])}],"
           + "['vyjmout vše',function(el){obj.callProc('onmenu',['remove-all','',''])}]"
           + mopt
         + "],arguments[0])};return false;\"";

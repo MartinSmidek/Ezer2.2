@@ -2395,7 +2395,7 @@ function load_files($x,$y) {
   $y->rows= $i;
 }
 # ===========================================================================================> FILES
-# funkce pro LabelDrop - mazání souborů
+# funkce pro LabelDrop - operace se soubory
 # -------------------------------------------------------------------------------------- drop_unlink
 # pokud $file=* budou smazány všechny soubory v dané složce, funkce vrací počet smazaných souborů
 function drop_unlink($folder,$file,$cloud='S:') {
@@ -2427,6 +2427,24 @@ function drop_unlink($folder,$file,$cloud='S:') {
     $deleted= unlink($path) ? "soubor $file byl smazán" : "odstranění souboru se nepovedlo";
   }
   return $deleted;
+}
+# -------------------------------------------------------------------------------------- drop rename
+# přejmenuje soubor
+function drop_rename($folder,$file,$name,$cloud='S:') {
+  global $ezer_root;
+  if ( $cloud=='S:' && isset($_SESSION[$ezer_root]['path_files']) )
+    // S: relativně (zpětná kompatibilita)
+    $path_files= trim($_SESSION[$ezer_root]['path_files']);
+  else
+    // S: H: absolutní (od září 2015)
+    $path_files= trim($_SESSION[$ezer_root][$cloud=='S:' ? 'path_files_s' :  'path_files_h'],"' ");
+  $path_files= rtrim($path_files,"/");
+  $renamed= 0;
+  // přejmenování souboru
+  $path1= str_replace('//','/',"$path_files/$folder/$file");
+  $path2= str_replace('//','/',"$path_files/$folder/").cz2ascii($name,'.');
+  $renamed= rename($path1,$path2) ? "soubor $file byl přejmenován" : "přejmenování souboru se nepovedlo";
+  return $renamed;
 }
 # ---------------------------------------------------------------------------------------- drop_find
 # najde jméno prvního souboru vyhovující dané masce
