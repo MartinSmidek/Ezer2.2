@@ -120,6 +120,11 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
 //                                                         debug($load,$cname);
 //                                                         display($cname);
           $code= $load->code;
+          if ( !$code ) { 
+            $err= "<br>v souboru $try.json je chyba (".json_last_error()
+                .') tj. '.json_last_error_msg().'<br><br>'; 
+            fce_error($err);
+          }
           if ( $code->library )
             $is_library= true;
 //                                                         display("$try includes ".($code->library?'is library':''));
@@ -267,8 +272,8 @@ function comp_file ($name,$root='',$list_only='') {  #trace();
                                                         if ($_GET['trace']==4) debug($loads,"kód");
     // informace o kódu pro informaci o struktuře aplikace
     $loads->info= (object)array('php'=>$call_php);
-    $json_loads= $json->encode($loads);
-//     $json_loads= json_encode($loads);//,JSON_HEX_AMP);
+//    $json_loads= $json->encode($loads);
+     $json_loads= json_encode($loads);//,JSON_HEX_AMP);
     // zabezpečení přenosy vnořených uvozovek a zpětných lomítek
 //     $json_loads= strtr($json_loads,array('\\\\'=>'\\','\\"'=>'"'));
     file_put_contents($cname,$json_loads);
