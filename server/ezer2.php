@@ -22,10 +22,16 @@
     $USER= $_SESSION[$ezer_root]['USER'];
   }
   # --------------------------------------------------------------------------------- root.inc[.php]
-  $path= $_SESSION[$ezer_root]['abs_root']; //$_POST['app_root'] ? "./../../$ezer_root" : "./../../";
-  $ezer_root_inc= 
-      file_exists("$path/$ezer_root/$ezer_root.inc.php") ? "$ezer_root/$ezer_root.inc.php" : (
-      file_exists("$path/$ezer_root.inc.php")            ? "$ezer_root.inc.php" : "$ezer_root.inc");
+  if ( isset($_SESSION[$ezer_root]['abs_root']) ) {
+    $path= $_SESSION[$ezer_root]['abs_root'];
+    $ezer_root_inc= 
+        file_exists("$path/$ezer_root/$ezer_root.inc.php") ? "$ezer_root/$ezer_root.inc.php" : (
+        file_exists("$path/$ezer_root.inc.php")            ? "$ezer_root.inc.php" : "$ezer_root.inc");
+  }
+  else {
+    $path= $_POST['app_root'] ? "./../../$ezer_root" : "./../../";
+    $ezer_root_inc= file_exists("$path/$ezer_root.inc.php") ? "$ezer_root.inc.php" : "$ezer_root.inc";
+  }
   require_once("$path/$ezer_root_inc");
   require_once("$ezer_path_serv/ae_slib.php");
   $php_start= getmicrotime();                        // měření času
