@@ -1161,6 +1161,8 @@ Ezer.Block= new Class({
 //   true    - pokud obsluha neexistuje
 //   num|str - hodnota volané funkce
 // onchanged se dědí z položky do jejího formuláře, pokud její formát neobsahuje 'T'
+// fire('onchanged'): pokud procedura onchanged má právě jeden parametr je v něm předán 
+//                    element, který fire způsobil
   fire: function(event_name,args,el) {
     // trasování události ovlivněné fcí set_trace
     function trace_event (event_type,id,event_name,fce) {
@@ -1204,9 +1206,11 @@ Ezer.Block= new Class({
         if ( !this._fc('T') ) {
           form._changed= true;
           if ( form.part && (fce= form.part['onchanged']) ) {
+            var narg= fce.desc.npar==1 ? 1 : 0;
+            args= narg ? [this] : [];    
             trace_event('form',form.id,'onchanged',fce);
             //Ezer.trace('e','EVENT:form.'+form.id+'.onchanged in '+Ezer.App.block_info(fce),fce);
-            v= new Ezer.Eval([{o:'c',i:fce.desc._init||'onchanged',a:args.length}],
+            v= new Ezer.Eval([{o:'c',i:fce.desc._init||'onchanged',a:narg}],
               fce.context||form,args,'onchanged',false,false,fce);
             res= res && (v.simple ? v.value : false);
           }
@@ -8133,7 +8137,12 @@ Ezer.fce.contextmenu= function (menu,event,id,up) {
     }
   });
   if ( Ezer.obj.contextmenu.menu ) {
-    Ezer.obj.contextmenu.menu.options.focus= null; // zapomeneme starý focus
+    var focus= Ezer.obj.contextmenu.menu.options.focus;
+    if ( focus ) {
+      // zapomeneme starý focus
+      focus.removeClass('ContextFocus');
+      Ezer.obj.contextmenu.menu.options.focus= null; 
+    }
     if ( id )
       Ezer.obj.contextmenu.menu.options.focus= $(id);
     Ezer.obj.contextmenu.menu.reinitialize({event:event,target:event.originalTarget||event.target,

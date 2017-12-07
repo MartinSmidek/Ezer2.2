@@ -193,6 +193,14 @@ Ezer.Area= new Class({
       this.tree.root.toggle(true, true, n-1);
     return 1;
   },
+// ------------------------------------------------------------------------------------ tree_select
+//fm: Area.tree_select (id)
+//      nastaví uzel jako aktivní
+  tree_select: function (id) {
+    var node= this.tree.get(id);
+    this.tree.select(node);
+    return 1;
+  },
 // ------------------------------------------------------------------------------------ tree_insert
 //fm: Area.tree_insert (id)
 //      vloží uzel pod daný uzel

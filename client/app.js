@@ -1,5 +1,7 @@
 /* Ezer2        (C) 2009 Martin Šmídek */
 
+/* global Ezer */
+
 //Ezer.root                     je definován v hlavním programu aplikace
 //Ezer.version                  dtto - default=ezer2
 //Ezer.browser                  CH|FF|OP|IE

@@ -1343,7 +1343,9 @@ function verify_rodcis($rc) {
     list(, $year, $month, $day, $ext, $c) = $matches;
     // do roku 1954 přidělovaná devítimístná RČ nelze ověřit
     if ($c === '') {
-      $ok= $year < 54;
+      // k měsíci může být připočteno 50 
+      if ($month > 50 ) $month-= 50;
+      $ok= $year < 54 && checkdate($month, $day, $year);
     }
     else {
       // kontrolní číslice
