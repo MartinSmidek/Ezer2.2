@@ -181,6 +181,7 @@ panel nov [,,770,] {type:'right', title:'Přehled změn', _sys:'*'
         topic.set(replace(meta.modal,'^[^\.]+\.','')); topic.change;
         name.set(replace(meta.name.get,'<[^>]+>','','^[^\|]+\|','')); name.change; }}
     field hlp [239+60,45,431,] { data:h.help, format:'' }
+    field wrk [698,20,32,] { title:'pracnost:', data:h.work, format:'r:e', skill:'m|mw' }
     // seznam změn
     browse s [0,75,150,100] { rows:20, qry_rows:1
       show id_help { data:h.id_help }
@@ -501,7 +502,7 @@ form _tit [,,*,30] {
 table _help {  key_id:'id_help'                     // tabulka _help je v databázi aplikace
   number id_help { key:'primary' }
   text kind, number version, date datum { sql_pipe:'sql_date1' },
-  text topic, text name, text seen, text help
+  text topic, text name, text seen, text help, number work
 }
 group group {
   table _help {  key_id:'id_help', db:'ezer_group'  // význam 'ezer_group' je určen v {app}.ini
