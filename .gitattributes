@@ -132,6 +132,7 @@ client/skins/default/sort_n.png -text
 client/skins/default/submenu_bg.png -text
 client/skins/default/tab_top.png -text
 client/skins/default/tree.png -text
+code/comp2tab.php -text
 /comp.css -text
 /comp.php -text
 /comp.png -text
@@ -141,6 +142,8 @@ client/skins/default/tree.png -text
 /ezer2.pers.ezer -text
 /ezer2.syst.ezer -text
 /ezer2_fce.php -text
+/ezer_ajax.php -text
+/ezer_main.php -text
 /help.php -text
 server/ae_slib.php -text
 server/comp2.php -text

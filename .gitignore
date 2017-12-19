@@ -1,8 +1,11 @@
+/@
 client/licensed/ckeditor4
 client/licensed/ckeditor4.6
 /code
+code/*.json
 /nbproject
 server/licensed/ckeditor4
 server/licensed/ckeditor4.6
 server/licensed/phpmailer
 server/licensed/xls
+server/licensed/xls2
