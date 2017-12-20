@@ -49,11 +49,13 @@ function sys_user_record($id_user=0) {  trace();
       if ( $skill && $USER->skills ) {
         $skills= explode(' ',$USER->skills);
         if ( in_array($skill,$skills) ) {
-          $tr= "<tr><td style='color:red' align='right'>$i:</td><td><b>$v</b></td></tr>";
+          $tr= "<tr><td style='color:red;vertical-align:top' align='right'><b>$i:</b></td>"
+              . "<td>$v</td></tr>";
         }
       }
       else {
-        $tr= "<tr><td align='right'>$i:</td><td><b>$v</b> $skill</td></tr>";
+        $tr= "<tr><td style='vertical-align:top' align='right'><b>$i:</b></td>"
+            . "<td>$v $skill</td></tr>";
       }
     }
     return $tr;
@@ -76,6 +78,7 @@ function sys_user_record($id_user=0) {  trace();
     $html.= row('potvrzuje',$opt->potvrzuje);
     $html.= row('zvláštní styl',$opt->css);
     $html.= row('state',$u->state,'m');
+    $html.= row('patička mailu',$opt->email_foot);
   }
   $html.= "</table>";
   return $html;
@@ -99,6 +102,7 @@ function sys_user_get ($id_user,$typ,$fld) {  trace();
       $val= $u->$fld;
       break;
     case 'opt':                                         // _user.options.fld
+    case 'txt':                                         // _user.options.fld
       $val= $options->$fld;
       break;
     case 'oop':                                         // _user.options.options.fld
@@ -133,6 +137,7 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
       if (!$res) $err.= "CHYBA:".mysql_error();
       break;
     case 'opt':                                         // zápis do _user.options
+    case 'txt':                                         // zápis do _user.options
     case 'oop':                                         // zápis do _user.options.options
       $qry= "SELECT options FROM $ezer_system._user WHERE id_user='$id_user'";
       $res= mysql_qry($qry,0,0,0,'ezer_system');
@@ -140,6 +145,7 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
         $u= mysql_fetch_object($res);
         $options= $json->decode($u->options) ?: (object)array();
         switch ($typ) {
+        case 'txt':   // zápis do _user.options
         case 'opt':   // zápis do _user.options
           $options->$fld= $val;
           break;

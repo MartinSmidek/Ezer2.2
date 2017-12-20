@@ -1,7 +1,7 @@
 #pragma library,test
 
 # Systém Ezer2 - panel osobního nastavení
-# (c) 2010-2011 Martin Šmídek <martin@smidek.eu>
+# (c) 2010-2017 Martin Šmídek <martin@smidek.eu>
 
 var the_user: number
 var last_item: object
@@ -31,6 +31,7 @@ menu m {type:'left',
       ch.get.display(0); msg.get.display(1);
       switch(i.par.typ,
       'oso',{msg.txt.set(ask('sys_user_record',the_user.get))},
+      'foo',{msg.txt.set(ask('sys_user_record',the_user.get))},
       'sys',{msg.txt.set(debug(sys))},
       'opt',{msg.txt.set(debug(javascript('Ezer.options')))},
       'use',{msg.txt.set(ask('sys_user'))},
@@ -39,6 +40,7 @@ menu m {type:'left',
   }
   menu {title:"Změna osobního nastavení", type:'group', _sys:'jm'
     item { title:"změna emailové adresy"      ,par:°{typ:'opt',fld:'email'} }
+    item { title:"změna emailové patičky"     ,par:°{typ:'txt',fld:'email_foot'} }
     item { title:"změna textu 'vyřizuje'"     ,par:°{typ:'opt',fld:'vyrizuje'} }
     item { title:"změna textu 'potvrzuje'"    ,par:°{typ:'opt',fld:'potvrzuje'} }
     item { title:"m: změna options 'to_trace'",par:°{typ:'oop',fld:'to_trace'}, skill:'m' }
@@ -66,15 +68,16 @@ form _chng [,,700,120] { style:'z-index:2'
   var the_itm: object
   var the_par: object
   proc onchanged () { _form_state('bc','bn') }
-  label     [0,2,100,]    { tag:'!', title:'stará hodnota:', format:'r' }
-  label     [0,32,100,]   { tag:'!', title:'nová hodnota:', format:'r' }
-  field ops [110,0,200,]  { tag:'p', format:'pnt' }
-  field old [110,0,200,]  { tag:'o', format:'o' }
-  field new [110,30,200,] { tag:'o', format:'' }
-  field nps [110,30,200,] { tag:'p', format:'np' }
-  label     [285,32,100,] { tag:'p', title:'opakovaně:', format:'r' }
-  field rep [390,30,200,] { tag:'p', format:'np' }
-  # procedury
+  field ops [110,0,200,]  { tag:'p', title:'stará hodnota:', format:'pnt' }
+  field old [110,0,200,]  { tag:'o', title:'stará hodnota:', format:'o' }
+  field new [110,30,200,] { tag:'o', title:'nová hodnota:', format:'' }
+  field nps [110,30,200,] { tag:'p', title:'nová hodnota:', format:'np' }
+  field rep [390,30,200,] { tag:'p', title:'opakovaně:', format:'np' }
+  label     [0,0,157,15]  { tag:'f', title:'stará patička:', format:'r' }
+  label fo1 [170,0,400,100]  { tag:'f', format:'o' }
+  label     [0,141,156,14]  { tag:'f', title:'nová patička:', format:'r' }
+  edit  fo2 [170,142,400,183] { tag:'f', type:'html' }
+# procedury
   proc _form_state(on,off) { form.enable(1,on); form.enable(0,off); }
   proc _form_show(on,off) { form.display(1,on); form.display(0,off); }
   proc _init() { _form_state('bn','bc'); new.init }
@@ -82,14 +85,11 @@ form _chng [,,700,120] { style:'z-index:2'
     the_itm.set(i); _init;
     the_par.set(par);
     switch(par.typ,
-    'fld',{ _form_show('o','p'); old.set(ask('sys_user_get',the_user.get,par.typ,par.fld)) },
-    'opt',{ _form_show('o','p'); old.set(ask('sys_user_get',the_user.get,par.typ,par.fld)) },
-    'oop',{ _form_show('o','p'); old.set(ask('sys_user_get',the_user.get,par.typ,par.fld)) },
-    'pas',{ _form_show('p','o') },
-#     'fld',{ _form_show('o','p'); old.set(sys('user',par.fld)) },
-#     'opt',{ _form_show('o','p'); old.set(sys('user','options',par.fld)) },
-#     'oop',{ _form_show('o','p'); old.set(sys('user','options','options',par.fld)) },
-#     'pas',{ _form_show('p','o') },
+    'fld',{ _form_show('o','p|f'); old.set(ask('sys_user_get',the_user.get,par.typ,par.fld)) },
+    'opt',{ _form_show('o','p|f'); old.set(ask('sys_user_get',the_user.get,par.typ,par.fld)) },
+    'oop',{ _form_show('o','p|f'); old.set(ask('sys_user_get',the_user.get,par.typ,par.fld)) },
+    'txt',{ _form_show('f','p|o'); fo1.set(ask('sys_user_get',the_user.get,par.typ,par.fld)); fo2.set(fo1.get) },
+    'pas',{ _form_show('p','o|f') },
     {stop}) }
   # tlačítka
   proc _init() { _form_state('bn','bc'); form.init }
@@ -99,10 +99,11 @@ form _chng [,,700,120] { style:'z-index:2'
       var t: text var f: text
       t.set(the_par.get('typ')); f.set(the_par.get('fld'));
       switch(t,
-      'fld',{ _form_show('o','p'); rp.fill('',ask('sys_user_change',the_user.get,t,f,new.get)); new.plain },
-      'opt',{ _form_show('o','p'); rp.fill('',ask('sys_user_change',the_user.get,t,f,new.get)); new.plain },
-      'oop',{ _form_show('o','p'); rp.fill('',ask('sys_user_change',the_user.get,t,f,new.get)); new.plain },
-      'pas',{ _form_show('p','o'); rp.fill('',ask('sys_user_change',the_user.get,t,'',nps.get,ops.get,rep.get));
+      'fld',{ _form_show('o','p|f'); rp.fill('',ask('sys_user_change',the_user.get,t,f,new.get)); new.plain },
+      'opt',{ _form_show('o','p|f'); rp.fill('',ask('sys_user_change',the_user.get,t,f,new.get)); new.plain },
+      'oop',{ _form_show('o','p|f'); rp.fill('',ask('sys_user_change',the_user.get,t,f,new.get)); new.plain },
+      'txt',{ _form_show('f','p|o'); rp.fill('',ask('sys_user_change',the_user.get,t,f,fo2.get)); fo2.plain },
+      'pas',{ _form_show('p','o|f'); rp.fill('',ask('sys_user_change',the_user.get,t,'',nps.get,ops.get,rep.get));
               _init });
   } }
   button    [110,70,,] { tag:'bc', title:' Zpět ',
