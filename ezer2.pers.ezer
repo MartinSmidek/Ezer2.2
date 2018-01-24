@@ -75,8 +75,8 @@ form _chng [,,700,120] { style:'z-index:2'
   field rep [390,30,200,] { tag:'p', title:'opakovaně:', format:'np' }
   label     [0,0,157,15]  { tag:'f', title:'stará patička:', format:'r' }
   label fo1 [170,0,400,100]  { tag:'f', format:'o' }
-  label     [0,141,156,14]  { tag:'f', title:'nová patička:', format:'r' }
-  edit  fo2 [170,142,400,183] { tag:'f', type:'html' }
+  label     [0,141,100,14]  { tag:'f', title:'nová patička:', format:'r' }
+  edit  fo2 [110,142,500,183] { tag:'f', type:'html' }
 # procedury
   proc _form_state(on,off) { form.enable(1,on); form.enable(0,off); }
   proc _form_show(on,off) { form.display(1,on); form.display(0,off); }

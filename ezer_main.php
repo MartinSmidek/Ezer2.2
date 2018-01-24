@@ -111,7 +111,7 @@
     'dbg' => $dbg,                                              
     'watch_ip' => false,
     'watch_key' => false,
-    'contact' => $kontakt,
+    'contact' => isset($kontakt) ? $kontakt : '',
     'CKEditor' => "{
       version:'$CKEditor',
       EzerHelp2:{

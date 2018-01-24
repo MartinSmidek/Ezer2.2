@@ -1,4 +1,4 @@
-/* global Ezer, Options */
+/* global Ezer, Options, NaN */
 
 // Tento modul abstrahuje od konkrétní DOM-reprezentace
 // 'DOM' je vlastnost se kterou se smí pracovat jen jako s celkem
@@ -1925,13 +1925,20 @@ Ezer.Var= new Class({
         Ezer.assert($type(this.value)=='object',
           'get s parametrem lze použít jen na objekty nebo pole',this);
         v= this.value;
-        $each(part.split('.'),function(i) {
-//           Ezer.assert(v[i]!==undefined,'get s parametrem '+part+' nelze použít',this);
-          if ( v[i]=='' )
+        if ( Number.isInteger(part) ) {
+          if ( v[part]=='' )
             v= '';
           else
-            v= v[i]===undefined ? '' : v[i];
-        },this)
+            v= v[part]===undefined ? '' : v[part];
+        }
+        else {
+          $each(part.split('.'),function(i) {
+            if ( v[i]=='' )
+              v= '';
+            else
+              v= v[i]===undefined ? '' : v[i];
+          },this)
+        }
       }
     }
     else
