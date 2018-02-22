@@ -1,7 +1,7 @@
 <?php # (c) 2010 Martin Smidek <martin@smidek.eu>
 header("Content-type: text/css");
 session_start();
-$skin= $_SESSION['skin'] ? $_SESSION['skin'] : 'default';
+$skin= isset($_SESSION['skin']) ? $_SESSION['skin'] : 'default';
 # pokud je v root-adresáři aplikace složka skins se souborem colors.php
 # musí v něm být obsažen příkaz global spřístupňující změněné barvy a cestu k obrázkům
 global $skin, $path, $c, $b, $ab, $c_appl, $ezer_root,
@@ -14,6 +14,7 @@ global $skin, $path, $c, $b, $ab, $c_appl, $ezer_root,
   $path_img= "../client/img";                     // cesta k default background-image
   $path= "./skins/default";                       // cesta k background-image
   $bila= '#ffffff'; $cerna= '#000000'; $seda= '#4d4d4d'; $zelena= '#2c8931'; // základní barvy
+  $oranzova= '#ef7f13';  
   // prvky
   $c= '#333'; $b= '#6f93c3'; $ab= $bila;
   $c_appl= $bila;
@@ -25,11 +26,11 @@ global $skin, $path, $c, $b, $ab, $c_appl, $ezer_root,
   $b_brow= '#ccc'; $b2_brow= '#f2f8ff'; $b3_brow= '#E5E5E6'; $b4_brow= '#d1e4ff';
     $b5_brow= '#f0f0f0'; $b6_brow= '#f2f8ff'; $b7_brow= '#d1e4ff'; $b8_brow= '#d1e4ff';
     $c_brow= '#777'; $s1_brow= '#6593cf'; $s2_brow= '#d30';
-  $c_kuk= 'navy'; $c2_kuk= $c_kuk; $b_kuk= '#fb6'; $s_kuk= '#FBC84F';
+  $c_kuk= 'navy'; $c2_kuk= $c_kuk; $c3_kuk= $cerna; $b_kuk= '#fb6'; $s_kuk= '#FBC84F';
   $b_warn= $s_kuk; $c_warn= '#000000';
   $b_doc_modul= '#c17878'; $b_doc_menu= '#7389ae'; $b_doc_form= '#80a2cf';
   $w_right= 720;        // šířka panel.right
-  $h_kuk= $_SESSION['trace_height']?$_SESSION['trace_height']:240;
+  $h_kuk= isset($_SESSION['trace_height'])?$_SESSION['trace_height']:240;
 
 if ( file_exists("../../skins/colors.php") ) {
   require_once("../../skins/colors.php");
