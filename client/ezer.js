@@ -7998,7 +7998,7 @@ Ezer.fce.copy_by_name= function (x,y,delimiters,par4) {
   else if ( typ_x=='f' && typ_y=='o' ) {        // form --> object
     $each(x.part,function(field,id) {
       if ( par4 && (!field.changed || !field.changed()) ) // od 7.6.2017, Gándí ... par4 = only_changed
-        return;
+        return 1;
       if ( id[0]!='$' && field.key ) {          // přednost má definice klíče
         y[id]= field.key();
       }
