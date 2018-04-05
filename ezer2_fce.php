@@ -8,7 +8,7 @@ function sys_svn_cmd($par) {
     // provedení příkazu
     $html= $cmd;
     $last_line= exec($cmd,$output,$retval);
-                                                          debug($output,"do_cmd=$retval");
+//                                                          debug($output,"do_cmd=$retval");
     $lines= implode('<br>',$output);
     $html.= "<br>return:'$retval'<br>output:'$lines'<hr>";
     return $html;
@@ -95,7 +95,7 @@ function sys_user_get ($id_user,$typ,$fld) {  trace();
   $res= mysql_qry($qry,0,0,0,'ezer_system');
   if ( $res ) {
     $u= mysql_fetch_object($res);
-                                                debug($u,'fetch');
+//                                                debug($u,'fetch');
     $options= $json->decode($u->options);
     switch ($typ) {
     case 'fld':                                         // _user.fld
@@ -155,7 +155,7 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
           break;
         }
         $options_s= ezer_json_encode($options);
-                                                display("old={$u->options};new=$options_s");
+//                                                display("old={$u->options};new=$options_s");
         $qry= "UPDATE $ezer_system._user SET options='$options_s' WHERE id_user='$id_user'";
         $res= mysql_qry($qry,0,0,0,'ezer_system');
       };
@@ -164,7 +164,7 @@ function sys_user_change($id_user,$typ,$fld,$val,$p1='',$p2='') {  trace();
     case 'pas':                                         // zápis do _user.fld
       if ( $p1!=select('password','_user',"id_user='$id_user'",'ezer_system') && (!isset($hash_password) || $hash_password===false) )
         $err.= "chybně zapsané původní heslo";
-      else if ( !password_verify($p1,select('password','_user',"id_user='$id_user'",'ezer_system')) && $hash_password===true )
+      else if ( $hash_password===true && !password_verify($p1,select('password','_user',"id_user='$id_user'",'ezer_system')) )
         $err.= "chybně zapsané původní heslo";
       else if ( !$val )
         $err.= "heslo nesmí být prázdné";
@@ -332,7 +332,7 @@ function sys_user_skills($file='') {
 #   kontrola - kontrola existence dnešní zálohy
 function sys_backup_make($par) {  trace();
   global $path_backup, $ezer_root, $EZER;
-                                                        display("path_backup=$path_backup, ezer_root=$ezer_root");
+//                                                        display("path_backup=$path_backup, ezer_root=$ezer_root");
   $html= '';
   $sign= date("Ymd_Hi");
   if ( $EZER->options->local )
@@ -464,14 +464,14 @@ function sys_backup_into($into,$sign) {   trace();
       list($n,$host,$user,$pasw,$lang,$db_name,$omitt)= $db_desc;
       if ( !$omitt ) { //&& !isset($ezer_db[$db_name]) ) {
         $name= $db_name ? $db_name : $db_id;
-                                                debug($db_desc,$db_id);
+//                                                debug($db_desc,$db_id);
         $file= "{$name}_$sign.sql";
         $path= "$into/$file";
         $cmd= "$ezer_mysql_path/mysqldump --opt -h $host ";
         $cmd.= "-u $user --password=$pasw $name ";
         $cmd.= "> $path";
         if (substr(php_uname(), 0, 7) == "Windows" ) {
-                                                display("windows rise:$cmd");
+//                                                display("windows rise:$cmd");
           try {
 //             $WshShell= new COM("WScript.Shell");
 //                                                 debug($WshShell,"windows shell");
@@ -481,7 +481,7 @@ function sys_backup_into($into,$sign) {   trace();
               $msg= fread($pid, 2096);
               $dbs.= "$name:<br>$file -- ukládání bylo odstartováno ($msg)";
               @pclose($pid);
-                                                  display("windows rised:$cmd");
+//                                                  display("windows rised:$cmd");
             }
             else {
               $dbs.= "$name:<br>$file -- start ukládání zhavaroval ";
@@ -495,13 +495,13 @@ function sys_backup_into($into,$sign) {   trace();
             //... and close pipes
             $retval= proc_close($proc);
             session_start(); //restore session
-                                                display("windows proc_close:$retval");
+//                                                display("windows proc_close:$retval");
            }
         }
         else {
-                                                display("linux:$cmd");
+//                                                display("linux:$cmd");
           $status= exec($cmd);
-                                                display("linux:$status:$cmd");
+//                                                display("linux:$status:$cmd");
           $dbs.= "$name:<br>$file ";
           $filesize= @filesize($path);
           $size= number_format($filesize,0,'.',' ').'B';
@@ -707,7 +707,7 @@ function sys_activity($k,$to_skip=0,$den=0,$_watch_access_opt='') {
   global $ezer_root, $json, $user_options, $APLIKACE, $USER, $EZER, $watch_access_opt;
   $watch_access_opt= $_watch_access_opt;
   $user_options= $_SESSION[$ezer_root]['user_options'];
-                                        debug($watch_access_opt);
+//                                        debug($watch_access_opt);
   $skip= $to_skip && $EZER->activity->skip ? $EZER->activity->skip : '';
   $html= "<div class='CSection CMenu'>";
   switch ( "{$k->s} {$k->c}" ) {
@@ -1218,7 +1218,7 @@ function sys_day_error($id,$akce) {
     $qry= "SELECT * FROM _touch WHERE id_touch=$id";
     $res= mysql_qry($qry);
     if ( $res && $row= mysql_fetch_assoc($res) ) {
-      debug($row);
+//      debug($row);
     }
     break;
   }
@@ -1416,7 +1416,7 @@ function sys_todo_notify($type,$id_todo,$chng) { trace();
     $head= $type=='new' ? "nový požadavek" : ( $type=='att' ? "doplněna příloha k požadavku"
       : ($todo->email_kdyz==1 ? "změna požadavku" : "změna stavu požadavku"));
     $subject= "Ezer/$ezer_root NOTIFY:$head $id_todo";
-    $html= debugx($chng);
+//    $html= debugx($chng);
     // poslání mailu - jako odesílatel bude první ze seznamu
     list($from)= explode(',',$email);
     send_mail($subject,$html,$from,$email);   // funkce z ae_slib.php
