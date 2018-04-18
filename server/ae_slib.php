@@ -1723,6 +1723,7 @@ function sql_time_mss ($datetime,$user2sql=0) {
     if ( $datetime ) {
       $time= explode(':',$datetime);
       $hod= $time[0];
+      $hod= strtr($hod,['-'=>'']);
       $min= $time[1];
       $sec= $time[2];
       if ($datetime[0]=="-")
