@@ -5848,10 +5848,13 @@ Ezer.Browse= new Class({
               icss= Number(this.buf[this.t+i-1-this.b][clmn.css_clmn.id]);
               if ( clmn.css[icss]===undefined ) {            // indexující styly
                 // defaultní styl, pokud je definován
-                if ( clmn.css_default ) ccss+= ' '+clmn.css_default;
+//                if ( clmn.css_default ) ccss+= ' '+clmn.css_default;
+                if ( clmn.css_default ) 
+                  ccss= clmn.css_default;
               }
               else if ( clmn.css[icss] )
-                ccss+= ' '+clmn.css[icss];
+//                ccss+= ' '+clmn.css[icss];
+                ccss= clmn.css[icss];
             }
             clmn.DOM_cell[i].className= ccss;
           }
