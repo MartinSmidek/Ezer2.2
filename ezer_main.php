@@ -99,6 +99,7 @@
 
   // nastavení jádra
   $options= (object)array(              // přejde do Ezer.options...
+    'awesome' => 3,
     'curr_version' => 0,                // při přihlášení je nahrazeno nejvyšší ezer_kernel.version
     'path_files_href' => "'$path_files_href'",  // relativní cesta do složky docs/{root}
     'path_files_s' => "'$path_files_s'",        // absolutní cesta do složky docs/{root}
@@ -141,5 +142,5 @@
   else {
     $options->must_log_in= 1;
   }
-  root_php($app,$app_name,'test',$skin,$options,$js,$css,$pars);
+  root_php($app,$app_name,'chngs',$skin,$options,$js,$css,$pars);
 ?>
