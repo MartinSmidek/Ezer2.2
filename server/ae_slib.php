@@ -104,7 +104,7 @@ __EOD;
     $gc_maxlifetime= isset($pars->gc_maxlifetime) ? $pars->gc_maxlifetime : 12*60*60;
     $session= "php";                      // standardní práce se SESSION
     ini_set('session.gc_maxlifetime',$gc_maxlifetime);
-    session_start();                      // defaultní práce se session, $session=='php'
+    if ( !isset($_SESSION) ) session_start();    // defaultní práce se session, $session=='php'
     $_SESSION['gc_maxlifetime']= $gc_maxlifetime;
     if ( isset($_GET['session']) ) {             // zobraz stav session hned po startu
       $info= $_SESSION;
@@ -308,12 +308,20 @@ __EOD
   // PŘIHLAŠOVACÍ DIALOG
   $chngs= "";
   $css_login= "";
-  $kontakt= $pars->contact ? $pars->contact
-    : " V případě zjištění problému nebo potřeby konzultace mi prosím:<br/>
-       <ul><li>napište na mail&nbsp;<a href='mailto:{$EZER->options->mail}{$EZER->options->mail_subject}'>{$EZER->options->mail}</a></li>"
-     . ($EZER->options->phone ? "<li>případně zavolejte&nbsp;{$EZER->options->phone}</li>" : '')
-     . ($EZER->options->skype ? "<li>nebo použijte Skype&nbsp;<a href='skype:{$EZER->options->skype}?chat'>{$EZER->options->skype}</a></li>" : '')
-     . "</ul>Za spolupráci děkuje <b>{$EZER->options->author}</b>";
+  $kontakt= '';
+  if ( isset($pars->contact) && $pars->contact ) {
+    $kontakt= $pars->contact;
+  }
+  else {
+    $napiste= isset($EZER->options->mail)
+      ? "napište na mail <a href='mailto:{$EZER->options->mail}'>{$EZER->options->mail}</a>" : '';
+    $napiste.= isset($EZER->options->phone) 
+      ? ($napiste ? " nebo " : ''). " zavolejte na {$EZER->options->phone}" : '';
+    $kontakt.= $napiste 
+      ? " V případě zjištění problému nebo potřeby konzultace prosím $napiste." : '';
+    $kontakt.= $napiste && isset($EZER->options->author)
+      ? "<br><br>Za spolupráci děkuje {$EZER->options->author}" : '';
+  }
   $type= $ip_ok ? (is_array($welcome) ? $welcome[0] : $welcome) : 'kontakt';
   switch ($type) {
   case 'kontakt':
