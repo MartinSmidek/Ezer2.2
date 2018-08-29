@@ -424,7 +424,7 @@ __EOD;
   // definice povinného začátku a konce HTML stránky
   $html_footer= '';
   //$html_base= $app_root ? "\n  <base href=\"http://".$_SERVER["HTTP_HOST"].'">' : '';
-  $html_base= $app_root ? "\n  <base href=\"$http://$app_root\">" : '';
+  $html_base= $app_root ? "\n  <base href=\"$http://$app_root/\">" : '';
   $html_header= '';
 //   $html_header.= "\xEF\xBB\xBF";    // DOM pro UTF-8
   $html_header.= <<<__EOD
