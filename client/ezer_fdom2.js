@@ -2457,6 +2457,10 @@ Ezer.Select.implement({
       ? this.options.par.width : this._w-1;
     this.DOM_DropList= new Element('ul',{'class':'SelectDrop',styles:{
         display:'none'}}).inject(this.DOM_Block);
+    if ( this.multi ) {
+      // přidej upozornění pro multi
+      this.DOM_DropList.set({title:'použij CTRL pro změnu'});
+    }
     if ( this.options.par && this.options.par.subtype && this.options.par.subtype=='browse' ) {
       // select jako výběr v rámci browse
       this.DOM_DropList.setStyles({'min-width':dl_w,top:16});
@@ -2528,11 +2532,11 @@ Ezer.Select.implement({
       }.bind(this),
       blur: function (event) {
 //                                                         Ezer.trace('*','blur');
-        if ( !this.multi && this._drop_status==1 ) {
+//        if ( !this.multi && this._drop_status==1 ) {
           this.blur();
           this.DOM_drop_hide();
           this.DOM_blur();
-        }
+//        }
       }.bind(this),
       change: function() {
         if ( this._fc('t') )
