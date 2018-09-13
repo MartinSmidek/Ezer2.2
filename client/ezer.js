@@ -3269,7 +3269,7 @@ Ezer.LabelMap= new Class({
   geo: null,            // běžný gobjekt pro asynchronní metody
   map: null,            // Google mapa
   // prvky v mapě
-  clustering: true,     // sdružovat značky (nastavuje se v init)
+  clustering: false,    // sdružovat značky (nastavuje se v init)
   poly: null,           // seznam aktuálních polygonů
   mark: null,           // pole aktuálních značek indexovaných předaným id
   zoom: null,           // aktivní výřez mapy (LatLngBounds)
@@ -3280,7 +3280,7 @@ Ezer.LabelMap= new Class({
 // pokud je options.clustering=true budou sdružovány značky
   init: function (type,options) {
     this.map= null;
-    this.clustering= options && options.clustering ? true : false;
+    this.clustering= options && options.clustering==1 ? true : false;
     var ok= typeof google!="undefined" && google.maps;
     if ( ok ) {
       var stredCR= new google.maps.LatLng(49.8, 15.6);
@@ -8030,12 +8030,22 @@ Ezer.fce.copy_by_name= function (x,y,delimiters,par4) {
 // -------------------------------------------------------------------------------------- sys
 //ff: fce.sys (id1,id2,...)
 //   část hodnoty systémové proměnné Ezer.sys z PHP, totiž Ezer.sys.id1.id2....
-//a: idi - selektory objektu Ezer.sys
+//   pokud id1=.. pak se následující selektory použijí pro Ezer
+//   např. sys('..','sys')==sys() 
+//a: idi - selektory objektu Ezer.sys resp. Ezer
 //s: funkce
-Ezer.sys= {};
+// Ezer.sys= {};
 Ezer.fce.sys= function () {
-  var y= Ezer.sys;
-  for (var i= 0; i<arguments.length; i++) {
+  let i,y;
+  if ( arguments[0]=='..' ) {
+    i= 1;
+    y= Ezer;
+  }
+  else {
+    i= 0;
+    y= Ezer.sys;
+  }
+  for (i; i<arguments.length; i++) {
     if ( y[arguments[i]] ) {
       y= y[arguments[i]];
     }
@@ -8045,7 +8055,7 @@ Ezer.fce.sys= function () {
     }
   }
   return y;
-}
+};
 // -------------------------------------------------------------------------------------- has_skill
 //ff: fce.has_skill (skills)
 //      zjistí zda přihlášený uživatel má aspoň jedno z daných oprávnění

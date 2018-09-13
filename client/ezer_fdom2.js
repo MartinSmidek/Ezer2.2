@@ -4001,7 +4001,7 @@ Ezer.fce.DOM.help= function (html,title,ykey,xkey,seen,refs,db) {
     Ezer.obj.DOM.help.sticky.getElement('div.top_ur').adopt(
       // část pro načtení dotazu
       Ezer.obj.DOM.help.dotaz_butt=
-        new Element('input',{type:'button','class':'Button',value:'Chci se zeptat k této kartě',
+        new Element('input',{type:'button','class':'Button Zeptat',value:'Chci se zeptat k této kartě',
         title:"dotaz zde bude zobrazen a od autora bude interním mailem vyžádána odpověď",
         styles:{float:'right', position:'absolute',fontSize:'8pt',
           right:'40px',marginTop:'5px',zIndex:5},events:{
