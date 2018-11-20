@@ -845,7 +845,8 @@ Ezer.Block= new Class({
               case 'case':          part= new Ezer.Case(this,desc,DOM,id,skill); break;
               case 'chat':          part= new Ezer.Chat(this,desc,DOM,id,skill); break;
               case 'check':         part= new Ezer.Check(this,desc,DOM,id,skill); break;
-              case 'edit':          part= new Ezer.Edit(this,desc,DOM,id,skill); break;
+              case 'edit':
+              case 'edit.auto':     part= new Ezer.Edit(this,desc,DOM,id,skill); break;
               case 'edit.html':     part= new Ezer.EditHtml(this,desc,DOM,id,skill); break;
               case 'field':         part= new Ezer.Field(this,desc,DOM,id,skill); break;
               case 'field.date':    part= new Ezer.FieldDate(this,desc,DOM,id,skill); break;
