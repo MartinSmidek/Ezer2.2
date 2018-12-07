@@ -1564,8 +1564,11 @@ Ezer.Elem.implement({
         this.DOM_Input.removeClass('empty').removeClass('empty_focus');
         this._changed= true;
       }
-      else if ( !quiet )
-        this.DOM_Input.removeClass('changed');
+      else {
+        if ( !quiet )
+          this.DOM_Input.removeClass('changed');
+        this._changed= false;
+      }
     }
   },
 // ------------------------------------------------------------------------------------ DOM_fixed
@@ -1727,6 +1730,8 @@ Ezer.Field.implement({
   DOM_add: function() {
     var owners_block= this.owner.DOM_Block ? this.owner.DOM_Block : this.owner.value.DOM_Block;
     this.DOM_Input= new Element('input.Field',{type:this._f('p')==-1?'text':'password'});
+//    if ( this._fc('p') )
+//      this.DOM_Input.set('autocomplete','off');
     if ( this.options.title ) {
       // přidej div na obal input a návěští
       this.DOM_Block= new Element('div.Element').inject(owners_block);
