@@ -132,6 +132,7 @@ client/skins/default/sort_n.png -text
 client/skins/default/submenu_bg.png -text
 client/skins/default/tab_top.png -text
 client/skins/default/tree.png -text
+client/wiki.css -text
 code/comp2tab.php -text
 /comp.css -text
 /comp.php -text
