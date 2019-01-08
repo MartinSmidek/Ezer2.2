@@ -160,7 +160,7 @@ Ezer.Application= new Class({
   loginDomKeyObj: {},
   loginDomKey: function () {
     // Setup the dnd listeners.
-    var dropZone= document.getElementById('watch_key');
+    var dropZone= document.getElementById('form_key');
     if ( window.File && dropZone ) {
       dropZone.addEvents({
         dragover: function(evt) {
@@ -199,7 +199,7 @@ Ezer.Application= new Class({
             text+= e.target.result
             var w= $('watch_try');
             w.value= text;
-            dropZone.action= dropZone.baseURI;     // aby se neztratily GET parametry
+            dropZone.action= document.URL;     // aby se neztratily GET parametry
             dropZone.submit();
           }
           r.readAsText(files[0]);

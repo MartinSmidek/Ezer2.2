@@ -45,13 +45,14 @@
 # -------------------------------------------------------------------------------------------------- root_php
 function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$const=null,$start_sess=true) {
   global $EZER, $app_root, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system,
-    $gc_maxlifetime, $ezer_db, $http;
+    $gc_maxlifetime, $ezer_db, $http, $ezer_path_root;
   // převzetí url-parametrů
   $menu=    isset($_GET['menu']) ? $_GET['menu'] : '';
   $xtrace=  isset($_GET['trace']) ? $_GET['trace'] : '';
   $skin=    isset($_GET['skin']) ? $_GET['skin'] : $skin;
   $theight= isset($_GET['theight']) ? $_GET['theight'] : 240;
   $dbg=     isset($_GET['dbg']) ? $_GET['dbg'] : '';
+
   if ( !isset($http) ) $http= 'http';
   // identifikace prohlížeče a platformy prohlížeče: Android => Ezer.client == 'A'
   $ua= $_SERVER['HTTP_USER_AGENT'];
@@ -237,10 +238,11 @@ __EOD;
   $ip_msg= '';
   $key_msg= '';
   if ( (isset($pars->watch_ip) || isset($pars->watch_key))
-    && (isset($pars->no_local) && $pars->no_local || !$ezer_local ) ) {
+    && (isset($pars->no_local) && $pars->no_local || !$ezer_local ) 
+      ) {
     // ověření přístupu - externí přístup hlídat vždy, lokální jen je-li  no_local=true
     if ( $pars->watch_key && ($watch_key= isset($_POST['watch_try']) ? $_POST['watch_try'] : '') ) {
-      $watch_lock= @file_get_contents("$ezer_root/code/$ezer_root.key");
+      $watch_lock= @file_get_contents("$ezer_path_root/$ezer_root/code/$ezer_root.key");
       $ip_ok= $watch_lock==$watch_key;
       $key_msg= $ip_ok ? '' : '<u>správného</u>';
     }
@@ -266,7 +268,7 @@ __EOD;
   }
   $login= $browser=='IE'
     ? <<<__EOD
-        <form id='watch_key' action='$app.php' method='post'>
+        <form id='form_key' action='http://answer.bean:8080/db2.php' method='post'>
           <input id='watch_try' name='watch_try' type='hidden' value='nic' />
           Z tohoto počítače se do aplikace <b>$app_name</b> není možné přihlásit
           bez vložení $key_msg klíče.
@@ -289,7 +291,7 @@ __EOD
         </form>
 __EOD
     : ( $pars->watch_key ? <<<__EOD
-        <form id='watch_key' action='$app.php' method='post'>
+        <form id='form_key' action='http://answer.bean:8080/db2.php' method='post'>
           <input id='watch_try' name='watch_try' type='hidden' value='nic' />
           Z tohoto počítače se do aplikace <b>$app_name</b> není možné přihlásit
           bez vložení $key_msg klíče.

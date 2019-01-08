@@ -25,6 +25,9 @@
   $abs_root= $_SESSION[$ezer_root]['abs_root'];
   $rel_root= $_SESSION[$ezer_root]['rel_root'];
 
+  // cesty pro zálohy
+  $path_backup= "$abs_root/zalohy";
+
   chdir($abs_root);//("../..");
 
   require_once("$abs_root/ezer2.2/server/ae_slib.php");
