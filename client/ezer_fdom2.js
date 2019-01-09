@@ -2538,7 +2538,7 @@ Ezer.Select.implement({
       blur: function (event) {
 //                                                         Ezer.trace('*','blur');
 //        if ( !this.multi && this._drop_status==1 ) {
-          this.blur();
+//          this.blur(); //190109 vyvolávalo podruhé onchanged
           this.DOM_drop_hide();
           this.DOM_blur();
 //        }

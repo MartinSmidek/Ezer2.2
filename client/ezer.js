@@ -1201,7 +1201,7 @@ Ezer.Block= new Class({
       };
     }
     if ( this instanceof Ezer.Elem ) {
-      var form= this.owner;
+      var form= this.owner instanceof Ezer.ListRow ? this.owner.owner.owner : this.owner;
       if ( event_name=='onchanged' || !form._changed && event_name=='onchange' ) {
         // některá přerušení se z elementu přenášejí do formuláře: elem.onchange => form.onchanged
         if ( !this._fc('T') ) {
