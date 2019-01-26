@@ -134,6 +134,13 @@
     }
   }
     
+  // případná úprava $options podle $add_options
+  if ( isset($add_options) ) {
+    foreach ($add_options as $key=>$val) {
+      $options->$key= $val;
+    }
+  }
+
   // způsob přihlášení  
   if ( $app_login ) {
     $pars->autologin= $app_login;   
