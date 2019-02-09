@@ -4309,6 +4309,21 @@ Ezer.Select= new Class({
     this.parent(init_values);
     return true;
   },
+// ------------------------------------------------------------------------------------ change
+//fm: Select.change ([silent=0])
+//      nastaví příznak změny a způsobí onchange+onchanged, pokud není silent=1
+//a: silent - 0 | 1
+//e: onchange
+  change: function(silent) {
+    this._changed= true;
+    this.DOM_empty(false);
+    this.DOM_changed(1,this._fc('t'));     // když není format:'t' bez rámečku
+    if ( !silent ) {
+      this.fire('onchange');
+      this.fire('onchanged');
+    }
+    return 1;
+  },
 // ------------------------------------------------------------------------------------ key
 //fm: Select.key ([key])
 //      lze použít jako setter nebo getter pro key - pro multiselect key je seznam čísel
@@ -6945,11 +6960,11 @@ Ezer.Eval= new Class({
               // pro C použijeme kód z popisu formuláře
               this.code= cc.o=='c' ? this.proc.code : this.proc.desc.code;
               this.c= 0;
-              this.nargs= (cc.o=='C' ? this.proc.npar : this.proc.desc.npar) || 0;
+              this.nargs= cc.o=='C' ? this.proc.npar : (this.proc.desc ? this.proc.desc.npar : 0);
               if ( (cc.a||0)<this.nargs )
                 Ezer.error('procedura '+cc.i+' je volána s '+(cc.a||0)+' argumenty místo s '+this.nargs,
                   'S',this.proc,last_lc);
-              this.nvars= (cc.o=='C' ? this.proc.nvar : this.proc.desc.nvar) || 0;
+              this.nvars= cc.o=='C' ? this.proc.nvar : (this.proc.desc ? this.proc.desc.nvar : 0);
               this.context= this.proc.owner;
               if ( this.nvars ) {           // vymezení inicializovaného místa na lokální proměnné
                 for (var i=0; i<this.nvars; i++) {

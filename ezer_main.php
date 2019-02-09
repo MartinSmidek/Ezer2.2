@@ -49,7 +49,7 @@
   $_SESSION[$app]['app_path']= "";
   
   // kořeny pro LabelDrop
-  $path_files_href= "$rel_root/docs/$app";
+  $path_files_href= "$http_rel_root/docs/$app";
   $path_files_s= "$abs_root/docs/$app";
   $path_files_h= substr($abs_root,0,strrpos($abs_root,'/'))."/files/$app/";
 
