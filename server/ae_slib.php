@@ -40,11 +40,17 @@
 #     gc_maxlifetime       -- int: životnost SESSION v sec (default 12 hodin)
 #   $const: object      -- definice hodnot nedefinovaných konstant
 # globální proměnné na vstupu
-#   $ezer_local         -- bool: ladící běh
+#   $ezer_local resp. $ezer_server -- bool resp. index serveru 
 #   $ezer_path_serv     -- string: cesta ke skriptům
 # -------------------------------------------------------------------------------------------------- root_php
 function root_php($app,$app_name,$welcome,$skin,$options,$js,$css,$pars=null,$const=null,$start_sess=true) {
-  global $EZER, $app_root, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_local, $ezer_system,
+  // platí buďto isnull($ezer_local) nebo isnull($ezer_server)
+  global $ezer_local, $ezer_server;
+  if ( is_null($ezer_local) && is_null($ezer_server) ) 
+    fce_error("inconsistent server setting (3)");
+  $is_local= is_null($ezer_local) ? !$ezer_server : $ezer_local;
+
+  global $EZER, $app_root, $ezer_root, $ezer_path_serv, $ezer_path_docs, $ezer_system,
     $gc_maxlifetime, $ezer_db, $http, $ezer_path_root;
   // převzetí url-parametrů
   $menu=    isset($_GET['menu']) ? $_GET['menu'] : '';
@@ -95,11 +101,18 @@ __EOD;
   $title= isset($pars->title) ? $pars->title : '';
   $title_right= isset($pars->title_right) ? $pars->title_right : $app_name;
   $ezer_template= $browser=='IE' ? 'IE' : (isset($pars->template) ? $pars->template : 'menu');
-  $post_server= isset($pars->post_server) ? $pars->post_server[$ezer_local] : null;
+  $post_server= !isset($pars->post_server) ? null : (
+    isset($ezer_local) ? $pars->post_server[$ezer_local ? 1 : 0] : $pars->post_server[$ezer_server] 
+   );
   // ikona aplikace
-  $favicon= $ezer_local ? "favicon_local.ico" : "favicon.ico";
-  $favicon= file_exists("./$app/img/{$favicon}") ? $favicon
-    : ($ezer_local ? "{$app}_local.png" : "{$app}.png");
+  if ( isset($pars->favicon ) )
+    $favicon= $pars->favicon;
+  else {
+    $favicon= isset($pars->favicon ) ? $pars->favicon
+      : ($is_local ? "favicon_local.ico" : "favicon.ico");
+    $favicon= file_exists("./$app/img/{$favicon}") ? $favicon
+      : ($is_local ? "{$app}_local.png" : "{$app}.png");
+  }
   if ( $start_sess ) {
     // promítnutí nastavení do SESSION
     $gc_maxlifetime= isset($pars->gc_maxlifetime) ? $pars->gc_maxlifetime : 12*60*60;
@@ -130,7 +143,7 @@ __EOD;
   $refresh= isset($options->refresh) ? $options->refresh :(
     isset($_SESSION[$ezer_root]['sess_state']) && $_SESSION[$ezer_root]['sess_state']=='on'
     ? 'true' : 'false');
-  if ( $ezer_local && isset($_GET['skin']) ) {
+  if ( $is_local && isset($_GET['skin']) ) {
     $_SESSION['skin']= $skin;
     $title.= "/$skin";
   }
@@ -238,7 +251,7 @@ __EOD;
   $ip_msg= '';
   $key_msg= '';
   if ( (isset($pars->watch_ip) || isset($pars->watch_key))
-    && (isset($pars->no_local) && $pars->no_local || !$ezer_local ) 
+    && (isset($pars->no_local) && $pars->no_local || !$is_local ) 
       ) {
     // ověření přístupu - externí přístup hlídat vždy, lokální jen je-li  no_local=true
     if ( $pars->watch_key && ($watch_key= isset($_POST['watch_try']) ? $_POST['watch_try'] : '') ) {
@@ -392,7 +405,7 @@ __EOD;
   }
   // spojení všech CSS a JS do jediného souboru pokud je $minify==true a $_GET['dbg'] je prázdné
   if ( $browser!='IE' && $minify && !$dbg ) {
-    if ( !$ezer_local ) define('MINIFY_BASE_DIR',$ezer_path_serv);
+    if ( !$is_local ) define('MINIFY_BASE_DIR',$ezer_path_serv);
     require_once('ezer2.2/server/licensed/minify.php');
     $minifyCSS= new Minify(TYPE_CSS);
     $minifyJS= new Minify(TYPE_JS);
@@ -674,7 +687,13 @@ __EOD;
 # vstup/výstupní globální proměnné
 #   $ezer_system        -- jméno databáze s tabulkou _user
 function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
-  global $ezer_root,$ezer_local,
+  global // import
+    $ezer_root, $EZER, $ezer_local, $ezer_server;
+  // platí buďto is_null($ezer_local) nebo is_null($ezer_server)
+  if ( is_null($ezer_local) && is_null($ezer_server) ) 
+    fce_error("inconsistent server setting (4)");
+
+  global // export
     $ezer_path_root,$sess_save_path,$ezer_path_appl,$ezer_path_libr,$ezer_path_docs,
     $ezer_path_code,$ezer_path_serv,$ezer_path_svn,$ezer_path_todo,$ezer_path_pspad,
     $mysql_db,$ezer_db,$ezer_system,
@@ -685,7 +704,7 @@ function root_inc($db,$dbs,$tracking,$tracked,$path_root,$path_pspad) {
   $EZER->version= 'ezer2.2';
   //$ezer_root= $ezer_root ?: $ezer_root0; - vzniklo 14.4.2015
   // nastavení databází
-  $sada= $ezer_local ? 1 : 0;
+  $sada= is_null($ezer_local) ? $ezer_server : ($ezer_local ? 1 : 0);
 //   $mysql_db= $db[$sada];
   $mysql_db= isset($dbs[$sada][$db[$sada]][5]) ? $dbs[$sada][$db[$sada]][5] : $db[$sada];
   $ezer_db= $dbs[$sada];

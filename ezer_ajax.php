@@ -7,7 +7,15 @@
  * $app_php - seznam *.php umístěných v $ezer_root
 */
  
+  const EZER_version= 2.2;
+
   global $ezer_root;
+  
+  // platí buďto isnull($ezer_local) nebo isnull($ezer_server)
+  global $ezer_local, $ezer_server;
+  if ( is_null($ezer_local) )
+    $ezer_server= $_SESSION[$ezer_root]['ezer_server'];
+  $is_local= is_null($ezer_local) ? !$ezer_server : $ezer_local;
 
   // nastavení zobrazení PHP-chyb klientem při &err=1
   if ( isset($_GET['err']) && $_GET['err'] ) {
@@ -19,7 +27,7 @@
   if ( $_POST['root']!=$ezer_root ) die('POST PROBLEM'); 
 
   // identifikace ladícího serveru
-  $ezer_local= preg_match('/^\w+\.bean$/',$_SERVER["SERVER_NAME"])?1:0;
+//  $ezer_local= preg_match('/^\w+\.bean$/',$_SERVER["SERVER_NAME"])?1:0;
 
   // cesty
   $abs_root= $_SESSION[$ezer_root]['abs_root'];
