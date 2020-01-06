@@ -323,7 +323,7 @@ function sys_user_skills($file='') {
 #   $path_backup     -- složka záloh databází
 #   $ezer_mysql_path -- cesta k utilitě mysql
 # ---------------------------------------------------------------------------------- sys_backup_make
-# BACKUP: uloží obrazy databází do příslušných složek, pro lokální systém připojí postfix -local
+# BACKUP: uloží obrazy databází do příslušných složek, pro lokální systém připojí postfix _local
 # parametry
 #   listing  - přehled existujících záloh
 #   download - přehled existujících záloh s možností downloadu
@@ -339,7 +339,7 @@ function sys_backup_make($par) {  trace();
   $html= '';
   $sign= date("Ymd_Hi");
   if ( $EZER->options->local )
-    $sign.= "-local";
+    $sign.= "_local";
   switch ($par->typ) {
   case 'download':
   case 'listing':
@@ -400,7 +400,7 @@ function sys_backup_make($par) {  trace();
     break;
   case 'kontrola':
     $d= date('N');                                              // dnešní den v týdnu (pondělí=1)
-    sys_backup_test("$path_backup/days/$d",date("Ymd_*"),$backs,$ok);
+    sys_backup_test("$path_backup/days/$d",date("Ymd*"),$backs,$ok);
 //                                         display("$ok:$backs");
     $html.= $backs && $ok ? "Dnešní zálohy byly vytvořeny v pořádku"
       : ($backs ? "Některé":"Žádné") . " dnešní zálohy nebyly vytvořeny";
@@ -409,7 +409,7 @@ function sys_backup_make($par) {  trace();
   case 'kaskada':
     $d= date('N');                                              // dnešní den v týdnu (pondělí=1)
     // kontrola existence záloh - aby nedošlo k přepsání
-    sys_backup_test("$path_backup/days/$d",date("Ymd_*"),$backs,$ok);
+    sys_backup_test("$path_backup/days/$d",date("Ymd*"),$backs,$ok);
     if ( $ok ) {
       $html.= "<br>dnešní zálohy již v 'days/$d' existují";
     }
@@ -447,7 +447,7 @@ function sys_backup_test($into,$sign,&$backs,&$ok) {   trace();
     list($n,$host,$user,$pasw,$lang,$db_name)= $db_desc;
     if ( !isset($ezer_db[$db_name]) ) {
       $name= $db_name ? $db_name : $db_id;
-      $files= glob("$into/{$name}_$sign.sql");
+      $files= glob("$into/{$name}-$sign.sql");
       $je= count($files)>0;
       $backs.= "<dt>databáze $name</dt><dd>";
       $backs.= $je ? implode(' ',$files) : "!!! chybí";
@@ -468,7 +468,7 @@ function sys_backup_into($into,$sign) {   trace();
       if ( !$omitt ) { //&& !isset($ezer_db[$db_name]) ) {
         $name= $db_name ? $db_name : $db_id;
 //                                                debug($db_desc,$db_id);
-        $file= "{$name}_$sign.sql";
+        $file= "{$name}-$sign.sql";
         $path= "$into/$file";
         $cmd= "$ezer_mysql_path/mysqldump --opt -h $host ";
         $cmd.= "-u $user --password=$pasw $name ";
